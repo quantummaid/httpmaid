@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+  ~
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <suppress checks="." files="HttpMaidTestConfigurations.java"/>
+    <suppress checks="LineLength" files="HttpMaidTestConfigurations.java|LowLevelTestSuite.java" />
+    <suppress checks="MethodLength" files="HttpMaidTestConfigurations.java" />
+    <suppress checks="UnnecessaryParentheses" files="HttpMaidTestConfigurations.java" />
+    <suppress checks="MagicNumber" files="HttpMaidTestConfigurations|AwsDeployer|Util|EventsHttpMaidConfiguration" />
+    <suppress checks="VisibilityModifier" files="DataTransferObject.java" />
+    <suppress checks="VisibilityModifier" files="Parameter1.java" />
+    <suppress checks="VisibilityModifier" files="Parameter2.java" />
+    <suppress checks="VisibilityModifier" files="HeadersInResponseReturnValue.java" />
+    <suppress checks="VisibilityModifier" files="SetContentTypeInResponseValue.java" />
+    <suppress checks="VisibilityModifier" files="EventsHttpMaidConfiguration|LowLevelHttpMaidConfiguration" />
+    <suppress checks="ClassDataAbstractionCoupling" files="HttpMaidTestConfigurations.java" />
+    <suppress checks="IllegalSystemOutPrintln" files="AwsDeployer.java" />
+    <suppress checks="Regexp" files="AwsDeployer.java|LambdaStatus.java" />
+    <suppress checks="IllegalCatch" files="ServletDeployer.java|DeployerManager.java|JettyDeployer.java" />
+    <suppress checks="ClassFanOutComplexity|ClassDataAbstractionCoupling" files="ShittyHttpClientWrapper.java" />
+    <suppress checks="MagicNumber|LineLength" files=".*Specs" />
+    <suppress checks="Regexp" files="FreePortPool" />
+    <suppress checks="Regexp" files="ResourceDeallocationSpecs" />
+    <suppress checks="MagicNumber|IllegalCatch" files="Deployer" />
+</suppressions>
