@@ -21,11 +21,11 @@
 
 package de.quantummaid.httpmaid.tests;
 
-import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
-import de.quantummaid.httpmaid.tests.usecases.vooooid.VoidUseCase;
+import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
 import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
+import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echomultipart.EchoMultipartUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersUseCase;
@@ -48,9 +48,8 @@ import de.quantummaid.httpmaid.tests.usecases.simple.TestUseCase;
 import de.quantummaid.httpmaid.tests.usecases.twoparameters.Parameter1;
 import de.quantummaid.httpmaid.tests.usecases.twoparameters.Parameter2;
 import de.quantummaid.httpmaid.tests.usecases.twoparameters.TwoParametersUseCase;
+import de.quantummaid.httpmaid.tests.usecases.vooooid.VoidUseCase;
 import de.quantummaid.httpmaid.usecases.UseCasesModule;
-import com.google.gson.Gson;
-import de.quantummaid.mapmaid.MapMaid;
 
 import java.util.Map;
 import java.util.Objects;
@@ -66,22 +65,18 @@ import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurator.toUseMapMaid;
-import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 import static java.util.Map.of;
 
 public final class HttpMaidTestConfigurations {
-
-    private static final MapMaid MAP_MAID = aMapMaid("de.quantummaid.httpmaid.tests.usecases.mapmaid.mapmaiddefinitions")
-            .usingJsonMarshaller(new Gson()::toJson, new Gson()::fromJson)
-            .build();
 
     private HttpMaidTestConfigurations() {
     }
 
     @SuppressWarnings("unchecked")
     public static HttpMaid theHttpMaidInstanceUsedForTesting() {
-        final HttpMaid httpMaid = anHttpMaid()
+        return anHttpMaid()
                 .serving(TestUseCase.class).forRequestPath("/test").andRequestMethods(GET, POST, PUT, DELETE)
                 .serving(EchoBodyUseCase.class).forRequestPath("/echo_body").andRequestMethods(GET, POST, PUT, DELETE)
                 .get("/wild/<parameter>/card", WildCardUseCase.class)
@@ -98,6 +93,9 @@ public final class HttpMaidTestConfigurations {
                 .get("/void", VoidUseCase.class)
                 .put("/multipart_and_mapmaid", MultipartAndMapMaidUseCase.class)
 
+                .configured(toMarshallContentType(json(),
+                        string -> new Gson().fromJson(string, Map.class),
+                        map -> new Gson().toJson(map)))
                 .configured(configuratorForType(UseCasesModule.class, useCasesModule -> {
                     useCasesModule.addRequestMapperForType(Parameter.class, (targetType, map) -> new Parameter());
                     useCasesModule.addRequestMapperForType(WildcardParameter.class, (targetType, map) -> new WildcardParameter((String) map.get("parameter")));
@@ -120,7 +118,7 @@ public final class HttpMaidTestConfigurations {
                     useCasesModule.addResponseSerializerForType(ToStringWrapper.class, wrapper -> of("response", wrapper.toString()));
                 }))
                 .configured(toEnrichTheIntermediateMapWithAllRequestData())
-                .configured(toUseMapMaid(MAP_MAID))
+
                 .configured(toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> {
                     response.setStatus(METHOD_NOT_ALLOWED);
                     response.setBody("No use case found.");
@@ -130,6 +128,5 @@ public final class HttpMaidTestConfigurations {
                     metaData.get(RESPONSE_HEADERS).put(CONTENT_TYPE, "application/json");
                 }))
                 .build();
-        return httpMaid;
     }
 }

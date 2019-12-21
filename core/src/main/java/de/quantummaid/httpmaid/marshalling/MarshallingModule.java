@@ -57,10 +57,6 @@ public final class MarshallingModule implements ChainModule {
     private final Map<ContentType, Marshaller> marshallers;
     private volatile boolean throwExceptionIfNoMarshallerFound;
 
-    public static MarshallingModuleBuilder toMarshallBodiesBy() {
-        return MarshallingModuleBuilder.toMarshallBodiesBy();
-    }
-
     public static MarshallingModule emptyMarshallingModule() {
         return new MarshallingModule(new HashMap<>(), new HashMap<>());
     }

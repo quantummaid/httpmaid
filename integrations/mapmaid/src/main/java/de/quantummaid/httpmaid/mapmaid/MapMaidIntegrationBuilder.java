@@ -22,47 +22,30 @@
 package de.quantummaid.httpmaid.mapmaid;
 
 import de.quantummaid.httpmaid.chains.ConfiguratorBuilder;
-import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.mapmaid.MapMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.mapmaid.MapMaidSerializerAndDeserializer.mapMaidSerializerAndDeserializer;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapMaidIntegrationBuilder implements ConfiguratorBuilder {
-    private final MapMaidSerializerAndDeserializer mapMaidSerializerAndDeserializer;
+    private final MapMaidModule mapMaidSerializerAndDeserializer;
 
     static MapMaidIntegrationBuilder mapMaidIntegration(final MapMaid mapMaid) {
         validateNotNull(mapMaid, "mapMaid");
-        final MapMaidSerializerAndDeserializer mapMaidSerializerAndDeserializer = mapMaidSerializerAndDeserializer();
+        final MapMaidModule mapMaidSerializerAndDeserializer = mapMaidModule();
         mapMaidSerializerAndDeserializer.setMapMaid(mapMaid);
         return new MapMaidIntegrationBuilder(mapMaidSerializerAndDeserializer);
     }
 
-    public MarshallerTypeStage<MapMaidIntegrationBuilder> matchingTheContentType(final ContentType contentType) {
-        validateNotNull(contentType, "contentType");
-        return marshallingType -> {
-            validateNotNull(marshallingType, "marshallingType");
-            mapMaidSerializerAndDeserializer.addRequestContentTypeToUnmarshallingTypeMapping(contentType, marshallingType);
-            mapMaidSerializerAndDeserializer.addMarshallingTypeToResponseContentTypeMapping(contentType, marshallingType);
-            return this;
-        };
-    }
-
-    public MapMaidIntegrationBuilder assumingTheDefaultContentType(final ContentType defaultContentType) {
-        validateNotNull(defaultContentType, "defaultContentType");
-        mapMaidSerializerAndDeserializer.setDefaultContentType(defaultContentType);
-        return this;
-    }
-
     @Override
-    public MapMaidSerializerAndDeserializer build() {
+    public MapMaidModule build() {
         return mapMaidSerializerAndDeserializer;
     }
 }

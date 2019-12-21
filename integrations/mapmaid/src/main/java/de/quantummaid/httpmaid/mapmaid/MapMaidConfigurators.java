@@ -21,17 +21,45 @@
 
 package de.quantummaid.httpmaid.mapmaid;
 
+import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.mapmaid.MapMaid;
+import de.quantummaid.mapmaid.builder.recipes.Recipe;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.Collections.singletonList;
 
-public final class MapMaidConfigurator {
+public final class MapMaidConfigurators {
+    public static final MetaDataKey<List<Recipe>> RECIPES = metaDataKey("RECIPES");
 
-    private MapMaidConfigurator() {
+    private MapMaidConfigurators() {
     }
 
     public static MapMaidIntegrationBuilder toUseMapMaid(final MapMaid mapMaid) {
         validateNotNull(mapMaid, "mapMaid");
         return MapMaidIntegrationBuilder.mapMaidIntegration(mapMaid);
+    }
+
+    public static Configurator toConfigureMapMaidUsingRecipe(final Recipe recipe) {
+        validateNotNull(recipe, "recipe");
+        return new Configurator() {
+            @Override
+            public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+                return singletonList(mapMaidModule());
+            }
+
+            @Override
+            public void init(final MetaData configurationMetaData) {
+                configurationMetaData.getOrSetDefault(RECIPES, LinkedList::new).add(recipe);
+            }
+
+            @Override
+            public void configure(final DependencyRegistry dependencyRegistry) {
+            }
+        };
     }
 }

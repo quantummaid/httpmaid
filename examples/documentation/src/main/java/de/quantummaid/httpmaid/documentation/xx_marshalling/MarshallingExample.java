@@ -21,14 +21,14 @@
 
 package de.quantummaid.httpmaid.documentation.xx_marshalling;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import com.google.gson.Gson;
+import de.quantummaid.httpmaid.HttpMaid;
 
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
-import static de.quantummaid.httpmaid.marshalling.MarshallingModule.toMarshallBodiesBy;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.*;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
 public final class MarshallingExample {
@@ -37,10 +37,9 @@ public final class MarshallingExample {
     @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
         final HttpMaid httpMaid = anHttpMaid()
-                .configured(toMarshallBodiesBy()
-                        .unmarshallingContentTypeInRequests(fromString("application/json")).with(body -> GSON.fromJson(body, Map.class))
-                        .marshallingContentTypeInResponses(fromString("application/json")).with(map -> GSON.toJson(map))
-                        .usingTheDefaultContentType(fromString("application/json")))
+                .configured(toUnmarshallContentTypeInRequests(json(), body -> GSON.fromJson(body, Map.class)))
+                .configured(toMarshallContentTypeInResponses(json(), GSON::toJson))
+                .configured(toMarshallByDefaultUsingTheContentType(json()))
                 .build();
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }

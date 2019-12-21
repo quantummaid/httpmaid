@@ -38,7 +38,7 @@ import static de.quantummaid.httpmaid.cors.CorsConfigurators.toActivateCORSWitho
 import static de.quantummaid.httpmaid.documentation.react.LoginException.loginException;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.BAD_REQUEST;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurator.toUseMapMaid;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingOAuth2BearerToken;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeAllAuthenticatedRequests;

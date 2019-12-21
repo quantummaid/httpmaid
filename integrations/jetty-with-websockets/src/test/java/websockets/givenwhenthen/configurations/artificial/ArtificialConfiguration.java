@@ -21,11 +21,11 @@
 
 package websockets.givenwhenthen.configurations.artificial;
 
+import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.path.Path;
 import de.quantummaid.httpmaid.security.SecurityConfigurators;
 import de.quantummaid.httpmaid.websockets.registry.WebSocketRegistry;
-import com.google.gson.Gson;
 import de.quantummaid.messagemaid.messageBus.MessageBus;
 import de.quantummaid.messagemaid.messageBus.MessageBusType;
 import de.quantummaid.messagemaid.useCases.building.ExceptionSerializationStep1Builder;
@@ -61,7 +61,7 @@ import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogUsing;
 import static de.quantummaid.httpmaid.logger.Loggers.stderrLogger;
-import static de.quantummaid.httpmaid.marshalling.MarshallingModule.toMarshallBodiesBy;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.*;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateRequestsUsing;
 import static de.quantummaid.httpmaid.websockets.WebSocketsConfigurator.toUseWebSockets;
 import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.WEBSOCKET_REGISTRY;
@@ -109,46 +109,6 @@ public final class ArtificialConfiguration {
                 .throwAnExceptionByDefaultIfNoResponseDeserializationCanBeApplied()
                 .buildAsStandaloneAdapter();
 
-        /*
-        final UseCaseAdapter useCaseAdapter = anUseCaseAdapter()
-                .invokingUseCase(NormalUseCase.class).forType("NormalUseCase").callingTheSingleUseCaseMethod()
-                .obtainingUseCaseInstancesUsingTheZeroArgumentConstructor()
-                .throwingAnExceptionByDefaultIfNoRequestSerializationCanBeApplied()
-                .throwAnExceptionByDefaultIfNoUseCaseRequestDeserializationCanBeApplied()
-                .throwingAnExceptionByDefaultIfNoResponseSerializationCanBeApplied()
-                .respondingWithAWrappingMissingExceptionSerializationExceptionByDefault()
-                .throwAnExceptionByDefaultIfNoResponseDeserializationCanBeApplied()
-
-                .throwAnExceptionByDefaultIfNoUseCaseRequestDeserializationCanBeApplied()
-                .serializingUseCaseResponseBackOntoTheBusOfType(String.class).using(object -> Map.of("stringValue", object))
-                .throwingAnExceptionByDefaultIfNoResponseSerializationCanBeApplied()
-                .puttingExceptionObjectNamedAsExceptionIntoResponseMapByDefault()
-
-                .invokingUseCase(BothUseCase.class).forType("BothUseCase").callingTheSingleUseCaseMethod()
-                .invokingUseCase(CountUseCase.class).forType("CountUseCase").callingTheSingleUseCaseMethod()
-                .invokingUseCase(CloseUseCase.class).forType("CloseUseCase").callingTheSingleUseCaseMethod()
-                .invokingUseCase(QueryFooUseCase.class).forType("QueryFooUseCase").callingTheSingleUseCaseMethod()
-                .invokingUseCase(UseCaseA.class).forType("UseCaseA").callingTheSingleUseCaseMethod()
-                .invokingUseCase(UseCaseB.class).forType("UseCaseB").callingTheSingleUseCaseMethod()
-                .invokingUseCase(UseCaseC.class).forType("UseCaseC").callingTheSingleUseCaseMethod()
-                .invokingUseCase(ExceptionUseCase.class).forType("ExceptionUseCaseParameter").callingTheSingleUseCaseMethod()
-                .invokingUseCase(QueryUseCase.class).forType("QueryParameter").callingTheSingleUseCaseMethod()
-                .invokingUseCase(HeaderUseCase.class).forType("HeaderParameter").callingTheSingleUseCaseMethod()
-                .invokingUseCase(ParameterUseCase.class).forType("ParameterParameter").callingTheSingleUseCaseMethod()
-                .invokingUseCase(EchoUseCase.class).forType("EchoParameter").callingTheSingleUseCaseMethod()
-                .obtainingUseCaseInstancesUsingTheZeroArgumentConstructor()
-                .mappingRequestsToUseCaseParametersOfType(QueryParameter.class).using((targetType, map) -> queryParameter((String) map.get("var")))
-                .mappingRequestsToUseCaseParametersOfType(HeaderParameter.class).using((targetType, map) -> headerParameter((String) map.get("var")))
-                .mappingRequestsToUseCaseParametersOfType(ParameterParameter.class).using((targetType, map) -> parameterParameter((String) map.get("var")))
-                .mappingRequestsToUseCaseParametersOfType(EchoParameter.class).using((targetType, map) -> echoParameter((String) map.get("echoValue")))
-                .mappingRequestsToUseCaseParametersOfType(ExceptionUseCaseParameter.class).using((targetType, map) -> exceptionUseCaseParameter((String) map.get("mode")))
-                .throwAnExceptionByDefaultIfNoParameterMappingCanBeApplied()
-                .serializingResponseObjectsOfType(String.class).using(object -> Map.of("stringValue", object))
-                .throwingAnExceptionByDefaultIfNoResponseMappingCanBeApplied()
-                .puttingExceptionObjectNamedAsExceptionIntoResponseMapByDefault()
-                .buildAsStandaloneAdapter();
-                */
-
         useCaseAdapter.attachAndEnhance(messageBus);
 
         final HttpMaid httpMaid = anHttpMaid()
@@ -169,10 +129,9 @@ public final class ArtificialConfiguration {
 
                 .configured(toUseTheMessageBus(messageBus))
 
-                .configured(toMarshallBodiesBy()
-                        .unmarshallingContentTypeInRequests(json()).with(string -> new Gson().fromJson(string, Map.class))
-                        .marshallingContentTypeInResponses(json()).with(map -> new Gson().toJson(map))
-                        .usingTheDefaultContentType(json()))
+                .configured(toUnmarshallContentTypeInRequests(json(), string -> new Gson().fromJson(string, Map.class)))
+                .configured(toMarshallContentTypeInResponses(json(), map -> new Gson().toJson(map)))
+                .configured(toMarshallByDefaultUsingTheContentType(json()))
 
                 .configured(toAuthenticateRequestsUsing(request -> request.queryParameters().getOptionalQueryParameter("username")).notFailingOnMissingAuthentication())
                 .configured(toAuthenticateRequestsUsing(request -> request.headers().getOptionalHeader("username")).notFailingOnMissingAuthentication())

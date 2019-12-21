@@ -143,6 +143,7 @@ public final class HttpMaidBuilder {
         if(autodetectionOfModules) {
             chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.events.EventModule");
             chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.usecases.UseCasesModule");
+            chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.mapmaid.MapMaidModule");
         }
         configurators.forEach(chainRegistryBuilder::addConfigurator);
         final ChainRegistry chainRegistry = chainRegistryBuilder.build();

@@ -44,10 +44,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
@@ -120,6 +117,10 @@ public final class UseCasesModule implements ChainModule {
 
     public void setSerializerAndDeserializer(final SerializerAndDeserializer serializerAndDeserializer) {
         this.serializerAndDeserializer = serializerAndDeserializer;
+    }
+
+    public Set<Class<?>> getUseCases() {
+        return useCaseToEventMappings.keySet();
     }
 
     @Override

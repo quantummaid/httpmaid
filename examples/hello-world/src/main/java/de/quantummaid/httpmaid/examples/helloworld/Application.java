@@ -33,7 +33,7 @@ import static de.quantummaid.httpmaid.cors.CorsConfigurators.toActivateCORSWitho
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.GET;
 import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogToStdout;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurator.toUseMapMaid;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 

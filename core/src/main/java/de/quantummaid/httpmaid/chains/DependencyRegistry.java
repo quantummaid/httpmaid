@@ -53,6 +53,10 @@ public final class DependencyRegistry {
         return modules.get(dependency);
     }
 
+    public MetaData getMetaData() {
+        return metaData;
+    }
+
     public <T> void setMetaDatum(final MetaDataKey<T> key, final T value) {
         metaData.set(key, value);
     }

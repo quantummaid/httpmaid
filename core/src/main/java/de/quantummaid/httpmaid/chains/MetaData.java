@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -63,6 +64,16 @@ public final class MetaData {
     public <T> T get(final MetaDataKey<T> key) {
         return getOptional(key).orElseThrow(() -> new RuntimeException(format(
                 "Could not find meta datum %s in %s", key.key(), map)));
+    }
+
+    public <T> T getOrSetDefault(final MetaDataKey<T> key, final Supplier<T> defaultProvider) {
+        final Optional<T> optional = getOptional(key);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        final T defaultValue = defaultProvider.get();
+        set(key, defaultValue);
+        return defaultValue;
     }
 
     @SuppressWarnings("unchecked")

@@ -24,7 +24,7 @@ package de.quantummaid.httpmaid.documentation.xx_marshalling;
 import de.quantummaid.mapmaid.MapMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurator.toUseMapMaid;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 
 public final class MarshallingWithMapMaidExample {

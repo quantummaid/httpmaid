@@ -19,18 +19,29 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid;
+package de.quantummaid.httpmaid.marshalling;
 
-import de.quantummaid.mapmaid.MapMaid;
+import de.quantummaid.httpmaid.chains.ChainModule;
+import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.chains.DependencyRegistry;
 
-import static de.quantummaid.httpmaid.mapmaid.MapMaidIntegrationBuilder.mapMaidIntegration;
+import java.util.List;
 
-public final class MapMaidIntegration {
+import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
+import static java.util.Collections.singletonList;
 
-    private MapMaidIntegration() {
+public interface MarshallingModuleConfigurator extends Configurator {
+
+    @Override
+    default List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+        return singletonList(emptyMarshallingModule());
     }
 
-    public static MapMaidIntegrationBuilder toMarshalRequestAndResponseBodiesUsingMapMaid(final MapMaid mapMaid) {
-        return mapMaidIntegration(mapMaid);
+    void configure(MarshallingModule marshallingModule);
+
+    @Override
+    default void configure(final DependencyRegistry dependencyRegistry) {
+        final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
+        configure(marshallingModule);
     }
 }

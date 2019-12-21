@@ -21,20 +21,18 @@
 
 package de.quantummaid.httpmaid.tests.lowlevel;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.marshalling.MarshallingException;
-import de.quantummaid.httpmaid.marshalling.MarshallingModule;
 import de.quantummaid.httpmaid.marshalling.UnsupportedContentTypeException;
+import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
-import static de.quantummaid.httpmaid.marshalling.MarshallingModule.toMarshallBodiesBy;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.*;
 
 public final class MarshallingSpecs {
 
@@ -47,9 +45,8 @@ public final class MarshallingSpecs {
                             final Object value = map.get("a");
                             response.setBody((String) value);
                         }))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("qwer")).with(body -> Map.of("a", "b"))
-                                .usingTheDefaultContentType(fromString("qwer")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("qwer").isIssued()
@@ -63,10 +60,9 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("qwer")).with(body -> Map.of("a", "b"))
-                                .marshallingContentTypeInResponses(fromString("qwer")).with(map -> (String) map.get("a"))
-                                .usingTheDefaultContentType(fromString("qwer")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
+                        .configured(toMarshallContentTypeInResponses(fromString("qwer"), map -> (String) map.get("a")))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("qwer").withTheHeader("Accept", "qwer").isIssued()
@@ -83,10 +79,9 @@ public final class MarshallingSpecs {
                             final Object value = map.get("a");
                             response.setBody((String) value);
                         }))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("wrong")).with(body -> Map.of("a", "wrong"))
-                                .unmarshallingContentTypeInRequests(fromString("right")).with(body -> Map.of("a", "right"))
-                                .usingTheDefaultContentType(fromString("wrong")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("wrong"), body -> Map.of("a", "wrong")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("right"), body -> Map.of("a", "right")))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("wrong")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("right").isIssued()
@@ -103,10 +98,9 @@ public final class MarshallingSpecs {
                             final Object value = map.get("a");
                             response.setBody((String) value);
                         }))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("wrong")).with(body -> Map.of("a", "wrong"))
-                                .unmarshallingContentTypeInRequests(fromString("right")).with(body -> Map.of("a", "right"))
-                                .usingTheDefaultContentType(fromString("right")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("wrong"), body -> Map.of("a", "wrong")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("right"), body -> Map.of("a", "right")))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("right")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().isIssued()
@@ -120,11 +114,10 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("qwer")).with(body -> Map.of("a", "b"))
-                                .marshallingContentTypeInResponses(fromString("wrong")).with(map -> "the wrong marshaller")
-                                .marshallingContentTypeInResponses(fromString("right")).with(map -> "the right marshaller")
-                                .usingTheDefaultContentType(fromString("qwer")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
+                        .configured(toMarshallContentTypeInResponses(fromString("wrong"), map -> "the wrong marshaller"))
+                        .configured(toMarshallContentTypeInResponses(fromString("right"), map -> "the right marshaller"))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("qwer").withTheHeader("Accept", "right")
@@ -140,11 +133,10 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("right")).with(body -> Map.of("a", "b"))
-                                .marshallingContentTypeInResponses(fromString("wrong")).with(map -> "the wrong marshaller")
-                                .marshallingContentTypeInResponses(fromString("right")).with(map -> "the right marshaller")
-                                .usingTheDefaultContentType(fromString("right")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("right"), body -> Map.of("a", "b")))
+                        .configured(toMarshallContentTypeInResponses(fromString("wrong"), map -> "the wrong marshaller"))
+                        .configured(toMarshallContentTypeInResponses(fromString("right"), map -> "the right marshaller"))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("right")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("right")
@@ -160,11 +152,10 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("wrong/x")).with(body -> Map.of("a", "b"))
-                                .marshallingContentTypeInResponses(fromString("wrong/x")).with(map -> "the wrong marshaller")
-                                .marshallingContentTypeInResponses(fromString("right/x")).with(map -> "the right marshaller")
-                                .usingTheDefaultContentType(fromString("wrong/x")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("wrong/x"), body -> Map.of("a", "b")))
+                        .configured(toMarshallContentTypeInResponses(fromString("wrong/x"), map -> "the wrong marshaller"))
+                        .configured(toMarshallContentTypeInResponses(fromString("right/x"), map -> "the right marshaller"))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("wrong/x")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withTheHeader("Accept", "right/*")
@@ -180,12 +171,11 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("right/x")).with(body -> Map.of("a", "b"))
-                                .unmarshallingContentTypeInRequests(fromString("right/y")).with(body -> Map.of("a", "c"))
-                                .marshallingContentTypeInResponses(fromString("right/x")).with(map -> "the right marshaller")
-                                .marshallingContentTypeInResponses(fromString("right/y")).with(map -> "the wrong marshaller")
-                                .usingTheDefaultContentType(fromString("right/y")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("right/x"), body -> Map.of("a", "b")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("right/y"), body -> Map.of("a", "c")))
+                        .configured(toMarshallContentTypeInResponses(fromString("right/x"), map -> "the right marshaller"))
+                        .configured(toMarshallContentTypeInResponses(fromString("right/y"), map -> "the wrong marshaller"))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("right/y")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("right/x").withTheHeader("Accept", "right/*")
@@ -201,11 +191,10 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("qwer")).with(body -> Map.of("a", "b"))
-                                .unmarshallingContentTypeInRequests(fromString("asdf")).with(body -> Map.of("a", "c"))
-                                .marshallingContentTypeInResponses(fromString("qwer")).with(map -> "right")
-                                .usingTheDefaultContentType(fromString("qwer")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("asdf"), body -> Map.of("a", "c")))
+                        .configured(toMarshallContentTypeInResponses(fromString("qwer"), map -> "right"))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("asdf").isIssued()
@@ -219,11 +208,9 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("qwer")).with(body -> Map.of("a", "b"))
-                                .usingTheDefaultContentType(fromString("qwer")))
-                        .configured(configuratorForType(MarshallingModule.class,
-                                marshallingModule -> marshallingModule.setThrowExceptionIfNoMarshallerFound(true)))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
+                        .configured(toThrowAnExceptionIfNoMarshallerWasFound())
                         .configured(toMapExceptionsOfType(UnsupportedContentTypeException.class, (exception, response) -> {
                             response.setStatus(501);
                             response.setBody(exception.getMessage());
@@ -241,11 +228,9 @@ public final class MarshallingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
-                        .configured(toMarshallBodiesBy()
-                                .unmarshallingContentTypeInRequests(fromString("qwer")).with(body -> Map.of("a", "b"))
-                                .usingTheDefaultContentType(fromString("qwer")))
-                        .configured(configuratorForType(MarshallingModule.class,
-                                marshallingModule -> marshallingModule.setThrowExceptionIfNoMarshallerFound(true)))
+                        .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
+                        .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
+                        .configured(toThrowAnExceptionIfNoMarshallerWasFound())
                         .configured(toMapExceptionsOfType(MarshallingException.class, (exception, response) -> response.setStatus(501)))
                         .build()
         )
