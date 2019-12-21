@@ -23,11 +23,17 @@ package de.quantummaid.httpmaid.marshalling;
 
 import de.quantummaid.httpmaid.http.headers.ContentType;
 
+import static de.quantummaid.httpmaid.http.headers.ContentType.formUrlEncoded;
+import static de.quantummaid.httpmaid.marshalling.urlencoded.UrlEncodedUnmarshaller.urlEncodedUnmarshaller;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 public final class MarshallingConfigurators {
 
     private MarshallingConfigurators() {
+    }
+
+    public static MarshallingModuleConfigurator toUnmarshallFormUrlEncodedRequests() {
+        return toUnmarshallContentTypeInRequests(formUrlEncoded(), urlEncodedUnmarshaller());
     }
 
     public static MarshallingModuleConfigurator toMarshallContentType(final ContentType contentType,

@@ -22,22 +22,16 @@
 package de.quantummaid.httpmaid.documentation.form;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.mapmaid.MapMaid;
 
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
-import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedMarshallerRecipe.urlEncodedMarshaller;
 
 public final class FormExample {
 
     public static void main(String[] args) {
-        final MapMaid mapMaid = aMapMaid()
-                .usingRecipe(urlEncodedMarshaller())
-                .build();
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
                 .post("/submit", (request, response) -> {
@@ -46,7 +40,7 @@ public final class FormExample {
                     final String profession = (String) bodyMap.get("profession");
                     response.setBody("Hello " + name + " and good luck as a " + profession + "!");
                 })
-                .configured(toUseMapMaid(mapMaid))
+                .configured(toUnmarshallFormUrlEncodedRequests())
                 .build();
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }

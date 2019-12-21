@@ -63,37 +63,16 @@ and
 ```
 which is exactly what we need.
 
-## MapMaid
-Before we can configure HttpMaid to unmarshall form encoded request
-bodies, we need a way to actually parse form encoded bodies to
-maps. Luckily, HttpMaid has a sister project called MapMaid that
-is able to do exactly this and integrates seamlessly into HttpMaid.
-Let's add HttpMaid's MapMaid integration module to our project, so we
-can access it:
-```xml
-<dependency>
-    <groupId>de.quantummaid.httpmaid.integrations</groupId>
-    <artifactId>httpmaid-mapmaid</artifactId>
-    <version>${httpmaid.version}</version>
-</dependency>
-```
-Now we can configure a simple MapMaid instance for our HttpMaid
-instance to use:
-```java
-final MapMaid mapMaid = aMapMaid()
-                .usingRecipe(urlEncodedMarshaller())
-                .build();
-```
 ## Configuring unmarshalling
-The next step would be to tell HttpMaid about our MapMaid instance.
-We can easily do that using the `MapMaidConfigurator.toUseMapMaid()` configurator
+Now we need to tell HttpMaid to actually unmarshall requests from the *form encoded* format.
+We can easily do that using the `MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests()` configurator
 method:
 
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/form", theResource("form.html"))
         .post("/submit", (request, response) -> response.setBody(request.bodyString()))
-        .configured(toUseMapMaid(mapMaid))
+        .configured(toUnmarshallFormUrlEncodedRequests())
         .build();
 ```
 This way, HttpMaid will automatically detect any form encoded bodies
@@ -112,7 +91,7 @@ final HttpMaid httpMaid = anHttpMaid()
             final String profession = (String) bodyMap.get("profession");
             response.setBody("Hello " + name + " and good luck as a " + profession + "!");
         })
-        .configured(toUseMapMaid(mapMaid))
+        .configured(toUnmarshallFormUrlEncodedRequests())
         .build();
 ```
 When you now submit the form again with the values `Bob` and `Developer`,
