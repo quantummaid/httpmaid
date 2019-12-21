@@ -27,14 +27,21 @@ import de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
-public final class QuickstartExample {
+public final class QuickstartPartsExample {
 
     public static void main(final String[] args) {
-        //Showcase start quickstart
+        //Showcase start quickstartPart1
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/hello", (request, response) -> response.setBody("Hi."))
                 .build();
+        //Showcase end quickstartPart1
+
+        //Showcase start quickstartPart2
         final PureJavaEndpoint endpoint = pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
-        //Showcase end quickstart
+        //Showcase end quickstartPart2
+
+        //Showcase start quickstartPart3
+        httpMaid.close();
+        //Showcase end quickstartPart3
     }
 }

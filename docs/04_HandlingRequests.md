@@ -6,11 +6,12 @@ and how to access fine-grained http features like header values, etc.
 
 ## The `HttpHandler` interface 
 Let's get back to the quickstart example configuration:
-<!---[CodeSnippet] (routingIntroductionExample)-->
+<!---[CodeSnippet] (quickstart)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/hello", (request, response) -> response.setBody("hi!"))
+        .get("/hello", (request, response) -> response.setBody("Hi."))
         .build();
+final PureJavaEndpoint endpoint = pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
 ```
 
 We can take the `(request, response) -> response.setBody("hi!")` lambda

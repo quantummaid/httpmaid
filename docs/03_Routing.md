@@ -2,14 +2,16 @@
 By now, you should have gone through the quickstart example and know how
 to set up a minimal HttpMaid instance and run it via the `PureJavaEndpoint`.
 The Httpmaid configuration without endpoint looked like this:
-<!---[CodeSnippet] (routingIntroductionExample)-->
+<!---[CodeSnippet] (quickstart)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/hello", (request, response) -> response.setBody("hi!"))
+        .get("/hello", (request, response) -> response.setBody("Hi."))
         .build();
+final PureJavaEndpoint endpoint = pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
 ```
 
-As you experienced when you started the configuration, browser requests to http://localhost:1337/hello
+As you experienced when you started the configuration, browser requests
+ to http://localhost:1337/hello
 caused the `(request, response) -> response.setBody("hi!")` lambda to be called.
 
 The mapping itself is called *request routing*.
