@@ -30,12 +30,14 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class MappedDefaultExceptionExample {
 
     public static void main(final String[] args) {
+        //Showcase start defaultMappedException
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/exception", (request, response) -> {
                     throw new RuntimeException("this is an example");
                 })
                 .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody("Something went wrong")))
                 .build();
+        //Showcase end defaultMappedException
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

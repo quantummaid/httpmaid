@@ -29,12 +29,14 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class ContentDispositionExample {
 
     public static void main(final String[] args) {
+        //Showcase start contentDisposition
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/myDownload", (request, response) -> {
                     response.setBody("Hello World");
                     response.asDownloadWithFilename("hello-world.txt");
                 })
                 .build();
+        //Showcase end contentDisposition
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

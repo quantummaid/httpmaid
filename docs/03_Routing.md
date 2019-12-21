@@ -1,17 +1,16 @@
 # Routing
-By now, you should have gone through the quickstart example, know how
+By now, you should have gone through the quickstart example and know how
 to set up a minimal HttpMaid instance and run it via the `PureJavaEndpoint`.
-The configuration looked like this:
+The Httpmaid configuration without endpoint looked like this:
+<!---[CodeSnippet] (routingIntroductionExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/hello", (request, response) -> response.setBody("hi!"))
         .build();
 ```
+
 As you experienced when you started the configuration, browser requests to http://localhost:1337/hello
 caused the `(request, response) -> response.setBody("hi!")` lambda to be called.
-If you have basic knowledge of http, this did probably not surprise you -
-but if you are new, the reasons behind this might not be too obvious.
-Let's shed some light onto which requests are mapped to which handling logic and - more importantly - why.
 
 The mapping itself is called *request routing*.
 Normal routing in HttpMaid acts on two
@@ -25,14 +24,16 @@ It is the only one we have used so far in the examples - this is why the
 `.get("/hello", (request, response) -> response.setBody("hi!"))` line starts with `.get`.
 Other common methods are `POST`, `PUT` and `DELETE`.
 You can specify handlers for each of them in the same way as with the `.get()` method:
+<!---[CodeSnippet] (httpMethods)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/test", (request, response) -> System.out.println("This is a GET request"))
-                .post("/test", (request, response) -> System.out.println("This is a POST request"))
-                .put("/test", (request, response) -> System.out.println("This is a PUT request"))
-                .delete("/test", (request, response) -> System.out.println("This is a DELETE request"))
-                .build();
+        .get("/test", (request, response) -> System.out.println("This is a GET request"))
+        .post("/test", (request, response) -> System.out.println("This is a POST request"))
+        .put("/test", (request, response) -> System.out.println("This is a PUT request"))
+        .delete("/test", (request, response) -> System.out.println("This is a DELETE request"))
+        .build();
 ```
+
 The request method is the first thing that is looked at when routing a request.
 Only when the request's method matches the method a handler is declared on, the path is taken into consideration.
 
@@ -53,8 +54,7 @@ will only be matched by a request path that is exactly equal to it:
 /img/island.png
 ```
 
-There are also more dynamic ways to specify path templates which are explained in the following paragraphs.  
-
+There are also more dynamic ways to specify path templates using path parameters.
 
 ### Path parameters
 You can specify parameterized routes in this manner:
@@ -63,15 +63,17 @@ You can specify parameterized routes in this manner:
 ```
 Here, a call to e.g. `/items/milk` would match the route and the `itemId` parameter would resolve to `milk`.
 You can access path parameters like this:
+<!---[CodeSnippet] (pathParameters)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/items/<itemId>", (request, response) -> {
-                    final String itemId = request.pathParameters().getPathParameter("itemId");
-                    System.out.println("itemId = " + itemId);
-                })
-                .build();
+        .get("/items/<itemId>", (request, response) -> {
+            final String itemId = request.pathParameters().getPathParameter("itemId");
+            System.out.println("itemId = " + itemId);
+        })
+        .build();
 ```
-This will be explained in broad detail soon.
+
+This will be explained in broad detail later.
 
 ### Regular expressions
 If you wrap a single route element into horizontal lines (`|`), it's content will

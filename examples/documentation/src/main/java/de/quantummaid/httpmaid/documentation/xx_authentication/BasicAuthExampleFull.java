@@ -19,24 +19,32 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_routing;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import de.quantummaid.httpmaid.HttpMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toDoBasicAuthWith;
 
-public final class PathParametersExample {
+public final class BasicAuthExampleFull {
 
     public static void main(final String[] args) {
-        //Showcase start pathParameters
+        //Showcase start basicAuthFull
+        final UserDatabase userDatabase = new InMemoryUserDatabase();
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/items/<itemId>", (request, response) -> {
-                    final String itemId = request.pathParameters().getPathParameter("itemId");
-                    System.out.println("itemId = " + itemId);
-                })
+                .get("/normal", (request, response) -> response.setBody("The normal section"))
+                .get("/admin", (request, response) -> response.setBody("The admin section"))
+                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
+                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
+                        authenticationInformation
+                                .map(username -> userDatabase.hasAdminRights((String) username))
+                                .orElse(false))
+                        .onlyRequestsTo("/admin")
+                        .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
                 .build();
-        //Showcase end pathParameters
+        //Showcase end basicAuthFull
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

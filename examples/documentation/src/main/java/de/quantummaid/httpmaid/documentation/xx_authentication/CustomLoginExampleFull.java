@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.authentication;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.mapmaid.MapMaid;
@@ -42,9 +42,10 @@ import static io.jsonwebtoken.Jwts.builder;
 import static io.jsonwebtoken.Jwts.parser;
 import static io.jsonwebtoken.security.Keys.secretKeyFor;
 
-public final class CustomLoginExample {
+public final class CustomLoginExampleFull {
 
     public static void main(final String[] args) {
+        //Showcase start customLoginFull
         final Key key = secretKeyFor(SignatureAlgorithm.HS256);
         final JwtParser jwtParser = parser().setSigningKey(key);
 
@@ -80,6 +81,7 @@ public final class CustomLoginExample {
                         .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
                 .configured(toUseMapMaid(mapMaid))
                 .build();
+        //Showcase end customLoginFull
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

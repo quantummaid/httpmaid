@@ -32,13 +32,15 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class MappedSpecificExceptionExample {
 
     public static void main(final String[] args) {
+        //Showcase start specificMappedException
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/exception", (request, response) -> {
                     throw new UnsupportedOperationException("this is an example");
                 })
                 .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody("Something went wrong")))
-                .configured(toMapExceptionsOfType(UnsupportedContentTypeException.class, (exception, response) -> response.setBody("Operation not supported")))
+                .configured(toMapExceptionsOfType(UnsupportedOperationException.class, (exception, response) -> response.setBody("Operation not supported")))
                 .build();
+        //Showcase end specificMappedException
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

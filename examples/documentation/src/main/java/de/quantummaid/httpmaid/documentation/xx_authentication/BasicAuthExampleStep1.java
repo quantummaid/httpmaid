@@ -19,10 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.authentication;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
-public interface UserDatabase {
-    boolean authenticate(String username, String password);
+import de.quantummaid.httpmaid.HttpMaid;
 
-    boolean hasAdminRights(String username);
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+
+public final class BasicAuthExampleStep1 {
+
+    public static void main(final String[] args) {
+        //Showcase start basicAuthStep1
+        final HttpMaid httpMaid = anHttpMaid()
+                .get("/normal", (request, response) -> response.setBody("The normal section"))
+                .get("/admin", (request, response) -> response.setBody("The admin section"))
+                .build();
+        //Showcase end basicAuthStep1
+        pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
+    }
 }

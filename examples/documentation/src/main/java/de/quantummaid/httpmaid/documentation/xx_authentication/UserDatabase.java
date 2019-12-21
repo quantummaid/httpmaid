@@ -19,22 +19,12 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_logging;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
-import de.quantummaid.httpmaid.HttpMaid;
+//Showcase start aaaUserDataBase
+public interface UserDatabase {
+    boolean authenticate(String username, String password);
 
-import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogToStdout;
-import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-
-public final class LoggingExample {
-
-    public static void main(String[] args) {
-        //Showcase start logging
-        final HttpMaid httpMaid = anHttpMaid()
-                .configured(toLogToStdout())
-                .build();
-        //Showcase end logging
-        pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
-    }
+    boolean hasAdminRights(String username);
 }
+//Showcase end aaaUserDataBase

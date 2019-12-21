@@ -19,22 +19,25 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_logging;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import de.quantummaid.httpmaid.HttpMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogToStdout;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateRequestsUsing;
 
-public final class LoggingExample {
+public final class AuthenticationExample {
 
-    public static void main(String[] args) {
-        //Showcase start logging
+    public static void main(final String[] args) {
         final HttpMaid httpMaid = anHttpMaid()
-                .configured(toLogToStdout())
+                .get("/amIAuthenticated", (request, response) -> {
+                    //request.authenticationInformationAs(String.class).map(authenticationInformation -> )
+
+                })
+                .get("/thisIsSecret", (request, response) -> response.setBody("This is secret!"))
+                .configured(toAuthenticateRequestsUsing(request -> request.headers().getOptionalHeader("Auth").map("abc"::equals)))
                 .build();
-        //Showcase end logging
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

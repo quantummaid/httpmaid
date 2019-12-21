@@ -19,25 +19,23 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.authentication;
+package de.quantummaid.httpmaid.documentation.xx_ServingFiles;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.path.Path;
+import de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateRequestsUsing;
 
-public final class AuthenticationExample {
+public final class StaticFileExample {
 
     public static void main(final String[] args) {
+        //Showcase start staticFile
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/amIAuthenticated", (request, response) -> {
-                    //request.authenticationInformationAs(String.class).map(authenticationInformation -> )
-
-                })
-                .get("/thisIsSecret", (request, response) -> response.setBody("This is secret!"))
-                .configured(toAuthenticateRequestsUsing(request -> request.headers().getOptionalHeader("Auth").map("abc"::equals)))
+                .get("/myFile", (request, response) -> response.setFileAsBody("./files/image.jpg"))
                 .build();
+        //Showcase end staticFile
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

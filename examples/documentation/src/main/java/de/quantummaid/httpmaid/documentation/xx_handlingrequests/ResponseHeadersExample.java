@@ -29,9 +29,11 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class ResponseHeadersExample {
 
     public static void main(final String[] args) {
+        //Showcase start responseHeaders
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/test", (request, response) -> response.addHeader("name", "Bob"))
                 .build();
+        //Showcase end responseHeaders
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

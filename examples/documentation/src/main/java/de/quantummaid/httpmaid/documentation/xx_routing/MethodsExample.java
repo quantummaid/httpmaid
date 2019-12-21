@@ -29,12 +29,14 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class MethodsExample {
 
     public static void main(final String[] args) {
+        //Showcase start httpMethods
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/test", (request, response) -> System.out.println("This is a GET request"))
                 .post("/test", (request, response) -> System.out.println("This is a POST request"))
                 .put("/test", (request, response) -> System.out.println("This is a PUT request"))
                 .delete("/test", (request, response) -> System.out.println("This is a DELETE request"))
                 .build();
+        //Showcase end httpMethods
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

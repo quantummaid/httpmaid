@@ -19,22 +19,25 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_logging;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import de.quantummaid.httpmaid.HttpMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogToStdout;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toDoBasicAuthWith;
 
-public final class LoggingExample {
+public final class BasicAuthExampleStep2 {
 
-    public static void main(String[] args) {
-        //Showcase start logging
+    public static void main(final String[] args) {
+        //Showcase start basicAuthStep2
+        final UserDatabase userDatabase = new InMemoryUserDatabase();
         final HttpMaid httpMaid = anHttpMaid()
-                .configured(toLogToStdout())
+                .get("/normal", (request, response) -> response.setBody("The normal section"))
+                .get("/admin", (request, response) -> response.setBody("The admin section"))
+                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
                 .build();
-        //Showcase end logging
+        //Showcase end basicAuthStep2
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

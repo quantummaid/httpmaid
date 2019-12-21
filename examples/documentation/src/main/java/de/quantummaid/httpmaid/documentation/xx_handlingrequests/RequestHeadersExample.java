@@ -30,6 +30,7 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class RequestHeadersExample {
 
     public static void main(final String[] args) {
+        //Showcase start requestHeaders
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/hello", (request, response) -> {
                     final Headers headers = request.headers();
@@ -37,6 +38,7 @@ public final class RequestHeadersExample {
                     response.setBody("hi " + name + "!");
                 })
                 .build();
+        //Showcase end requestHeaders
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

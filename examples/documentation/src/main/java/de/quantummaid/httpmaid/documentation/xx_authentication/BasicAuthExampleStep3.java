@@ -19,27 +19,31 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_cookies;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import de.quantummaid.httpmaid.HttpMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.http.headers.cookies.CookieBuilder.cookie;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-import static java.util.concurrent.TimeUnit.HOURS;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toDoBasicAuthWith;
 
-public final class CookiesExample {
+public final class BasicAuthExampleStep3 {
 
     public static void main(final String[] args) {
+        //Showcase start basicAuthStep3
+        final UserDatabase userDatabase = new InMemoryUserDatabase();
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/set", (request, response) -> response.setCookie("myCookie", "foo"))
-                .get("/setWithOptions", (request, response) -> response.setCookie(cookie("myCookie", "foo").withMaxAge(2, HOURS)))
-                .get("/get", (request, response) -> {
-                    final String myCookie = request.cookies().getCookie("myCookie");
-                    response.setBody("Value was: " + myCookie);
-                })
-                .get("/invalidate", (request, response) -> response.invalidateCookie("myCookie"))
+                .get("/normal", (request, response) -> response.setBody("The normal section"))
+                .get("/admin", (request, response) -> response.setBody("The admin section"))
+                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
+                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
+                        authenticationInformation
+                                .map(username -> userDatabase.hasAdminRights((String) username))
+                                .orElse(false))
+                        .onlyRequestsTo("/admin"))
                 .build();
+        //Showcase end basicAuthStep3
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

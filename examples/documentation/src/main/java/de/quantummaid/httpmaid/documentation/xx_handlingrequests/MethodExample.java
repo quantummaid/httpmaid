@@ -30,12 +30,14 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class MethodExample {
 
     public static void main(final String[] args) {
+        //Showcase start requestPathMethod
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/", (request, response) -> {
                     final HttpRequestMethod method = request.method();
                     System.out.println("method = " + method);
                 })
                 .build();
+        //Showcase end requestPathMethod
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

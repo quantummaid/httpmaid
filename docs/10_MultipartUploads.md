@@ -1,29 +1,32 @@
 # Multipart uploads
 The multipart standard is used to implement file uploads in http.
-This chapter explains how it is handled in HttpMaid.
 
-In order to upload a file to our soon-to-be-implemented server, we need to give the user the
+Let's suppose we need a web server, where users can upload files. 
+In order to upload a file to our server, we need to give the user the
 ability to choose the uploaded file. This is achieved by the following web frontend that we will create
 in the classpath as the Java resource `upload.html`:
-
-```html
+<!---[CodeSnippet] (file=../examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_multipart/upload.html)-->
+```
 <html>
 <body>
-	<h1>Simple File Uploads in Java</h1>
-	<form action="/upload" method="post" enctype="multipart/form-data">
-	    <input type="file" name="myFile" />
-	    <input type="submit" value="Upload" />
-	</form>
+<h1>Simple File Uploads in Java</h1>
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="myFile"/>
+    <input type="submit" value="Upload"/>
+</form>
 </body>
 </html>
 ```
+
 We can now serve this with HttpMaid:
+<!---[CodeSnippet] (multipart)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/upload", (request, response) -> response.setJavaResourceAsBody("upload.html"))
-                .post("/upload", (request, response) -> System.out.println(request.bodyString()))
-                .build();
+        .get("/upload", (request, response) -> response.setJavaResourceAsBody("upload.html"))
+        .post("/upload", (request, response) -> System.out.println(request.bodyString()))
+        .build();
 ```
+
 When browsing to http://localhost:1337/upload, you will see our form. Once you uploaded a file,
 the `POST` route at `/upload` is triggered and HttpMaid will just dump the request to the console.
 You should see something like this:
@@ -57,17 +60,19 @@ can instruct HttpMaid to handle multipart requests specifically. Like the name o
 receive the multipart content as a so-called `MultipartIteratorBody`. This is an object that allows us to process
 multipart parts - one after the other. In order to access it, we need to register a `MultipartHandler` instead of
 the established `HttpHandler`:
+<!---[CodeSnippet] (multipartIterator)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/upload", (request, response) -> response.setJavaResourceAsBody("upload.html"))
-                .post("/upload", (MultipartHandler) (request, response) -> {
-                    final MultipartPart part = request.partIterator().next();
-                    final String content = part.readContentToString();
-                    System.out.println(content);
-                })
-                .configured(toExposeMultipartBodiesUsingMultipartIteratorBody())
-                .build();
+        .get("/upload", (request, response) -> response.setJavaResourceAsBody("upload.html"))
+        .post("/upload", (MultipartHandler) (request, response) -> {
+            final MultipartPart part = request.partIterator().next();
+            final String content = part.readContentToString();
+            System.out.println(content);
+        })
+        .configured(toExposeMultipartBodiesUsingMultipartIteratorBody())
+        .build();
 ```
+
 As you can see, we can now query the `MultipartIteratorBody` from the `request` object and
 ask for the first part with the `.next()` method.
 This time, we print only the content of the uploaded file to the console.

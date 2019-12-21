@@ -22,10 +22,9 @@ you can use the configurator methods provided in the `LoggerConfigurators` class
 
 The default setting is to log to both `STDOUT` and `STDERR` - if you want to
 change that to log only to `STDOUT`, the configuration would look like this:
-
+<!---[CodeSnippet] (logging)-->
 ```java
-final HttpMaid build = anHttpMaid()
-                [...]
-                .configured(toLogToStdout())
-                .build();
+final HttpMaid httpMaid = anHttpMaid()
+        .configured(toLogToStdout())
+        .build();
 ```

@@ -29,9 +29,11 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class ResponseBodyExample {
 
     public static void main(final String[] args) {
+        //Showcase start responseBody
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/test", (request, response) -> response.setBody("this is the body"))
                 .build();
+        //Showcase end responseBody
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

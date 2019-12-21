@@ -136,8 +136,9 @@ two paragraphs.
 ### Explicitly setting the response `Content-Type`
 The `Content-Type` to be used in the response can be explicitly configured using
 the `setContentType()` method of the response object:
+<!---[CodeSnippet] (marshallingHandlerWithContentType)-->
 ```java
-public final class MyHandler implements HttpHandler {
+public class MarshallingHandlerWithContentType implements HttpHandler {
     @Override
     public void handle(final HttpRequest request, final HttpResponse response) {
         final Map<String, Object> responseMap = Map.of(
@@ -177,9 +178,12 @@ Instead of directly using HttpMaid's marshalling module, a convenient and recomm
 choice would be to source marshalling and unmarshalling out to HttpMaid's sister project
 MapMaid. In order to integrate MapMaid into HttpMaid, an integration module is offered
 which can be configured like this:
+<!---[CodeSnippet] (marshallingWithMapMaid)-->
 ```java
+final MapMaid mapMaid = aMapMaid().build();
 anHttpMaid()
-                .configured(toUseMapMaid(mapMaid))
-                .build();
+        .configured(toUseMapMaid(mapMaid))
+        .build();
 ```
+
 All settings will be automatically adapted from the provided MapMaid object.

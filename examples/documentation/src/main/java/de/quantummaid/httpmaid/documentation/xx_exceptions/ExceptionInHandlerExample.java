@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_logging;
+package de.quantummaid.httpmaid.documentation.xx_exceptions;
 
 import de.quantummaid.httpmaid.HttpMaid;
 
@@ -27,14 +27,16 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogToStdout;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
-public final class LoggingExample {
+public final class ExceptionInHandlerExample {
 
     public static void main(String[] args) {
-        //Showcase start logging
+        //Showcase start exceptionInHandler
         final HttpMaid httpMaid = anHttpMaid()
-                .configured(toLogToStdout())
+                .get("/exception", (request, response) -> {
+                    throw new RuntimeException("this is an example");
+                })
                 .build();
-        //Showcase end logging
+        //Showcase end exceptionInHandler
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

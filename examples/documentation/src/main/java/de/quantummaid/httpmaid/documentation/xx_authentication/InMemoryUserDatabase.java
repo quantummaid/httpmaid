@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.authentication;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -42,8 +42,8 @@ public final class InMemoryUserDatabase implements UserDatabase {
 
     public InMemoryUserDatabase() {
         passwordsByUsers = Map.of(
-                "joe", hashPassword("qrpk4L?>L(DB\\[mN"),
-                "jim", hashPassword(":Ce<9q=8KKj\\tgfK"),
+                "joe", hashPassword("qrpk4L?>L(DBa[mN"),
+                "jim", hashPassword(":Ce<9q=8KKjbtgfK"),
                 "jack", hashPassword("*eG)r@;{'4g'cM?3")
         );
         admins = Collections.singletonList("jack");

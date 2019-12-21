@@ -30,6 +30,7 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class QueryParametersExample {
 
     public static void main(final String[] args) {
+        //Showcase start queryParameters
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/hello", (request, response) -> {
                     final QueryParameters queryParameters = request.queryParameters();
@@ -37,6 +38,7 @@ public final class QueryParametersExample {
                     response.setBody("hi " + name + "!");
                 })
                 .build();
+        //Showcase end queryParameters
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

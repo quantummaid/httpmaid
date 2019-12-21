@@ -8,24 +8,30 @@ can help you with handling forms.
 One recurring challenge in web applications is the processing of forms.
 To start, let's create a form as a Java resource named `form.html` somewhere
 in the classpath:
-```html
+<!---[CodeSnippet] (file=../../examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_marshalling/form.html)-->
+```
 <html>
+<body>
 <form action="/submit" method="post">
     Name:<input type="text" name="name"><br>
     Profession:<input type="text" name="profession">
     <input type="submit" value="Send">
 </form>
+</body>
 </html>
 ```
-As you can see, the form will consist of two textfields (name and profession)
+
+The form will consist of two textfields (name and profession)
 and a button to submit the form.
-Let's configure a simple HttpMaid instance to serve the form:
+The following code creates a HttpMaid instance to serve the form:
+<!---[CodeSnippet] (formMarshallingStep1)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/form", theResource("form.html"))
+        //.get("/form", theResource("form.html")) TODO: theResource gibts ned
         .post("/submit", (request, response) -> response.setBody(request.bodyString()))
         .build();
 ```
+
 We configured two routes in the endpoint. The first one serves every `GET` request
 to the `/form` route with our html resource.
 The second one accepts `POST` requests to the `/submit` route, since the
@@ -67,14 +73,15 @@ which is exactly what we need.
 Now we need to tell HttpMaid to actually unmarshall requests from the *form encoded* format.
 We can easily do that using the `MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests()` configurator
 method:
-
+<!---[CodeSnippet] (formMarshallingStep2)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/form", theResource("form.html"))
+        //.get("/form", theResource("form.html")) //TODO theResource gibts ned
         .post("/submit", (request, response) -> response.setBody(request.bodyString()))
         .configured(toUnmarshallFormUrlEncodedRequests())
         .build();
 ```
+
 This way, HttpMaid will automatically detect any form encoded bodies
 and unmarshall them.
 
@@ -82,9 +89,10 @@ and unmarshall them.
 In order to access the unmarshalled form contents, the `HttpRequest` object
 offers a method `bodyMap()`. Let's use this to change our handler to something
 slightly more productive:
+<!---[CodeSnippet] (formMarshallingStep3)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/form", theResource("form.html"))
+        //.get("/form", theResource("form.html")) TODO: theResource gibts ned
         .post("/submit", (request, response) -> {
             final Map<String, Object> bodyMap = request.bodyMap();
             final String name = (String) bodyMap.get("name");
@@ -94,6 +102,7 @@ final HttpMaid httpMaid = anHttpMaid()
         .configured(toUnmarshallFormUrlEncodedRequests())
         .build();
 ```
+
 When you now submit the form again with the values `Bob` and `Developer`,
 the resulting web page should look like this:
 ```

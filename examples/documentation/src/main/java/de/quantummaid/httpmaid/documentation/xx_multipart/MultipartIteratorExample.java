@@ -19,29 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.form;
+package de.quantummaid.httpmaid.documentation.xx_multipart;
 
 import de.quantummaid.httpmaid.HttpMaid;
-
-import java.util.Map;
+import de.quantummaid.httpmaid.multipart.MultipartPart;
+import de.quantummaid.httpmaid.multipart.handler.MultipartHandler;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests;
+import static de.quantummaid.httpmaid.multipart.MultipartConfigurators.toExposeMultipartBodiesUsingMultipartIteratorBody;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
-public final class FormExample {
+public final class MultipartIteratorExample {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
+        //Showcase start multipartIterator
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
-                .post("/submit", (request, response) -> {
-                    final Map<String, Object> bodyMap = request.bodyMap();
-                    final String name = (String) bodyMap.get("name");
-                    final String profession = (String) bodyMap.get("profession");
-                    response.setBody("Hello " + name + " and good luck as a " + profession + "!");
+                .get("/upload", (request, response) -> response.setJavaResourceAsBody("upload.html"))
+                .post("/upload", (MultipartHandler) (request, response) -> {
+                    final MultipartPart part = request.partIterator().next();
+                    final String content = part.readContentToString();
+                    System.out.println(content);
                 })
-                .configured(toUnmarshallFormUrlEncodedRequests())
+                .configured(toExposeMultipartBodiesUsingMultipartIteratorBody())
                 .build();
+        //Showcase end multipartIterator
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

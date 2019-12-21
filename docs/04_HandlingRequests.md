@@ -1,18 +1,21 @@
 # Handling Requests
 So far, you know how to configure a minimal HttpMaid instance, run it with
 an endpoint and understand routing.
-In this chapter, we will take a closer look at basic request handlers
+In this chapter, we will take a closer look at basic request handling
 and how to access fine-grained http features like header values, etc.
 
 ## The `HttpHandler` interface 
 Let's get back to the quickstart example configuration:
+<!---[CodeSnippet] (routingIntroductionExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/hello", (request, response) -> response.setBody("hi!"))
         .build();
 ```
+
 We can take the `(request, response) -> response.setBody("hi!")` lambda
 and transform it into an actual class:
+<!---[CodeSnippet] (helloHandler)-->
 ```java
 public final class HelloHandler implements HttpHandler {
 
@@ -22,46 +25,53 @@ public final class HelloHandler implements HttpHandler {
     }
 }
 ```
+
 As you can see, the lambda implements the `HttpHandler` interface,
 which provides the `handle()` method. In the `handle()` method,
 you get two objects as parameters: an `HttpRequest` and an `HttpResponse`.
-To no surprise, the `HttpRequest` object contains all data that
+The `HttpRequest` object contains all data that
 was received in the request, and the `HttpResponse` object respectively holds
 all data that will be sent back as a response. Let's take a deeper look at
 both of them.
 
 ## The `HttpRequest` object
-`HttpRequest` holds all data that was sent in the request. The following
+A `HttpRequest` instance holds all data that was sent in a request. The following
 paragraphs will walk you through each possible aspect and explain how to
 access it.
 
 ### Request Method
-The previous chapter explained to you what the request method is.
-If you want to explicitly query it from the current request object, you can do so with the `method()` method.
-Example:
+The chapter [Routing](03_Routing.md#request-path) explained what the request method is.
+It can be queried from the current request object with the `method()` method:
+<!---[CodeSnippet] (requestPathMethod)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/", (request, response) -> {
-                    final HttpRequestMethod method = request.method();
-                    System.out.println("method = " + method);
-                })
-                .build();
+        .get("/", (request, response) -> {
+            final HttpRequestMethod method = request.method();
+            System.out.println("method = " + method);
+        })
+        .build();
 ```
 
 ### Request Route and Path Parameters
 Every http request has a specific route. You can query that route
 of the current request using the `path()` method:
+<!---[CodeSnippet] (pathExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/", (request, response) -> {
-                    final Path path = request.path();
-                    System.out.println("path = " + path);
-                })
-                .build();
+        .get("/", (request, response) -> {
+            final Path path = request.path();
+            System.out.println("path = " + path);
+        })
+        .build();
 ```
+
+As stated before, retrieving the path for `https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol`
+would result in `/wiki/Hypertext_Transfer_Protocol`
+
 If you have specified any path parameters in the HttpMaid configuration,
 you can access the values of these parameters via the `pathParameters()`
 method. Assume this example configuration:
+<!---[CodeSnippet] (pathParameters2)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/hello/<name>", (request, response) -> {
@@ -71,7 +81,9 @@ final HttpMaid httpMaid = anHttpMaid()
         })
         .build();
 ```
-When deployed the same way as the other examples using the `PureJavaEndpoint`, a request to http://localhost:1337/hello/bob
+
+
+When deployed the same way as the other examples (do not forget  the `PureJavaEndpoint`), a request to http://localhost:1337/hello/bob
 would yield the string `hi bob!`
 
 ### Query Parameters
@@ -82,6 +94,7 @@ parameter with the name `mode` and the value `fullscreen`).
 
 Query parameters can be easily accessed from the `HttpRequest` object using
 the `request.queryParameters()` method. If you start this example configuration:
+<!---[CodeSnippet] (queryParameters)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/hello", (request, response) -> {
@@ -91,22 +104,25 @@ final HttpMaid httpMaid = anHttpMaid()
         })
         .build();
 ```
+
+
 and access http://localhost:1337/hello/?name=bob, you should again see the
 message `hi bob!`.
 
 ### Request Headers
 Every http request contains a set of headers, which are key-value pairs
-of strings. You can access the headers of a request using the `headers()` method.
-Example:
+of strings. You can access the headers of a request using the `headers()` method:
+<!---[CodeSnippet] (requestHeaders)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/hello", (request, response) -> {
-                    final Headers headers = request.headers();
-                    final String name = headers.getHeader("name");
-                    response.setBody("hi " + name + "!");
-                })
-                .build();
+        .get("/hello", (request, response) -> {
+            final Headers headers = request.headers();
+            final String name = headers.getHeader("name");
+            response.setBody("hi " + name + "!");
+        })
+        .build();
 ```
+
 Unfortunately, it is not possible to set custom headers with requests in a generic web browser.
 Nonetheless, we can issue a request with the command line tool `curl` to try out the example.
 ```bash
@@ -119,14 +135,14 @@ Some requests carry bodies, i.e. an additional chunk of data.
 You can conveniently access this body as a `String` using the `bodyString()`
 method. Note that if you want to receive a body, you cannot reliably use the `GET` request
 method - recommended and common is the use of `POST` or - less common - `PUT`.
-Example:
+<!---[CodeSnippet] (requestBody)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .post("hello", (request, response) -> {
-                    final String name = request.bodyString();
-                    response.setBody("hi " + name + "!");
-                })
-                .build();
+        .post("hello", (request, response) -> {
+            final String name = request.bodyString();
+            response.setBody("hi " + name + "!");
+        })
+        .build();
 ```
 
 Again, setting request bodies is not possbile with generic web browsers, so
@@ -146,12 +162,13 @@ will be explained in later chapters).
 Every http response can carry a body.
 You already saw how to set the response body in the quickstart example - using the `setBody()` method.
 You can provide a `String` to this method and HttpMaid will send the body accordingly.
-Example:
+<!---[CodeSnippet] (responseBody)-->
 ```java
-        final HttpMaid httpMaid = anHttpMaid()
-                .get("/test", (request, response) -> response.setBody("this is the body"))
-                .build();
+final HttpMaid httpMaid = anHttpMaid()
+        .get("/test", (request, response) -> response.setBody("this is the body"))
+        .build();
 ```
+
 Go to http://localhost:1337/test and see the `this is the body` response.
 
 You can also give the `setBody()` method an `InputStream` as parameter.
@@ -161,17 +178,19 @@ This way, you can send large bodies without the need to allocate a huge `String`
 ### Status Code
 Every http response contains a so-called status code.
 These codes are standardized and tell the client whether the request could be handled successfully and what went wrong in case of an error.
-To a successful request will be responded with the status code 200 ("OK").
-If something went wrong, most commonly status codes in the range between 400-500 are used depending on the error condition, including
-the famous 404 ("Not Found") code.
+A successful request will be answered with the status code 200 ("OK").
+Typical status codes for errors lie in the range between 400-500.
+The most famous 404 ("Not Found") code indicates that the resource was not found 
+(or that you are not allowed to see its existence).
 HttpMaid will set the status code by default to 200 ("OK").
 If you want to set it manually, you can do this using the `setStatus()` method:
-
+<!---[CodeSnippet] (statusCode)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/test", (request, response) -> response.setStatus(201))
-                .build();
+        .get("/test", (request, response) -> response.setStatus(201))
+        .build();
 ```
+
 Since browsers normally don't show response status codes, we will fall back to curl again to try out the example:
 
 ```bash
@@ -198,13 +217,14 @@ being of interest here:
 
 ### Response Headers
 The same way as a request, a response can have headers.
-You can set individual headers using the `addHeader()` method.
-Example:
+You can set individual headers using the `addHeader()` method:
+<!---[CodeSnippet] (responseHeaders)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/test", (request, response) -> response.addHeader("name", "Bob"))
-                .build();
+        .get("/test", (request, response) -> response.addHeader("name", "Bob"))
+        .build();
 ```
+
 You can try it out with this curl command:
 ```bash
 curl -v http://localhost:1337/test

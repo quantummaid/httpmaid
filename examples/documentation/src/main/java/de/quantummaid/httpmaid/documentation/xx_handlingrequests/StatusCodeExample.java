@@ -29,9 +29,11 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class StatusCodeExample {
 
     public static void main(final String[] args) {
+        //Showcase start statusCode
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/test", (request, response) -> response.setStatus(201))
                 .build();
+        //Showcase end statusCode
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

@@ -30,9 +30,11 @@ import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 public final class MarshallingWithMapMaidExample {
 
     public static void main(final String[] args) {
+        //Showcase start marshallingWithMapMaid
         final MapMaid mapMaid = aMapMaid().build();
         anHttpMaid()
                 .configured(toUseMapMaid(mapMaid))
                 .build();
+        //Showcase end marshallingWithMapMaid
     }
 }

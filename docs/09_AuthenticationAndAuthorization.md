@@ -5,19 +5,19 @@ There are two requirements that arise from this goal:
 authentication and authorization. Authentication makes sure
 that users are who they claim they are, while authorization is the process that determines
 whether the users actually have the permission to do what they intend to do.
-This chapter will explain how these requirements can be met with HttpMaid. 
+This chapter will explain how to do both using an extended example.
 
 ## The application
-To help you understand the authentication and authorization mechanics of
-HttpMaid, we start by creating a simplistic web application. The application
-has two sections - a *normal* section that every user will get access to and
+This example will create a simplistic web application with two sections - a *normal* section that every user will get access to and
 an *admin* section that will be reserved to select users.
+<!---[CodeSnippet] (basicAuthStep1)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/normal", (request, response) -> response.setBody("The normal section"))
-                .get("/admin", (request, response) -> response.setBody("The admin section"))
-                .build();
+        .get("/normal", (request, response) -> response.setBody("The normal section"))
+        .get("/admin", (request, response) -> response.setBody("The admin section"))
+        .build();
 ```
+
 Right now, both sections can be accessed by anyone. We will change that soon.
 
 ## Creating a user database
@@ -25,6 +25,7 @@ Before we can go into HttpMaid details, we need a way to authenticate users
 and query their access rights.
 To keep things as abstract as possible, we will do this by interacting with the
 following interface:  
+<!---[CodeSnippet] (aaaUserDataBase)-->
 ```java
 public interface UserDatabase {
     boolean authenticate(String username, String password);
@@ -32,10 +33,13 @@ public interface UserDatabase {
     boolean hasAdminRights(String username);
 }
 ```
-This interface is just an example and the exact layout does not matter. You can find an in-memory implementation of this interface in the `examples/documentation`
+
+This interface is just an example and the exact layout does not matter.
+ You can find an in-memory implementation `InMemoryUserDatabase.java` 
+ of this interface in the `examples/documentation`
 submodule that provides two normal users:
-- `joe` (password: `qrpk4L?>L(DB\[mN`)
-- `jim` (password: `:Ce<9q=8KKj\tgfK`)
+- `joe` (password: `qrpk4L?>L(DBa[mN`)
+- `jim` (password: `:Ce<9q=8KKjbtgfK`)
 
 and one admin user:
 - `jack` (password: `*eG)r@;{'4g'cM?3`)
@@ -52,41 +56,46 @@ of HttpMaid authentication and authorization features.
 To activate it in our sample application, we will facilitate the `toDoBasicAuthWith()` configurator method
 in the `SecurityConfigurators` class. It can optionally be appended with a message that is shown when the user
 is asked to log in.
+<!---[CodeSnippet] (basicAuthStep2)-->
 ```java
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/normal", (request, response) -> response.setBody("The normal section"))
-                .get("/admin", (request, response) -> response.setBody("The admin section"))
-                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
-                .build();
+        .get("/normal", (request, response) -> response.setBody("The normal section"))
+        .get("/admin", (request, response) -> response.setBody("The admin section"))
+        .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
+        .build();
 ```
+
 When starting the example and navigating to http://localhost:1337/normal,
 the browser will open a pop-up window that will ask you for username and
 password credentials with the message `Hello, please authenticate!`.
-After entering the valid username and password `joe` / `qrpk4L?>L(DB\[mN`, you should successfully see the `The normal section`
-message.
+After entering the valid username and password `joe` / `qrpk4L?>L(DB\[mN`,
+ you should successfully see the `The normal section`message.
 
 You should have noticed two things: first, you did not have to provide the credentials again, because the browser caches them
 for a fixed period of time (15 minutes for most browsers).
 Secondly, you have access to the admin section as `joe`, although Joe is not intended to have access to it.
 Obviously, we still need to implement the authorization logic.
 Let's add the `toAuthorizeRequestsUsing()` configurator method (also in `SecurityConfigurators`).
+<!---[CodeSnippet] (basicAuthStep3)-->
 ```java
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/normal", (request, response) -> response.setBody("The normal section"))
-                .get("/admin", (request, response) -> response.setBody("The admin section"))
-                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
-                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
-                        authenticationInformation
-                                .map(username -> userDatabase.hasAdminRights((String) username))
-                                .orElse(false))
-                        .onlyRequestsTo("/admin")
-                .build();
+        .get("/normal", (request, response) -> response.setBody("The normal section"))
+        .get("/admin", (request, response) -> response.setBody("The admin section"))
+        .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
+        .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
+                authenticationInformation
+                        .map(username -> userDatabase.hasAdminRights((String) username))
+                        .orElse(false))
+                .onlyRequestsTo("/admin"))
+        .build();
 ```
+
 Note that the authorizer configurator method takes a lambda with two parameters - `authenticationInformation` and `request`.
-Whilst the `request` parameter is simply the established `HttpRequest` object, the `authenticationInformation` is
-particularly interesting. It is of type `Optional<Object>` and is set by the authenticator.
+The `request` parameter is the established `HttpRequest` object. 
+The `authenticationInformation` is of type `Optional<Object>` 
+and is set by the authenticator.
 If the request has not been authenticated, it is empty.
 If the request has been successfully authenticated, it will contain a value of a type depending on the implementation of the authenticator.
 In case of the Basic Auth authenticator, it will contain the username that the user has logged in with as a `String`.
@@ -114,20 +123,22 @@ Secondly, you could customize the authorizer configurator with the `.rejectingUn
 only apply to requests that fail this particular authorizer.
 
 In our example, we will opt for option two:
+<!---[CodeSnippet] (basicAuthFull)-->
 ```java
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/normal", (request, response) -> response.setBody("The normal section"))
-                .get("/admin", (request, response) -> response.setBody("The admin section"))
-                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
-                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
-                        authenticationInformation
-                                .map(username -> userDatabase.hasAdminRights((String) username))
-                                .orElse(false))
-                        .onlyRequestsTo("/admin")
-                        .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-                .build();
+        .get("/normal", (request, response) -> response.setBody("The normal section"))
+        .get("/admin", (request, response) -> response.setBody("The admin section"))
+        .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
+        .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
+                authenticationInformation
+                        .map(username -> userDatabase.hasAdminRights((String) username))
+                        .orElse(false))
+                .onlyRequestsTo("/admin")
+                .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
+        .build();
 ```
+
 You can now again try to access the admin section, but this time you will be rejected with a much more friendly `Please login as an administrator.`
 message.
 
@@ -141,46 +152,53 @@ In order to use them, we must ditch the Basic Auth mechanism, which had the conv
 login mechanism (the browser pop-up window).
 Without it, we need to implement it ourselves. Let's create a simple login form as a Java resource in the classpath
 called `login.html`:
-```html
+<!---[CodeSnippet] (file=../examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_authentication/login.html)-->
+```
 <html>
+<body>
 <form action="/login" method="post">
     Username:<input type="text" name="username"><br>
     Password:<input type="password" name="password">
     <input type="submit" value="Login">
 </form>
+</body>
 </html>
 ```
+
 Since the form will be posted as `form encoded`, we will need MapMaid to unmarshall the content
-to a body map (see the chapters about forms and marshalling).
+to a body map (see [marshalling](11_Marshalling/1_MarshallingForms.md)).
 This will lead to the following configuration:
+<!---[CodeSnippet] (customLoginStep1)-->
 ```java
 final MapMaid mapMaid = aMapMaid()
-                .usingRecipe(urlEncodedMarshaller())
-                .build();
+        .usingRecipe(urlEncodedMarshaller())
+        .build();
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
-                .post("/login", (request, response) -> {
-                    final Map<String, Object> loginForm = request.bodyMap();
-                    final String username = (String) loginForm.get("username");
-                    final String password = (String) loginForm.get("password");
-                    if (!userDatabase.authenticate(username, password)) {
-                        throw new RuntimeException("Login failed");
-                    }
-                    final boolean admin = userDatabase.hasAdminRights(username);
-                    // TODO store login in session
-                })
-                .get("/normal", (request, response) -> response.setBody("The normal section"))
-                .get("/admin", (request, response) -> response.setBody("The admin section"))
-                // TODO add authenticator                
-                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
-                            // TODO authorize
-                        )
-                        .onlyRequestsTo("/admin")
-                        .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-                .configured(toUseMapMaid(mapMaid))
-                .build();
+        .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
+        .post("/login", (request, response) -> {
+            final Map<String, Object> loginForm = request.bodyMap();
+            final String username = (String) loginForm.get("username");
+            final String password = (String) loginForm.get("password");
+            if (!userDatabase.authenticate(username, password)) {
+                throw new RuntimeException("Login failed");
+            }
+            final boolean admin = userDatabase.hasAdminRights(username);
+            // TODO store login in session
+        })
+        .get("/normal", (request, response) -> response.setBody("The normal section"))
+        .get("/admin", (request, response) -> response.setBody("The admin section"))
+        // TODO add authenticator
+        .configured(toAuthorizeRequestsUsing((authenticationInformation, request) -> {
+                    return false; // TODO authorize
+                }
+        )
+                .onlyRequestsTo("/admin")
+                .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
+        .configured(toUseMapMaid(mapMaid))
+        .build();
 ```
+
 We now have a login form and can verify whether the provided username and password combination is actually correct.
 As indicated by the first `TODO` comment, we still lack a way of storing this result somewhere in the session.
 We could just set a cookie with the value `LoggedIn=true`, but this would be insecure for obvious reasons (any user could
@@ -215,43 +233,45 @@ Just add the following dependencies to the project:
 We can now store the verified username in a jwt (as `Subject`) and add a claim that indicates whether the user is an administrator.
 This allows us to add an authenticator configurator that will authenticate requests based on the jwt cookie and 
 authorize requests based on the stored `admin` claim.
+<!---[CodeSnippet] (customLoginFull)-->
 ```java
 final Key key = secretKeyFor(SignatureAlgorithm.HS256);
 final JwtParser jwtParser = parser().setSigningKey(key);
 
 final MapMaid mapMaid = aMapMaid()
-                .usingRecipe(urlEncodedMarshaller())
-                .build();
+        .usingRecipe(urlEncodedMarshaller())
+        .build();
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
-                .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
-                .post("/login", (request, response) -> {
-                    final Map<String, Object> loginForm = request.bodyMap();
-                    final String username = (String) loginForm.get("username");
-                    final String password = (String) loginForm.get("password");
-                    if (!userDatabase.authenticate(username, password)) {
-                        throw new RuntimeException("Login failed");
-                    }
-                    final boolean admin = userDatabase.hasAdminRights(username);
-                    final String jwt = builder()
-                            .setSubject(username)
-                            .claim("admin", admin)
-                            .signWith(key).compact();
-                    response.setCookie("jwt", jwt);
-                })
-                .get("/normal", (request, response) -> response.setBody("The normal section"))
-                .get("/admin", (request, response) -> response.setBody("The admin section"))
-                .configured(toAuthenticateUsingCookie("jwt", jwt -> Optional.of(jwtParser.parseClaimsJws(jwt).getBody()))
-                        .failingOnMissingAuthenticationOnlyForRequestsTo("/login"))
-                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) -> authenticationInformation
-                        .map(object -> (Claims) object)
-                        .map(claims -> (Boolean) claims.get("admin"))
-                        .orElse(false))
-                        .onlyRequestsTo("/admin")
-                        .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-                .configured(toUseMapMaid(mapMaid))
-                .build();
+        .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
+        .post("/login", (request, response) -> {
+            final Map<String, Object> loginForm = request.bodyMap();
+            final String username = (String) loginForm.get("username");
+            final String password = (String) loginForm.get("password");
+            if (!userDatabase.authenticate(username, password)) {
+                throw new RuntimeException("Login failed");
+            }
+            final boolean admin = userDatabase.hasAdminRights(username);
+            final String jwt = builder()
+                    .setSubject(username)
+                    .claim("admin", admin)
+                    .signWith(key).compact();
+            response.setCookie("jwt", jwt);
+        })
+        .get("/normal", (request, response) -> response.setBody("The normal section"))
+        .get("/admin", (request, response) -> response.setBody("The admin section"))
+        .configured(toAuthenticateUsingCookie("jwt", jwt -> Optional.of(jwtParser.parseClaimsJws(jwt).getBody()))
+                .failingOnMissingAuthenticationOnlyForRequestsTo("/login"))
+        .configured(toAuthorizeRequestsUsing((authenticationInformation, request) -> authenticationInformation
+                .map(object -> (Claims) object)
+                .map(claims -> (Boolean) claims.get("admin"))
+                .orElse(false))
+                .onlyRequestsTo("/admin")
+                .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
+        .configured(toUseMapMaid(mapMaid))
+        .build();
 ```
+
 The authenticator `toAuthenticateUsingCookie()` will find a cookie with the name `jwt` and feed its value
 into the provided authenticator lambda. If no cookie with that name is found, the authenticator is not called. 
 Note how this time the authenticator lambda sets the authentication information explictly by returning
@@ -264,6 +284,8 @@ we made authentication optional for that route with the `.failingOnMissingAuthen
 
 You can now start this application, login via http://localhost:1337/login, navigate to http://localhost:1337/normal
 or http://localhost:1337/admin and be allowed or rejected depending on the user you logged in with.
+(Just in case the credentials were: `joe`/`qrpk4L?>L(DBa[mN`, `jim`/`:Ce<9q=8KKjbtgfK`,
+ `jack`/`*eG)r@;{'4g'cM?3`)
 
 
 ## Accessing authentication information in handlers and use cases

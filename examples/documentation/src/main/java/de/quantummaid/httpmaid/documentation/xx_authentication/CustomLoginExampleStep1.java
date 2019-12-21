@@ -19,30 +19,52 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.authentication;
+package de.quantummaid.httpmaid.documentation.xx_authentication;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.mapmaid.MapMaid;
+
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
-import static de.quantummaid.httpmaid.security.SecurityConfigurators.toDoBasicAuthWith;
+import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
+import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedMarshallerRecipe.urlEncodedMarshaller;
 
-public final class BasicAuthExample {
+public final class CustomLoginExampleStep1 {
 
     public static void main(final String[] args) {
+        //Showcase start customLoginStep1
+        final MapMaid mapMaid = aMapMaid()
+                .usingRecipe(urlEncodedMarshaller())
+                .build();
         final UserDatabase userDatabase = new InMemoryUserDatabase();
         final HttpMaid httpMaid = anHttpMaid()
+                .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
+                .post("/login", (request, response) -> {
+                    final Map<String, Object> loginForm = request.bodyMap();
+                    final String username = (String) loginForm.get("username");
+                    final String password = (String) loginForm.get("password");
+                    if (!userDatabase.authenticate(username, password)) {
+                        throw new RuntimeException("Login failed");
+                    }
+                    final boolean admin = userDatabase.hasAdminRights(username);
+                    // TODO store login in session
+                })
                 .get("/normal", (request, response) -> response.setBody("The normal section"))
                 .get("/admin", (request, response) -> response.setBody("The admin section"))
-                .configured(toDoBasicAuthWith(userDatabase::authenticate).withMessage("Hello, please authenticate!"))
-                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) ->
-                        authenticationInformation
-                                .map(username -> userDatabase.hasAdminRights((String) username))
-                                .orElse(false))
+                // TODO add authenticator
+                .configured(toAuthorizeRequestsUsing((authenticationInformation, request) -> {
+                            return false; // TODO authorize
+                        }
+                )
                         .onlyRequestsTo("/admin")
                         .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
+                .configured(toUseMapMaid(mapMaid))
                 .build();
+        //Showcase end customLoginStep1
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

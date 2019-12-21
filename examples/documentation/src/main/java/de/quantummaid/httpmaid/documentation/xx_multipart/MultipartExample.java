@@ -29,18 +29,12 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class MultipartExample {
 
     public static void main(final String[] args) {
+        //Showcase start multipart
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/upload", (request, response) -> response.setJavaResourceAsBody("upload.html"))
                 .post("/upload", (request, response) -> System.out.println(request.bodyString()))
-                /*
-                .post("/upload", (MultipartHandler) (request, response) -> {
-                    final MultipartPart part = request.partIterator().next("myFile");
-                    final String content = part.readContentToString();
-                    response.setBody(content);
-                })
-                 */
-                //.configured(toExposeMultipartBodiesUsingMultipartIteratorBody())
                 .build();
+        //Showcase end multipart
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

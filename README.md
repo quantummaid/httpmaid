@@ -15,7 +15,6 @@ It's non-invasive, flexible and ultra-extendable.
 <br/>
 
 Let's see some low-level example:
-<!---[Link](./docs/00_Introduction.md link)-->[link](./docs/00_Introduction.md)
 
 ```
 final HttpMaid httpMaid = HttpMaid.anHttpMaid()
@@ -194,4 +193,4 @@ And replace the `PureJavaEndpoint` line with:
 Restart the application and enjoy the benefits of Jetty.
 
 ## Documentation
-You can find an extensive documentation [here](docs/00_Introduction.md).
+You can find an extensive documentation [here](docs/01_Introduction.md).

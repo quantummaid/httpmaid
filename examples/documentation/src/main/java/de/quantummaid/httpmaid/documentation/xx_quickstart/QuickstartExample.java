@@ -30,9 +30,11 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class QuickstartExample {
 
     public static void main(final String[] args) {
+        //Showcase start routingIntroductionExample
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/hello", (request, response) -> response.setBody("hi!"))
                 .build();
+        //Showcase end routingIntroductionExample
         final PureJavaEndpoint endpoint = pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
         endpoint.close();
     }

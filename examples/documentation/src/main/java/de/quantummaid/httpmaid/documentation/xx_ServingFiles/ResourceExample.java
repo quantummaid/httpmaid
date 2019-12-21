@@ -19,21 +19,21 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_exceptions;
+package de.quantummaid.httpmaid.documentation.xx_ServingFiles;
 
 import de.quantummaid.httpmaid.HttpMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
-public final class UnmappedExceptionExample {
+public final class ResourceExample {
 
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
+        //Showcase start javaResource
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/exception", (request, response) -> {
-                    throw new RuntimeException("this is an example");
-                })
+                .get("/resource", (request, response) -> response.setJavaResourceAsBody("myHtmlResource.html"))
                 .build();
+        //Showcase end javaResource
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

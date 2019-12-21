@@ -19,19 +19,27 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.resource;
+package de.quantummaid.httpmaid.documentation.xx_handlingrequests;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.http.PathParameters;
+import de.quantummaid.httpmaid.path.Path;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
-public final class ResourceExample {
+public final class PathParametersExample {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
+        //Showcase start pathParameters2
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/resource", (request, response) -> response.setJavaResourceAsBody("myHtmlResource.html"))
+                .get("/hello/<name>", (request, response) -> {
+                    final PathParameters pathParameters = request.pathParameters();
+                    final String name = pathParameters.getPathParameter("name");
+                    response.setBody("hi " + name + "!");
+                })
                 .build();
+        //Showcase end pathParameters2
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }
