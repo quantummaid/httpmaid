@@ -103,20 +103,23 @@ and this workflow for serialization (c) and marshalling (d):
 Domain Object    -(c)->    Map<String, Object>    -(d)->    Response Body
 ```
 
-In fact, MapMaid is so powerful at doing (de-)serialization that we just need to point it to the package where our domain objects
-(`MultiplicationRequest`, `CalculationResponse` and `Number`)
-reside and it will auto-detect their structure and be able to conveniently perform the desired mapping
-(please refer to MapMaid's documentation if you want to learn more about this feature).
+In fact, MapMaid is so powerful at doing (de-)serialization that we just need to add
+the following dependency and it will automatically and intelligently determine how
+to (de-)serialize our domain objects (`MultiplicationRequest`, `CalculationResponse` and `Number`):
+```xml
+        <dependency>
+            <groupId>de.quantummaid.httpmaid.integrations</groupId>
+            <artifactId>httpmaid-mapmaid</artifactId>
+            <version>${httpmaid.version}</version>
+        </dependency>
+```
+Please refer to MapMaid's documentation if you want to learn more about this feature.
 Using Gson for marshalling, we end up with a very lean and readable configuration:
 ```java
-final Gson gson = new Gson();
-final MapMaid mapMaid = aMapMaid("de.quantummaid.httpmaid.documentation.xx_usecases.calculation")
-        .usingJsonMarshaller(gson::toJson, gson::fromJson)
-        .build();
 final HttpMaid httpMaid = anHttpMaid()
-        .post("/multiply", MultiplicationUseCase.class)
-        .configured(toUseMapMaid(mapMaid))
-        .build();
+                .post("/multiply", MultiplicationUseCase.class)
+                .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
+                .build();
 ```
 
 You can try the configuration with the following curl command:
