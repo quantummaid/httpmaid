@@ -15,7 +15,7 @@ It's non-invasive, flexible and ultra-extendable.
 <br/>
 
 Let's see some low-level example:
-
+<!---[Link](./docs/00_Introduction.md link)-->[link](./docs/00_Introduction.md)
 
 ```
 final HttpMaid httpMaid = HttpMaid.anHttpMaid()
