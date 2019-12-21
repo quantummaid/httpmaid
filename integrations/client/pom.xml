@@ -79,7 +79,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid</groupId>
             <artifactId>core</artifactId>
-            <version>1.6.26</version>
+            <version>1.6.27</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

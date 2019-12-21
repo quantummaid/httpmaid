@@ -37,8 +37,7 @@ public final class MarshallingExample {
     @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
         final HttpMaid httpMaid = anHttpMaid()
-                .configured(toUnmarshallContentTypeInRequests(json(), body -> GSON.fromJson(body, Map.class)))
-                .configured(toMarshallContentTypeInResponses(json(), GSON::toJson))
+                .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
                 .configured(toMarshallByDefaultUsingTheContentType(json()))
                 .build();
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);

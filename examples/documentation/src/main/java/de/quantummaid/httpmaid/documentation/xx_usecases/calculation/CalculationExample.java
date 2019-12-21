@@ -21,31 +21,31 @@
 
 package de.quantummaid.httpmaid.documentation.xx_usecases.calculation;
 
-import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.MultiplicationRequest;
+import com.google.gson.Gson;
+import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.DivisionUseCase;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.MultiplicationUseCase;
-import de.quantummaid.httpmaid.HttpMaid;
-import com.google.gson.Gson;
-import de.quantummaid.mapmaid.MapMaid;
+
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 
 public final class CalculationExample {
+    private static final Gson GSON = new Gson();
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
-        final Gson gson = new Gson();
-        final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName())
-                .usingJsonMarshaller(gson::toJson, gson::fromJson)
-                .withExceptionIndicatingValidationError(IllegalArgumentException.class)
-                .build();
-
         final HttpMaid httpMaid = anHttpMaid()
                 .post("/multiply", MultiplicationUseCase.class)
                 .post("/divide", DivisionUseCase.class)
-                .configured(toUseMapMaid(mapMaid))
+                .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
+                .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+                    mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
+                }))
                 .build();
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
