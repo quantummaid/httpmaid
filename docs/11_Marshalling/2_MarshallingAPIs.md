@@ -172,18 +172,3 @@ If the `Content-Type` of the request is in this set, this one will be picked in
 order to maintain consistency between the request's and the response's `Content-Type`.
 Otherwise, it will pick any `Content-Type` of the set. If the set is empty,
 it will pick the default `Content-Type` according to the HttpMaid configuration (if a marshaller is configured for it). 
-
-## Integrating MapMaid
-Instead of directly using HttpMaid's marshalling module, a convenient and recommended
-choice would be to source marshalling and unmarshalling out to HttpMaid's sister project
-MapMaid. In order to integrate MapMaid into HttpMaid, an integration module is offered
-which can be configured like this:
-<!---[CodeSnippet] (marshallingWithMapMaid)-->
-```java
-final MapMaid mapMaid = aMapMaid().build();
-anHttpMaid()
-        .configured(toUseMapMaid(mapMaid))
-        .build();
-```
-
-All settings will be automatically adapted from the provided MapMaid object.
