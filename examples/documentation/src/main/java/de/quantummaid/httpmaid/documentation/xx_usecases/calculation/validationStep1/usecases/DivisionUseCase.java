@@ -19,16 +19,18 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep1.usecases;
 
-import de.quantummaid.httpmaid.documentation.xx_usecases.restaurant.Reservation;
-import de.quantummaid.httpmaid.documentation.xx_usecases.restaurant.ReservationConfirmation;
-import de.quantummaid.httpmaid.documentation.xx_usecases.restaurant.RestaurantTimetable;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep1.domain.DivisionRequest;
 
-public final class MakeReservationUseCase {
-    private final RestaurantTimetable restaurantTimetable = new RestaurantTimetable();
+//Showcase start divisionUseCasStep1
+public final class DivisionUseCase {
 
-    public ReservationConfirmation makeReservation(final Reservation reservation) {
-        return restaurantTimetable.reserve(reservation);
+    public CalculationResponse divide(final DivisionRequest divisionRequest) {
+        final int divisor = divisionRequest.divisor;
+        final int result = divisionRequest.dividend / divisor;
+        return new CalculationResponse(result);
     }
 }
+//Showcase end divisionUseCasStep1

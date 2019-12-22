@@ -31,10 +31,12 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class CorsExample {
 
     public static void main(final String[] args) {
+        //Showcase start cors
         final HttpMaid httpMaid = anHttpMaid()
                 .put("/api", (request, response) -> response.setBody("Version 1.0"))
                 .configured(toActivateCORSWithAllowedOrigins("frontend.example.org").withAllowedMethods(PUT))
                 .build();
+        //Showcase end cors
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

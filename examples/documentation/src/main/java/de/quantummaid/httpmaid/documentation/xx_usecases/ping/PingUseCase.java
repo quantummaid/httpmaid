@@ -19,21 +19,13 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
+package de.quantummaid.httpmaid.documentation.xx_usecases.ping;
 
-//Showcase start multiplicationRequest
-public final class MultiplicationRequest {
-    public final Integer factor1;
-    public final Integer factor2;
+//Showcase start pingUseCase
+public final class PingUseCase {
 
-    public MultiplicationRequest(final Integer factor1, final Integer factor2) {
-        this.factor1 = factor1;
-        this.factor2 = factor2;
-    }
-
-    public static MultiplicationRequest multiplicationRequest(final Integer factor1,
-                                                              final Integer factor2) {
-        return new MultiplicationRequest(factor1, factor2);
+    public void ping() {
+        System.out.println("Ping!");
     }
 }
-//Showcase end multiplicationRequest
+//Showcase end pingUseCase

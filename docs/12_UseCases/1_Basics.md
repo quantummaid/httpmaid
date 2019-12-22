@@ -14,6 +14,7 @@ call the entry points into your domain logic services, usecases, or even somethi
 In order to maintain consistency, throughout HttpMaid we will call this concept a *usecase*.
 
 Let's design a simple usecase:
+<!---[CodeSnippet] (pingUseCase)-->
 ```java
 public final class PingUseCase {
 
@@ -22,10 +23,12 @@ public final class PingUseCase {
     }
 }
 ```
+
 As you can see, the `PingUseCase` is a POJO class with a single public method `ping()`.
 Note how the class does not contain a single dependency on any infrastructure (read: HttpMaid) code.
 If we want to serve this usecase via HttpMaid using the constructs we know so far,
 we will probably end up with something like this:
+<!---[CodeSnippet] (pingUseCaseLowLevel)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/ping", (request, response) -> {
@@ -34,10 +37,11 @@ final HttpMaid httpMaid = anHttpMaid()
         })
         .build();
 ```
+
 We registered a handler that instantiates the usecase and then calls it.
-Since serious projects might contain hundreds of usecases, this way
-of registering them to HttpMaid seems like a lot of boilerplate code
-and a violation of the *Don't repeat yourself* design principle.
+Since more complex projects might contain hundreds of usecases, registering usecases
+to HttpMaid this way leads to a lot of boilerplate code
+and heavily violates the *Don't repeat yourself* design principle.
 
 # Serving usecases directly
 HttpMaid mitigates these problems by offering to directly serve usecases.
@@ -65,12 +69,14 @@ In order to do this, you need to add the `httpmaid-usecases` dependency to your 
 HttpMaid will automatically discover the dependency and support usecases.
 Afterwards, you can change the configuration and shrink it
 down significantly:
+<!---[CodeSnippet] (pingUseCaseCorrectExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .get("/ping", PingUseCase.class)
         .build();
 ```
 
-HttpMaid will now direct `POST` requests on the `/ping` route to the `ping()` usecase method.
-You can try this by running your application. Once you browse to http://localhost:1337/ping, you should see
+HttpMaid will now direct `POST` requests on the `/ping` route to the `ping()` 
+usecase method. You can try this by running your application. Once you 
+browse to http://localhost:1337/ping, you should see
 the `Ping!` message pop up on the console.

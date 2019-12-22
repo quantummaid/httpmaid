@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
 
+//Showcase start calculationResponse
 public final class CalculationResponse {
     public final Integer result;
 
@@ -32,3 +33,4 @@ public final class CalculationResponse {
         return new CalculationResponse(result);
     }
 }
+//Showcase end calculationResponse

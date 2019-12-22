@@ -19,30 +19,16 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
+package de.quantummaid.httpmaid.documentation.xx_usecases.restaurant;
 
-import static java.lang.Integer.parseInt;
+import de.quantummaid.httpmaid.documentation.xx_usecases.restaurant.Reservation;
+import de.quantummaid.httpmaid.documentation.xx_usecases.restaurant.ReservationConfirmation;
+import de.quantummaid.httpmaid.documentation.xx_usecases.restaurant.RestaurantTimetable;
 
-public final class Divisor {
-    private final int value;
+public final class MakeReservationUseCase {
+    private final RestaurantTimetable restaurantTimetable = new RestaurantTimetable();
 
-    private Divisor(final int value) {
-        this.value = value;
-    }
-
-    public static Divisor parseDivisor(final String divisorAsString) {
-        final int value = parseInt(divisorAsString);
-        if (value == 0) {
-            throw new IllegalArgumentException("the divisor must not be 0");
-        }
-        return new Divisor(value);
-    }
-
-    public int value() {
-        return value;
-    }
-
-    public String stringValue() {
-        return String.valueOf(value);
+    public ReservationConfirmation makeReservation(final Reservation reservation) {
+        return restaurantTimetable.reserve(reservation);
     }
 }

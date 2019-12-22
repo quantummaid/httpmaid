@@ -19,16 +19,18 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep2.usecases;
 
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse;
-import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.DivisionRequest;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep2.domain.DivisionRequest;
 
+//Showcase start divisionUsecaseStep2
 public final class DivisionUseCase {
 
     public CalculationResponse divide(final DivisionRequest divisionRequest) {
-        final int divisor = divisionRequest.divisor.value();
+        final int divisor = divisionRequest.divisor;
         final int result = divisionRequest.dividend / divisor;
         return new CalculationResponse(result);
     }
 }
+//Showcase end divisionUsecaseStep2

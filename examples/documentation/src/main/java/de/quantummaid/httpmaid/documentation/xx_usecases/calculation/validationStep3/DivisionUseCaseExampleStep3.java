@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3;
 
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
@@ -29,28 +29,31 @@ import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationS
 import de.quantummaid.mapmaid.MapMaid;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllQueryParameters;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 
-public final class CalculationWithQueryParametersExample {
+public final class DivisionUseCaseExampleStep3 {
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
-        //Showcase start calculationWithQueryParametersExample
-        final Gson gson = new Gson();
-        final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName()) //TODO: wie kann ich das auf die richtigen ummünzen?
-                .usingJsonMarshaller(gson::toJson, gson::fromJson)
+        //Showcase start divisionExampleStep3
+        final Gson GSON = new Gson();
+        final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName())
+                .usingJsonMarshaller(GSON::toJson, GSON::fromJson)
                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)
+                //.usingRecipe(builtInPrimitiveSerializedAsStringSupport()) TODO: methode gibts ned
                 .build();
-
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/multiply", MultiplicationUseCase.class)
-                .get("/divide", DivisionUseCase.class)
-                .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
+                .post("/multiply", MultiplicationUseCase.class)
+                .post("/divide", DivisionUseCase.class)
                 .configured(toUseMapMaid(mapMaid))
+                .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+                    mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
+                }))
                 .build();
-        //Showcase end calculationWithQueryParametersExample
+        //Showcase end divisionExampleStep3
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

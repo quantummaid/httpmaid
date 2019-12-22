@@ -19,23 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation;
 
+import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.documentation.PingUseCase;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.MultiplicationUseCase;
+
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
-public final class UseCasesWithHandlersExample {
+public final class MultiplicationUseCaseWithMappingExample {
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
+        //Showcase start multiplicationUseCaseWithMappingExample
+        final Gson GSON = new Gson();
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/ping", (request, response) -> {
-                    final PingUseCase pingUseCase = new PingUseCase();
-                    pingUseCase.ping();
-                })
+                .post("/multiply", MultiplicationUseCase.class)
+                .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
                 .build();
+        //Showcase end multiplicationUseCaseWithMappingExample
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

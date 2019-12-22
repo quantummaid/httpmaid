@@ -19,21 +19,18 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.useCases;
 
-//Showcase start multiplicationRequest
-public final class MultiplicationRequest {
-    public final Integer factor1;
-    public final Integer factor2;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.domain.DivisionRequest;
 
-    public MultiplicationRequest(final Integer factor1, final Integer factor2) {
-        this.factor1 = factor1;
-        this.factor2 = factor2;
-    }
+//Showcase start divisionUsecaseStep3
+public final class DivisionUseCase {
 
-    public static MultiplicationRequest multiplicationRequest(final Integer factor1,
-                                                              final Integer factor2) {
-        return new MultiplicationRequest(factor1, factor2);
+    public CalculationResponse divide(final DivisionRequest divisionRequest) {
+        final int divisor = divisionRequest.divisor.value();
+        final int result = divisionRequest.dividend / divisor;
+        return new CalculationResponse(result);
     }
 }
-//Showcase end multiplicationRequest
+//Showcase end divisionUsecaseStep3

@@ -19,11 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep2.domain;
 
-public final class PingUseCase {
+//Showcase start divisionRequestStep2
+public final class DivisionRequest {
+    public final Integer dividend;
+    public final Integer divisor;
 
-    public void ping() {
-        System.out.println("Ping!");
+    public DivisionRequest(final Integer dividend, final Integer divisor) {
+        this.dividend = dividend;
+        this.divisor = divisor;
+    }
+
+    public static DivisionRequest divisionRequest(final Integer dividend,
+                                                  final Integer divisor) {
+        if (divisor == 0) {
+            throw new IllegalArgumentException("the divisor must not be 0");
+        }
+        return new DivisionRequest(dividend, divisor);
     }
 }
+//Showcase end divisionRequestStep2

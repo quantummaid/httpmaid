@@ -19,26 +19,29 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation;
+package de.quantummaid.httpmaid.documentation.xx_usecases.dependencyInjection;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
+import de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiator;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
+import static de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 
-public final class Documentation {
+public final class DependencyInjectionExample {
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
-        anHttpMaid()
-                .get("/hello", (request, response) -> response.setBody("hi!"))
-                .get("/ping", PingUseCase.class)
-                .build();
+        final UseCaseInstantiator injector = zeroArgumentsConstructorUseCaseInstantiator();
 
+        //Showcase start dependencyInjectionSample
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/", (request, response) -> {
-                    response.setStatus(404);
-                })
+                /*...*/
+                .configured(toCreateUseCaseInstancesUsing(injector::instantiate))
                 .build();
+        //Showcase end dependencyInjectionSample
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }

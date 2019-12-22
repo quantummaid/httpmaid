@@ -106,14 +106,22 @@ provided header key.
 ### Example
 As stated above, we can now change the multiplication example to use take its
 input from the query parameters instead of the request body:
+<!---[CodeSnippet] (calculationWithQueryParametersExample)-->
 ```java
+final Gson gson = new Gson();
+final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName()) //TODO: wie kann ich das auf die richtigen ummünzen?
+        .usingJsonMarshaller(gson::toJson, gson::fromJson)
+        .withExceptionIndicatingValidationError(IllegalArgumentException.class)
+        .build();
+
 final HttpMaid httpMaid = anHttpMaid()
-                .post("/multiply", MultiplicationUseCase.class)
-                .post("/divide", DivisionUseCase.class)
-                .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
-                .configured(toUseMapMaid(mapMaid))
-                .build();
+        .get("/multiply", MultiplicationUseCase.class)
+        .get("/divide", DivisionUseCase.class)
+        .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
+        .configured(toUseMapMaid(mapMaid))
+        .build();
 ```
+
 You can point a browser to http://localhost:1337/multiply?factor1=3&factor2=4 and verify that the response
 is indeed the multiplication of 3 and 4:
 ```json
@@ -136,10 +144,11 @@ In order to configure usecase instantiation to your needs and e.g. register
 the injector of your choice, the `UseCaseConfigurators.toCreateUseCaseInstancesUsing()`
 configurator method exists. If for example you would like
 to register a Guice injector, the configuration would look like this:
-
+<!---[CodeSnippet] (dependencyInjectionSample)-->
 ```java
-anHttpMaid()
-        ...
-        .configured(toCreateUseCaseInstancesUsing(injector::getInstance))
+final HttpMaid httpMaid = anHttpMaid()
+        /*...*/
+        .configured(toCreateUseCaseInstancesUsing(injector::instantiate))
         .build();
 ```
+

@@ -8,6 +8,7 @@ that offers the multiplication of two integers.
 
 ## Parameters and Return Values
 Let's start with defining the use case:
+<!---[CodeSnippet] (multiplicationUseCase)-->
 ```java
 public final class MultiplicationUseCase {
 
@@ -17,8 +18,9 @@ public final class MultiplicationUseCase {
     }
 }
 ```
-This usecase takes an object of type `MultiplicationRequest` as parameter:
 
+This usecase takes an object of type `MultiplicationRequest` as parameter:
+<!---[CodeSnippet] (multiplicationRequest)-->
 ```java
 public final class MultiplicationRequest {
     public final Integer factor1;
@@ -35,11 +37,12 @@ public final class MultiplicationRequest {
     }
 }
 ```
+
 As you can see, a `MultiplicationRequest` simply encapsulates two factors, each of with
 having the datatype `Integer`.
 The `MultiplicationUseCase` will then take both factors, multiply them, and return the result
 encapsulated in an object of type `CalculationResponse`:
-
+<!---[CodeSnippet] (calculationResponse)-->
 ```java
 public final class CalculationResponse {
     public final Integer result;
@@ -58,15 +61,30 @@ The `MultiplicationUseCase` is structured in the same way as the `PingUseCase` (
 and again does not contain a single dependency on any infrastructure code.
 
 We can now add the usecase to our configuration:
+<!---[CodeSnippet] (multiplicationUseCaseWithoutMappingExample)-->
 ```java
-anHttpMaid()
-        .post("/multiply", MultiplicationUseCase.class)
-        .build();
+public final class MultiplicationUseCaseWithoutMappingExample {
+
+    public static void main(final String[] args) {
+        final HttpMaid httpMaid = anHttpMaid()
+                .post("/multiply", MultiplicationUseCase.class)
+                .build();
+        pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
+    }
+}
 ```
 
 If we would start the application now, a `POST` request to `/multiply` would fail, because HttpMaid
 does not yet know how to create the `MultiplicationRequest` parameter and what to do with the `CalculationResponse`
 return value.
+
+Sending a `POST` request using curl
+```bash
+curl -X POST http://localhost:1337/multiply
+```
+would result in a `java.lang.NullPointerException`.
+Providing data with `-data="factor1=1&factor2=2"`
+would not yield a different result.
 
 ## Object mapping
 Until this point, it is unclear how HttpMaid could get the `MultiplicationRequest` parameter needed to call
@@ -115,11 +133,13 @@ to (de-)serialize our domain objects (`MultiplicationRequest`, `CalculationRespo
 ```
 Please refer to MapMaid's documentation if you want to learn more about this feature.
 Using Gson for marshalling, we end up with a very lean and readable configuration:
+<!---[CodeSnippet] (multiplicationUseCaseWithMappingExample)-->
 ```java
+final Gson GSON = new Gson();
 final HttpMaid httpMaid = anHttpMaid()
-                .post("/multiply", MultiplicationUseCase.class)
-                .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-                .build();
+        .post("/multiply", MultiplicationUseCase.class)
+        .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
+        .build();
 ```
 
 You can try the configuration with the following curl command:

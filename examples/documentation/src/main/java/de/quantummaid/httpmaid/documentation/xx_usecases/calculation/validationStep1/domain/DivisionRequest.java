@@ -19,21 +19,21 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep1.domain;
 
-//Showcase start multiplicationRequest
-public final class MultiplicationRequest {
-    public final Integer factor1;
-    public final Integer factor2;
+//Showcase start divisionRequestStep1
+public final class DivisionRequest {
+    public final Integer dividend;
+    public final Integer divisor;
 
-    public MultiplicationRequest(final Integer factor1, final Integer factor2) {
-        this.factor1 = factor1;
-        this.factor2 = factor2;
+    private DivisionRequest(final Integer dividend, final Integer divisor) {
+        this.dividend = dividend;
+        this.divisor = divisor;
     }
 
-    public static MultiplicationRequest multiplicationRequest(final Integer factor1,
-                                                              final Integer factor2) {
-        return new MultiplicationRequest(factor1, factor2);
+    public static DivisionRequest divisionRequest(final Integer dividend,
+                                                  final Integer divisor) {
+        return new DivisionRequest(dividend, divisor);
     }
 }
-//Showcase end multiplicationRequest
+//Showcase end divisionRequestStep1

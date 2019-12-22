@@ -14,13 +14,14 @@ In access it, you need to include the client integration.
 ```
 ## Configuring a client
 Before a client can be used, it needs to be configured. Example:
-
+<!---[CodeSnippet] (clientExample)-->
 ```java
 final HttpMaidClient httpMaidClient = aHttpMaidClientForTheHost("example.org")
-                .withThePort(8080)
-                .viaHttps()
-                .build();
+        .withThePort(8080)
+        .viaHttps()
+        .build();
 ```
+
 
 The first three configuration options deal with connecting the client to a server.
 In the example, the client is configured to send all requests to port `8080` on the `example.org` host. The
@@ -41,29 +42,35 @@ that, you need to provide mappings for them.
 
 ## Using a client
 A configured client can be used to issue http requests to the configured server. Examples:
-
+<!---[CodeSnippet] (clientUsageExamples)-->
 ```java
 final SimpleHttpResponseObject response = httpMaidClient.issue(aGetRequestToThePath("/foo"));
+
+final String stringResponse = httpMaidClient.issue(aGetRequestToThePath("/foo").mappedToString());
+
+final OrderConfirmation orderConfirmation = httpMaidClient.issue(
+        aPostRequestToThePath("/placeOrder")
+                .withTheBody("{articleId: 4324923}")
+                .mappedTo(OrderConfirmation.class));
+
+final InputStream myStream = null;
+final SimpleHttpResponseObject httpResponseObject = httpMaidClient.issue(
+        aPostRequestToThePath("/upload")
+                .withAMultipartBodyWithTheParts(
+                        aPartWithTheControlName("file")
+                                .withTheFileName("file.txt")
+                                .withTheContent(myStream)
+                )
+);
 ```
 
-```java
-final String response = httpMaidClient.issue(aGetRequestToThePath("/foo").mappedToString());
-```
-
-```java
-final OrderConfirmation orderConfirmation = httpMaidClient.issue(aPostRequestToThePath("/placeOrder").withTheBody("{articleId: 4324923}").mappedTo(OrderConfirmation.class));
-```
-
-```java
-httpMaidClient.issue(aPostRequestToThePath("/upload").withAMultipartBodyWithTheParts(aPartWithTheControlName("file").withTheFileName("file.txt").withTheContent(myStream)))
-```
 
 ## Using HttpMaid client and server together
 Sometimes you would use a HttpMaid client to connect to a HttpMaid server running in the same JVM.
 This could happen e.g. in an integration test scenario. In order to speed up the execution time
 of your tests, the possibility exists to connect the client directly to your server, bypassing
 all "real" http handling. You can create such a client like this:
-
+<!---[CodeSnippet] (clientToSameHttpMaidInstanceExample)-->
 ```java
-final HttpMaidClient httpMaidClient = aHttpMaidClientBypassingRequestsDirectlyTo(httpMaid).build();
+final HttpMaidClient connectedHttpMaidClient = aHttpMaidClientBypassingRequestsDirectlyTo(httpMaid).build();
 ```

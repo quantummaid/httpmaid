@@ -19,19 +19,32 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
+package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.domain;
 
-public final class DivisionRequest {
-    public final Integer dividend;
-    public final Divisor divisor;
+import static java.lang.Integer.parseInt;
 
-    private DivisionRequest(final Integer dividend, final Divisor divisor) {
-        this.dividend = dividend;
-        this.divisor = divisor;
+//Showcase start divisor
+public final class Divisor {
+    private final int value;
+
+    private Divisor(final int value) {
+        this.value = value;
     }
 
-    public static DivisionRequest divisionRequest(final Integer dividend,
-                                                  final Divisor divisor) {
-        return new DivisionRequest(dividend, divisor);
+    public static Divisor parseDivisor(final String divisorAsString) {
+        final int value = parseInt(divisorAsString);
+        if (value == 0) {
+            throw new IllegalArgumentException("the divisor must not be 0");
+        }
+        return new Divisor(value);
+    }
+
+    public int value() {
+        return value;
+    }
+
+    public String stringValue() {
+        return String.valueOf(value);
     }
 }
+//Showcase end divisor

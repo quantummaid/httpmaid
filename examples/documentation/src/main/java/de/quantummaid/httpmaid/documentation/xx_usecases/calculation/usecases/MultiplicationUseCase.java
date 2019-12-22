@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.MultiplicationRequest;
 
+//Showcase start multiplicationUseCase
 public final class MultiplicationUseCase {
 
     public CalculationResponse multiply(final MultiplicationRequest multiplicationRequest) {
@@ -31,3 +32,4 @@ public final class MultiplicationUseCase {
         return new CalculationResponse(result);
     }
 }
+//Showcase end multiplicationUseCase

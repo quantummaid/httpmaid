@@ -23,7 +23,7 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation;
 
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.DivisionUseCase;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.useCases.DivisionUseCase;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.MultiplicationUseCase;
 
 import java.util.Map;

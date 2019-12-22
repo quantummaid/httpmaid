@@ -48,9 +48,11 @@ cause browsers to use their respective default settings).
 This sets the `Access-Control-Max-Age` header - see [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age) for more information.
 
 ## Example
+<!---[CodeSnippet] (cors)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-                .put("/api", (request, response) -> response.setBody("Version 1.0"))
-                .configured(toActivateCORSWithAllowedOrigins("frontend.example.org").withAllowedMethods(PUT))
-                .build();
+        .put("/api", (request, response) -> response.setBody("Version 1.0"))
+        .configured(toActivateCORSWithAllowedOrigins("frontend.example.org").withAllowedMethods(PUT))
+        .build();
 ```
+

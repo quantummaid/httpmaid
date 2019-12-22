@@ -2,23 +2,26 @@
 Let's add another usecase to the multiplication example. One obvious additional feature
 would be to support division.
 The accompanying usecase is fairly trivial:
+<!---[CodeSnippet] (divisionUseCasStep1)-->
 ```java
 public final class DivisionUseCase {
 
     public CalculationResponse divide(final DivisionRequest divisionRequest) {
-        final int result = divisionRequest.dividend / divisionRequest.divisor;
+        final int divisor = divisionRequest.divisor;
+        final int result = divisionRequest.dividend / divisor;
         return new CalculationResponse(result);
     }
 }
 ```
 
 with the corresponding `DivisionRequest`:
+<!---[CodeSnippet] (divisionRequestStep1)-->
 ```java
 public final class DivisionRequest {
     public final Integer dividend;
     public final Integer divisor;
 
-    public DivisionRequest(final Integer dividend, final Integer divisor) {
+    private DivisionRequest(final Integer dividend, final Integer divisor) {
         this.dividend = dividend;
         this.divisor = divisor;
     }
@@ -29,15 +32,18 @@ public final class DivisionRequest {
     }
 }
 ```
-To add this usecase to HttpMaid, all you need to do is add one single line:
 
+To add this usecase to HttpMaid, all you need to do is add one single line:
+<!---[CodeSnippet] (divisionExampleStep1)-->
 ```java
+final Gson GSON = new Gson();
 final HttpMaid httpMaid = anHttpMaid()
-                .post("/multiply", MultiplicationUseCase.class)
-                .post("/divide", DivisionUseCase.class)
-                .configured(toUseMapMaid(mapMaid))
-                .build();
+        .post("/multiply", MultiplicationUseCase.class)
+        .post("/divide", DivisionUseCase.class)
+        .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
+        .build();
 ```
+
 Since the `DivisionRequest` class resides in the same package as `MultiplicationRequest`,
 the MapMaid configuration from the previous example will auto-detect the new class and does
 not need to be changed.
@@ -79,7 +85,7 @@ This might not be obvious for the divison, but think of a more mature example, w
 would not consist of a simple math operation, but of database queries with potentially corrupt data.
 To mitigate this problem, we can validate the divisor in the `DivisionRequest`, so the exception would
 be thrown before the usecase and calculation could be called:
-
+<!---[CodeSnippet] (divisionRequestStep2)-->
 ```java
 public final class DivisionRequest {
     public final Integer dividend;
@@ -116,12 +122,19 @@ re-throw the exception wrapped in the observed `UnrecognizedExceptionOccurredExc
 However, if we tell MapMaid that an `IllegalArgumentException` is to be expected and that it indicates a failed
 validation, MapMaid will behave differently. Let's tell MapMaid about the exception:
 
+<!---[CodeSnippet] (divisionExampleStep2)-->
 ```java
+final Gson GSON = new Gson();
 final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName())
-                .usingJsonMarshaller(gson::toJson, gson::fromJson)
-                .withExceptionIndicatingValidationError(IllegalArgumentException.class)
-                .usingRecipe(builtInPrimitiveSerializedAsStringSupport())
-                .build();
+        .usingJsonMarshaller(GSON::toJson, GSON::fromJson)
+        .withExceptionIndicatingValidationError(IllegalArgumentException.class)
+        //.usingRecipe(builtInPrimitiveSerializedAsStringSupport()) TODO: methode gibts ned
+        .build();
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/multiply", MultiplicationUseCase.class)
+        .post("/divide", DivisionUseCase.class)
+        .configured(toUseMapMaid(mapMaid))
+        .build();
 ```
 
 Now, when we devide by zero (again):
@@ -163,6 +176,7 @@ Currently, it is thrown in the `DivisionRequest` class.
 In order for it to be located in the `divisor` field, we need to throw the exception in the class of this field.
 Unfortunately, the divisor's data type is `Integer` and we cannot change the implementation of this class.
 To solve the problem, we need to write our own `Divisor` data type that contains the validation:
+<!---[CodeSnippet] (divisor)-->
 ```java
 public final class Divisor {
     private final int value;
@@ -188,6 +202,8 @@ public final class Divisor {
     }
 }
 ```
+
+
 We will call these kinds of classes *custom primitives* throughout this guide since
 they act pretty much the same as primitive data types like int, double, or even String
 (which is technically not a primitve data type but it is used like one).
@@ -196,6 +212,8 @@ but it does not really matter how you call them.
 They encapsulate all aspects of a specific type of data and make sure that its
 value is valid. We can now change the `DivisionRequest` accordingly:
 
+
+<!---[CodeSnippet] (divisionRequestStep3)-->
 ```java
 public final class DivisionRequest {
     public final Integer dividend;
@@ -214,6 +232,7 @@ public final class DivisionRequest {
 ```
 
 Also the `DivisionUseCase` needs a small change:
+<!---[CodeSnippet] (divisionUsecaseStep3)-->
 ```java
 public final class DivisionUseCase {
 
@@ -224,6 +243,7 @@ public final class DivisionUseCase {
     }
 }
 ```
+
 
 When you once again request the division by zero like this:
 ```bash
