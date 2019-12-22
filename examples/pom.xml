@@ -41,6 +41,5 @@
         <module>aws-lambda</module>
         <module>hello-world</module>
         <module>documentation</module>
-        <module>archetype-quickstart</module>
     </modules>
 </project>

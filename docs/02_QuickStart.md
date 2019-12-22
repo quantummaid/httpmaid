@@ -85,7 +85,6 @@ home directory.
 To use HttpMaid you need to declare it as a dependency.
 This guide assumes you are using Maven, but it will work with Gradle etc. accordingly.
 To use HttpMaid add its dependency to your pom.xml:
-<!---[CodeSnippet] (coreDep)-->
 ```xml
 <dependency>
     <groupId>de.quantummaid.httpmaid</groupId>

@@ -27,7 +27,7 @@ The following code creates a HttpMaid instance to serve the form:
 <!---[CodeSnippet] (formMarshallingStep1)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        //.get("/form", theResource("form.html")) TODO: theResource gibts ned
+        .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
         .post("/submit", (request, response) -> response.setBody(request.bodyString()))
         .build();
 ```
@@ -76,7 +76,7 @@ method:
 <!---[CodeSnippet] (formMarshallingStep2)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        //.get("/form", theResource("form.html")) //TODO theResource gibts ned
+        .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
         .post("/submit", (request, response) -> response.setBody(request.bodyString()))
         .configured(toUnmarshallFormUrlEncodedRequests())
         .build();
@@ -92,7 +92,7 @@ slightly more productive:
 <!---[CodeSnippet] (formMarshallingStep3)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        //.get("/form", theResource("form.html")) TODO: theResource gibts ned
+        .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
         .post("/submit", (request, response) -> {
             final Map<String, Object> bodyMap = request.bodyMap();
             final String name = (String) bodyMap.get("name");
