@@ -28,4 +28,7 @@
 		<Class name="de.quantummaid.httpmaid.util.Streams" />
 		<Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
 	</Match>
+	<Match>
+		<Bug pattern="DLS_DEAD_LOCAL_STORE" />
+	</Match>
 </FindBugsFilter>

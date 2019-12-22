@@ -6,13 +6,14 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests;
+import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
 public class FormMarshallingExampleStep3 {
 
     public static void main(String[] args) {
         //Showcase start formMarshallingStep3
         final HttpMaid httpMaid = anHttpMaid()
-                //.get("/form", theResource("form.html")) TODO: theResource gibts ned
+                .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
                 .post("/submit", (request, response) -> {
                     final Map<String, Object> bodyMap = request.bodyMap();
                     final String name = (String) bodyMap.get("name");
@@ -22,5 +23,6 @@ public class FormMarshallingExampleStep3 {
                 .configured(toUnmarshallFormUrlEncodedRequests())
                 .build();
         //Showcase end formMarshallingStep3
+        pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
     }
 }
