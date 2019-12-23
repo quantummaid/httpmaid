@@ -193,4 +193,26 @@ And replace the `PureJavaEndpoint` line with:
 Restart the application and enjoy the benefits of Jetty.
 
 ## Documentation
-You can find an extensive documentation [here](docs/01_Introduction.md).
+<!---[TOC](./docs)-->
+1. [Introduction](docs/01_Introduction.md)
+2. [Quick start](docs/02_QuickStart.md)
+3. [Routing](docs/03_Routing.md)
+4. [Handling requests](docs/04_HandlingRequests.md)
+5. [Cookies](docs/05_Cookies.md)
+6. [Serving files](docs/06_ServingFiles.md)
+7. [Configuring and logging](docs/07_ConfiguringAndLogging.md)
+8. [Exceptions](docs/08_Exceptions.md)
+9. [Authentication and authorization](docs/09_AuthenticationAndAuthorization.md)
+10. [Multipart uploads](docs/10_MultipartUploads.md)
+11.1. [Marshalling forms](docs/11_Marshalling/1_MarshallingForms.md)
+11.2. [Marshalling a p is](docs/11_Marshalling/2_MarshallingAPIs.md)
+12.1. [Basics](docs/12_UseCases/1_Basics.md)
+12.2. [Object mapping](docs/12_UseCases/2_ObjectMapping.md)
+12.3. [Validation](docs/12_UseCases/3_Validation.md)
+12.4. [Advanced topics](docs/12_UseCases/4_AdvancedTopics.md)
+13. [C o r s](docs/13_CORS.md)
+14. [Endpoints](docs/14_Endpoints.md)
+15. [Client](docs/15_Client.md)
+16. [Dependency management](docs/16_DependencyManagement.md)
+17. [F a q](docs/17_FAQ.md)
+<!---EndOfToc-->

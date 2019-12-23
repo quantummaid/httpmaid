@@ -23,7 +23,7 @@ in this case. Just run the following code to install the quickstart archetype. T
 create a directory with a complete Maven structure, all required dependencies and 
 a `Quickstart.java` ready to be executed.
 
-```
+```bash
 mvn archetype:generate -DarchetypeGroupId=de.quantummaid.httpmaid.examples  \ 
                        -DarchetypeArtifactId=archetype-quickstart           \
                        -DarchetypeVersion=1.0.28                  \
@@ -35,7 +35,7 @@ mvn archetype:generate -DarchetypeGroupId=de.quantummaid.httpmaid.examples  \
 
 You will see the following output with a prompt at the end:
 
-```
+```bash
 [INFO] Scanning for projects...
 [INFO] 
 [INFO] ------------------< org.apache.maven:standalone-pom >-------------------
@@ -74,7 +74,7 @@ mvn clean verify
 
 Then you can call java with the correct class and HttpMaid as dependency 
 (assuming you a Linux system)
-```
+```bash
 java -classpath target/classes:$HOME/.m2/repository/de/quantummaid/httpmaid/core/1.0.28/core-1.0.28.jar de.quantummaid.examples.QuickStart
 ```
 In case you are on a Windows replace `$HOME/.m2` in the command above with the absolute path to your Maven
@@ -126,3 +126,7 @@ httpMaid.close();
 ```
 
 This will close all resources, including the endpoint.
+
+<!---[Nav]-->
+[&larr;](01_Introduction.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](03_Routing.md)
+

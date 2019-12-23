@@ -18,7 +18,7 @@ you should just see an empty page (with the status code `500`, but your browser
 will probably not show you this).
 In the console output of the application, you will see the complete stacktrace
 of the thrown exception:
-```
+```bash
 ERROR: java.lang.RuntimeException: this is an example
 	at de.quantummaid.httpmaid.documentation.xx_exceptions.ExceptionInHandlerExample.lambda$main$0(ExceptionInHandlerExample.java:36)
 	at de.quantummaid.httpmaid.handler.http.HttpHandler.handle(HttpHandler.java:33)
@@ -65,3 +65,8 @@ final HttpMaid httpMaid = anHttpMaid()
 
 When starting the application and navigating to http://localhost:1337/exception, you should now see
 the `Operation not supported` message instead of `Something went wrong`.
+
+
+<!---[Nav]-->
+[&larr;](07_ConfiguringAndLogging.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](09_AuthenticationAndAuthorization.md)
+

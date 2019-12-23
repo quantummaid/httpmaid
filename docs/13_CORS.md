@@ -56,3 +56,8 @@ final HttpMaid httpMaid = anHttpMaid()
         .build();
 ```
 
+
+
+<!---[Nav]-->
+[&larr;](12_UseCases/4_AdvancedTopics.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](14_Endpoints.md)
+

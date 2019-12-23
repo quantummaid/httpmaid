@@ -152,3 +152,8 @@ final HttpMaid httpMaid = anHttpMaid()
         .build();
 ```
 
+
+<!---[Nav]-->
+[&larr;](3_Validation.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../13_CORS.md)
+
+

@@ -39,3 +39,7 @@ It contains the basic HttpMaid builder and the [PureJavaEndpoint](UserGuide.md#P
 Depending on which HttpMaid features you intend to use, you need to load additional
 dependencies. All integrations and their respective Maven coordinates can be found
 in the `/integrations` project subdirectory.
+
+<!---[Nav]-->
+[&larr;](15_Client.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](17_FAQ.md)
+

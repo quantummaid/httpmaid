@@ -75,8 +75,6 @@ final HttpMaid httpMaid = anHttpMaid()
         .build();
 ```
 
-This will be explained in broad detail later.
-
 ### Regular expressions
 If you wrap a single route element into horizontal lines (`|`), it's content will
 be interpreted as a [Java regular expression](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html).
@@ -113,3 +111,7 @@ will match all requests to routes that start with `/files` and end with `/item.x
 With the possibility of wildcards and parameters, some requests might match
 more than one route. Whenever this is the case, the route that was declared
 first in the builder will take precedence.
+
+<!---[Nav]-->
+[&larr;](02_QuickStart.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](04_HandlingRequests.md)
+

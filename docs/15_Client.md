@@ -74,3 +74,7 @@ all "real" http handling. You can create such a client like this:
 ```java
 final HttpMaidClient connectedHttpMaidClient = aHttpMaidClientBypassingRequestsDirectlyTo(httpMaid).build();
 ```
+
+<!---[Nav]-->
+[&larr;](14_Endpoints.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](16_DependencyManagement.md)
+
