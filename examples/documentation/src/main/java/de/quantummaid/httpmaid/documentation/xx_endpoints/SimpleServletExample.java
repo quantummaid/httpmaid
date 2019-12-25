@@ -5,6 +5,8 @@ import de.quantummaid.httpmaid.HttpMaid;
 import javax.servlet.http.HttpServlet;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.servlet.ServletEndpoint.servletEndpointFor;
+import static de.quantummaid.httpmaid.servletwithwebsockets.WebSocketAwareHttpMaidServlet.webSocketAwareHttpMaidServlet;
 
 public class SimpleServletExample {
 
@@ -14,11 +16,11 @@ public class SimpleServletExample {
                 .build();
 
         //Showcase start servletSample
-        //final HttpServlet servlet = servletEndpointFor(httpMaid); TODO: Methode gibts ned
+        final HttpServlet servlet = servletEndpointFor(httpMaid);
         //Showcase end servletSample
 
         //Showcase start websocketServletSample
-        //final HttpServlet servlet = webSocketAwareHttpMaidServlet(httpMaid); TODO: MEthode gibts ned
+        final HttpServlet servletWithWebsockets = webSocketAwareHttpMaidServlet(httpMaid);
         //Showcase end websocketServletSample
     }
 }
