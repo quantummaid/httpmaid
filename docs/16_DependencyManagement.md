@@ -43,5 +43,5 @@ dependencies. All integrations and their respective Maven coordinates can be fou
 in the `/integrations` project subdirectory.
 
 <!---[Nav]-->
-[&larr;](15_Client.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](17_FAQ.md)
+[&larr;](15_Client.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](17_Faq.md)
 
