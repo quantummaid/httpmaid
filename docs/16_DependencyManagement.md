@@ -11,11 +11,12 @@ All HttpMaid integrations have been bundled into a single maven module so that
 initial users don't need to bother choosing the correct dependencies. If you
 are new to HttpMaid and just want to experience HttpMaid for the first time,
 just include this dependency:
+<!---[Dependency](groupId=de.quantummaid.httpmaid.integrations artifactId=httpmaid-all version)-->
 ```xml
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-all</artifactId>
-    <version>${httpmaid.version}</version>
+    <version>1.0.28</version>
 </dependency>
 ```
 This contains anything HttpMaid has to offer, but be aware that it probably adds
@@ -26,11 +27,12 @@ dependencies which are actually used.
 
 ### The core module
 Every HttpMaid configuration needs to include the core module:
+<!---[Dependency](groupId=de.quantummaid.httpmaid artifactId=core version)-->
 ```xml
 <dependency>
     <groupId>de.quantummaid.httpmaid</groupId>
     <artifactId>core</artifactId>
-    <version>${httpmaid.version}</version>
+    <version>1.0.28</version>
 </dependency>
 ```
 It contains the basic HttpMaid builder and the [PureJavaEndpoint](UserGuide.md#Pure Java).

@@ -124,12 +124,13 @@ Domain Object    -(c)->    Map<String, Object>    -(d)->    Response Body
 In fact, MapMaid is so powerful at doing (de-)serialization that we just need to add
 the following dependency and it will automatically and intelligently determine how
 to (de-)serialize our domain objects (`MultiplicationRequest`, `CalculationResponse` and `Number`):
+<!---[Dependency](groupId=de.quantummaid.httpmaid.integrations artifactId=httpmaid-mapmaid version)-->
 ```xml
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-mapmaid</artifactId>
-            <version>${httpmaid.version}</version>
-        </dependency>
+<dependency>
+    <groupId>de.quantummaid.httpmaid.integrations</groupId>
+    <artifactId>httpmaid-mapmaid</artifactId>
+    <version>1.0.28</version>
+</dependency>
 ```
 Please refer to MapMaid's documentation if you want to learn more about this feature.
 Using Gson for marshalling, we end up with a very lean and readable configuration:

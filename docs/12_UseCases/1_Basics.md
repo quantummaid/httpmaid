@@ -59,13 +59,16 @@ that will reflect one single feature of your application. For example:
 -->
 
 In order to do this, you need to add the `httpmaid-usecases` dependency to your project:
+<!---[Dependency](groupId=de.quantummaid.httpmaid.integrations artifactId=httpmaid-usecases version)-->
 ```xml
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-usecases</artifactId>
-    <version>${httpmaid.version}</version>
+    <version>1.0.28</version>
 </dependency>
 ```
+
+
 HttpMaid will automatically discover the dependency and support usecases.
 Afterwards, you can change the configuration and shrink it
 down significantly:
