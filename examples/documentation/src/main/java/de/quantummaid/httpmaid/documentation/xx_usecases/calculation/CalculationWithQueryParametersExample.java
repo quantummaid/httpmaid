@@ -23,32 +23,32 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation;
 
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.MultiplicationRequest;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.MultiplicationUseCase;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.useCases.DivisionUseCase;
-import de.quantummaid.mapmaid.MapMaid;
+
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllQueryParameters;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toUseMapMaid;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 
 public final class CalculationWithQueryParametersExample {
+    private static final Gson GSON = new Gson();
 
+    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
         //Showcase start calculationWithQueryParametersExample
-        final Gson gson = new Gson();
-        final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName()) //TODO: wie kann ich das auf die richtigen ummünzen?
-                .usingJsonMarshaller(gson::toJson, gson::fromJson)
-                .withExceptionIndicatingValidationError(IllegalArgumentException.class)
-                .build();
-
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/multiply", MultiplicationUseCase.class)
                 .get("/divide", DivisionUseCase.class)
+                .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
                 .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
-                .configured(toUseMapMaid(mapMaid))
+                .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+                    mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
+                }))
                 .build();
         //Showcase end calculationWithQueryParametersExample
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);

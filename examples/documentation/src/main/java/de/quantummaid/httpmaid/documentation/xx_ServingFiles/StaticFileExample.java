@@ -33,7 +33,7 @@ public final class StaticFileExample {
     public static void main(final String[] args) {
         //Showcase start staticFile
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/myFile", (request, response) -> response.setFileAsBody("./files/image.jpg"))
+                .get("/myFile", (request, response) -> response.setFileAsBody("./examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_ServingFiles/files/image.jpg"))
                 .build();
         //Showcase end staticFile
         pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);

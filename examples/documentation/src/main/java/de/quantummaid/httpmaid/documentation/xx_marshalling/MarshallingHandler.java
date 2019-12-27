@@ -10,7 +10,6 @@ import java.util.Map;
 public class MarshallingHandler implements HttpHandler {
     @Override
     public void handle(final HttpRequest request, final HttpResponse response) {
-        //TODO final Map<String, Object> requestMap = request.bodyAsMap().orElseThrow();
         final Map<String, Object> responseMap = Map.of(
                 "orderId", "qwefgfd-gt-yeetgtr",
                 "status", "SHIPPING");
