@@ -216,5 +216,5 @@ Restart the application and enjoy the benefits of Jetty.
 14. [Endpoints](docs/14_Endpoints.md)
 15. [Client](docs/15_Client.md)
 16. [Dependency management](docs/16_DependencyManagement.md)
-17. [F a q](docs/17_Faq.md)
+17. [Faq](docs/17_Faq.md)
 <!---EndOfToc-->

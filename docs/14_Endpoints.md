@@ -13,12 +13,12 @@ It does not support websockets.
 Another option is the Jetty endpoint:
 <!---[CodeSnippet] (jettyEndpoint)-->
 ```java
-//jettyEndpointFor(httpMaid).listeningOnThePort(1337); // TODO: Methode gibts nicht
+jettyEndpointFor(httpMaid).listeningOnThePort(1337);
 ```
 If you intend to use websockets, you can go with the Jetty-for-websockets variant:
 <!---[CodeSnippet] (jettyWebsocketsEndpoint)-->
 ```java
-//jettyEndpointWithWebSocketsSupportFor(httpMaid).listeningOnThePort(1337); //TODO: Methode gibts nicht
+jettyEndpointWithWebSocketsSupportFor(httpMaid).listeningOnThePort(1337);
 ```
 ## Servlet
 If you intend to host your application using standard Java servlet technology, you can go with the servlet endpoint.
@@ -27,7 +27,7 @@ If you want to provide the servlet instance programmatically to your servlet eng
 
 <!---[CodeSnippet] (servletSample)-->
 ```java
-//final HttpServlet servlet = servletEndpointFor(httpMaid); TODO: Methode gibts ned
+final HttpServlet servlet = servletEndpointFor(httpMaid);
 ```
 
 If instead you need to provide your servlet engine with a class that it can construct by itself,
@@ -47,7 +47,7 @@ There exists a version of it supporting websockets. It can be used in the same m
 
 <!---[CodeSnippet] (websocketServletSample)-->
 ```java
-//final HttpServlet servlet = webSocketAwareHttpMaidServlet(httpMaid); TODO: MEthode gibts ned
+final HttpServlet servletWithWebsockets = webSocketAwareHttpMaidServlet(httpMaid);
 ```
 or
 ```java

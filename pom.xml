@@ -27,13 +27,13 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>quantummaid-opensource-parent</artifactId>
-        <version>1.0.0</version>
+        <version>0.9.1</version>
     </parent>
 
     <packaging>pom</packaging>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>1.0.28</version>
+    <version>0.9.0</version>
 
     <name>HttpMaid</name>
 
@@ -43,7 +43,7 @@
         you from the headache of configuring numerous beans and spoiling your code with annotations.
     </description>
 
-    <url>https://bitbucket.org/quantummaid/httpmaid</url>
+    <url>https://github.com/quantummaid/httpmaid</url>
 
     <organization>
         <name>Richard Hauswald</name>
@@ -72,6 +72,11 @@
         <developerConnection>scm:git:git://bitbucket.org/quantummaid/httpmaid.git</developerConnection>
         <url>https://bitbucket.org/quantummaid/httpmaid/src</url>
     </scm>
+
+    <properties>
+        <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
+        <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
+    </properties>
 
     <distributionManagement>
         <snapshotRepository>

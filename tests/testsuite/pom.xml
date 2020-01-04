@@ -27,7 +27,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.28</version>
+        <version>0.9.0</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-client</artifactId>
-            <version>1.0.28</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
@@ -102,19 +102,19 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-lambda</artifactId>
-            <version>1.11.675</version>
+            <version>1.11.700</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.675</version>
+            <version>1.11.700</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.18.v20190429</version>
+            <version>10.0.0.alpha1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

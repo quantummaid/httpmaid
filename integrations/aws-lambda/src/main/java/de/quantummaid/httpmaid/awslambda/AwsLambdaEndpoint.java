@@ -63,7 +63,8 @@ public final class AwsLambdaEndpoint {
 
     public APIGatewayProxyResponseEvent delegate(final APIGatewayProxyRequestEvent event, final Context context) {
         final String httpRequestMethod = event.getHttpMethod();
-        final String path = event.getPath();
+        final Map<String, String> pathParameters = event.getPathParameters();
+        final String path = pathParameters.get("path");
         final Map<String, String> headers = event.getHeaders();
         final String body = ofNullable(event.getBody()).orElse("");
         final InputStream bodyStream = stringToInputStream(body);
@@ -79,7 +80,6 @@ public final class AwsLambdaEndpoint {
         metaData.set(IS_HTTP_REQUEST, true);
 
         httpMaid.handleRequest(metaData, response -> {
-            throw new UnsupportedOperationException();
         });
 
         final int statusCode = metaData.get(RESPONSE_STATUS);

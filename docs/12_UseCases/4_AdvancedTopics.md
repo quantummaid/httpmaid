@@ -108,17 +108,14 @@ As stated above, we can now change the multiplication example to use take its
 input from the query parameters instead of the request body:
 <!---[CodeSnippet] (calculationWithQueryParametersExample)-->
 ```java
-final Gson gson = new Gson();
-final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName()) //TODO: wie kann ich das auf die richtigen ummünzen?
-        .usingJsonMarshaller(gson::toJson, gson::fromJson)
-        .withExceptionIndicatingValidationError(IllegalArgumentException.class)
-        .build();
-
 final HttpMaid httpMaid = anHttpMaid()
         .get("/multiply", MultiplicationUseCase.class)
         .get("/divide", DivisionUseCase.class)
+        .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
         .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
-        .configured(toUseMapMaid(mapMaid))
+        .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+            mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
+        }))
         .build();
 ```
 

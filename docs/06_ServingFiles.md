@@ -12,7 +12,7 @@ configuration could look like this:
 <!---[CodeSnippet] (staticFile)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/myFile", (request, response) -> response.setFileAsBody("./files/image.jpg"))
+        .get("/myFile", (request, response) -> response.setFileAsBody("./examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_ServingFiles/files/image.jpg"))
         .build();
 ```
 

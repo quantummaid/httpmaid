@@ -28,7 +28,7 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>httpmaid-parent</artifactId>
-        <version>1.0.28</version>
+        <version>0.9.0</version>
     </parent>
 
     <packaging>pom</packaging>

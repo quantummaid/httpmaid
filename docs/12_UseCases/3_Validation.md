@@ -124,16 +124,13 @@ validation, MapMaid will behave differently. Let's tell MapMaid about the except
 
 <!---[CodeSnippet] (divisionExampleStep2)-->
 ```java
-final Gson GSON = new Gson();
-final MapMaid mapMaid = aMapMaid(MultiplicationRequest.class.getPackageName())
-        .usingJsonMarshaller(GSON::toJson, GSON::fromJson)
-        .withExceptionIndicatingValidationError(IllegalArgumentException.class)
-        //.usingRecipe(builtInPrimitiveSerializedAsStringSupport()) TODO: methode gibts ned
-        .build();
 final HttpMaid httpMaid = anHttpMaid()
         .post("/multiply", MultiplicationUseCase.class)
         .post("/divide", DivisionUseCase.class)
-        .configured(toUseMapMaid(mapMaid))
+        .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
+        .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+            mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
+        }))
         .build();
 ```
 
