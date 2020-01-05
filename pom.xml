@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
   ~
@@ -19,37 +20,30 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>quantummaid-opensource-parent</artifactId>
-        <version>0.9.1</version>
+        <version>0.9.3</version>
     </parent>
 
+    <artifactId>httpmaid-parent</artifactId>
+    <version>0.9.1</version>
     <packaging>pom</packaging>
 
-    <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.0</version>
-
     <name>HttpMaid</name>
-
     <description>
         HttpMaid is a lightweight non-intrusive web framework, which allows you to easily use your services to handle
         HTTP requests. It delegates the processing of a request based on it's path to one of your services, releasing
         you from the headache of configuring numerous beans and spoiling your code with annotations.
     </description>
-
     <url>https://github.com/quantummaid/httpmaid</url>
-
     <organization>
         <name>Richard Hauswald</name>
         <url>https://www.quantummaid.de</url>
     </organization>
-
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -72,12 +66,6 @@
         <developerConnection>scm:git:git://bitbucket.org/quantummaid/httpmaid.git</developerConnection>
         <url>https://bitbucket.org/quantummaid/httpmaid/src</url>
     </scm>
-
-    <properties>
-        <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
-        <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
-    </properties>
-
     <distributionManagement>
         <snapshotRepository>
             <uniqueVersion>false</uniqueVersion>
@@ -95,14 +83,10 @@
         </repository>
     </distributionManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.10</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    <properties>
+        <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
+        <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -115,6 +99,14 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>
