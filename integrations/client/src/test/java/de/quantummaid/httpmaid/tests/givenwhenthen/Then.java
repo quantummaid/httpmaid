@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @ToString
 @EqualsAndHashCode

@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid</groupId>
         <artifactId>integrations-parent</artifactId>
-        <version>0.9.1</version>
+        <version>0.9.2</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
@@ -53,51 +53,12 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-servlet</artifactId>
-            <version>9.4.21.v20190926</version>
+            <version>9.4.25.v20191220</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>9.4.21.v20190926</version>
+            <version>9.4.25.v20191220</version>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>deployToMavenCentral</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>deployToMavenCentral</name>
-                </property>
-            </activation>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>${maven-enforcer-plugin-version}</version>
-                        <executions>
-                            <execution>
-                                <id>enforce-checksum</id>
-                                <goals>
-                                    <goal>enforce</goal>
-                                </goals>
-                                <phase>verify</phase>
-                                <configuration>
-                                    <rules>
-                                        <requireMavenVersion>
-                                            <version>3.6</version>
-                                        </requireMavenVersion>
-                                    </rules>
-                                    <fail>false</fail>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

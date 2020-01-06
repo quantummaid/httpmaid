@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static websockets.givenwhenthen.configurations.lowlevel.LowLevelConfiguration.logger;
 
 @ToString

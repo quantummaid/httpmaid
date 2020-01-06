@@ -31,7 +31,7 @@ import static de.quantummaid.httpmaid.path.Path.path;
 import static de.quantummaid.httpmaid.path.PathTemplate.pathTemplate;
 import static java.util.Map.of;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class PathTemplateSpecs {
 
