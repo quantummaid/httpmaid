@@ -50,6 +50,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>de.quantummaid.mapmaid</groupId>
+            <artifactId>core</artifactId>
+            <version>0.9.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.5.10</version>
@@ -72,12 +78,6 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.mapmaid</groupId>
-            <artifactId>core</artifactId>
-            <version>0.9.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
