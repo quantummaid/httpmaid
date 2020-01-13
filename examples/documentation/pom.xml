@@ -40,7 +40,7 @@
         <spotbugs.excludeFilterFile>
             ${project.basedir}/src/test/spotbugs/spotbugs-exclude.xml
         </spotbugs.excludeFilterFile>
-        <httpmaid.version>0.9.4</httpmaid.version>
+        <httpmaid.version>0.9.5</httpmaid.version>
     </properties>
 
     <dependencyManagement>

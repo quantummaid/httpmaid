@@ -37,7 +37,7 @@
         <checkstyle.suppressions.location>
             ${project.basedir}/src/test/checkstyle/checkstyle-suppressions.xml
         </checkstyle.suppressions.location>
-        <httpmaid.version>0.9.4</httpmaid.version>
+        <httpmaid.version>0.9.5</httpmaid.version>
 
         <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
     </properties>
