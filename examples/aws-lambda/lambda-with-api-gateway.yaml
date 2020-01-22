@@ -45,11 +45,11 @@ Resources:
       Tags:
       - Key: StackIdentifier
         Value: !Ref StackIdentifier
-      MemorySize: 512
+      MemorySize: 192
       Handler: de.quantummaid.httpmaid.examples.awslambda.infra.HttpMaidIntegration::handleRequest
       Role: !GetAtt FunctionRole.Arn
       Timeout: 20
-      Runtime: java8
+      Runtime: java11
 
   FunctionResourcePermission:
     Type: AWS::Lambda::Permission
