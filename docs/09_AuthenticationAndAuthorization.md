@@ -236,7 +236,7 @@ authorize requests based on the stored `admin` claim.
 <!---[CodeSnippet] (customLoginFull)-->
 ```java
 final Key key = secretKeyFor(SignatureAlgorithm.HS256);
-final JwtParser jwtParser = parser().setSigningKey(key);
+final JwtParser jwtParser = parserBuilder().setSigningKey(key).build();
 
 final MapMaid mapMaid = aMapMaid()
         .usingRecipe(urlEncodedMarshaller())
