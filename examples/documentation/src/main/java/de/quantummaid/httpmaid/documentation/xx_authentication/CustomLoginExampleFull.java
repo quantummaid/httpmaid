@@ -38,8 +38,7 @@ import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthentic
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedMarshallerRecipe.urlEncodedMarshaller;
-import static io.jsonwebtoken.Jwts.builder;
-import static io.jsonwebtoken.Jwts.parser;
+import static io.jsonwebtoken.Jwts.*;
 import static io.jsonwebtoken.security.Keys.secretKeyFor;
 
 public final class CustomLoginExampleFull {
@@ -47,7 +46,7 @@ public final class CustomLoginExampleFull {
     public static void main(final String[] args) {
         //Showcase start customLoginFull
         final Key key = secretKeyFor(SignatureAlgorithm.HS256);
-        final JwtParser jwtParser = parser().setSigningKey(key);
+        final JwtParser jwtParser = parserBuilder().setSigningKey(key).build();
 
         final MapMaid mapMaid = aMapMaid()
                 .usingRecipe(urlEncodedMarshaller())

@@ -43,8 +43,7 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingOAuth2BearerToken;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeAllAuthenticatedRequests;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
-import static io.jsonwebtoken.Jwts.builder;
-import static io.jsonwebtoken.Jwts.parser;
+import static io.jsonwebtoken.Jwts.*;
 import static io.jsonwebtoken.security.Keys.secretKeyFor;
 import static java.util.Objects.isNull;
 
@@ -52,7 +51,7 @@ public final class ReactExample {
     private static final Map<String, String> userDatabase = Map.of("joe", hashPassword("foo"));
 
     private static final Key key = secretKeyFor(SignatureAlgorithm.HS256);
-    private static final JwtParser jwtParser = parser().setSigningKey(key);
+    private static final JwtParser jwtParser = parserBuilder().setSigningKey(key).build();
 
     public static void main(String[] args) {
         final Gson gson = new Gson();
