@@ -11,60 +11,66 @@
         </rule>
         <rule groupId="com.amazonaws" artifactId="aws-java-sdk-lambda" comparisonMethod="maven">
             <ignoreVersions>
-                <ignoreVersion>1.11.706</ignoreVersion>
-                <ignoreVersion>1.11.707</ignoreVersion>
-                <ignoreVersion>1.11.708</ignoreVersion>
-                <ignoreVersion>1.11.709</ignoreVersion>
-                <ignoreVersion>1.11.710</ignoreVersion>
-                <ignoreVersion>1.11.711</ignoreVersion>
-                <ignoreVersion>1.11.712</ignoreVersion>
-                <ignoreVersion>1.11.713</ignoreVersion>
-                <ignoreVersion>1.11.714</ignoreVersion>
-                <ignoreVersion>1.11.715</ignoreVersion>
-                <ignoreVersion>1.11.716</ignoreVersion>
-                <ignoreVersion>1.11.717</ignoreVersion>
-                <ignoreVersion>1.11.718</ignoreVersion>
-                <ignoreVersion>1.11.719</ignoreVersion>
-                <ignoreVersion>1.11.720</ignoreVersion>
-                <ignoreVersion>1.11.721</ignoreVersion>
-                <ignoreVersion>1.11.722</ignoreVersion>
-                <ignoreVersion>1.11.723</ignoreVersion>
-                <ignoreVersion>1.11.724</ignoreVersion>
-                <ignoreVersion>1.11.725</ignoreVersion>
-                <ignoreVersion>1.11.726</ignoreVersion>
-                <ignoreVersion>1.11.727</ignoreVersion>
-                <ignoreVersion>1.11.728</ignoreVersion>
-                <ignoreVersion>1.11.729</ignoreVersion>
-                <ignoreVersion>1.11.730</ignoreVersion>
+                <ignoreVersion>1.11.732</ignoreVersion>
+                <ignoreVersion>1.11.733</ignoreVersion>
+                <ignoreVersion>1.11.734</ignoreVersion>
+                <ignoreVersion>1.11.735</ignoreVersion>
+                <ignoreVersion>1.11.736</ignoreVersion>
+                <ignoreVersion>1.11.737</ignoreVersion>
+                <ignoreVersion>1.11.738</ignoreVersion>
+                <ignoreVersion>1.11.739</ignoreVersion>
+                <ignoreVersion>1.11.740</ignoreVersion>
+                <ignoreVersion>1.11.741</ignoreVersion>
+                <ignoreVersion>1.11.742</ignoreVersion>
+                <ignoreVersion>1.11.743</ignoreVersion>
+                <ignoreVersion>1.11.744</ignoreVersion>
+                <ignoreVersion>1.11.745</ignoreVersion>
+                <ignoreVersion>1.11.746</ignoreVersion>
+                <ignoreVersion>1.11.747</ignoreVersion>
+                <ignoreVersion>1.11.748</ignoreVersion>
+                <ignoreVersion>1.11.749</ignoreVersion>
+                <ignoreVersion>1.11.750</ignoreVersion>
+                <ignoreVersion>1.11.751</ignoreVersion>
+                <ignoreVersion>1.11.752</ignoreVersion>
+                <ignoreVersion>1.11.753</ignoreVersion>
+                <ignoreVersion>1.11.754</ignoreVersion>
+                <ignoreVersion>1.11.755</ignoreVersion>
+                <ignoreVersion>1.11.756</ignoreVersion>
+                <ignoreVersion>1.11.757</ignoreVersion>
+                <ignoreVersion>1.11.758</ignoreVersion>
+                <ignoreVersion>1.11.759</ignoreVersion>
             </ignoreVersions>
         </rule>
         <rule groupId="com.amazonaws" artifactId="aws-java-sdk-s3" comparisonMethod="maven">
             <ignoreVersions>
-                <ignoreVersion>1.11.706</ignoreVersion>
-                <ignoreVersion>1.11.707</ignoreVersion>
-                <ignoreVersion>1.11.708</ignoreVersion>
-                <ignoreVersion>1.11.709</ignoreVersion>
-                <ignoreVersion>1.11.710</ignoreVersion>
-                <ignoreVersion>1.11.711</ignoreVersion>
-                <ignoreVersion>1.11.712</ignoreVersion>
-                <ignoreVersion>1.11.713</ignoreVersion>
-                <ignoreVersion>1.11.714</ignoreVersion>
-                <ignoreVersion>1.11.715</ignoreVersion>
-                <ignoreVersion>1.11.716</ignoreVersion>
-                <ignoreVersion>1.11.717</ignoreVersion>
-                <ignoreVersion>1.11.718</ignoreVersion>
-                <ignoreVersion>1.11.719</ignoreVersion>
-                <ignoreVersion>1.11.720</ignoreVersion>
-                <ignoreVersion>1.11.721</ignoreVersion>
-                <ignoreVersion>1.11.722</ignoreVersion>
-                <ignoreVersion>1.11.723</ignoreVersion>
-                <ignoreVersion>1.11.724</ignoreVersion>
-                <ignoreVersion>1.11.725</ignoreVersion>
-                <ignoreVersion>1.11.726</ignoreVersion>
-                <ignoreVersion>1.11.727</ignoreVersion>
-                <ignoreVersion>1.11.728</ignoreVersion>
-                <ignoreVersion>1.11.729</ignoreVersion>
-                <ignoreVersion>1.11.730</ignoreVersion>
+                <ignoreVersion>1.11.732</ignoreVersion>
+                <ignoreVersion>1.11.733</ignoreVersion>
+                <ignoreVersion>1.11.734</ignoreVersion>
+                <ignoreVersion>1.11.735</ignoreVersion>
+                <ignoreVersion>1.11.736</ignoreVersion>
+                <ignoreVersion>1.11.737</ignoreVersion>
+                <ignoreVersion>1.11.738</ignoreVersion>
+                <ignoreVersion>1.11.739</ignoreVersion>
+                <ignoreVersion>1.11.740</ignoreVersion>
+                <ignoreVersion>1.11.741</ignoreVersion>
+                <ignoreVersion>1.11.742</ignoreVersion>
+                <ignoreVersion>1.11.743</ignoreVersion>
+                <ignoreVersion>1.11.744</ignoreVersion>
+                <ignoreVersion>1.11.745</ignoreVersion>
+                <ignoreVersion>1.11.746</ignoreVersion>
+                <ignoreVersion>1.11.747</ignoreVersion>
+                <ignoreVersion>1.11.748</ignoreVersion>
+                <ignoreVersion>1.11.749</ignoreVersion>
+                <ignoreVersion>1.11.750</ignoreVersion>
+                <ignoreVersion>1.11.751</ignoreVersion>
+                <ignoreVersion>1.11.752</ignoreVersion>
+                <ignoreVersion>1.11.753</ignoreVersion>
+                <ignoreVersion>1.11.754</ignoreVersion>
+                <ignoreVersion>1.11.755</ignoreVersion>
+                <ignoreVersion>1.11.756</ignoreVersion>
+                <ignoreVersion>1.11.757</ignoreVersion>
+                <ignoreVersion>1.11.758</ignoreVersion>
+                <ignoreVersion>1.11.759</ignoreVersion>
             </ignoreVersions>
         </rule>
     </rules>
