@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.websocketsusecases;
 
-import de.quantummaid.messagemaid.processingContext.EventType;
-import de.quantummaid.messagemaid.serializedMessageBus.SerializedMessageBus;
+import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

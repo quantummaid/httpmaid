@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,7 +25,7 @@ import websockets.givenwhenthen.configurations.artificial.ArtificialConfiguratio
 
 import java.util.HashMap;
 
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
 
 public final class CloseUseCase {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,17 +22,17 @@
 package de.quantummaid.httpmaid.tests.lowlevel.events;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.messagemaid.identification.CorrelationId;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
-import de.quantummaid.messagemaid.messageBus.MessageBusType;
+import de.quantummaid.eventmaid.identification.CorrelationId;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.messageBus.MessageBusType;
 
 import java.util.HashMap;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toUseTheMessageBus;
-import static de.quantummaid.messagemaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.messagemaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
+import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
 
 final class EventsHttpMaidConfiguration {
     private static MessageBus messageBus;

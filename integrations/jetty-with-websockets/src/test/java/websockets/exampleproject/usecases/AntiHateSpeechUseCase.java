@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,7 +25,7 @@ import websockets.exampleproject.domain.Username;
 
 import java.util.List;
 
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
 import static java.util.Arrays.asList;
 import static websockets.exampleproject.Application.MESSAGE_BUS;
 import static websockets.exampleproject.usecases.BanUserEvent.banUserEvent;

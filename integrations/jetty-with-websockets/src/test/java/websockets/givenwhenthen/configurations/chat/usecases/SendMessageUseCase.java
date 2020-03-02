@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,7 +28,7 @@ import websockets.givenwhenthen.configurations.chat.domain.Username;
 
 import java.util.Map;
 
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
 import static websockets.givenwhenthen.configurations.chat.ChatConfiguration.messageBus;
 import static websockets.givenwhenthen.configurations.chat.domain.UserRepository.userRepository;
 import static websockets.givenwhenthen.configurations.chat.usecases.NewMessageEvent.newMessageEvent;

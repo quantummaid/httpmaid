@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -27,18 +27,18 @@ import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
-import de.quantummaid.messagemaid.internal.collections.filtermap.FilterMapBuilder;
-import de.quantummaid.messagemaid.internal.collections.predicatemap.PredicateMapBuilder;
-import de.quantummaid.messagemaid.mapping.Demapifier;
-import de.quantummaid.messagemaid.mapping.Mapifier;
-import de.quantummaid.messagemaid.mapping.SerializationFilters;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
-import de.quantummaid.messagemaid.processingContext.EventType;
-import de.quantummaid.messagemaid.serializedMessageBus.SerializedMessageBus;
-import de.quantummaid.messagemaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder;
-import de.quantummaid.messagemaid.useCases.useCaseAdapter.UseCaseAdapter;
-import de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseCalling.Caller;
-import de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
+import de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder;
+import de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder;
+import de.quantummaid.eventmaid.mapping.Demapifier;
+import de.quantummaid.eventmaid.mapping.Mapifier;
+import de.quantummaid.eventmaid.mapping.SerializationFilters;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseCalling.Caller;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -52,13 +52,13 @@ import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.messagemaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
-import static de.quantummaid.messagemaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
-import static de.quantummaid.messagemaid.mapping.DeserializationFilters.areOfType;
-import static de.quantummaid.messagemaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromClass;
-import static de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseCalling.SinglePublicUseCaseMethodCaller.singlePublicUseCaseMethodCaller;
-import static de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
+import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
+import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
+import static de.quantummaid.eventmaid.mapping.DeserializationFilters.areOfType;
+import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromClass;
+import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseCalling.SinglePublicUseCaseMethodCaller.singlePublicUseCaseMethodCaller;
+import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 import static java.util.Collections.singletonList;
 
 @ToString

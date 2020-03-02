@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,8 +29,8 @@ import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.generator.Generator;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
-import de.quantummaid.messagemaid.processingContext.EventType;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.processingContext.EventType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -51,9 +51,9 @@ import static de.quantummaid.httpmaid.generator.Generator.generator;
 import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.messagemaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.messagemaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.messagemaid.messageBus.MessageBusType.ASYNCHRONOUS;
+import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
+import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.messageBus.MessageBusType.ASYNCHRONOUS;
 import static java.util.Optional.of;
 
 @ToString

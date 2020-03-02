@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.events;
 
 import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
 
 import java.util.Map;
 

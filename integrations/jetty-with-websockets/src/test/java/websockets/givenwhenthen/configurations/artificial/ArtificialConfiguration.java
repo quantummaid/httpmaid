@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,11 +26,11 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.path.Path;
 import de.quantummaid.httpmaid.security.SecurityConfigurators;
 import de.quantummaid.httpmaid.websockets.registry.WebSocketRegistry;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
-import de.quantummaid.messagemaid.messageBus.MessageBusType;
-import de.quantummaid.messagemaid.useCases.building.ExceptionSerializationStep1Builder;
-import de.quantummaid.messagemaid.useCases.building.Step1Builder;
-import de.quantummaid.messagemaid.useCases.useCaseAdapter.UseCaseAdapter;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.messageBus.MessageBusType;
+import de.quantummaid.eventmaid.useCases.building.ExceptionSerializationStep1Builder;
+import de.quantummaid.eventmaid.useCases.building.Step1Builder;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
 import websockets.givenwhenthen.configurations.TestConfiguration;
 import websockets.givenwhenthen.configurations.artificial.usecases.abc.UseCaseA;
 import websockets.givenwhenthen.configurations.artificial.usecases.abc.UseCaseB;
@@ -66,10 +66,10 @@ import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthentic
 import static de.quantummaid.httpmaid.websockets.WebSocketsConfigurator.toUseWebSockets;
 import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.WEBSOCKET_REGISTRY;
 import static de.quantummaid.httpmaid.websocketsevents.Conditions.webSocketIsTaggedWith;
-import static de.quantummaid.messagemaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.messagemaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromString;
-import static de.quantummaid.messagemaid.useCases.useCaseAdapter.UseCaseInvocationBuilder.anUseCaseAdapter;
+import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
+import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseInvocationBuilder.anUseCaseAdapter;
 import static websockets.givenwhenthen.configurations.TestConfiguration.testConfiguration;
 import static websockets.givenwhenthen.configurations.artificial.usecases.echo.EchoParameter.echoParameter;
 import static websockets.givenwhenthen.configurations.artificial.usecases.exception.ExceptionUseCaseParameter.exceptionUseCaseParameter;

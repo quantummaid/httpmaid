@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,11 +23,11 @@ package de.quantummaid.httpmaid.events.processors;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
-import de.quantummaid.messagemaid.messageFunction.MessageFunction;
-import de.quantummaid.messagemaid.messageFunction.ResponseFuture;
-import de.quantummaid.messagemaid.processingContext.EventType;
-import de.quantummaid.messagemaid.processingContext.ProcessingContext;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.messageFunction.MessageFunction;
+import de.quantummaid.eventmaid.messageFunction.ResponseFuture;
+import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.processingContext.ProcessingContext;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ import java.util.concurrent.ExecutionException;
 
 import static de.quantummaid.httpmaid.events.EventModule.*;
 import static de.quantummaid.httpmaid.events.processors.EventDispatchingException.eventDispatchingException;
-import static de.quantummaid.messagemaid.messageFunction.MessageFunctionBuilder.aMessageFunction;
+import static de.quantummaid.eventmaid.messageFunction.MessageFunctionBuilder.aMessageFunction;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
 

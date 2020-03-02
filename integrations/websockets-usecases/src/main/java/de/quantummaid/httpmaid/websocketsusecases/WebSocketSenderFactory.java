@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,12 +23,12 @@ package de.quantummaid.httpmaid.websocketsusecases;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
-import de.quantummaid.messagemaid.processingContext.EventType;
-import de.quantummaid.messagemaid.serializedMessageBus.SerializedMessageBus;
-import de.quantummaid.messagemaid.subscribing.AcceptingBehavior;
-import de.quantummaid.messagemaid.subscribing.Subscriber;
-import de.quantummaid.messagemaid.subscribing.SubscriptionId;
-import de.quantummaid.messagemaid.useCases.payloadAndErrorPayload.PayloadAndErrorPayload;
+import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
+import de.quantummaid.eventmaid.subscribing.AcceptingBehavior;
+import de.quantummaid.eventmaid.subscribing.Subscriber;
+import de.quantummaid.eventmaid.subscribing.SubscriptionId;
+import de.quantummaid.eventmaid.useCases.payloadAndErrorPayload.PayloadAndErrorPayload;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.usecases.UseCasesModule.SERIALIZED_MESSAGE_BUS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websocketsusecases.WebSocketMessageSenderConfiguration.webSocketMessageSenderConfiguration;
-import static de.quantummaid.messagemaid.subscribing.SubscriptionId.newUniqueId;
+import static de.quantummaid.eventmaid.subscribing.SubscriptionId.newUniqueId;
 
 @ToString
 @EqualsAndHashCode

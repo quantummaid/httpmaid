@@ -210,7 +210,7 @@ being of interest here:
 > Accept: */*
 > 
 < HTTP/1.1 201 Created
-< Date: Thu, 31 Oct 2019 16:36:24 GMT
+< Date: Thu, 31 Oct 2020 16:36:24 GMT
 < Transfer-encoding: chunked
 < 
 * Connection #0 to host localhost left intact
@@ -240,7 +240,7 @@ and see an output like this, with the `< Name: Bob` line being of interest:
 > Accept: */*
 > 
 < HTTP/1.1 200 OK
-< Date: Thu, 31 Oct 2019 16:43:53 GMT
+< Date: Thu, 31 Oct 2020 16:43:53 GMT
 < Name: Bob
 < Transfer-encoding: chunked
 < 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,8 +24,8 @@ package de.quantummaid.httpmaid.usecases.serializing;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
-import de.quantummaid.messagemaid.mapping.Demapifier;
-import de.quantummaid.messagemaid.mapping.Mapifier;
+import de.quantummaid.eventmaid.mapping.Demapifier;
+import de.quantummaid.eventmaid.mapping.Mapifier;
 
 import java.util.Map;
 

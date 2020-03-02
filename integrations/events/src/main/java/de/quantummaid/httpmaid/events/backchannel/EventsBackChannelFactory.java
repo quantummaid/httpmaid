@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,20 +23,20 @@ package de.quantummaid.httpmaid.events.backchannel;
 
 import de.quantummaid.httpmaid.backchannel.BackChannelFactory;
 import de.quantummaid.httpmaid.backchannel.BackChannelTrigger;
-import de.quantummaid.messagemaid.messageBus.MessageBus;
-import de.quantummaid.messagemaid.processingContext.EventType;
-import de.quantummaid.messagemaid.subscribing.AcceptingBehavior;
-import de.quantummaid.messagemaid.subscribing.Subscriber;
-import de.quantummaid.messagemaid.subscribing.SubscriptionId;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.subscribing.AcceptingBehavior;
+import de.quantummaid.eventmaid.subscribing.Subscriber;
+import de.quantummaid.eventmaid.subscribing.SubscriptionId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.messagemaid.processingContext.EventType.eventTypeFromString;
-import static de.quantummaid.messagemaid.subscribing.AcceptingBehavior.MESSAGE_ACCEPTED;
-import static de.quantummaid.messagemaid.subscribing.SubscriptionId.newUniqueId;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.subscribing.AcceptingBehavior.MESSAGE_ACCEPTED;
+import static de.quantummaid.eventmaid.subscribing.SubscriptionId.newUniqueId;
 import static java.util.UUID.randomUUID;
 
 @ToString

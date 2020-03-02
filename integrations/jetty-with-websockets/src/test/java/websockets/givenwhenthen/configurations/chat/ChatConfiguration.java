@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,12 +21,12 @@
 
 package websockets.givenwhenthen.configurations.chat;
 
-import de.quantummaid.messagemaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
 import websockets.givenwhenthen.configurations.TestConfiguration;
 
-import static de.quantummaid.messagemaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.messagemaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.messagemaid.messageBus.MessageBusType.ASYNCHRONOUS;
+import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
+import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.messageBus.MessageBusType.ASYNCHRONOUS;
 
 public final class ChatConfiguration {
     private static final int POOL_SIZE = 4;

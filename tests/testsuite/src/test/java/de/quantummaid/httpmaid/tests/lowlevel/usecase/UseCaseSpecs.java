@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Richard Hauswald - https://quantummaid.de/.
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,7 +26,7 @@ import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.FailInInitializer
 import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.SomeCheckedException;
 import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.ThrowCheckedExceptionUseCase;
 import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.VoidUseCase;
-import de.quantummaid.messagemaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
