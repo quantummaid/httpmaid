@@ -26,7 +26,7 @@ public final class MultiplicationRequest {
     public final Integer factor1;
     public final Integer factor2;
 
-    public MultiplicationRequest(final Integer factor1, final Integer factor2) {
+    private MultiplicationRequest(final Integer factor1, final Integer factor2) {
         this.factor1 = factor1;
         this.factor2 = factor2;
     }

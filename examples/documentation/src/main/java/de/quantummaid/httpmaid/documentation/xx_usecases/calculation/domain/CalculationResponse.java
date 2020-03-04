@@ -25,7 +25,7 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain;
 public final class CalculationResponse {
     public final Integer result;
 
-    public CalculationResponse(final Integer result) {
+    private CalculationResponse(final Integer result) {
         this.result = result;
     }
 

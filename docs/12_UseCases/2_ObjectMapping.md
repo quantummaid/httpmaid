@@ -14,7 +14,7 @@ public final class MultiplicationUseCase {
 
     public CalculationResponse multiply(final MultiplicationRequest multiplicationRequest) {
         final int result = multiplicationRequest.factor1 * multiplicationRequest.factor2;
-        return new CalculationResponse(result);
+        return calculationResult(result);
     }
 }
 ```
@@ -26,7 +26,7 @@ public final class MultiplicationRequest {
     public final Integer factor1;
     public final Integer factor2;
 
-    public MultiplicationRequest(final Integer factor1, final Integer factor2) {
+    private MultiplicationRequest(final Integer factor1, final Integer factor2) {
         this.factor1 = factor1;
         this.factor2 = factor2;
     }
@@ -47,7 +47,7 @@ encapsulated in an object of type `CalculationResponse`:
 public final class CalculationResponse {
     public final Integer result;
 
-    public CalculationResponse(final Integer result) {
+    private CalculationResponse(final Integer result) {
         this.result = result;
     }
 

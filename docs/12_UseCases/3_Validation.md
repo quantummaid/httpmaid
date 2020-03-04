@@ -9,7 +9,7 @@ public final class DivisionUseCase {
     public CalculationResponse divide(final DivisionRequest divisionRequest) {
         final int divisor = divisionRequest.divisor;
         final int result = divisionRequest.dividend / divisor;
-        return new CalculationResponse(result);
+        return calculationResult(result);
     }
 }
 ```
@@ -236,7 +236,7 @@ public final class DivisionUseCase {
     public CalculationResponse divide(final DivisionRequest divisionRequest) {
         final int divisor = divisionRequest.divisor.value();
         final int result = divisionRequest.dividend / divisor;
-        return new CalculationResponse(result);
+        return calculationResult(result);
     }
 }
 ```

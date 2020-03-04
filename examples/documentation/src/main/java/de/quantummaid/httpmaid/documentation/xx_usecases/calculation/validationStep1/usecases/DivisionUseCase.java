@@ -24,13 +24,15 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validation
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep1.domain.DivisionRequest;
 
+import static de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse.calculationResult;
+
 //Showcase start divisionUseCasStep1
 public final class DivisionUseCase {
 
     public CalculationResponse divide(final DivisionRequest divisionRequest) {
         final int divisor = divisionRequest.divisor;
         final int result = divisionRequest.dividend / divisor;
-        return new CalculationResponse(result);
+        return calculationResult(result);
     }
 }
 //Showcase end divisionUseCasStep1

@@ -24,12 +24,14 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.MultiplicationRequest;
 
+import static de.quantummaid.httpmaid.documentation.xx_usecases.calculation.domain.CalculationResponse.calculationResult;
+
 //Showcase start multiplicationUseCase
 public final class MultiplicationUseCase {
 
     public CalculationResponse multiply(final MultiplicationRequest multiplicationRequest) {
         final int result = multiplicationRequest.factor1 * multiplicationRequest.factor2;
-        return new CalculationResponse(result);
+        return calculationResult(result);
     }
 }
 //Showcase end multiplicationUseCase
