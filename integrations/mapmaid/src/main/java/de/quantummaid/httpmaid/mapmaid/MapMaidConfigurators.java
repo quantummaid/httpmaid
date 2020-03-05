@@ -48,7 +48,7 @@ public final class MapMaidConfigurators {
         validateNotNull(recipe, "recipe");
         return new Configurator() {
             @Override
-            public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+            public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
                 return singletonList(mapMaidModule());
             }
 

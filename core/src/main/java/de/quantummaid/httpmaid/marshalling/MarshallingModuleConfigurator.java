@@ -33,7 +33,7 @@ import static java.util.Collections.singletonList;
 public interface MarshallingModuleConfigurator extends Configurator {
 
     @Override
-    default List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    default List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return singletonList(emptyMarshallingModule());
     }
 

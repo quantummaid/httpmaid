@@ -79,7 +79,7 @@ public final class ChainRegistryBuilder {
     private static void enterDefaultDependencies(final List<? extends Configurator> configurators,
                                                  final DependencyRegistry dependencyRegistry) {
         configurators.stream()
-                .map(Configurator::supplyModulesIfNotAlreadyPreset)
+                .map(Configurator::supplyModulesIfNotAlreadyPresent)
                 .flatMap(Collection::stream)
                 .forEach(module -> enterDefaultDependency(module, dependencyRegistry));
     }

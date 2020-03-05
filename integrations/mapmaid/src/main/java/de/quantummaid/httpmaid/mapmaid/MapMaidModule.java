@@ -27,6 +27,7 @@ import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.marshalling.MarshallingModule;
+import de.quantummaid.httpmaid.usecases.UseCases;
 import de.quantummaid.httpmaid.usecases.UseCasesModule;
 import de.quantummaid.httpmaid.usecases.serializing.SerializerAndDeserializer;
 import de.quantummaid.mapmaid.MapMaid;
@@ -38,16 +39,19 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_MAP;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.RECIPES;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidMarshallingMapper.mapMaidMarshallingMapper;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidSerializerAndDeserializer.mapMaidSerializerAndDeserializer;
+import static de.quantummaid.httpmaid.mapmaid.recipe.ClassScannerRecipe.addAllReferencedClassesIn;
 import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
-import static de.quantummaid.mapmaid.builder.recipes.scanner.ClassScannerRecipe.addAllReferencedClassesIs;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -84,27 +88,31 @@ public final class MapMaidModule implements ChainModule {
     }
 
     @Override
-    public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return singletonList(emptyMarshallingModule());
     }
 
     @Override
     public void configure(final DependencyRegistry dependencyRegistry) {
         final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-        final Set<Class<?>> useCases = useCasesModule.getUseCases();
 
-        if (mapMaid == null) {
-            final MapMaidBuilder mapMaidBuilder = aMapMaid();
-            dependencyRegistry.getMetaData().getOrSetDefault(RECIPES, LinkedList::new).forEach(mapMaidBuilder::usingRecipe);
-            useCases.forEach(useCase -> mapMaidBuilder.usingRecipe(addAllReferencedClassesIs(useCase)));
-            mapMaid = mapMaidBuilder.build();
-        }
+        final Function<UseCases, SerializerAndDeserializer> mapMaidSupplier = useCases -> {
+            if (mapMaid == null) {
+                final MapMaidBuilder mapMaidBuilder = aMapMaid();
+                dependencyRegistry.getMetaData().getOrSetDefault(RECIPES, LinkedList::new).forEach(mapMaidBuilder::usingRecipe);
+                mapMaidBuilder.usingRecipe(addAllReferencedClassesIn(
+                        useCases.useCases(),
+                        useCases.typesWithSpecialSerializers(),
+                        useCases.typesWithSpecialDeserializers()));
+                mapMaid = mapMaidBuilder.build();
+            }
 
-        final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
-        mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
+            final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
+            mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
 
-        final SerializerAndDeserializer serializerAndDeserializer = mapMaidSerializerAndDeserializer(mapMaid);
-        useCasesModule.setSerializerAndDeserializer(serializerAndDeserializer);
+            return mapMaidSerializerAndDeserializer(mapMaid);
+        };
+        useCasesModule.setSerializerAndDeserializer(mapMaidSupplier);
 
         if (addAggregatedExceptionHandler) {
             final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);

@@ -23,8 +23,8 @@ package de.quantummaid.httpmaid.documentation.xx_usecases.calculation;
 
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.useCases.DivisionUseCase;
 import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.usecases.MultiplicationUseCase;
+import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationStep3.useCases.DivisionUseCase;
 
 import java.util.Map;
 
@@ -43,7 +43,7 @@ public final class CalculationExample {
                 .post("/multiply", MultiplicationUseCase.class)
                 .post("/divide", DivisionUseCase.class)
                 .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-                .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
                     mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
                 }))
                 .build();

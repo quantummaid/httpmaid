@@ -21,17 +21,10 @@
 
 package de.quantummaid.httpmaid.usecases;
 
-import de.quantummaid.httpmaid.usecases.serializing.SerializerAndDeserializer;
-import de.quantummaid.httpmaid.chains.ChainExtender;
-import de.quantummaid.httpmaid.chains.ChainModule;
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.MetaDataKey;
-import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder;
 import de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder;
 import de.quantummaid.eventmaid.mapping.Demapifier;
 import de.quantummaid.eventmaid.mapping.Mapifier;
-import de.quantummaid.eventmaid.mapping.SerializationFilters;
 import de.quantummaid.eventmaid.messageBus.MessageBus;
 import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
@@ -39,26 +32,34 @@ import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBu
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseCalling.Caller;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
+import de.quantummaid.httpmaid.chains.ChainExtender;
+import de.quantummaid.httpmaid.chains.ChainModule;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
+import de.quantummaid.httpmaid.usecases.serializing.SerializerAndDeserializer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
-import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
-import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
-import static de.quantummaid.httpmaid.events.EventModule.eventModule;
-import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
 import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
-import static de.quantummaid.eventmaid.mapping.DeserializationFilters.areOfType;
 import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
 import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromClass;
 import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseCalling.SinglePublicUseCaseMethodCaller.singlePublicUseCaseMethodCaller;
 import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
+import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
+import static de.quantummaid.httpmaid.events.EventModule.eventModule;
+import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
+import static de.quantummaid.httpmaid.usecases.SerializersAndDeserializers.serializersAndDeserializers;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
 
 @ToString
@@ -69,9 +70,7 @@ public final class UseCasesModule implements ChainModule {
 
     private UseCaseInstantiator useCaseInstantiator;
     private final Map<Class<?>, EventType> useCaseToEventMappings = new HashMap<>();
-    private final FilterMapBuilder<Class<?>, Map<String, Object>, Demapifier<?>> requestDeserializers = filterMapBuilder();
-    private final PredicateMapBuilder<Object, Mapifier<Object>> responseSerializers = predicateMapBuilder();
-    private SerializerAndDeserializer serializerAndDeserializer;
+    private final SerializersAndDeserializers serializersAndDeserializers = serializersAndDeserializers();
 
     public static UseCasesModule useCasesModule() {
         return new UseCasesModule();
@@ -88,43 +87,27 @@ public final class UseCasesModule implements ChainModule {
         useCaseToEventMappings.put(useCaseClass, eventType);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> void addRequestMapperForType(final Class<T> type,
                                             final Demapifier<T> requestMapper) {
-        addRequestMapper((clazz, event) -> areOfType(type).test(clazz, event), requestMapper);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public void addRequestMapper(final EventFilter filter,
-                                 final Demapifier<?> requestMapper) {
-        validateNotNull(filter, "filter");
-        validateNotNull(requestMapper, "requestMapper");
-        requestDeserializers.put(filter::filter, requestMapper);
+        this.serializersAndDeserializers.addSpecialDeserializer(type, requestMapper);
     }
 
     @SuppressWarnings("unchecked")
     public <T> void addResponseSerializerForType(final Class<T> type,
                                                  final Mapifier<T> responseMapper) {
-        addResponseSerializer(SerializationFilters.areOfType(type), (Mapifier<Object>) responseMapper);
-    }
-
-    public void addResponseSerializer(final Predicate<Object> filter,
-                                      final Mapifier<Object> responseMapper) {
-        validateNotNull(filter, "filter");
-        validateNotNull(responseMapper, "responseMapper");
-        responseSerializers.put(filter, responseMapper);
+        this.serializersAndDeserializers.addSpecialSerializer(type, (Mapifier<Object>) responseMapper);
     }
 
     public void setSerializerAndDeserializer(final SerializerAndDeserializer serializerAndDeserializer) {
-        this.serializerAndDeserializer = serializerAndDeserializer;
+        this.serializersAndDeserializers.setSerializerAndDeserializer(useCases -> serializerAndDeserializer);
     }
 
-    public Set<Class<?>> getUseCases() {
-        return useCaseToEventMappings.keySet();
+    public void setSerializerAndDeserializer(final Function<UseCases, SerializerAndDeserializer> serializerAndDeserializer) {
+        this.serializersAndDeserializers.setSerializerAndDeserializer(serializerAndDeserializer);
     }
 
     @Override
-    public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return singletonList(eventModule());
     }
 
@@ -154,11 +137,8 @@ public final class UseCasesModule implements ChainModule {
         } else {
             lowLevelUseCaseAdapterBuilder.setUseCaseInstantiator(zeroArgumentsConstructorUseCaseInstantiator());
         }
-        this.requestDeserializers.setDefaultValue((targetType, map) -> serializerAndDeserializer.deserialize(targetType, map));
-        lowLevelUseCaseAdapterBuilder.setRequestDeserializers(this.requestDeserializers);
-        this.responseSerializers.put(Objects::isNull, object -> null);
-        this.responseSerializers.setDefaultValue(object -> serializerAndDeserializer.serialize(object));
-        lowLevelUseCaseAdapterBuilder.setReseponseSerializers(responseSerializers);
+
+        this.serializersAndDeserializers.add(lowLevelUseCaseAdapterBuilder, this.useCaseToEventMappings.keySet());
 
         lowLevelUseCaseAdapterBuilder.setRequestSerializers(failingPredicateMap());
         lowLevelUseCaseAdapterBuilder.setResponseDeserializers(failingFilterMap());

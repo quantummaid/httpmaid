@@ -124,7 +124,7 @@ public final class CorsConfigurator implements Configurator {
     }
 
     @Override
-    public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return singletonList(corsModule());
     }
 

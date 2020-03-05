@@ -62,7 +62,7 @@ public final class WebSocketsConfigurator implements Configurator {
     }
 
     @Override
-    public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return Arrays.asList(WebSocketModule.webSocketModule());
     }
 

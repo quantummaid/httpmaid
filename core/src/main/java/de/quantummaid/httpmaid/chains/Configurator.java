@@ -37,7 +37,7 @@ public interface Configurator {
         validateNotNull(modules, "modules");
         return new Configurator() {
             @Override
-            public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+            public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
                 return asList(modules);
             }
 
@@ -59,9 +59,9 @@ public interface Configurator {
     static Configurator allOf(final Configurator... configurators) {
         return new Configurator() {
             @Override
-            public List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+            public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
                 return stream(configurators)
-                        .map(Configurator::supplyModulesIfNotAlreadyPreset)
+                        .map(Configurator::supplyModulesIfNotAlreadyPresent)
                         .flatMap(Collection::stream)
                         .collect(toList());
             }
@@ -78,7 +78,7 @@ public interface Configurator {
         };
     }
 
-    default List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    default List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return emptyList();
     }
 

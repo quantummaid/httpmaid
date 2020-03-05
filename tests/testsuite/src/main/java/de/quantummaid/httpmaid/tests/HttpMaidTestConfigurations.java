@@ -27,13 +27,11 @@ import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
 import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
-import de.quantummaid.httpmaid.tests.usecases.echomultipart.EchoMultipartUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersValue;
 import de.quantummaid.httpmaid.tests.usecases.headers.HeaderUseCase;
 import de.quantummaid.httpmaid.tests.usecases.headers.HeadersParameter;
 import de.quantummaid.httpmaid.tests.usecases.mapmaid.MapMaidUseCase;
-import de.quantummaid.httpmaid.tests.usecases.multipartandmapmaid.MultipartAndMapMaidUseCase;
 import de.quantummaid.httpmaid.tests.usecases.parameter.Parameter;
 import de.quantummaid.httpmaid.tests.usecases.parameter.ParameterizedUseCase;
 import de.quantummaid.httpmaid.tests.usecases.pathparameter.WildCardUseCase;
@@ -52,7 +50,6 @@ import de.quantummaid.httpmaid.tests.usecases.vooooid.VoidUseCase;
 import de.quantummaid.httpmaid.usecases.UseCasesModule;
 
 import java.util.Map;
-import java.util.Objects;
 
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
@@ -86,12 +83,10 @@ public final class HttpMaidTestConfigurations {
                 .get("/headers_response", HeadersInResponseUseCase.class)
                 .get("/echo_contenttype", EchoContentTypeUseCase.class)
                 .get("/set_contenttype_in_response", SetContentTypeInResponseUseCase.class)
-                .serving(EchoMultipartUseCase.class).forRequestPath("/multipart_echo").andRequestMethods(GET, POST, PUT, DELETE)
                 .serving(MapMaidUseCase.class).forRequestPath("/mapmaid/<value1>").andRequestMethods(GET, POST)
                 .get("/echo_path_and_query_parameters/<wildcard>", EchoPathAndQueryParametersUseCase.class)
                 .get("/twoparameters", TwoParametersUseCase.class)
                 .get("/void", VoidUseCase.class)
-                .put("/multipart_and_mapmaid", MultipartAndMapMaidUseCase.class)
 
                 .configured(toMarshallContentType(json(),
                         string -> new Gson().fromJson(string, Map.class),
@@ -113,7 +108,6 @@ public final class HttpMaidTestConfigurations {
 
                     useCasesModule.addResponseSerializerForType(HeadersInResponseReturnValue.class, value -> of(value.key, value.value));
                     useCasesModule.addResponseSerializerForType(SetContentTypeInResponseValue.class, value -> of("contentType", value.value));
-                    useCasesModule.addResponseSerializer(Objects::isNull, object -> null);
                     useCasesModule.addResponseSerializerForType(String.class, string -> of("response", string));
                     useCasesModule.addResponseSerializerForType(ToStringWrapper.class, wrapper -> of("response", wrapper.toString()));
                 }))

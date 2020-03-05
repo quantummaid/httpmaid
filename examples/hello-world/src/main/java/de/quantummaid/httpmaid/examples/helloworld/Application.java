@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.examples.helloworld;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import com.google.gson.Gson;
 import de.quantummaid.mapmaid.MapMaid;
 
 import java.util.Optional;
@@ -45,9 +44,7 @@ public final class Application {
     }
 
     public static void main(final String[] args) {
-        final Gson gson = new Gson();
-        final MapMaid mapMaid = aMapMaid(Application.class.getPackageName())
-                .usingJsonMarshaller(gson::toJson, gson::fromJson)
+        final MapMaid mapMaid = aMapMaid()
                 .build();
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/api/hello", (httpRequest, httpResponse) -> {

@@ -46,7 +46,7 @@ public final class CalculationWithQueryParametersExample {
                 .get("/divide", DivisionUseCase.class)
                 .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
                 .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
-                .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
                     mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
                 }))
                 .build();

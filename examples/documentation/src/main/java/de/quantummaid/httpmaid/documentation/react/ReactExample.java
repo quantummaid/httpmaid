@@ -54,12 +54,6 @@ public final class ReactExample {
     private static final JwtParser jwtParser = parserBuilder().setSigningKey(key).build();
 
     public static void main(String[] args) {
-        final Gson gson = new Gson();
-
-        final MapMaid mapMaid = aMapMaid()
-                .usingJsonMarshaller(gson::toJson, gson::fromJson)
-                .build();
-
         final HttpMaid httpMaid = anHttpMaid()
                 .post("/login", (request, response) -> {
                     final Map<String, Object> bodyMap = request.bodyMap();
@@ -75,7 +69,6 @@ public final class ReactExample {
                     response.setBody(Map.of("token", jws));
                 })
                 .get("/dashboard", (request, response) -> response.setBody(Map.of("message", new Date().toString())))
-                .configured(toUseMapMaid(mapMaid))
                 .configured(toActivateCORSWithoutValidatingTheOrigin())
                 .configured(toAuthenticateUsingOAuth2BearerToken(ReactExample::checkJwt))
                 .configured(toAuthorizeAllAuthenticatedRequests().exceptRequestsTo("/login"))

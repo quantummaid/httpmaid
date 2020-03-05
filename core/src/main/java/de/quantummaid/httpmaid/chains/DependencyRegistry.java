@@ -83,7 +83,7 @@ public final class DependencyRegistry {
             return emptyList();
         }
         modules.add(module);
-        return module.supplyModulesIfNotAlreadyPreset();
+        return module.supplyModulesIfNotAlreadyPresent();
     }
 
     ChainRegistry buildChainRegistry() {

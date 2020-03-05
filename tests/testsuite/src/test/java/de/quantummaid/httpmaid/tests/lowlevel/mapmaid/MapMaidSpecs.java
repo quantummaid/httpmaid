@@ -106,7 +106,7 @@ public final class MapMaidSpecs {
                         .configured(toMarshallContentType(json(),
                                 string -> gson.fromJson(string, Map.class),
                                 gson::toJson))
-                        .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> mapMaidBuilder
+                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
                                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
                         .build()
         )

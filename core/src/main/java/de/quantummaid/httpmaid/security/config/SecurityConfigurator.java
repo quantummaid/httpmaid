@@ -34,7 +34,7 @@ public interface SecurityConfigurator<T extends SecurityConfigurator>
         extends Configurator, PhaseConfigurator<T>, FilterConfigurator<T> {
 
     @Override
-    default List<ChainModule> supplyModulesIfNotAlreadyPreset() {
+    default List<ChainModule> supplyModulesIfNotAlreadyPresent() {
         return singletonList(SecurityModule.securityModule());
     }
 }
