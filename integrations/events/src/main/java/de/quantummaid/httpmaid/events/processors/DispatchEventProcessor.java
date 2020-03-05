@@ -60,13 +60,13 @@ public final class DispatchEventProcessor implements Processor {
         final Object event = metaData.get(EVENT);
         final ResponseFuture request = messageFunction.request(eventType, event);
         try {
-            final ProcessingContext<Map<String, Object>> raw = (ProcessingContext<Map<String, Object>>) (Object) request.getRaw();
+            final ProcessingContext<Object> raw = request.getRaw();
             if (raw.getErrorPayload() != null) {
                 final Map<String, Object> errorPayload = (Map<String, Object>) raw.getErrorPayload();
                 final Throwable exception = (Throwable) errorPayload.get("Exception");
                 throw eventDispatchingException(exception);
             } else {
-                final Map<String, Object> response = raw.getPayload();
+                final Object response = raw.getPayload();
                 metaData.set(RECEIVED_EVENT, ofNullable(response));
             }
         } catch (final InterruptedException e) {

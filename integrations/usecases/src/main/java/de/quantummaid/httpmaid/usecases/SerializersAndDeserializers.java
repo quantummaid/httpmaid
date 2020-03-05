@@ -81,7 +81,7 @@ final class SerializersAndDeserializers {
         final SerializerAndDeserializer serializerAndDeserializer = this.serializerAndDeserializer.apply(useCases);
         final PredicateMapBuilder<Object, Mapifier<Object>> serializers = toPredicateMap(serializerAndDeserializer);
         lowLevelUseCaseAdapterBuilder.setReseponseSerializers(serializers);
-        final FilterMapBuilder<Class<?>, Map<String, Object>, Demapifier<?>> deserializers = toFilterMap(serializerAndDeserializer);
+        final FilterMapBuilder<Class<?>, Object, Demapifier<?>> deserializers = toFilterMap(serializerAndDeserializer);
         lowLevelUseCaseAdapterBuilder.setRequestDeserializers(deserializers);
     }
 
@@ -93,8 +93,8 @@ final class SerializersAndDeserializers {
         return responseSerializers;
     }
 
-    private FilterMapBuilder<Class<?>, Map<String, Object>, Demapifier<?>> toFilterMap(final SerializerAndDeserializer serializerAndDeserializer) {
-        final FilterMapBuilder<Class<?>, Map<String, Object>, Demapifier<?>> requestDeserializers = filterMapBuilder();
+    private FilterMapBuilder<Class<?>, Object, Demapifier<?>> toFilterMap(final SerializerAndDeserializer serializerAndDeserializer) {
+        final FilterMapBuilder<Class<?>, Object, Demapifier<?>> requestDeserializers = filterMapBuilder();
         requestDeserializers.setDefaultValue(serializerAndDeserializer::deserialize);
         this.specialDeserializers.forEach((type, demapifier) -> requestDeserializers.put((currentType, map) -> currentType.equals(type), demapifier));
         return requestDeserializers;

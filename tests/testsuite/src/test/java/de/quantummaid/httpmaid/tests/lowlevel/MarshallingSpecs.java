@@ -61,7 +61,7 @@ public final class MarshallingSpecs {
                 anHttpMaid()
                         .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
                         .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
-                        .configured(toMarshallContentTypeInResponses(fromString("qwer"), map -> (String) map.get("a")))
+                        .configured(toMarshallContentTypeInResponses(fromString("qwer"), map -> (String) ((Map) map).get("a")))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .build()
         )

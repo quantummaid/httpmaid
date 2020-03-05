@@ -38,7 +38,7 @@ import lombok.ToString;
 
 import java.util.*;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_MAP;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
 import static de.quantummaid.httpmaid.chains.ChainRegistry.CHAIN_REGISTRY;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
@@ -64,7 +64,7 @@ public final class EventModule implements ChainModule {
     public static final MetaDataKey<Boolean> IS_EXTERNAL_EVENT = metaDataKey("IS_EXTERNAL_EVENT");
     public static final MetaDataKey<EventType> EVENT_TYPE = metaDataKey("EVENT_TYPE");
     public static final MetaDataKey<Map<String, Object>> EVENT = metaDataKey("EVENT");
-    public static final MetaDataKey<Optional<Map<String, Object>>> RECEIVED_EVENT = metaDataKey("RECEIVED_EVENT");
+    public static final MetaDataKey<Optional<Object>> RECEIVED_EVENT = metaDataKey("RECEIVED_EVENT");
 
     private static final int DEFAULT_POOL_SIZE = 4;
 
@@ -144,8 +144,8 @@ public final class EventModule implements ChainModule {
         extender.createChain(EventsChains.MAP_EVENT_TO_RESPONSE, jumpTo(POST_INVOKE), jumpTo(EXCEPTION_OCCURRED));
         responseMapExtractors.forEach(extractor -> extender.appendProcessor(EventsChains.MAP_EVENT_TO_RESPONSE, extractor));
         extender.appendProcessor(EventsChains.MAP_EVENT_TO_RESPONSE, metaData -> {
-            final Map<String, Object> map = metaData.get(RECEIVED_EVENT).orElseGet(HashMap::new);
-            metaData.set(RESPONSE_BODY_MAP, map);
+            final Object map = metaData.get(RECEIVED_EVENT).orElseGet(HashMap::new);
+            metaData.set(RESPONSE_BODY_OBJECT, map);
         });
 
         extender.appendProcessor(PREPARE_EXCEPTION_RESPONSE, unwrapDispatchingExceptionProcessor());
@@ -168,12 +168,11 @@ public final class EventModule implements ChainModule {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void registerEventHandlers(final MessageBus messageBus,
                                        final ChainRegistry chainRegistry) {
         externalEventMappings.forEach((type, mapping) -> messageBus.subscribe(type, event -> {
             final MetaData metaData = emptyMetaData();
-            metaData.set(RECEIVED_EVENT, of((Map<String, Object>) event));
+            metaData.set(RECEIVED_EVENT, of(event));
             metaData.set(EVENT_TYPE, type);
             metaData.set(IS_EXTERNAL_EVENT, true);
             chainRegistry.putIntoChain(INIT, metaData, m -> {

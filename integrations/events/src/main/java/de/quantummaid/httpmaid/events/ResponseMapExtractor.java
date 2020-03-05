@@ -32,12 +32,16 @@ import static de.quantummaid.httpmaid.handler.http.HttpResponse.httpResponse;
 
 public interface ResponseMapExtractor extends Processor {
 
+    @SuppressWarnings("unchecked")
     @Override
     default void apply(final MetaData metaData) {
-        final Optional<Map<String, Object>> eventReturnValue = metaData.get(EventModule.RECEIVED_EVENT);
+        final Optional<Object> eventReturnValue = metaData.get(EventModule.RECEIVED_EVENT);
         eventReturnValue.ifPresent(map -> {
+            if (map instanceof Map) {
+                return;
+            }
             final HttpResponse httpResponse = httpResponse(metaData);
-            extract(map, httpResponse);
+            extract((Map<String, Object>) map, httpResponse);
         });
     }
 

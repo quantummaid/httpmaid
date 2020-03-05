@@ -117,7 +117,7 @@ public final class MarshallingModule implements ChainModule {
 
     private void processMarshalling(final MetaData metaData) {
         try {
-            metaData.getOptional(RESPONSE_BODY_MAP).ifPresent(map -> {
+            metaData.getOptional(RESPONSE_BODY_OBJECT).ifPresent(map -> {
                 final ContentType responseContentType = determineResponseContentType(metaData);
                 final Marshaller marshaller = marshallerFor(responseContentType);
                 metaData.set(RESPONSE_CONTENT_TYPE, responseContentType);

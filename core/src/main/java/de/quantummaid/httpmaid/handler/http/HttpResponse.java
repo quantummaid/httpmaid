@@ -100,7 +100,7 @@ public final class HttpResponse {
     }
 
     public void setBody(final Map<String, Object> map) {
-        metaData.set(RESPONSE_BODY_MAP, map);
+        metaData.set(RESPONSE_BODY_OBJECT, map);
     }
 
     public void setBody(final String body) {

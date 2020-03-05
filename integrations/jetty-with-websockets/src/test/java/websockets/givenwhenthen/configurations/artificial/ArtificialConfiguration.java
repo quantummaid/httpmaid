@@ -172,6 +172,7 @@ public final class ArtificialConfiguration {
         return testConfiguration(httpMaid);
     }
 
+    @SuppressWarnings("unchecked")
     private static ExceptionSerializationStep1Builder addUseCase(final Class<?> useCase,
                                                                  final String event,
                                                                  final Step1Builder step1Builder) {
@@ -179,11 +180,11 @@ public final class ArtificialConfiguration {
                 .obtainingUseCaseInstancesUsingTheZeroArgumentConstructor()
                 .throwingAnExceptionByDefaultIfNoRequestSerializationCanBeApplied()
 
-                .deserializingRequestsToUseCaseParametersOfType(QueryParameter.class).using((targetType, map) -> queryParameter((String) map.get("var")))
-                .deserializingRequestsToUseCaseParametersOfType(HeaderParameter.class).using((targetType, map) -> headerParameter((String) map.get("var")))
-                .deserializingRequestsToUseCaseParametersOfType(ParameterParameter.class).using((targetType, map) -> parameterParameter((String) map.get("var")))
-                .deserializingRequestsToUseCaseParametersOfType(EchoParameter.class).using((targetType, map) -> echoParameter((String) map.get("echoValue")))
-                .deserializingRequestsToUseCaseParametersOfType(ExceptionUseCaseParameter.class).using((targetType, map) -> exceptionUseCaseParameter((String) map.get("mode")))
+                .deserializingRequestsToUseCaseParametersOfType(QueryParameter.class).using((targetType, map) -> queryParameter((String) ((Map<String, Object>) map).get("var")))
+                .deserializingRequestsToUseCaseParametersOfType(HeaderParameter.class).using((targetType, map) -> headerParameter((String) ((Map<String, Object>) map).get("var")))
+                .deserializingRequestsToUseCaseParametersOfType(ParameterParameter.class).using((targetType, map) -> parameterParameter((String) ((Map<String, Object>) map).get("var")))
+                .deserializingRequestsToUseCaseParametersOfType(EchoParameter.class).using((targetType, map) -> echoParameter((String) ((Map<String, Object>) map).get("echoValue")))
+                .deserializingRequestsToUseCaseParametersOfType(ExceptionUseCaseParameter.class).using((targetType, map) -> exceptionUseCaseParameter((String) ((Map<String, Object>) map).get("mode")))
                 .throwAnExceptionByDefaultIfNoUseCaseRequestDeserializationCanBeApplied()
 
                 .serializingUseCaseResponseBackOntoTheBusOfType(String.class).using(object -> Map.of("stringValue", object))

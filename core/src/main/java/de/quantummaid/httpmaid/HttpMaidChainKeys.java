@@ -66,7 +66,7 @@ public final class HttpMaidChainKeys {
     public static final MetaDataKey<ContentType> REQUEST_CONTENT_TYPE = MetaDataKey.metaDataKey("REQUEST_CONTENT_TYPE");
     public static final MetaDataKey<Headers> REQUEST_HEADERS = MetaDataKey.metaDataKey("REQUEST_HEADERS");
 
-    public static final MetaDataKey<Map<String, Object>> RESPONSE_BODY_MAP = MetaDataKey.metaDataKey("RESPONSE_BODY_MAP");
+    public static final MetaDataKey<Object> RESPONSE_BODY_OBJECT = MetaDataKey.metaDataKey("RESPONSE_BODY_MAP");
     public static final MetaDataKey<String> RESPONSE_BODY_STRING = MetaDataKey.metaDataKey("RESPONSE_BODY_STRING");
     public static final MetaDataKey<InputStream> RESPONSE_STREAM = MetaDataKey.metaDataKey("RESPONSE_STREAM");
 

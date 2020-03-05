@@ -68,7 +68,7 @@ public final class WebSocketsExternalEventMapping implements ExternalEventMappin
 
     @Override
     public void apply(final MetaData metaData) {
-        final Map<String, Object> event = metaData.get(RECEIVED_EVENT).orElseThrow();
+        final Object event = metaData.get(RECEIVED_EVENT).orElseThrow();
         final WebSocketRegistry registry = metaData.get(WEBSOCKET_REGISTRY);
         final List<WebSocket> webSockets = registry.allActiveWebSockets().stream()
                 .filter(webSocket -> {

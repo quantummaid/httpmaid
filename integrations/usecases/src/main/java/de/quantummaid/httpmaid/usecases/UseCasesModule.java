@@ -154,8 +154,8 @@ public final class UseCasesModule implements ChainModule {
         extender.addMetaDatum(SERIALIZED_MESSAGE_BUS, serializedMessageBus);
     }
 
-    private static FilterMapBuilder<Class<?>, Map<String, Object>, Demapifier<?>> failingFilterMap() {
-        final FilterMapBuilder<Class<?>, Map<String, Object>, Demapifier<?>> filterMap = filterMapBuilder();
+    private static FilterMapBuilder<Class<?>, Object, Demapifier<?>> failingFilterMap() {
+        final FilterMapBuilder<Class<?>, Object, Demapifier<?>> filterMap = filterMapBuilder();
         filterMap.setDefaultValue((targetType, map) -> {
             throw new UnsupportedOperationException();
         });

@@ -26,8 +26,6 @@ import de.quantummaid.eventmaid.mapping.Mapifier;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,12 +43,12 @@ public final class DelegatingDeserializerAndSerializer implements SerializerAndD
     @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(final Class<T> type,
-                             final Map<String, Object> map) {
+                             final Object map) {
         return (T) requestMapper.map((Class<Object>) type, map);
     }
 
     @Override
-    public Map<String, Object> serialize(final Object event) {
+    public Object serialize(final Object event) {
         return responseMapper.map(event);
     }
 }

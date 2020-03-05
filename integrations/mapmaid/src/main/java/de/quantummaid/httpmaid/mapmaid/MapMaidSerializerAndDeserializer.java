@@ -43,13 +43,14 @@ public final class MapMaidSerializerAndDeserializer implements SerializerAndDese
         return new MapMaidSerializerAndDeserializer(mapMaid);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T deserialize(final Class<T> type, final Map<String, Object> map) {
-        return mapMaid.deserializer().deserializeFromMap(map, type);
+    public <T> T deserialize(final Class<T> type, final Object map) {
+        return mapMaid.deserializer().deserializeFromMap((Map<String, Object>) map, type);
     }
 
     @Override
-    public Map<String, Object> serialize(final Object event) {
-        return mapMaid.serializer().serializeToMap(event);
+    public Object serialize(final Object event) {
+        return mapMaid.serializer().serializeToUniversalObject(event);
     }
 }

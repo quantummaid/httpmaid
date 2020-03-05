@@ -19,10 +19,11 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets;
+package de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases;
 
-import de.quantummaid.httpmaid.chains.MetaData;
+public final class StringReturningUseCase {
 
-public interface WebSocketForEventFilter {
-    boolean test(MetaData metaData, Object event);
+    public String doSomething() {
+        return "the correct response";
+    }
 }

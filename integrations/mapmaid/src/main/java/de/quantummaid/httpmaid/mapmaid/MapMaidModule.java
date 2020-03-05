@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_MAP;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.RECIPES;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidMarshallingMapper.mapMaidMarshallingMapper;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidSerializerAndDeserializer.mapMaidSerializerAndDeserializer;
@@ -125,7 +125,7 @@ public final class MapMaidModule implements ChainModule {
                                         "message", validationError.message,
                                         "path", validationError.propertyPath))
                                 .collect(toList());
-                        metaData.set(RESPONSE_BODY_MAP, Map.of("errors", errorsList));
+                        metaData.set(RESPONSE_BODY_OBJECT, Map.of("errors", errorsList));
                     });
         }
     }

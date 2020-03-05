@@ -47,7 +47,7 @@ public final class UrlEncodedMarshaller implements Marshaller {
     }
 
     @Override
-    public String marshall(final Map<String, Object> map) {
+    public String marshall(final Object map) {
         validateNotNull(map, "map");
         final List<KeyValue> parts = new LinkedList<>();
         marshal(Key.emptyKey(), parts, map);

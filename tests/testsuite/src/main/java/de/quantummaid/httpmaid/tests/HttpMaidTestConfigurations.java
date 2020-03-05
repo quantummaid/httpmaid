@@ -93,16 +93,16 @@ public final class HttpMaidTestConfigurations {
                         map -> new Gson().toJson(map)))
                 .configured(configuratorForType(UseCasesModule.class, useCasesModule -> {
                     useCasesModule.addRequestMapperForType(Parameter.class, (targetType, map) -> new Parameter());
-                    useCasesModule.addRequestMapperForType(WildcardParameter.class, (targetType, map) -> new WildcardParameter((String) map.get("parameter")));
-                    useCasesModule.addRequestMapperForType(QueryParametersParameter.class, (targetType, map) -> new QueryParametersParameter((Map<String, String>) (Object) map));
-                    useCasesModule.addRequestMapperForType(HeadersParameter.class, (targetType, map) -> new HeadersParameter((Map<String, String>) (Object) map));
-                    useCasesModule.addRequestMapperForType(EchoPathAndQueryParametersValue.class, (targetType, map) -> new EchoPathAndQueryParametersValue((Map<String, String>) (Object) map));
+                    useCasesModule.addRequestMapperForType(WildcardParameter.class, (targetType, map) -> new WildcardParameter((String) ((Map<String, Object>) map).get("parameter")));
+                    useCasesModule.addRequestMapperForType(QueryParametersParameter.class, (targetType, map) -> new QueryParametersParameter((Map<String, String>) map));
+                    useCasesModule.addRequestMapperForType(HeadersParameter.class, (targetType, map) -> new HeadersParameter((Map<String, String>) map));
+                    useCasesModule.addRequestMapperForType(EchoPathAndQueryParametersValue.class, (targetType, map) -> new EchoPathAndQueryParametersValue((Map<String, String>) map));
                     useCasesModule.addRequestMapperForType(Parameter1.class, (targetType, map) -> {
-                        final Object param1 = map.get("param1");
+                        final Object param1 = ((Map<String, Object>) map).get("param1");
                         return new Parameter1((String) param1);
                     });
                     useCasesModule.addRequestMapperForType(Parameter2.class, (targetType, map) -> {
-                        final Object param2 = map.get("param2");
+                        final Object param2 = ((Map<String, Object>) map).get("param2");
                         return new Parameter2((String) param2);
                     });
 

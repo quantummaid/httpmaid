@@ -21,23 +21,21 @@
 
 package de.quantummaid.httpmaid.usecases.serializing;
 
+import de.quantummaid.eventmaid.mapping.Demapifier;
+import de.quantummaid.eventmaid.mapping.Mapifier;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
-import de.quantummaid.eventmaid.mapping.Demapifier;
-import de.quantummaid.eventmaid.mapping.Mapifier;
-
-import java.util.Map;
 
 public interface SerializerAndDeserializer extends Demapifier<Object>, Mapifier<Object>, ChainModule {
 
     @Override
-    default Object map(final Class<Object> targetType, final Map<String, Object> map) {
+    default Object map(final Class<Object> targetType, final Object map) {
         return deserialize(targetType, map);
     }
 
     @Override
-    default Map<String, Object> map(final Object object) {
+    default Object map(final Object object) {
         return serialize(object);
     }
 
@@ -49,7 +47,7 @@ public interface SerializerAndDeserializer extends Demapifier<Object>, Mapifier<
     default void register(final ChainExtender extender) {
     }
 
-    <T> T deserialize(Class<T> type, Map<String, Object> map);
+    <T> T deserialize(Class<T> type, Object map);
 
-    Map<String, Object> serialize(Object event);
+    Object serialize(Object event);
 }

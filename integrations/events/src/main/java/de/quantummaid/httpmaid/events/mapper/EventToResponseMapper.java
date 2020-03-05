@@ -23,15 +23,13 @@ package de.quantummaid.httpmaid.events.mapper;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 
-import java.util.Map;
-
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_MAP;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 
 public interface EventToResponseMapper {
 
     static EventToResponseMapper byUsingTheReceivedEventAsBody() {
-        return (event, metaData) -> metaData.set(RESPONSE_BODY_MAP, event);
+        return (event, metaData) -> metaData.set(RESPONSE_BODY_OBJECT, event);
     }
 
-    void map(Map<String, Object> event, MetaData metaData);
+    void map(Object event, MetaData metaData);
 }

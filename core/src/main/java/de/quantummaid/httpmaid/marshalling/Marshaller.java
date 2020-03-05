@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.marshalling;
 
-import java.util.Map;
-
 public interface Marshaller {
-    String marshall(Map<String, Object> map);
+    String marshall(Object map);
 }

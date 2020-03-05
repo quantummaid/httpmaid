@@ -95,6 +95,6 @@ final class MapMaidMarshallingMapper {
                     contentTypeMappingsForMarshalling.put(contentType, marshallingType);
                 });
         contentTypeMappingsForMarshalling.forEach((contentType, marshallingType) -> marshallingModule
-                .addMarshaller(contentType, map -> mapMaid.serializer().serializeFromMap(map, marshallingType)));
+                .addMarshaller(contentType, map -> mapMaid.serializer().serializeFromUniversalObject(map, marshallingType)));
     }
 }

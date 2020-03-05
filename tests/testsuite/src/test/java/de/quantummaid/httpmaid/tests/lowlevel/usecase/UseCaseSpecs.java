@@ -21,18 +21,20 @@
 
 package de.quantummaid.httpmaid.tests.lowlevel.usecase;
 
+import com.google.gson.Gson;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.FailInInitializerUseCase;
-import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.SomeCheckedException;
-import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.ThrowCheckedExceptionUseCase;
-import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.VoidUseCase;
+import de.quantummaid.httpmaid.tests.lowlevel.usecase.usecases.*;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Map;
+
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 
 public final class UseCaseSpecs {
 
@@ -98,5 +100,39 @@ public final class UseCaseSpecs {
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(505)
                 .theResponseBodyWas("The correct exception has been thrown");
+    }
+
+    @SuppressWarnings("unchecked")
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCasesCanReturnStrings(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", StringReturningUseCase.class)
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Map.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"the correct response\"");
+    }
+
+    @SuppressWarnings("unchecked")
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCasesCanReturnInts(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", IntReturningUseCase.class)
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Map.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"42\"");
     }
 }
