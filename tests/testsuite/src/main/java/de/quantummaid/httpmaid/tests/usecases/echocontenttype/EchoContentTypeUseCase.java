@@ -21,13 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.usecases.echocontenttype;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class EchoContentTypeUseCase {
 
-    public ToStringWrapper echo(final EchoContentTypeValue value) {
-        return ToStringWrapper.toStringWrapper(value);
+    public String echo(final EchoContentTypeValue value) {
+        return value.toString();
     }
 }

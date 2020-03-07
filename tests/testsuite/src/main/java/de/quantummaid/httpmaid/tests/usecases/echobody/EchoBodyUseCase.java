@@ -21,13 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.usecases.echobody;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class EchoBodyUseCase {
 
-    public ToStringWrapper echo(final EchoBodyValue value) {
-        return ToStringWrapper.toStringWrapper(value);
+    public String echo(final EchoBodyValue value) {
+        return value.toString();
     }
 }

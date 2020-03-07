@@ -92,12 +92,6 @@ public final class UseCasesModule implements ChainModule {
         this.serializersAndDeserializers.addSpecialDeserializer(type, requestMapper);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> void addResponseSerializerForType(final Class<T> type,
-                                                 final Mapifier<T> responseMapper) {
-        this.serializersAndDeserializers.addSpecialSerializer(type, (Mapifier<Object>) responseMapper);
-    }
-
     public void setSerializerAndDeserializer(final SerializerAndDeserializer serializerAndDeserializer) {
         this.serializersAndDeserializers.setSerializerAndDeserializer(useCases -> serializerAndDeserializer);
     }

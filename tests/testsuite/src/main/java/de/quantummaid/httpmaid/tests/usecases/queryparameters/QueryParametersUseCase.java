@@ -21,13 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.usecases.queryparameters;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class QueryParametersUseCase {
 
-    public ToStringWrapper queryParameters(final QueryParametersParameter parameter) {
-        return ToStringWrapper.toStringWrapper(parameter);
+    public String queryParameters(final QueryParametersParameter parameter) {
+        return parameter.toString();
     }
 }

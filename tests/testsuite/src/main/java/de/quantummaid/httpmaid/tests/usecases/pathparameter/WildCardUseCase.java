@@ -21,13 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.usecases.pathparameter;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class WildCardUseCase {
 
-    public ToStringWrapper wildcard(final WildcardParameter parameter) {
-        return ToStringWrapper.toStringWrapper(parameter);
+    public String wildcard(final WildcardParameter parameter) {
+        return parameter.toString();
     }
 }

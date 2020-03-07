@@ -21,13 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.usecases.parameter;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class ParameterizedUseCase {
 
-    public ToStringWrapper parameterized(final Parameter parameter) {
-        return ToStringWrapper.toStringWrapper(parameter);
+    public String parameterized(final Parameter parameter) {
+        return parameter.toString();
     }
 }

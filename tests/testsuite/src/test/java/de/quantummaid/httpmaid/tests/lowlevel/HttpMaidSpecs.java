@@ -36,7 +36,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"foo\"}");
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -46,7 +46,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/test").viaThePostMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"foo\"}");
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -56,7 +56,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/test").viaThePutMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"foo\"}");
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -66,7 +66,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/test").viaTheDeleteMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"foo\"}");
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -76,7 +76,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/parameterized").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"parameter\"}");
+                .theResponseBodyWas("\"parameter\"");
     }
 
     @ParameterizedTest
@@ -86,7 +86,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/headers").viaTheGetMethod().withAnEmptyBody().withTheHeader("testheader", "foo").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"foo\"}");
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -96,7 +96,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/wild/foo/card").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"foo\"}");
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -198,7 +198,7 @@ public final class HttpMaidSpecs {
                 .when().aRequestToThePath("/twoparameters").viaTheGetMethod().withAnEmptyBody().withTheHeader("param1", "Hello").withTheHeader("param2", "World").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("{\"response\":\"Hello World\"}");
+                .theResponseBodyWas("\"Hello World\"");
     }
 
     @ParameterizedTest

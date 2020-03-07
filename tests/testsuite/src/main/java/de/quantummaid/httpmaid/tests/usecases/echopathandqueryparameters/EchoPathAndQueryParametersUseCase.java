@@ -21,11 +21,9 @@
 
 package de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
-
 public final class EchoPathAndQueryParametersUseCase {
 
-    public ToStringWrapper echo(final EchoPathAndQueryParametersValue value) {
-        return ToStringWrapper.toStringWrapper(value);
+    public String echo(final EchoPathAndQueryParametersValue value) {
+        return value.toString();
     }
 }

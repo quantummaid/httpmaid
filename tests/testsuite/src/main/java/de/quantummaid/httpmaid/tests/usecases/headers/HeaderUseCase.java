@@ -21,15 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.usecases.headers;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import lombok.RequiredArgsConstructor;
-
-import static de.quantummaid.httpmaid.tests.usecases.ToStringWrapper.toStringWrapper;
 
 @RequiredArgsConstructor
 public final class HeaderUseCase {
 
-    public ToStringWrapper header(final HeadersParameter headersParameter) {
-        return toStringWrapper(headersParameter);
+    public String header(final HeadersParameter headersParameter) {
+        return headersParameter.toString();
     }
 }

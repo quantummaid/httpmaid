@@ -21,11 +21,9 @@
 
 package de.quantummaid.httpmaid.tests.usecases.echomultipart;
 
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
-
 public final class EchoMultipartUseCase {
 
-    public ToStringWrapper echo(final EchoMultipartValue value) {
-        return ToStringWrapper.toStringWrapper(value);
+    public String echo(final EchoMultipartValue value) {
+        return value.toString();
     }
 }

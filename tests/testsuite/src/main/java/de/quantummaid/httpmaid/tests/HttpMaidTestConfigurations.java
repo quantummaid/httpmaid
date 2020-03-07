@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.tests;
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
-import de.quantummaid.httpmaid.tests.usecases.ToStringWrapper;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersUseCase;
@@ -39,8 +38,6 @@ import de.quantummaid.httpmaid.tests.usecases.pathparameter.WildcardParameter;
 import de.quantummaid.httpmaid.tests.usecases.queryparameters.QueryParametersParameter;
 import de.quantummaid.httpmaid.tests.usecases.queryparameters.QueryParametersUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responsecontenttype.SetContentTypeInResponseUseCase;
-import de.quantummaid.httpmaid.tests.usecases.responsecontenttype.SetContentTypeInResponseValue;
-import de.quantummaid.httpmaid.tests.usecases.responseheaders.HeadersInResponseReturnValue;
 import de.quantummaid.httpmaid.tests.usecases.responseheaders.HeadersInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.simple.TestUseCase;
 import de.quantummaid.httpmaid.tests.usecases.twoparameters.Parameter1;
@@ -64,7 +61,6 @@ import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
-import static java.util.Map.of;
 
 public final class HttpMaidTestConfigurations {
 
@@ -105,11 +101,6 @@ public final class HttpMaidTestConfigurations {
                         final Object param2 = ((Map<String, Object>) map).get("param2");
                         return new Parameter2((String) param2);
                     });
-
-                    useCasesModule.addResponseSerializerForType(HeadersInResponseReturnValue.class, value -> of(value.key, value.value));
-                    useCasesModule.addResponseSerializerForType(SetContentTypeInResponseValue.class, value -> of("contentType", value.value));
-                    useCasesModule.addResponseSerializerForType(String.class, string -> of("response", string));
-                    useCasesModule.addResponseSerializerForType(ToStringWrapper.class, wrapper -> of("response", wrapper.toString()));
                 }))
                 .configured(toEnrichTheIntermediateMapWithAllRequestData())
 
