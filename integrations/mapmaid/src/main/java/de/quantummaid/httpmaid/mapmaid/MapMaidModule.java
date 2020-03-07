@@ -52,6 +52,7 @@ import static de.quantummaid.httpmaid.mapmaid.recipe.ClassScannerRecipe.addAllRe
 import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -100,10 +101,7 @@ public final class MapMaidModule implements ChainModule {
             if (mapMaid == null) {
                 final MapMaidBuilder mapMaidBuilder = aMapMaid();
                 dependencyRegistry.getMetaData().getOrSetDefault(RECIPES, LinkedList::new).forEach(mapMaidBuilder::usingRecipe);
-                mapMaidBuilder.usingRecipe(addAllReferencedClassesIn(
-                        useCases.useCases(),
-                        useCases.typesWithSpecialSerializers(),
-                        useCases.typesWithSpecialDeserializers()));
+                mapMaidBuilder.usingRecipe(addAllReferencedClassesIn(useCases.useCases(), emptyList(), emptyList()));
                 mapMaid = mapMaidBuilder.build();
             }
 

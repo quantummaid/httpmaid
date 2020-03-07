@@ -23,12 +23,14 @@ package de.quantummaid.httpmaid.tests.usecases.pathparameter;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @RequiredArgsConstructor
 public final class WildcardParameter {
-    private final String pathParameter;
+    private final Map<String, Object> map;
 
     @Override
     public String toString() {
-        return pathParameter;
+        return (String) map.get("parameter");
     }
 }

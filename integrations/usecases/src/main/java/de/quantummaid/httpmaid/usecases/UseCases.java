@@ -33,24 +33,12 @@ import java.util.Collection;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UseCases {
     private final Collection<Class<?>> useCases;
-    private final Collection<Class<?>> typesWithSpecialSerializers;
-    private final Collection<Class<?>> typesWithSpecialDeserializers;
 
-    public static UseCases useCases(final Collection<Class<?>> useCases,
-                                    final Collection<Class<?>> typesWithSpecialSerializers,
-                                    final Collection<Class<?>> typesWithSpecialDeserializers) {
-        return new UseCases(useCases, typesWithSpecialSerializers, typesWithSpecialDeserializers);
+    public static UseCases useCases(final Collection<Class<?>> useCases) {
+        return new UseCases(useCases);
     }
 
     public Collection<Class<?>> useCases() {
         return useCases;
-    }
-
-    public Collection<Class<?>> typesWithSpecialSerializers() {
-        return typesWithSpecialSerializers;
-    }
-
-    public Collection<Class<?>> typesWithSpecialDeserializers() {
-        return typesWithSpecialDeserializers;
     }
 }

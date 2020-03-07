@@ -33,51 +33,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
 import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
 import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
 import static de.quantummaid.httpmaid.usecases.UseCases.useCases;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class SerializersAndDeserializers {
     private Function<UseCases, SerializerAndDeserializer> serializerAndDeserializer;
-    private final Map<Class<?>, Mapifier<Object>> specialSerializers;
-    private final Map<Class<?>, Demapifier<?>> specialDeserializers;
 
     static SerializersAndDeserializers serializersAndDeserializers() {
-        return new SerializersAndDeserializers(new HashMap<>(), new HashMap<>());
+        return new SerializersAndDeserializers();
     }
 
     void setSerializerAndDeserializer(final Function<UseCases, SerializerAndDeserializer> serializerAndDeserializer) {
         this.serializerAndDeserializer = serializerAndDeserializer;
     }
 
-    void addSpecialSerializer(final Class<?> type,
-                              final Mapifier<Object> serializer) {
-        validateNotNull(type, "type");
-        validateNotNull(serializer, "serializer");
-        specialSerializers.put(type, serializer);
-    }
-
-    void addSpecialDeserializer(final Class<?> type,
-                                final Demapifier<?> deserializer) {
-        validateNotNull(type, "type");
-        validateNotNull(deserializer, "deserializer");
-        specialDeserializers.put(type, deserializer);
-    }
-
     void add(final LowLevelUseCaseAdapterBuilder lowLevelUseCaseAdapterBuilder,
              final Collection<Class<?>> registeredUseCases) {
-        final Collection<Class<?>> typesWithSpecialSerializers = this.specialSerializers.keySet();
-        final Collection<Class<?>> typesWithSpecialDeserializers = this.specialDeserializers.keySet();
-        final UseCases useCases = useCases(registeredUseCases, typesWithSpecialSerializers, typesWithSpecialDeserializers);
+        final UseCases useCases = useCases(registeredUseCases);
         final SerializerAndDeserializer serializerAndDeserializer = this.serializerAndDeserializer.apply(useCases);
         final PredicateMapBuilder<Object, Mapifier<Object>> serializers = toPredicateMap(serializerAndDeserializer);
         lowLevelUseCaseAdapterBuilder.setReseponseSerializers(serializers);
@@ -87,7 +66,6 @@ final class SerializersAndDeserializers {
 
     private PredicateMapBuilder<Object, Mapifier<Object>> toPredicateMap(final SerializerAndDeserializer serializerAndDeserializer) {
         final PredicateMapBuilder<Object, Mapifier<Object>> responseSerializers = predicateMapBuilder();
-        specialSerializers.forEach((type, mapifier) -> responseSerializers.put(type::isInstance, mapifier));
         responseSerializers.put(Objects::isNull, object -> null);
         responseSerializers.setDefaultValue(serializerAndDeserializer::serialize);
         return responseSerializers;
@@ -96,7 +74,6 @@ final class SerializersAndDeserializers {
     private FilterMapBuilder<Class<?>, Object, Demapifier<?>> toFilterMap(final SerializerAndDeserializer serializerAndDeserializer) {
         final FilterMapBuilder<Class<?>, Object, Demapifier<?>> requestDeserializers = filterMapBuilder();
         requestDeserializers.setDefaultValue(serializerAndDeserializer::deserialize);
-        this.specialDeserializers.forEach((type, demapifier) -> requestDeserializers.put((currentType, map) -> currentType.equals(type), demapifier));
         return requestDeserializers;
     }
 }

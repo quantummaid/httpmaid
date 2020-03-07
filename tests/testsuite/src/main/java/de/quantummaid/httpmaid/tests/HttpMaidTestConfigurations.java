@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.tests;
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
+import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersUseCase;
@@ -31,7 +32,6 @@ import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPat
 import de.quantummaid.httpmaid.tests.usecases.headers.HeaderUseCase;
 import de.quantummaid.httpmaid.tests.usecases.headers.HeadersParameter;
 import de.quantummaid.httpmaid.tests.usecases.mapmaid.MapMaidUseCase;
-import de.quantummaid.httpmaid.tests.usecases.parameter.Parameter;
 import de.quantummaid.httpmaid.tests.usecases.parameter.ParameterizedUseCase;
 import de.quantummaid.httpmaid.tests.usecases.pathparameter.WildCardUseCase;
 import de.quantummaid.httpmaid.tests.usecases.pathparameter.WildcardParameter;
@@ -61,13 +61,14 @@ import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
+import static de.quantummaid.httpmaid.tests.MapDeserializer.deserializeFromMap;
+import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
 
 public final class HttpMaidTestConfigurations {
 
     private HttpMaidTestConfigurations() {
     }
 
-    @SuppressWarnings("unchecked")
     public static HttpMaid theHttpMaidInstanceUsedForTesting() {
         return anHttpMaid()
                 .serving(TestUseCase.class).forRequestPath("/test").andRequestMethods(GET, POST, PUT, DELETE)
@@ -87,22 +88,16 @@ public final class HttpMaidTestConfigurations {
                 .configured(toMarshallContentType(json(),
                         string -> new Gson().fromJson(string, Map.class),
                         map -> new Gson().toJson(map)))
-                .configured(configuratorForType(UseCasesModule.class, useCasesModule -> {
-                    useCasesModule.addRequestMapperForType(Parameter.class, (targetType, map) -> new Parameter());
-                    useCasesModule.addRequestMapperForType(WildcardParameter.class, (targetType, map) -> new WildcardParameter((String) ((Map<String, Object>) map).get("parameter")));
-                    useCasesModule.addRequestMapperForType(QueryParametersParameter.class, (targetType, map) -> new QueryParametersParameter((Map<String, String>) map));
-                    useCasesModule.addRequestMapperForType(HeadersParameter.class, (targetType, map) -> new HeadersParameter((Map<String, String>) map));
-                    useCasesModule.addRequestMapperForType(EchoPathAndQueryParametersValue.class, (targetType, map) -> new EchoPathAndQueryParametersValue((Map<String, String>) map));
-                    useCasesModule.addRequestMapperForType(Parameter1.class, (targetType, map) -> {
-                        final Object param1 = ((Map<String, Object>) map).get("param1");
-                        return new Parameter1((String) param1);
-                    });
-                    useCasesModule.addRequestMapperForType(Parameter2.class, (targetType, map) -> {
-                        final Object param2 = ((Map<String, Object>) map).get("param2");
-                        return new Parameter2((String) param2);
-                    });
-                }))
                 .configured(toEnrichTheIntermediateMapWithAllRequestData())
+
+                .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+                    mapMaidBuilder.deserializing(deserializationOnlyType(QueryParametersParameter.class, deserializeFromMap(QueryParametersParameter::new)));
+                    mapMaidBuilder.deserializing(deserializationOnlyType(HeadersParameter.class, deserializeFromMap(HeadersParameter::new)));
+                    mapMaidBuilder.deserializing(deserializationOnlyType(EchoPathAndQueryParametersValue.class, deserializeFromMap(EchoPathAndQueryParametersValue::new)));
+                    mapMaidBuilder.deserializing(deserializationOnlyType(WildcardParameter.class, deserializeFromMap(WildcardParameter::new)));
+                    mapMaidBuilder.deserializing(deserializationOnlyType(Parameter1.class, deserializeFromMap(map -> new Parameter1((String) map.get("param1")))));
+                    mapMaidBuilder.deserializing(deserializationOnlyType(Parameter2.class, deserializeFromMap(map -> new Parameter2((String) map.get("param2")))));
+                }))
 
                 .configured(toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> {
                     response.setStatus(METHOD_NOT_ALLOWED);

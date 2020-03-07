@@ -27,7 +27,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public final class EchoPathAndQueryParametersValue {
-    private final Map<String, String> map;
+    private final Map<String, Object> map;
 
     @Override
     public String toString() {

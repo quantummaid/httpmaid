@@ -27,10 +27,10 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public final class HeadersParameter {
-    private final Map<String, String> headers;
+    private final Map<String, Object> headers;
 
     @Override
     public String toString() {
-        return headers.get("testheader");
+        return (String) headers.get("testheader");
     }
 }

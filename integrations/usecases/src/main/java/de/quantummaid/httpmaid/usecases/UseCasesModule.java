@@ -87,11 +87,6 @@ public final class UseCasesModule implements ChainModule {
         useCaseToEventMappings.put(useCaseClass, eventType);
     }
 
-    public <T> void addRequestMapperForType(final Class<T> type,
-                                            final Demapifier<T> requestMapper) {
-        this.serializersAndDeserializers.addSpecialDeserializer(type, requestMapper);
-    }
-
     public void setSerializerAndDeserializer(final SerializerAndDeserializer serializerAndDeserializer) {
         this.serializersAndDeserializers.setSerializerAndDeserializer(useCases -> serializerAndDeserializer);
     }

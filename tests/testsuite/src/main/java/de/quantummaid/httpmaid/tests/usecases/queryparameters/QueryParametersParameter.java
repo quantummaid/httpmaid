@@ -24,9 +24,9 @@ package de.quantummaid.httpmaid.tests.usecases.queryparameters;
 import java.util.Map;
 
 public final class QueryParametersParameter {
-    private final Map<String, String> queryParameters;
+    private final Map<String, Object> queryParameters;
 
-    public QueryParametersParameter(final Map<String, String> queryParameters) {
+    public QueryParametersParameter(final Map<String, Object> queryParameters) {
         this.queryParameters = queryParameters;
     }
 
