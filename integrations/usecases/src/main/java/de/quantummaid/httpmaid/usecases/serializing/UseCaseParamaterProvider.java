@@ -19,11 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.twoparameters;
+package de.quantummaid.httpmaid.usecases.serializing;
 
-public final class TwoParametersUseCase {
+import java.util.Map;
 
-    public String go(final Parameter1 param1, final Parameter2 param2) {
-        return param1.value + " " + param2.value;
-    }
+public interface UseCaseParamaterProvider {
+    Map<String, Object> provideParameters(Object event);
 }

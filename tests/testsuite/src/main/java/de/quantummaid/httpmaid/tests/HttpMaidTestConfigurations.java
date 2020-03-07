@@ -60,6 +60,7 @@ import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 import static de.quantummaid.httpmaid.tests.MapDeserializer.deserializeFromMap;
 import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
@@ -90,13 +91,11 @@ public final class HttpMaidTestConfigurations {
                         map -> new Gson().toJson(map)))
                 .configured(toEnrichTheIntermediateMapWithAllRequestData())
 
-                .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
                     mapMaidBuilder.deserializing(deserializationOnlyType(QueryParametersParameter.class, deserializeFromMap(QueryParametersParameter::new)));
                     mapMaidBuilder.deserializing(deserializationOnlyType(HeadersParameter.class, deserializeFromMap(HeadersParameter::new)));
                     mapMaidBuilder.deserializing(deserializationOnlyType(EchoPathAndQueryParametersValue.class, deserializeFromMap(EchoPathAndQueryParametersValue::new)));
                     mapMaidBuilder.deserializing(deserializationOnlyType(WildcardParameter.class, deserializeFromMap(WildcardParameter::new)));
-                    mapMaidBuilder.deserializing(deserializationOnlyType(Parameter1.class, deserializeFromMap(map -> new Parameter1((String) map.get("param1")))));
-                    mapMaidBuilder.deserializing(deserializationOnlyType(Parameter2.class, deserializeFromMap(map -> new Parameter2((String) map.get("param2")))));
                 }))
 
                 .configured(toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> {

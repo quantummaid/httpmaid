@@ -19,11 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.twoparameters;
+package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers;
 
-public final class TwoParametersUseCase {
+import de.quantummaid.mapmaid.MapMaid;
+import de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 
-    public String go(final Parameter1 param1, final Parameter2 param2) {
-        return param1.value + " " + param2.value;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class ZeroParametersDeserializationWrapper implements MethodParameterDeserializationWrapper {
+
+    public static MethodParameterDeserializationWrapper zeroParameters() {
+        return new de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.ZeroParametersDeserializationWrapper();
+    }
+
+    @Override
+    public Map<String, Object> deserializeParameters(final Object input, final MapMaid mapMaid) {
+        return new HashMap<>(0);
     }
 }

@@ -102,7 +102,6 @@ public final class UseCaseSpecs {
                 .theResponseBodyWas("The correct exception has been thrown");
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void useCasesCanReturnStrings(final TestEnvironment testEnvironment) {
@@ -119,7 +118,6 @@ public final class UseCaseSpecs {
                 .theResponseBodyWas("\"the correct response\"");
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void useCasesCanReturnInts(final TestEnvironment testEnvironment) {
