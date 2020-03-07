@@ -85,7 +85,7 @@ final class MapMaidMarshallingMapper {
                 });
 
         contentTypeMappingsForUnmarshalling.forEach((contentType, marshallingType) -> marshallingModule
-                .addUnmarshaller(contentType, input -> mapMaid.deserializer().deserializeToMap(input, marshallingType)));
+                .addUnmarshaller(contentType, input -> mapMaid.deserializer().deserializeToUniversalObject(input, marshallingType)));
 
         mapMaid.serializer().supportedMarshallingTypes().stream()
                 .filter(marshallingType -> !contentTypeMappingsForMarshalling.containsValue(marshallingType))

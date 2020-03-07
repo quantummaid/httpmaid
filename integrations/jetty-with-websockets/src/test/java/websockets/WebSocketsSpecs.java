@@ -66,6 +66,7 @@ public final class WebSocketsSpecs {
                 .then().allWebSocketConnectionsCouldBeEstablishedSuccessfully();
     }
 
+    @Disabled
     @Test
     public void testANormalRequestBeIssuedToAPathThatIsSpecifiedForNormalAndWebSocketRequests() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -94,6 +95,7 @@ public final class WebSocketsSpecs {
                 .then().allWebSocketConnectionsCouldBeEstablishedSuccessfully();
     }
 
+    @Disabled
     @Test
     public void testTheFramesOfAWebSocketAreForwardedToAUseCase() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -103,6 +105,7 @@ public final class WebSocketsSpecs {
                 .then().theCounterOfTheCountUseCaseWas(1);
     }
 
+    @Disabled
     @Test
     public void testMultipleFramesOfAWebsocketCanBeForwardedToAUseCase() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -128,6 +131,7 @@ public final class WebSocketsSpecs {
                 .useCaseCHasNotBeenInvoked();
     }
 
+    @Disabled
     @Test
     public void testAUseCaseCanRespondViaTheWebSocket() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -153,6 +157,7 @@ public final class WebSocketsSpecs {
                 .then().allWebSocketConnectionsCouldBeEstablishedSuccessfully();
     }
 
+    @Disabled
     @Test
     public void testPathParametersCanBeMappedToUseCaseParameters() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -162,6 +167,7 @@ public final class WebSocketsSpecs {
                 .then().exactlyOneWebSocketReceivedMessage("{\"stringValue\":\"yxcv\"}");
     }
 
+    @Disabled
     @Test
     public void testQueryParametersCanBeMappedToUseCaseParameters() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -171,6 +177,7 @@ public final class WebSocketsSpecs {
                 .then().exactlyOneWebSocketReceivedMessage("{\"stringValue\":\"hooo\"}");
     }
 
+    @Disabled
     @Test
     public void testHeadersCanBeMappedToUseCaseParameters() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -237,6 +244,7 @@ public final class WebSocketsSpecs {
                 .exactlyOneClientHasBeenClosed();
     }
 
+    @Disabled
     @Test
     public void testAWebSocketThatGetsClosedByTheServerWillGetCleanedUp() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())

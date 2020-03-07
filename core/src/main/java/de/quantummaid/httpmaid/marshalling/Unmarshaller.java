@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.marshalling;
 
-import java.util.Map;
-
 public interface Unmarshaller {
-    Map<String, Object> unmarshall(String string);
+    Object unmarshall(String string);
 }

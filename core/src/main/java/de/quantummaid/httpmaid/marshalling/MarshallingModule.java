@@ -94,6 +94,7 @@ public final class MarshallingModule implements ChainModule {
         extender.prependProcessor(POST_INVOKE, this::processMarshalling);
     }
 
+    @SuppressWarnings("unchecked")
     private void processUnmarshalling(final MetaData metaData) {
         metaData.getOptional(REQUEST_BODY_STRING).ifPresent(body -> {
             final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
@@ -108,9 +109,11 @@ public final class MarshallingModule implements ChainModule {
             if (isNull(unmarshaller)) {
                 failIfConfiguredToDoSo(() -> UnsupportedContentTypeException.unsupportedContentTypeException(contentType, unmarshallers.keySet()));
             } else {
-                final Map<String, Object> mapBody = ofNullable(unmarshaller.unmarshall(body))
-                        .orElseGet(HashMap::new);
-                metaData.set(REQUEST_BODY_MAP, mapBody);
+                final Object unmarshalled = unmarshaller.unmarshall(body);
+                if (!(unmarshalled instanceof Map)) {
+                    return;
+                }
+                metaData.set(REQUEST_BODY_MAP, (Map<String, Object>) unmarshalled);
             }
         });
     }

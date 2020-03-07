@@ -42,7 +42,6 @@ import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlE
 
 public final class MapMaidSpecs {
 
-    @SuppressWarnings("unchecked")
     private static HttpMaid httpMaid() {
         final Unmarshaller urlEncodedUnmarshaller = urlEncodedUnmarshaller();
         return anHttpMaid()
@@ -51,7 +50,7 @@ public final class MapMaidSpecs {
                 .configured(toMarshallContentTypeInResponses(fromString("custom"), map -> "custom_marshalled"))
                 .configured(toUnmarshallContentTypeInRequests(ContentType.formUrlEncoded(), string -> {
                     try {
-                        return urlEncodedUnmarshaller.unmarshal(string, Map.class);
+                        return urlEncodedUnmarshaller.unmarshal(string);
                     } catch (final Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -79,7 +78,6 @@ public final class MapMaidSpecs {
                 .theResponseBodyWas("custom_marshalled");
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void mapMaidIntegrationCorrectlyUnmarshallsWithoutSpecifiedRequestContentType(final TestEnvironment testEnvironment) {
@@ -95,7 +93,6 @@ public final class MapMaidSpecs {
                 .theResponseBodyWas("{}");
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void mapMaidIntegrationCanHelpWithValidation(final TestEnvironment testEnvironment) {

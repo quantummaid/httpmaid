@@ -28,8 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
@@ -43,10 +41,9 @@ public final class MapMaidSerializerAndDeserializer implements SerializerAndDese
         return new MapMaidSerializerAndDeserializer(mapMaid);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(final Class<T> type, final Object map) {
-        return mapMaid.deserializer().deserializeFromMap((Map<String, Object>) map, type);
+        return mapMaid.deserializer().deserializeFromUniversalObject(map, type);
     }
 
     @Override
