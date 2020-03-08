@@ -22,15 +22,15 @@
 package websockets.givenwhenthen.configurations.artificial;
 
 import com.google.gson.Gson;
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.path.Path;
-import de.quantummaid.httpmaid.security.SecurityConfigurators;
-import de.quantummaid.httpmaid.websockets.registry.WebSocketRegistry;
 import de.quantummaid.eventmaid.messageBus.MessageBus;
 import de.quantummaid.eventmaid.messageBus.MessageBusType;
 import de.quantummaid.eventmaid.useCases.building.ExceptionSerializationStep1Builder;
 import de.quantummaid.eventmaid.useCases.building.Step1Builder;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.path.Path;
+import de.quantummaid.httpmaid.security.SecurityConfigurators;
+import de.quantummaid.httpmaid.websockets.registry.WebSocketRegistry;
 import websockets.givenwhenthen.configurations.TestConfiguration;
 import websockets.givenwhenthen.configurations.artificial.usecases.abc.UseCaseA;
 import websockets.givenwhenthen.configurations.artificial.usecases.abc.UseCaseB;
@@ -52,8 +52,11 @@ import websockets.givenwhenthen.configurations.artificial.usecases.queryfoo.Quer
 
 import java.util.Map;
 
+import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
+import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseInvocationBuilder.anUseCaseAdapter;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_BODY_MAP;
 import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllRequestData;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toUseTheMessageBus;
@@ -66,10 +69,6 @@ import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthentic
 import static de.quantummaid.httpmaid.websockets.WebSocketsConfigurator.toUseWebSockets;
 import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.WEBSOCKET_REGISTRY;
 import static de.quantummaid.httpmaid.websocketsevents.Conditions.webSocketIsTaggedWith;
-import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
-import static de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseInvocationBuilder.anUseCaseAdapter;
 import static websockets.givenwhenthen.configurations.TestConfiguration.testConfiguration;
 import static websockets.givenwhenthen.configurations.artificial.usecases.echo.EchoParameter.echoParameter;
 import static websockets.givenwhenthen.configurations.artificial.usecases.exception.ExceptionUseCaseParameter.exceptionUseCaseParameter;
@@ -84,7 +83,6 @@ public final class ArtificialConfiguration {
     private ArtificialConfiguration() {
     }
 
-    @SuppressWarnings("unchecked")
     public static TestConfiguration theExampleHttpMaidInstanceWithWebSocketsSupport() {
         messageBus = aMessageBus()
                 .forType(MessageBusType.ASYNCHRONOUS)
@@ -117,9 +115,9 @@ public final class ArtificialConfiguration {
                 .get("/both", eventTypeFromString("BothUseCase"))
                 .serving(eventTypeFromString("CloseUseCase")).when(webSocketIsTaggedWith("CLOSE"))
                 .serving(eventTypeFromString("CountUseCase")).when(webSocketIsTaggedWith("COUNT"))
-                .serving(eventTypeFromString("UseCaseA")).when(metaData -> metaData.get(REQUEST_BODY_MAP).getOrDefault("useCase", "").equals("A"))
-                .serving(eventTypeFromString("UseCaseB")).when(metaData -> metaData.get(REQUEST_BODY_MAP).getOrDefault("useCase", "").equals("B"))
-                .serving(eventTypeFromString("UseCaseC")).when(metaData -> metaData.get(REQUEST_BODY_MAP).getOrDefault("useCase", "").equals("C"))
+                //.serving(eventTypeFromString("UseCaseA")).when(metaData -> metaData.get(REQUEST_BODY_MAP).getOrDefault("useCase", "").equals("A"))
+                //.serving(eventTypeFromString("UseCaseB")).when(metaData -> metaData.get(REQUEST_BODY_MAP).getOrDefault("useCase", "").equals("B"))
+                //.serving(eventTypeFromString("UseCaseC")).when(metaData -> metaData.get(REQUEST_BODY_MAP).getOrDefault("useCase", "").equals("C"))
                 .serving(eventTypeFromString("QueryFooUseCase")).when(webSocketIsTaggedWith("QUERY_FOO"))
                 .serving(eventTypeFromString("ExceptionUseCaseParameter")).when(webSocketIsTaggedWith("EXCEPTION"))
                 .serving(eventTypeFromString("EchoParameter")).when(webSocketIsTaggedWith("ECHO"))

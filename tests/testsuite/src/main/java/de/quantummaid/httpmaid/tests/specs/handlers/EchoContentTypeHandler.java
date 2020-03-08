@@ -19,28 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.tests.specs.handlers;
 
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.handler.Handler;
+import de.quantummaid.httpmaid.http.headers.ContentType;
 
-import java.util.Map;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_CONTENT_TYPE;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_STRING;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
+public final class EchoContentTypeHandler implements Handler {
 
-public interface RequestMapEnricher extends Processor {
-
-    @SuppressWarnings("unchecked")
-    @Override
-    default void apply(final MetaData metaData) {
-        final Object event = metaData.get(EVENT);
-        if (event instanceof Map) {
-            final HttpRequest httpRequest = httpRequest(metaData);
-            enrich((Map<String, Object>) event, httpRequest);
-        }
+    public static Handler echoContentTypeHandler() {
+        return new EchoContentTypeHandler();
     }
 
-    void enrich(Map<String, Object> map, HttpRequest request);
+    @Override
+    public void handle(final MetaData metaData) {
+        final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
+        metaData.set(RESPONSE_BODY_STRING, contentType.internalValueForMapping());
+    }
 }

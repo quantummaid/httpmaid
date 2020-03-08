@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
-import de.quantummaid.httpmaid.tests.lowlevel.LowLevelHttpMaidConfiguration;
+import de.quantummaid.httpmaid.tests.specs.LowLevelHttpMaidConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -110,10 +110,7 @@ public final class MarshallingModule implements ChainModule {
                 failIfConfiguredToDoSo(() -> UnsupportedContentTypeException.unsupportedContentTypeException(contentType, unmarshallers.keySet()));
             } else {
                 final Object unmarshalled = unmarshaller.unmarshall(body);
-                if (!(unmarshalled instanceof Map)) {
-                    return;
-                }
-                metaData.set(REQUEST_BODY_MAP, (Map<String, Object>) unmarshalled);
+                metaData.set(UNMARSHALLED_REQUEST_BODY, unmarshalled);
             }
         });
     }

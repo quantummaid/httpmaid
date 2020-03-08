@@ -19,28 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.domain;
 
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.Map;
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class MyRequest {
+    public final CustomPrimitive1 field1;
+    public final CustomPrimitive2 field2;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
-
-public interface RequestMapEnricher extends Processor {
-
-    @SuppressWarnings("unchecked")
-    @Override
-    default void apply(final MetaData metaData) {
-        final Object event = metaData.get(EVENT);
-        if (event instanceof Map) {
-            final HttpRequest httpRequest = httpRequest(metaData);
-            enrich((Map<String, Object>) event, httpRequest);
-        }
+    public static MyRequest myRequest(final CustomPrimitive1 field1,
+                                      final CustomPrimitive2 field2) {
+        return new MyRequest(field1, field2);
     }
-
-    void enrich(Map<String, Object> map, HttpRequest request);
 }

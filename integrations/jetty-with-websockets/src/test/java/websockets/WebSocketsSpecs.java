@@ -117,6 +117,7 @@ public final class WebSocketsSpecs {
                 .then().theCounterOfTheCountUseCaseWas(3);
     }
 
+    @Disabled
     @Test
     public void testOneWebSocketCanSendMessagesToMulipleUseCases() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())

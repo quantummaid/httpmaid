@@ -102,7 +102,15 @@ public final class HttpRequest {
                 .orElseThrow(() -> new RuntimeException("Request does not have a body map"));
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<Map<String, Object>> optionalBodyMap() {
-        return metaData.getOptional(REQUEST_BODY_MAP);
+        return metaData.getOptional(UNMARSHALLED_REQUEST_BODY)
+                .flatMap(unmarshalled -> {
+                    if (unmarshalled instanceof Map) {
+                        return Optional.of((Map<String, Object>) unmarshalled);
+                    } else {
+                        return Optional.empty();
+                    }
+                });
     }
 }

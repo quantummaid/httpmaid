@@ -19,28 +19,23 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.tests.specs.handlers;
 
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.handler.Handler;
 
-import java.util.Map;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_BODY_STRING;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_STRING;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
+public final class EchoBodyHandler implements Handler {
 
-public interface RequestMapEnricher extends Processor {
-
-    @SuppressWarnings("unchecked")
-    @Override
-    default void apply(final MetaData metaData) {
-        final Object event = metaData.get(EVENT);
-        if (event instanceof Map) {
-            final HttpRequest httpRequest = httpRequest(metaData);
-            enrich((Map<String, Object>) event, httpRequest);
-        }
+    public static EchoBodyHandler echoBodyHandler() {
+        return new EchoBodyHandler();
     }
 
-    void enrich(Map<String, Object> map, HttpRequest request);
+    @Override
+    public void handle(final MetaData metaData) {
+        final String responseBody = metaData.getOptional(REQUEST_BODY_STRING).orElse("");
+        metaData.set(RESPONSE_BODY_STRING, responseBody);
+    }
 }

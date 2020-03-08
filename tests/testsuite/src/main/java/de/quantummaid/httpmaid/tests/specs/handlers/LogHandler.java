@@ -19,28 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.tests.specs.handlers;
 
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.handler.Handler;
+import de.quantummaid.httpmaid.logger.Logger;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.Map;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.LOGGER;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class LogHandler implements Handler {
 
-public interface RequestMapEnricher extends Processor {
-
-    @SuppressWarnings("unchecked")
-    @Override
-    default void apply(final MetaData metaData) {
-        final Object event = metaData.get(EVENT);
-        if (event instanceof Map) {
-            final HttpRequest httpRequest = httpRequest(metaData);
-            enrich((Map<String, Object>) event, httpRequest);
-        }
+    public static Handler logHandler() {
+        return new LogHandler();
     }
 
-    void enrich(Map<String, Object> map, HttpRequest request);
+    @Override
+    public void handle(final MetaData metaData) {
+        final Logger logger = metaData.get(LOGGER);
+        logger.info("foobar");
+    }
 }

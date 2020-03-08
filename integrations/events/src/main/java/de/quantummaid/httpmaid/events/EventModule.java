@@ -39,6 +39,7 @@ import lombok.ToString;
 import java.util.*;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.UNMARSHALLED_REQUEST_BODY;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
 import static de.quantummaid.httpmaid.chains.ChainRegistry.CHAIN_REGISTRY;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
@@ -63,7 +64,7 @@ public final class EventModule implements ChainModule {
     public static final MetaDataKey<MessageBus> MESSAGE_BUS = metaDataKey("MESSAGE_BUS");
     public static final MetaDataKey<Boolean> IS_EXTERNAL_EVENT = metaDataKey("IS_EXTERNAL_EVENT");
     public static final MetaDataKey<EventType> EVENT_TYPE = metaDataKey("EVENT_TYPE");
-    public static final MetaDataKey<Map<String, Object>> EVENT = metaDataKey("EVENT");
+    public static final MetaDataKey<Object> EVENT = metaDataKey("EVENT");
     public static final MetaDataKey<Optional<Object>> RECEIVED_EVENT = metaDataKey("RECEIVED_EVENT");
 
     private static final int DEFAULT_POOL_SIZE = 4;
@@ -131,11 +132,13 @@ public final class EventModule implements ChainModule {
     @Override
     public void register(final ChainExtender extender) {
         extender.appendProcessor(DETERMINE_HANDLER, DetermineEventProcessor.determineEventProcessor(generators(eventTypeGenerators)));
-
         extender.routeIfSet(PREPARE_RESPONSE, jumpTo(EventsChains.MAP_REQUEST_TO_EVENT), EVENT_TYPE);
 
         extender.createChain(EventsChains.MAP_REQUEST_TO_EVENT, jumpTo(EventsChains.SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
-        extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, metaData -> metaData.set(EVENT, new HashMap<>()));
+        extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, metaData -> {
+            final Object event = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(new HashMap<>());
+            metaData.set(EVENT, event);
+        });
         requestMapEnrichers.forEach(enricher -> extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, enricher));
 
         extender.createChain(EventsChains.SUBMIT_EVENT, jumpTo(EventsChains.MAP_EVENT_TO_RESPONSE), jumpTo(EXCEPTION_OCCURRED));

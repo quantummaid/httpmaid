@@ -25,7 +25,6 @@ import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.events.EventModule.EVENT;
@@ -33,11 +32,11 @@ import static java.util.Optional.empty;
 
 public interface ExternalEventMapping extends Processor {
 
-    void handle(Map<String, Object> event);
+    void handle(Object event);
 
     @Override
     default void apply(final MetaData metaData) {
-        final Map<String, Object> event = metaData.get(EVENT);
+        final Object event = metaData.get(EVENT);
         handle(event);
     }
 

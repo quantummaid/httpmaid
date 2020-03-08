@@ -19,28 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.tests.specs.handlers;
 
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.handler.http.HttpResponse;
+import de.quantummaid.httpmaid.handler.Handler;
 
-import java.util.Map;
+public class MyDownloadHandler implements HttpHandler {
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
-
-public interface RequestMapEnricher extends Processor {
-
-    @SuppressWarnings("unchecked")
-    @Override
-    default void apply(final MetaData metaData) {
-        final Object event = metaData.get(EVENT);
-        if (event instanceof Map) {
-            final HttpRequest httpRequest = httpRequest(metaData);
-            enrich((Map<String, Object>) event, httpRequest);
-        }
+    public static Handler downloadHandler() {
+        return new MyDownloadHandler();
     }
 
-    void enrich(Map<String, Object> map, HttpRequest request);
+    @Override
+    public void handle(final HttpRequest request, final HttpResponse response) {
+        response.setBody("download-content");
+        response.asDownloadWithFilename("foo.txt");
+    }
 }

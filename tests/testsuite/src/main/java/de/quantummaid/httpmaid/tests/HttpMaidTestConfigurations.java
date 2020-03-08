@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.tests;
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
-import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersUseCase;
@@ -40,11 +39,8 @@ import de.quantummaid.httpmaid.tests.usecases.queryparameters.QueryParametersUse
 import de.quantummaid.httpmaid.tests.usecases.responsecontenttype.SetContentTypeInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responseheaders.HeadersInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.simple.TestUseCase;
-import de.quantummaid.httpmaid.tests.usecases.twoparameters.Parameter1;
-import de.quantummaid.httpmaid.tests.usecases.twoparameters.Parameter2;
 import de.quantummaid.httpmaid.tests.usecases.twoparameters.TwoParametersUseCase;
 import de.quantummaid.httpmaid.tests.usecases.vooooid.VoidUseCase;
-import de.quantummaid.httpmaid.usecases.UseCasesModule;
 
 import java.util.Map;
 
@@ -52,7 +48,6 @@ import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
-import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllRequestData;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
