@@ -149,4 +149,20 @@ public final class UseCaseSpecs {
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("\"foo\"");
     }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseCanHaveTwoStringsAsParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", TwoStringsParameterUseCase.class)
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Object.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter1\": \"foo\", \"parameter2\": \"bar\" }").withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"foobar\"");
+    }
 }
