@@ -19,39 +19,44 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.eventfactories;
+package de.quantummaid.httpmaid.events.enriching;
 
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
-import de.quantummaid.httpmaid.events.EventFactory;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-
-import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.enrichableMap;
-import static java.util.Collections.singletonList;
+import java.util.Map;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SingleParameterEventFactory implements EventFactory {
-    private final String name;
+public final class AddMapEntryEnricher implements Enricher {
+    private final String key;
+    private final Object value;
 
-    public static EventFactory singleParameterEventFactory(final String name) {
-        Validators.validateNotNullNorEmpty(name, "name");
-        return new SingleParameterEventFactory(name);
+    public static Enricher mapEntry(final String key,
+                                    final Object value) {
+        return new AddMapEntryEnricher(key, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Object enrich(final String key, final Object enrichable) {
+        if (this.key.equals(key)) {
+            return value;
+        }
+        if (enrichable instanceof Map) {
+            final Map<String, Object> map = (Map<String, Object>) enrichable;
+            if (!map.containsKey(this.key)) {
+                map.put(this.key, value);
+            }
+        }
+        return enrichable;
     }
 
     @Override
-    public EnrichableMap createEvent(final Object unmarshalledBody) {
-        final List<String> names = singletonList(name);
-        final EnrichableMap event = enrichableMap(names);
-        if(unmarshalledBody != null) {
-            event.overwriteTopLevel(name, unmarshalledBody);
-        }
-        return event;
+    public String description() {
+        return String.format("<%s, %s>", key, value);
     }
 }

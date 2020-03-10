@@ -19,10 +19,17 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.tests.specs.usecase.usecases.domain;
 
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-public interface EventFactory {
-    EnrichableMap createEvent(Object unmarshalledBody);
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+public final class MyDto {
+    public final String fieldA;
+    public final String fieldB;
 }

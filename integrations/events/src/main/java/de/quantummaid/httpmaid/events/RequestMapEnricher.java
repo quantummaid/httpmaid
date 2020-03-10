@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.events;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
 import static de.quantummaid.httpmaid.events.EventModule.EVENT;

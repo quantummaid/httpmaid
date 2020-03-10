@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.specs.usecase.usecases;
 
+import de.quantummaid.httpmaid.tests.specs.usecase.usecases.domain.MyDto;
+
 public final class SingleDtoParameterUseCase {
 
     public String performUseCase(final MyDto parameter) {

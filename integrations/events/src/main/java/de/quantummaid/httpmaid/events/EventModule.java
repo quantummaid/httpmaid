@@ -25,6 +25,7 @@ import de.quantummaid.eventmaid.messageBus.MessageBus;
 import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.events.processors.DetermineEventProcessor;
 import de.quantummaid.httpmaid.events.processors.DispatchEventProcessor;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
@@ -49,7 +50,7 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
-import static de.quantummaid.httpmaid.events.EnrichableMap.emptyEnrichableMap;
+import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor.handleExternalEventProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.generator.Generator.generator;
@@ -154,7 +155,7 @@ public final class EventModule implements ChainModule {
 
         extender.createChain(EventsChains.MAP_REQUEST_TO_EVENT, jumpTo(EventsChains.SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
         extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, metaData -> {
-            final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(new HashMap<>());
+            final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(null);
             final EventType eventType = metaData.get(EVENT_TYPE);
             final EventFactory eventFactory = eventFactories.get(eventType);
             final EnrichableMap event = eventFactory.createEvent(unmarshalled);

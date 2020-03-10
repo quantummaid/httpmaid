@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.usecases.eventfactories;
 
-import de.quantummaid.httpmaid.events.EnrichableMap;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.events.EventFactory;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -31,7 +31,7 @@ import lombok.ToString;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.events.EnrichableMap.enrichableMap;
+import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.enrichableMap;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
@@ -48,11 +48,10 @@ public final class MultipleParametersEventFactory implements EventFactory {
     @SuppressWarnings("unchecked")
     @Override
     public EnrichableMap createEvent(final Object unmarshalledBody) {
-        if (!(unmarshalledBody instanceof Map)) {
-            throw new UnsupportedOperationException("Expecting a Map<String, Object> but found: " + unmarshalledBody);
-        }
         final EnrichableMap event = enrichableMap(parameterNames);
-        ((Map<String, Object>) unmarshalledBody).forEach(event::overwriteTopLevel);
+        if (unmarshalledBody instanceof Map) {
+            event.overwriteTopLevel((Map<String, ?>) unmarshalledBody);
+        }
         return event;
     }
 }

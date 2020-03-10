@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.events.enriching;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -30,13 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.events.enriching.AddMapEntryEnricher.mapEntry;
+import static de.quantummaid.httpmaid.events.enriching.Enrichable.enrichable;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EnrichableMap {
-    private final Map<String, Object> map;
+    private final Map<String, Enrichable> map;
 
     public static EnrichableMap emptyEnrichableMap() {
         return new EnrichableMap(new HashMap<>());
@@ -44,20 +46,29 @@ public final class EnrichableMap {
 
     public static EnrichableMap enrichableMap(final List<String> topLevelKeys) {
         validateNotNull(topLevelKeys, "topLevelKeys");
-        final Map<String, Object> map = new HashMap<>(topLevelKeys.size());
-        topLevelKeys.forEach(key -> map.put(key, null));
+        final Map<String, Enrichable> map = new HashMap<>(topLevelKeys.size());
+        topLevelKeys.forEach(key -> map.put(key, enrichable(key)));
         return new EnrichableMap(map);
     }
 
     public Map<String, Object> asMap() {
-        return map;
+        final Map<String, Object> compiled = new HashMap<>();
+        map.forEach((key, enrichable) -> {
+            final Object value = enrichable.compile();
+            compiled.put(key, value);
+        });
+        return compiled;
+    }
+
+    public void overwriteTopLevel(final Map<String, ?> values) {
+        values.forEach(this::overwriteTopLevel);
     }
 
     public void overwriteTopLevel(final String key, final Object value) {
         if (!map.containsKey(key)) {
             return;
         }
-        map.put(key, value);
+        map.get(key).setValue(value);
     }
 
     public void enrichEitherTopOrSecondLevelWithoutOverwriting(final Map<String, ?> values) {
@@ -72,36 +83,23 @@ public final class EnrichableMap {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void enrichOnSecondLevelWithoutOverwriting(final String key, final Object value) {
-        this.map.values().forEach(object -> {
-            if (object instanceof Map) {
-                enrichWithoutOverwriting(key, value, (Map<String, Object>) object);
-            }
-        });
+        this.map.values().forEach(enrichable -> enrichWithoutOverwriting(key, value, enrichable));
     }
 
-    @SuppressWarnings("unchecked")
     public void enrichOnSecondLevelWithOverwriting(final String key, final Object value) {
-        this.map.values().forEach(object -> {
-            if (object instanceof Map) {
-                enrichWithOverwriting(key, value, (Map<String, Object>) object);
-            }
-        });
+        this.map.values().forEach(enrichable -> enrichWithOverwriting(key, value, enrichable));
     }
 
     private static void enrichWithoutOverwriting(final String key,
                                                  final Object value,
-                                                 final Map<String, Object> map) {
-        if (map.containsKey(key)) {
-            return;
-        }
-        map.put(key, value);
+                                                 final Enrichable enrichable) {
+        enrichable.enrichWithoutOverwrite(mapEntry(key, value));
     }
 
     private static void enrichWithOverwriting(final String key,
                                               final Object value,
-                                              final Map<String, Object> map) {
-        map.put(key, value);
+                                              final Enrichable enrichable) {
+        enrichable.enrichWithOverwrite(mapEntry(key, value));
     }
 }

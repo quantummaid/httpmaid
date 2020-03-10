@@ -19,39 +19,49 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.eventfactories;
+package de.quantummaid.httpmaid.events.enriching;
 
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
-import de.quantummaid.httpmaid.events.EventFactory;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.enrichableMap;
-import static java.util.Collections.singletonList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SingleParameterEventFactory implements EventFactory {
-    private final String name;
+public final class Enrichable {
+    private final String key;
+    private Object value = new HashMap<>();
+    private final List<Enricher> enrichersWithoutOverwrite = new ArrayList<>();
+    private final List<Enricher> enrichersWithOverwrite = new ArrayList<>();
 
-    public static EventFactory singleParameterEventFactory(final String name) {
-        Validators.validateNotNullNorEmpty(name, "name");
-        return new SingleParameterEventFactory(name);
+    public static Enrichable enrichable(final String key) {
+        return new Enrichable(key);
     }
 
-    @Override
-    public EnrichableMap createEvent(final Object unmarshalledBody) {
-        final List<String> names = singletonList(name);
-        final EnrichableMap event = enrichableMap(names);
-        if(unmarshalledBody != null) {
-            event.overwriteTopLevel(name, unmarshalledBody);
+    public void setValue(final Object value) {
+        this.value = value;
+    }
+
+    public void enrichWithoutOverwrite(final Enricher enricher) {
+        enrichersWithoutOverwrite.add(enricher);
+    }
+
+    public void enrichWithOverwrite(final Enricher enricher) {
+        enrichersWithOverwrite.add(enricher);
+    }
+
+    public Object compile() {
+        for (final Enricher enricher : enrichersWithoutOverwrite) {
+            value = enricher.enrich(key, value);
         }
-        return event;
+        for (final Enricher enricher : enrichersWithOverwrite) {
+            value = enricher.enrich(key, value);
+        }
+        return value;
     }
 }

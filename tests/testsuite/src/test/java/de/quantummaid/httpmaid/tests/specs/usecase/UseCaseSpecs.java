@@ -32,6 +32,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapUsing;
+import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllPathParameters;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
@@ -147,6 +148,23 @@ public final class UseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseCanHaveASingleStringAsParameterViaPathParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/<parameter>", SingleStringParameterUseCase.class)
+                        .configured(toEnrichTheIntermediateMapWithAllPathParameters())
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Object.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("\"foo\"");
     }

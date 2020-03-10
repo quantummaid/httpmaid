@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.events;
 import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 
 import java.util.Map;
 import java.util.Optional;

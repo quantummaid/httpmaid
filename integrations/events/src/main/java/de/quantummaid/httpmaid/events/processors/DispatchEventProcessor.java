@@ -28,7 +28,7 @@ import de.quantummaid.eventmaid.messageFunction.MessageFunction;
 import de.quantummaid.eventmaid.messageFunction.ResponseFuture;
 import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.eventmaid.processingContext.ProcessingContext;
-import de.quantummaid.httpmaid.events.EnrichableMap;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

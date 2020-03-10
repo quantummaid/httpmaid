@@ -19,17 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.usecase.usecases;
+package de.quantummaid.httpmaid.events.enriching;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+public interface Enricher {
+    Object enrich(String key, Object enrichable);
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public final class MyDto {
-    public final String fieldA;
-    public final String fieldB;
+    String description();
 }
