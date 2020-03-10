@@ -19,11 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters;
+package de.quantummaid.httpmaid.events;
 
-public final class EchoPathAndQueryParametersUseCase {
-
-    public String echo(final EchoPathAndQueryParametersValue echoPathAndQueryParametersValue) {
-        return echoPathAndQueryParametersValue.toString();
-    }
+public interface EventFactory {
+    Object createEvent(Object unmarshalledBody);
 }

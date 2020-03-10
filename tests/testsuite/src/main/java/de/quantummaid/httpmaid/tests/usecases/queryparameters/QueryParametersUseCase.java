@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class QueryParametersUseCase {
 
-    public String queryParameters(final QueryParametersParameter parameter) {
-        return parameter.toString();
+    public String queryParameters(final QueryParametersParameter queryParametersParameter) {
+        return queryParametersParameter.toString();
     }
 }

@@ -40,10 +40,7 @@ import static de.quantummaid.mapmaid.builder.RequiredCapabilities.deserializatio
 import static de.quantummaid.mapmaid.builder.RequiredCapabilities.serialization;
 import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
 import static de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MultipleParametersDeserializationWrapper.multipleParamters;
-import static de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.SingleParameterDeserializationWrapper.singleParameter;
-import static de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.ZeroParametersDeserializationWrapper.zeroParameters;
-import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.virtualTypeIdentifier;
-import static de.quantummaid.mapmaid.shared.types.ResolvedType.resolvedType;
+import static de.quantummaid.mapmaid.shared.identifier.VirtualTypeIdentifier.uniqueVirtualTypeIdentifier;
 import static de.quantummaid.mapmaid.shared.validators.NotNullValidator.validateNotNull;
 import static java.lang.String.format;
 
@@ -81,22 +78,13 @@ public final class UseCaseClassScanner {
                     format("because return type of method %s", method.describe()));
         });
 
-        if (parameters.isEmpty()) {
-            return zeroParameters();
-        } else if (parameters.size() == 1) {
-            final Map.Entry<String, Class<?>> parameter = parameters.entrySet().iterator().next();
-            final String name = parameter.getKey();
-            final Class<?> type = parameter.getValue();
-            return singleParameter(name, resolvedType(type));
-        } else {
-            final DeserializationOnlyType<?> virtualType = createVirtualObjectFor(method.describe(), parameters);
-            builder.deserializing(virtualType);
-            return multipleParamters(virtualType.type());
-        }
+        final DeserializationOnlyType<?> virtualType = createVirtualObjectFor(method.describe(), parameters);
+        builder.deserializing(virtualType);
+        return multipleParamters(virtualType.type());
     }
 
     private static DeserializationOnlyType<?> createVirtualObjectFor(final String method, final Map<String, Class<?>> parameters) {
-        final TypeIdentifier typeIdentifier = virtualTypeIdentifier(method);
+        final TypeIdentifier typeIdentifier = uniqueVirtualTypeIdentifier();
         final TypeDeserializer deserializer = virtualDeserializerFor(method, parameters);
         return deserializationOnlyType(typeIdentifier, deserializer);
     }

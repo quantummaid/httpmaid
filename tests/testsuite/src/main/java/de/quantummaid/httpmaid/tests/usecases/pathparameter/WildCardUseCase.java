@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class WildCardUseCase {
 
-    public String wildcard(final WildcardParameter parameter) {
-        return parameter.toString();
+    public String wildcard(final WildcardParameter wildcardParameter) {
+        return wildcardParameter.toString();
     }
 }

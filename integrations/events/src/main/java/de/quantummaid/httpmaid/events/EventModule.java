@@ -21,16 +21,15 @@
 
 package de.quantummaid.httpmaid.events;
 
-import de.quantummaid.httpmaid.events.processors.DetermineEventProcessor;
-import de.quantummaid.httpmaid.events.processors.DispatchEventProcessor;
-import de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor;
+import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
+import de.quantummaid.httpmaid.events.processors.DetermineEventProcessor;
+import de.quantummaid.httpmaid.events.processors.DispatchEventProcessor;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.generator.Generator;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
-import de.quantummaid.eventmaid.messageBus.MessageBus;
-import de.quantummaid.eventmaid.processingContext.EventType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +37,9 @@ import lombok.ToString;
 
 import java.util.*;
 
+import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
+import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.messageBus.MessageBusType.ASYNCHRONOUS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.UNMARSHALLED_REQUEST_BODY;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
@@ -47,14 +49,12 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor.handleExternalEventProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.generator.Generator.generator;
 import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.eventmaid.messageBus.MessageBusType.ASYNCHRONOUS;
 import static java.util.Optional.of;
 
 @ToString
@@ -72,6 +72,7 @@ public final class EventModule implements ChainModule {
     private volatile MessageBus messageBus;
     private volatile boolean closeMessageBusOnClose = true;
     private final List<Generator<EventType>> eventTypeGenerators = new LinkedList<>();
+    private final Map<EventType, EventFactory> eventFactories = new HashMap<>();
 
     private final List<RequestMapEnricher> requestMapEnrichers = new LinkedList<>();
     private final List<ResponseMapExtractor> responseMapExtractors = new LinkedList<>();
@@ -108,10 +109,24 @@ public final class EventModule implements ChainModule {
 
     public void addEventMapping(final EventType eventType,
                                 final GenerationCondition condition) {
+        addEventMapping(eventType, condition, object -> object);
+    }
+
+    public void addEventMapping(final EventType eventType,
+                                final GenerationCondition condition,
+                                final EventFactory eventFactory) {
         validateNotNull(eventType, "eventType");
         validateNotNull(condition, "condition");
+        validateNotNull(eventFactory, "eventFactory");
         final Generator<EventType> eventTypeGenerator = generator(eventType, condition);
         eventTypeGenerators.add(eventTypeGenerator);
+        setEventFactoryFor(eventType, eventFactory);
+    }
+
+    public void setEventFactoryFor(final EventType eventType, final EventFactory eventFactory) {
+        validateNotNull(eventType, "eventType");
+        validateNotNull(eventFactory, "eventFactory");
+        eventFactories.put(eventType, eventFactory);
     }
 
     public void addExternalEventMapping(final EventType eventType,
@@ -136,7 +151,10 @@ public final class EventModule implements ChainModule {
 
         extender.createChain(EventsChains.MAP_REQUEST_TO_EVENT, jumpTo(EventsChains.SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
         extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, metaData -> {
-            final Object event = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(new HashMap<>());
+            final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(new HashMap<>());
+            final EventType eventType = metaData.get(EVENT_TYPE);
+            final EventFactory eventFactory = eventFactories.get(eventType);
+            final Object event = eventFactory.createEvent(unmarshalled);
             metaData.set(EVENT, event);
         });
         requestMapEnrichers.forEach(enricher -> extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, enricher));
@@ -152,19 +170,15 @@ public final class EventModule implements ChainModule {
         });
 
         extender.appendProcessor(PREPARE_EXCEPTION_RESPONSE, unwrapDispatchingExceptionProcessor());
-
         extender.createChain(EventsChains.EXTERNAL_EVENT, drop(), jumpTo(EXCEPTION_OCCURRED));
-        extender.appendProcessor(EventsChains.EXTERNAL_EVENT, HandleExternalEventProcessor.handleExternalEventProcessor(externalEventMappings));
-
+        extender.appendProcessor(EventsChains.EXTERNAL_EVENT, handleExternalEventProcessor(externalEventMappings));
         extender.routeIfFlagIsSet(INIT, jumpTo(EventsChains.EXTERNAL_EVENT), IS_EXTERNAL_EVENT);
-
         externalEventMappings.forEach((eventType, externalEventMapping) ->
                 externalEventMapping.jumpTarget().ifPresent(chainName ->
                         extender.routeIfEquals(EventsChains.EXTERNAL_EVENT, jumpTo(chainName), EVENT_TYPE, eventType)));
 
         final ChainRegistry chainRegistry = extender.getMetaDatum(CHAIN_REGISTRY);
         registerEventHandlers(messageBus, chainRegistry);
-
         if (closeMessageBusOnClose) {
             final ClosingActions closingActions = chainRegistry.getMetaDatum(CLOSING_ACTIONS);
             closingActions.addClosingAction(() -> messageBus.close());

@@ -48,6 +48,7 @@ import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
+import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapUsing;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllRequestData;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
@@ -65,6 +66,7 @@ public final class HttpMaidTestConfigurations {
     private HttpMaidTestConfigurations() {
     }
 
+    @SuppressWarnings("unchecked")
     public static HttpMaid theHttpMaidInstanceUsedForTesting() {
         return anHttpMaid()
                 .serving(TestUseCase.class).forRequestPath("/test").andRequestMethods(GET, POST, PUT, DELETE)
@@ -85,6 +87,28 @@ public final class HttpMaidTestConfigurations {
                         string -> new Gson().fromJson(string, Map.class),
                         map -> new Gson().toJson(map)))
                 .configured(toEnrichTheIntermediateMapWithAllRequestData())
+                .configured(toEnrichTheIntermediateMapUsing((map, request) -> {
+                    if (map.containsKey("wildcardParameter")) {
+                        ((Map<String, Object>) map.get("wildcardParameter")).put("parameter", map.get("parameter"));
+                    }
+                    if (map.containsKey("headersParameter")) {
+                        ((Map<String, Object>) map.get("headersParameter")).put("testheader", map.get("testheader"));
+                    }
+                    if (map.containsKey("queryParametersParameter")) {
+                        ((Map<String, Object>) map.get("queryParametersParameter")).put("param1", map.get("param1"));
+                        ((Map<String, Object>) map.get("queryParametersParameter")).put("param2", map.get("param2"));
+                    }
+                    if (map.containsKey("dataTransferObject")) {
+                        ((Map<String, Object>) map.get("dataTransferObject")).put("value1", map.get("value1"));
+                        ((Map<String, Object>) map.get("dataTransferObject")).put("value2", map.get("value2"));
+                        ((Map<String, Object>) map.get("dataTransferObject")).put("value3", map.get("value3"));
+                        ((Map<String, Object>) map.get("dataTransferObject")).put("value4", map.get("value4"));
+                    }
+                    if (map.containsKey("echoPathAndQueryParametersValue")) {
+                        ((Map<String, Object>) map.get("echoPathAndQueryParametersValue")).put("wildcard", map.get("wildcard"));
+                        ((Map<String, Object>) map.get("echoPathAndQueryParametersValue")).put("test", map.get("test"));
+                    }
+                }))
 
                 .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
                     mapMaidBuilder.deserializing(deserializationOnlyType(QueryParametersParameter.class, deserializeFromMap(QueryParametersParameter::new)));

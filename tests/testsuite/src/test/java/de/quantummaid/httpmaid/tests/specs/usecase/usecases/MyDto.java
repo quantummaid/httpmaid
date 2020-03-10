@@ -19,35 +19,17 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid;
+package de.quantummaid.httpmaid.tests.specs.usecase.usecases;
 
-import de.quantummaid.httpmaid.usecases.serializing.SerializerAndDeserializer;
-import de.quantummaid.mapmaid.MapMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MapMaidSerializerAndDeserializer implements SerializerAndDeserializer {
-    private final MapMaid mapMaid;
-
-    public static SerializerAndDeserializer mapMaidSerializerAndDeserializer(final MapMaid mapMaid) {
-        validateNotNull(mapMaid, "mapMaid");
-        return new MapMaidSerializerAndDeserializer(mapMaid);
-    }
-
-    @Override
-    public <T> T deserialize(final Class<T> type, final Object map) {
-        return mapMaid.deserializer().deserializeFromUniversalObject(map, type);
-    }
-
-    @Override
-    public Object serialize(final Object event) {
-        return mapMaid.serializer().serializeToUniversalObject(event);
-    }
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+public final class MyDto {
+    public final String fieldA;
+    public final String fieldB;
 }

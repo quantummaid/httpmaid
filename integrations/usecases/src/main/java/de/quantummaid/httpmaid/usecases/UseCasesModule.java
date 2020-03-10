@@ -31,10 +31,8 @@ import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
-import de.quantummaid.httpmaid.chains.ChainExtender;
-import de.quantummaid.httpmaid.chains.ChainModule;
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.chains.*;
+import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
@@ -44,11 +42,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
 import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
@@ -59,6 +53,7 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
+import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
 
@@ -71,6 +66,7 @@ public final class UseCasesModule implements ChainModule {
     private SerializationAndDeserializationProvider serializationAndDeserializationProvider;
     private UseCaseInstantiator useCaseInstantiator;
     private final Map<Class<?>, EventType> useCaseToEventMappings = new HashMap<>();
+    private final List<UseCaseMethod> useCaseMethods = new ArrayList<>();
 
     public static UseCasesModule useCasesModule() {
         return new UseCasesModule();
@@ -104,20 +100,36 @@ public final class UseCasesModule implements ChainModule {
             final EventType eventType = eventTypeFromClass(useCaseClass);
             useCaseToEventMappings.put(useCaseClass, eventType);
             handlerDistributors.distribute(eventType, condition);
+            useCaseMethods.add(useCaseMethodOf(useCaseClass));
+        });
+    }
+
+    @Override
+    public void configure(final DependencyRegistry dependencyRegistry) {
+        final EventModule eventModule = dependencyRegistry.getDependency(EventModule.class);
+        useCaseMethods.forEach(useCaseMethod -> {
+            final Class<?> useCaseClass = useCaseMethod.useCaseClass();
+            final EventType eventType = useCaseToEventMappings.get(useCaseClass);
+            if (useCaseMethod.isSingleParameterUseCase()) {
+                final String name = useCaseMethod.singleParameterName();
+                eventModule.setEventFactoryFor(eventType, unmarshalled -> {
+                    final Map<String, Object> map = new HashMap<>();
+                    map.put(name, unmarshalled);
+                    return map;
+                });
+            }
         });
     }
 
     @Override
     public void register(final ChainExtender extender) {
         final LowLevelUseCaseAdapterBuilder lowLevelUseCaseAdapterBuilder = LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder();
-        final List<UseCaseMethod> useCaseMethods = useCaseToEventMappings.keySet().stream()
-                .map(UseCaseMethod::useCaseMethodOf)
-                .collect(Collectors.toList());
         final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods);
 
         useCaseMethods.forEach(useCaseMethod -> {
             final Class<?> useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
+
             lowLevelUseCaseAdapterBuilder.addUseCase(useCaseClass, eventType, (useCase, event, callingContext) -> {
                 final Map<String, Object> parameters = serializationAndDeserialization.deserializeParameters(event, useCaseClass);
                 final Optional<Object> returnValue = useCaseMethod.invoke(useCase, parameters, event);

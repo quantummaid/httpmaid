@@ -62,6 +62,14 @@ public final class UseCaseMethod {
         return useCaseClass;
     }
 
+    public boolean isSingleParameterUseCase() {
+        return parameters.asMap().size() == 1;
+    }
+
+    public String singleParameterName() {
+        return parameters().entrySet().iterator().next().getKey();
+    }
+
     public Map<String, Class<?>> parameters() {
         return parameters.asMap();
     }

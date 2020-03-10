@@ -19,11 +19,11 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters;
+package de.quantummaid.httpmaid.tests.specs.usecase.usecases;
 
-public final class EchoPathAndQueryParametersUseCase {
+public final class SingleDtoParameterUseCase {
 
-    public String echo(final EchoPathAndQueryParametersValue echoPathAndQueryParametersValue) {
-        return echoPathAndQueryParametersValue.toString();
+    public String performUseCase(final MyDto parameter) {
+        return parameter.toString();
     }
 }

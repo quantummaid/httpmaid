@@ -22,9 +22,9 @@
 package de.quantummaid.httpmaid.tests.specs.usecase;
 
 import com.google.gson.Gson;
+import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.*;
-import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -136,7 +136,7 @@ public final class UseCaseSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void useCaseCanHaveASingleStringAsParameter(final TestEnvironment testEnvironment) {
+    public void useCaseCanHaveASingleStringAsParameterWithInlinedRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", SingleStringParameterUseCase.class)
@@ -148,6 +148,54 @@ public final class UseCaseSpecs {
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseCanHaveASingleDtoAsParameterWithInlinedRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", SingleDtoParameterUseCase.class)
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Object.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"fieldA\": \"foo\", \"fieldB\": \"bar\" }").withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"MyDto(fieldA\\u003dfoo, fieldB\\u003dbar)\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseCanHaveASingleStringAsParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", SingleStringParameterUseCase.class)
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Object.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": \"foo\" }").withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseCanHaveASingleDtoAsParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", SingleDtoParameterUseCase.class)
+                        .configured(toMarshallContentType(json(),
+                                string -> new Gson().fromJson(string, Object.class),
+                                map -> new Gson().toJson(map)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" } }").withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"MyDto(fieldA\\u003dfoo, fieldB\\u003dbar)\"");
     }
 
     @ParameterizedTest

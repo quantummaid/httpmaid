@@ -111,9 +111,14 @@ public final class MapMaidSpecs {
                 .theStatusCodeWas(500)
                 .theJsonResponseEquals("" +
                         "{" +
-                        "\"errors\":[" +
-                        "{\"path\":\"field1\",\"message\":\"customPrimitive1 is wrong\"}," +
-                        "{\"path\":\"field2\",\"message\":\"customPrimitive2 is wrong\"}" +
-                        "]}");
+                        "\"errors\": [" +
+                        "{" +
+                        "   \"message\": \"customPrimitive1 is wrong\"," +
+                        "   \"path\": \"myRequest.field1\"" +
+                        "}," +
+                        "{" +
+                        "   \"message\": \"customPrimitive2 is wrong\"," +
+                        "   \"path\": \"myRequest.field2\"" +
+                        "}]}");
     }
 }
