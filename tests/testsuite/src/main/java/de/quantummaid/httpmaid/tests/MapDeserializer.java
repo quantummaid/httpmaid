@@ -68,7 +68,8 @@ public final class MapDeserializer implements TypeDeserializer {
         if(!(input instanceof UniversalObject)) {
             throw new UnsupportedOperationException("Can only deserialize from map but got: " + input);
         }
-        return (T) deserializer.apply((Map<String, Object>) input.toNativeJava());
+        final Map<String, Object> map = (Map<String, Object>) input.toNativeJava();
+        return (T) deserializer.apply(map);
     }
 
     @Override

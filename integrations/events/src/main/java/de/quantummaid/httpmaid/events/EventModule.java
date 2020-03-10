@@ -49,6 +49,7 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.events.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor.handleExternalEventProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.generator.Generator.generator;
@@ -64,7 +65,7 @@ public final class EventModule implements ChainModule {
     public static final MetaDataKey<MessageBus> MESSAGE_BUS = metaDataKey("MESSAGE_BUS");
     public static final MetaDataKey<Boolean> IS_EXTERNAL_EVENT = metaDataKey("IS_EXTERNAL_EVENT");
     public static final MetaDataKey<EventType> EVENT_TYPE = metaDataKey("EVENT_TYPE");
-    public static final MetaDataKey<Object> EVENT = metaDataKey("EVENT");
+    public static final MetaDataKey<EnrichableMap> EVENT = metaDataKey("EVENT");
     public static final MetaDataKey<Optional<Object>> RECEIVED_EVENT = metaDataKey("RECEIVED_EVENT");
 
     private static final int DEFAULT_POOL_SIZE = 4;
@@ -81,7 +82,9 @@ public final class EventModule implements ChainModule {
 
     public static EventModule eventModule() {
         final EventModule eventModule = new EventModule();
-        eventModule.addRequestMapEnricher((map, request) -> request.optionalBodyMap().ifPresent(map::putAll));
+        //eventModule.addRequestMapEnricher((map, request) -> { TODO
+        //    request.optionalBodyMap().ifPresent(map::putAll);
+        //});
         final MessageBus defaultMessageBus = aMessageBus().forType(ASYNCHRONOUS)
                 .withAsynchronousConfiguration(constantPoolSizeAsynchronousConfiguration(DEFAULT_POOL_SIZE))
                 .build();
@@ -109,7 +112,7 @@ public final class EventModule implements ChainModule {
 
     public void addEventMapping(final EventType eventType,
                                 final GenerationCondition condition) {
-        addEventMapping(eventType, condition, object -> object);
+        addEventMapping(eventType, condition, object -> emptyEnrichableMap());
     }
 
     public void addEventMapping(final EventType eventType,
@@ -154,7 +157,7 @@ public final class EventModule implements ChainModule {
             final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(new HashMap<>());
             final EventType eventType = metaData.get(EVENT_TYPE);
             final EventFactory eventFactory = eventFactories.get(eventType);
-            final Object event = eventFactory.createEvent(unmarshalled);
+            final EnrichableMap event = eventFactory.createEvent(unmarshalled);
             metaData.set(EVENT, event);
         });
         requestMapEnrichers.forEach(enricher -> extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, enricher));

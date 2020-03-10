@@ -25,22 +25,17 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.events.EventModule.EVENT;
 import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 
 public interface RequestMapEnricher extends Processor {
 
-    @SuppressWarnings("unchecked")
     @Override
     default void apply(final MetaData metaData) {
-        final Object event = metaData.get(EVENT);
-        if (event instanceof Map) {
-            final HttpRequest httpRequest = httpRequest(metaData);
-            enrich((Map<String, Object>) event, httpRequest);
-        }
+        final EnrichableMap event = metaData.get(EVENT);
+        final HttpRequest httpRequest = httpRequest(metaData);
+        enrich(event, httpRequest);
     }
 
-    void enrich(Map<String, Object> map, HttpRequest request);
+    void enrich(EnrichableMap map, HttpRequest request);
 }

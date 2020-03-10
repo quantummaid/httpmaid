@@ -49,21 +49,21 @@ public final class EventConfigurators {
     public static Configurator toEnrichTheIntermediateMapWithAllHeaders() {
         return toEnrichTheIntermediateMapUsing((map, request) -> {
             final Map<String, String> headersMap = request.headers().asStringMap();
-            map.putAll(headersMap);
+            map.enrichEitherTopOrSecondLevelWithoutOverwriting(headersMap);
         });
     }
 
     public static Configurator toEnrichTheIntermediateMapWithAllQueryParameters() {
         return toEnrichTheIntermediateMapUsing((map, request) -> {
             final Map<String, String> queryParametersMap = request.queryParameters().asStringMap();
-            map.putAll(queryParametersMap);
+            map.enrichEitherTopOrSecondLevelWithoutOverwriting(queryParametersMap);
         });
     }
 
     public static Configurator toEnrichTheIntermediateMapWithAllPathParameters() {
         return toEnrichTheIntermediateMapUsing((map, request) -> {
             final Map<String, String> pathParametersMap = request.pathParameters().asStringMap();
-            map.putAll(pathParametersMap);
+            map.enrichEitherTopOrSecondLevelWithoutOverwriting(pathParametersMap);
         });
     }
 
@@ -77,7 +77,7 @@ public final class EventConfigurators {
         validateNotNullNorEmpty(key, "key");
         return toEnrichTheIntermediateMapUsing((map, request) ->
                 request.authenticationInformation()
-                        .ifPresent(authenticationInforamtion -> map.put(key, authenticationInforamtion)));
+                        .ifPresent(authenticationInforamtion -> map.enrichOnSecondLevelWithOverwriting(key, authenticationInforamtion)));
     }
 
     public static Configurator toExtractFromTheResponseMapUsing(final ResponseMapExtractor extractor) {

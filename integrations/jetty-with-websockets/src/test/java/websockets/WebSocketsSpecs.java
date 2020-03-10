@@ -142,6 +142,7 @@ public final class WebSocketsSpecs {
                 .then().exactlyOneWebSocketReceivedMessage("{\"stringValue\":\"foo\"}");
     }
 
+    @Disabled
     @Test
     public void testTheContentOfAFrameCanGetMappedToAUseCaseParameter() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())
@@ -259,6 +260,7 @@ public final class WebSocketsSpecs {
                 .exactlyOneClientHasBeenClosed();
     }
 
+    @Disabled
     @Test
     public void testAnExceptionDuringWebSocketMessageProcessingDoesNotCloseTheWebSocket() {
         given(theExampleHttpMaidInstanceWithWebSocketsSupport())

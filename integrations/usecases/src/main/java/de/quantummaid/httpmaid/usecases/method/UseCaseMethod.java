@@ -67,7 +67,11 @@ public final class UseCaseMethod {
     }
 
     public String singleParameterName() {
-        return parameters().entrySet().iterator().next().getKey();
+        return parameterNames().get(0);
+    }
+
+    public List<String> parameterNames() {
+        return parameters.names();
     }
 
     public Map<String, Class<?>> parameters() {

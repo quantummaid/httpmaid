@@ -22,5 +22,5 @@
 package de.quantummaid.httpmaid.events;
 
 public interface EventFactory {
-    Object createEvent(Object unmarshalledBody);
+    EnrichableMap createEvent(Object unmarshalledBody);
 }

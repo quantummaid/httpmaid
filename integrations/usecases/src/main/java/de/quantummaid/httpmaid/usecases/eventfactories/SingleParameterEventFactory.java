@@ -19,29 +19,37 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers;
+package de.quantummaid.httpmaid.usecases.eventfactories;
 
-import de.quantummaid.mapmaid.MapMaid;
-import de.quantummaid.mapmaid.shared.identifier.TypeIdentifier;
+import de.quantummaid.httpmaid.events.EnrichableMap;
+import de.quantummaid.httpmaid.events.EventFactory;
+import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.Map;
+import java.util.List;
+
+import static de.quantummaid.httpmaid.events.EnrichableMap.enrichableMap;
+import static java.util.Collections.singletonList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MultipleParametersDeserializationWrapper implements MethodParameterDeserializationWrapper {
-    private final TypeIdentifier typeIdentifier;
+public final class SingleParameterEventFactory implements EventFactory {
+    private final String name;
 
-    public static MethodParameterDeserializationWrapper multipleParamters(final TypeIdentifier typeIdentifier) {
-        return new MultipleParametersDeserializationWrapper(typeIdentifier);
+    public static EventFactory singleParameterEventFactory(final String name) {
+        Validators.validateNotNullNorEmpty(name, "name");
+        return new SingleParameterEventFactory(name);
     }
 
     @Override
-    public Map<String, Object> deserializeParameters(final Map<String, Object> input, final MapMaid mapMaid) {
-        return mapMaid.deserializer().deserializeFromUniversalObject(input, this.typeIdentifier);
+    public EnrichableMap createEvent(final Object unmarshalledBody) {
+        final List<String> names = singletonList(name);
+        final EnrichableMap event = enrichableMap(names);
+        event.overwriteTopLevel(name, unmarshalledBody);
+        return event;
     }
 }

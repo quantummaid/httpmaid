@@ -28,6 +28,7 @@ import de.quantummaid.eventmaid.messageFunction.MessageFunction;
 import de.quantummaid.eventmaid.messageFunction.ResponseFuture;
 import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.eventmaid.processingContext.ProcessingContext;
+import de.quantummaid.httpmaid.events.EnrichableMap;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -57,8 +58,8 @@ public final class DispatchEventProcessor implements Processor {
     @Override
     public void apply(final MetaData metaData) {
         final EventType eventType = metaData.get(EVENT_TYPE);
-        final Object event = metaData.get(EVENT);
-        final ResponseFuture request = messageFunction.request(eventType, event);
+        final EnrichableMap event = metaData.get(EVENT);
+        final ResponseFuture request = messageFunction.request(eventType, event.asMap());
         try {
             final ProcessingContext<Object> raw = request.getRaw();
             if (raw.getErrorPayload() != null) {

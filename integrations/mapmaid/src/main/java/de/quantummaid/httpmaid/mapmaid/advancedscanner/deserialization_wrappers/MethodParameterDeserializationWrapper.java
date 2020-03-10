@@ -26,5 +26,5 @@ import de.quantummaid.mapmaid.MapMaid;
 import java.util.Map;
 
 public interface MethodParameterDeserializationWrapper {
-    Map<String, Object> deserializeParameters(Object input, MapMaid mapMaid);
+    Map<String, Object> deserializeParameters(Map<String, Object> input, MapMaid mapMaid);
 }

@@ -32,6 +32,7 @@ import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBu
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
 import de.quantummaid.httpmaid.chains.*;
+import de.quantummaid.httpmaid.events.EventFactory;
 import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
@@ -53,6 +54,8 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
+import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
+import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEventFactory.singleParameterEventFactory;
 import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
@@ -110,14 +113,8 @@ public final class UseCasesModule implements ChainModule {
         useCaseMethods.forEach(useCaseMethod -> {
             final Class<?> useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
-            if (useCaseMethod.isSingleParameterUseCase()) {
-                final String name = useCaseMethod.singleParameterName();
-                eventModule.setEventFactoryFor(eventType, unmarshalled -> {
-                    final Map<String, Object> map = new HashMap<>();
-                    map.put(name, unmarshalled);
-                    return map;
-                });
-            }
+            final EventFactory eventFactory = buildEventFactory(useCaseMethod);
+            eventModule.setEventFactoryFor(eventType, eventFactory);
         });
     }
 
@@ -175,5 +172,15 @@ public final class UseCasesModule implements ChainModule {
             throw new UnsupportedOperationException();
         });
         return predicateMap;
+    }
+
+    private static EventFactory buildEventFactory(final UseCaseMethod useCaseMethod) {
+        if (useCaseMethod.isSingleParameterUseCase()) {
+            final String name = useCaseMethod.singleParameterName();
+            return singleParameterEventFactory(name);
+        } else {
+            final List<String> parameterNames = useCaseMethod.parameterNames();
+            return multipleParametersEventFactory(parameterNames);
+        }
     }
 }

@@ -19,29 +19,40 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers;
+package de.quantummaid.httpmaid.usecases.eventfactories;
 
-import de.quantummaid.mapmaid.MapMaid;
-import de.quantummaid.mapmaid.shared.identifier.TypeIdentifier;
+import de.quantummaid.httpmaid.events.EnrichableMap;
+import de.quantummaid.httpmaid.events.EventFactory;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
+
+import static de.quantummaid.httpmaid.events.EnrichableMap.enrichableMap;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MultipleParametersDeserializationWrapper implements MethodParameterDeserializationWrapper {
-    private final TypeIdentifier typeIdentifier;
+public final class MultipleParametersEventFactory implements EventFactory {
+    private final List<String> parameterNames;
 
-    public static MethodParameterDeserializationWrapper multipleParamters(final TypeIdentifier typeIdentifier) {
-        return new MultipleParametersDeserializationWrapper(typeIdentifier);
+    public static EventFactory multipleParametersEventFactory(final List<String> parameterNames) {
+        validateNotNull(parameterNames, "parameterNames");
+        return new MultipleParametersEventFactory(parameterNames);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Map<String, Object> deserializeParameters(final Map<String, Object> input, final MapMaid mapMaid) {
-        return mapMaid.deserializer().deserializeFromUniversalObject(input, this.typeIdentifier);
+    public EnrichableMap createEvent(final Object unmarshalledBody) {
+        if (!(unmarshalledBody instanceof Map)) {
+            throw new UnsupportedOperationException("Expecting a Map<String, Object> but found: " + unmarshalledBody);
+        }
+        final EnrichableMap event = enrichableMap(parameterNames);
+        ((Map<String, Object>) unmarshalledBody).forEach(event::overwriteTopLevel);
+        return event;
     }
 }

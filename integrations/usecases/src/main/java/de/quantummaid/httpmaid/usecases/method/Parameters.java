@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 @ToString
@@ -43,6 +44,12 @@ public final class Parameters {
     public static Parameters parametersOf(final Method method) {
         final List<Parameter> parameters = asList(method.getParameters());
         return new Parameters(parameters);
+    }
+
+    public List<String> names() {
+        return parameters.stream()
+                .map(Parameter::getName)
+                .collect(toList());
     }
 
     public Map<String, Class<?>> asMap() {

@@ -31,6 +31,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
@@ -172,6 +173,12 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", SingleStringParameterUseCase.class)
+                        .configured(toEnrichTheIntermediateMapUsing((map, request) -> {
+                            request.optionalBodyMap().ifPresent(stringObjectMap -> {
+                                final Object parameter = stringObjectMap.get("parameter");
+                                map.overwriteTopLevel("parameter", parameter);
+                            });
+                        }))
                         .configured(toMarshallContentType(json(),
                                 string -> new Gson().fromJson(string, Object.class),
                                 map -> new Gson().toJson(map)))
@@ -188,6 +195,12 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", SingleDtoParameterUseCase.class)
+                        .configured(toEnrichTheIntermediateMapUsing((map, request) -> {
+                            request.optionalBodyMap().ifPresent(stringObjectMap -> {
+                                final Object parameter = stringObjectMap.get("parameter");
+                                map.overwriteTopLevel("parameter", parameter);
+                            });
+                        }))
                         .configured(toMarshallContentType(json(),
                                 string -> new Gson().fromJson(string, Object.class),
                                 map -> new Gson().toJson(map)))

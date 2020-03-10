@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
@@ -80,6 +81,6 @@ public final class WebSocketsExternalEventMapping implements ExternalEventMappin
     }
 
     @Override
-    public void handle(final Object event) {
+    public void handle(final Map<String, Object> event) {
     }
 }
