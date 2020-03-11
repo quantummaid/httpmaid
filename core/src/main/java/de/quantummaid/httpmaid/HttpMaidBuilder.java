@@ -32,9 +32,14 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
+import static java.time.Duration.between;
 
 @ToString
 @EqualsAndHashCode
@@ -138,6 +143,7 @@ public final class HttpMaidBuilder {
     }
 
     public HttpMaid build() {
+        final Instant begin = Instant.now();
         final ChainRegistryBuilder chainRegistryBuilder = ChainRegistryBuilder.chainRegistryBuilder();
         chainRegistryBuilder.addModule(coreModule);
         if (autodetectionOfModules) {
@@ -147,7 +153,11 @@ public final class HttpMaidBuilder {
         }
         configurators.forEach(chainRegistryBuilder::addConfigurator);
         final ChainRegistry chainRegistry = chainRegistryBuilder.build();
-        return HttpMaid.httpMaid(chainRegistry);
+        final HttpMaid httpMaid = HttpMaid.httpMaid(chainRegistry);
+        final Instant end = Instant.now();
+        final Duration startUpTime = between(begin, end);
+        chainRegistry.addMetaDatum(STARTUP_TIME, startUpTime);
+        return httpMaid;
     }
 }
 

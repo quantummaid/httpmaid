@@ -29,9 +29,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 
 /**
  * A configured {@link HttpMaid} instance. Can be deployed using an endpoint like
@@ -39,6 +41,8 @@ import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
+    public static final MetaDataKey<Duration> STARTUP_TIME = metaDataKey("STARTUP_TIME");
+
     private final ChainRegistry chainRegistry;
 
     public static HttpMaid httpMaid(final ChainRegistry chainRegistry) {
