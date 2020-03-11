@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.domain.ACustomPrimitive;
 import de.quantummaid.httpmaid.client.HttpClientRequestBuilder;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.mapmaid.MapMaid;
@@ -59,7 +58,7 @@ public final class When {
     }
 
     public Then aRequestIsMade(final Consumer<HttpMaidClient> clientConsumer) {
-        final MapMaid mapMaid = aMapMaid(ACustomPrimitive.class.getPackageName()).build();
+        final MapMaid mapMaid = aMapMaid().build();
         final HttpMaidClient client = aHttpMaidClientForTheHost("localhost")
                 .withThePort(port)
                 .viaHttp()
