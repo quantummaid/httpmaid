@@ -52,13 +52,13 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid</groupId>
             <artifactId>core</artifactId>
-            <version>0.9.16</version>
+            <version>0.9.17</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.11</version>
+            <version>4.5.12</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

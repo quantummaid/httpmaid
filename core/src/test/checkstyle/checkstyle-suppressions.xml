@@ -34,4 +34,5 @@
     <suppress checks="ClassFanOutComplexity" files="HttpMaidConfigurator" />
     <suppress checks="ExplicitInitialization" files=".*" />
     <suppress checks="AbbreviationAsWordInName" files="CorsConfigurators" />
+    <suppress checks="VariableDeclarationUsageDistance" files="HttpMaidBuilder"/>
 </suppressions>

@@ -128,7 +128,7 @@ final HttpMaid httpMaid = anHttpMaid()
         .post("/multiply", MultiplicationUseCase.class)
         .post("/divide", DivisionUseCase.class)
         .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-        .configured(toConfigureMapMaidUsingRecipe((mapMaidBuilder, dependencyRegistry) -> {
+        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
             mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
         }))
         .build();
