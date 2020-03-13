@@ -30,7 +30,7 @@
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.20</version>
+    <version>0.9.21</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
@@ -135,6 +135,7 @@
             <modules>
                 <module>core</module>
                 <module>integrations</module>
+                <module>bom</module>
             </modules>
         </profile>
     </profiles>
