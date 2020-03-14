@@ -33,6 +33,6 @@ public final class EventSpecs {
         testEnvironment.given(EventsHttpMaidConfiguration.theEventsHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/trigger").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("");
+                .theResponseBodyWas("{}");
     }
 }

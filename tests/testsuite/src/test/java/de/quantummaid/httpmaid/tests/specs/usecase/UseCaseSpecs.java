@@ -46,7 +46,7 @@ public final class UseCaseSpecs {
         testEnvironment.given(anHttpMaid().get("/", VoidUseCase.class).build())
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("");
+                .theResponseBodyWas("{}");
     }
 
     @ParameterizedTest
@@ -182,7 +182,7 @@ public final class UseCaseSpecs {
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"fieldA\": \"foo\", \"fieldB\": \"bar\" }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("\"MyDto(fieldA\\u003dfoo, fieldB\\u003dbar)\"");
+                .theResponseBodyWas("\"MyDto(fieldA=foo, fieldB=bar)\"");
     }
 
     @ParameterizedTest
@@ -226,7 +226,7 @@ public final class UseCaseSpecs {
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" } }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("\"MyDto(fieldA\\u003dfoo, fieldB\\u003dbar)\"");
+                .theResponseBodyWas("\"MyDto(fieldA=foo, fieldB=bar)\"");
     }
 
     @ParameterizedTest

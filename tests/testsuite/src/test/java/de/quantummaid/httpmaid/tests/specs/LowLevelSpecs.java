@@ -27,7 +27,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.http.HttpRequestMethod.DELETE;
 import static de.quantummaid.httpmaid.tests.specs.LowLevelHttpMaidConfiguration.theLowLevelHttpMaidInstanceUsedForTesting;
+import static de.quantummaid.httpmaid.tests.specs.handlers.EchoBodyHandler.echoBodyHandler;
 
 public final class LowLevelSpecs {
 
@@ -52,7 +54,11 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testBodyOfADeleteRequest(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(
+                anHttpMaid()
+                        .serving(echoBodyHandler()).forRequestPath("/echo").andRequestMethods(DELETE)
+                        .build()
+        )
                 .when().aRequestToThePath("/echo").viaTheDeleteMethod().withTheBody("This is a delete request.").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("This is a delete request.");

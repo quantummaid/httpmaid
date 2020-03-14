@@ -24,15 +24,16 @@
         "-//Puppy Crawl//DTD Suppressions 1.1//EN"
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-    <suppress checks="IllegalCatchCheck" files="HttpMaid.java" />
-    <suppress checks="Regexp" files="Loggers.java" />
-    <suppress checks="DeclarationOrder" files="HttpMaidChains|HttpMaidChainKeys" />
-    <suppress checks="OverloadMethodsDeclarationOrder" files="ContentType" />
-    <suppress checks="ParameterNumber" files="Core" />
-    <suppress checks="IllegalCatch" files="Chain" />
-    <suppress checks="EmptyBlock" files="Chain" />
-    <suppress checks="ClassFanOutComplexity" files="HttpMaidConfigurator" />
-    <suppress checks="ExplicitInitialization" files=".*" />
-    <suppress checks="AbbreviationAsWordInName" files="CorsConfigurators" />
+    <suppress checks="IllegalCatchCheck" files="HttpMaid.java"/>
+    <suppress checks="Regexp" files="Loggers.java"/>
+    <suppress checks="DeclarationOrder" files="HttpMaidChains|HttpMaidChainKeys"/>
+    <suppress checks="OverloadMethodsDeclarationOrder" files="ContentType"/>
+    <suppress checks="ParameterNumber" files="Core"/>
+    <suppress checks="IllegalCatch" files="Chain"/>
+    <suppress checks="EmptyBlock" files="Chain"/>
+    <suppress checks="ClassFanOutComplexity" files="HttpMaidConfigurator"/>
+    <suppress checks="ExplicitInitialization" files=".*"/>
+    <suppress checks="AbbreviationAsWordInName" files="CorsConfigurators"/>
     <suppress checks="VariableDeclarationUsageDistance" files="HttpMaidBuilder"/>
+    <suppress checks="IllegalCatch" files="MarshallingModule"/>
 </suppressions>

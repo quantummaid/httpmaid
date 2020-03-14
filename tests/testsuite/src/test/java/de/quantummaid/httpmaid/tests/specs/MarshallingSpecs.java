@@ -21,9 +21,11 @@
 
 package de.quantummaid.httpmaid.tests.specs;
 
+import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
 import de.quantummaid.httpmaid.marshalling.MarshallingException;
 import de.quantummaid.httpmaid.marshalling.UnsupportedContentTypeException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.mapmaid.builder.AdvancedBuilder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -211,6 +213,8 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .configured(toThrowAnExceptionIfNoMarshallerWasFound())
+                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                                mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .configured(toMapExceptionsOfType(UnsupportedContentTypeException.class, (exception, response) -> {
                             response.setStatus(501);
                             response.setBody(exception.getMessage());
@@ -232,6 +236,8 @@ public final class MarshallingSpecs {
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .configured(toThrowAnExceptionIfNoMarshallerWasFound())
                         .configured(toMapExceptionsOfType(MarshallingException.class, (exception, response) -> response.setStatus(501)))
+                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                                mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("qwer").isIssued()

@@ -109,8 +109,8 @@ public final class AuthenticationSpecs {
                         .configured(toAuthenticateRequestsUsing(request -> of(request.bodyString())).afterBodyProcessing())
                         .build()
         )
-                .when().aRequestToThePath("/username").viaThePostMethod().withTheBody("asdf").isIssued()
-                .theResponseBodyWas("asdf");
+                .when().aRequestToThePath("/username").viaThePostMethod().withTheBody("\"asdf\"").isIssued()
+                .theResponseBodyWas("\"asdf\"");
     }
 
     @ParameterizedTest

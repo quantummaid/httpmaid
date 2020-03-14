@@ -109,8 +109,12 @@ public final class MarshallingModule implements ChainModule {
             if (isNull(unmarshaller)) {
                 failIfConfiguredToDoSo(() -> UnsupportedContentTypeException.unsupportedContentTypeException(contentType, unmarshallers.keySet()));
             } else {
-                final Object unmarshalled = unmarshaller.unmarshall(body);
-                metaData.set(UNMARSHALLED_REQUEST_BODY, unmarshalled);
+                try {
+                    final Object unmarshalled = unmarshaller.unmarshall(body);
+                    metaData.set(UNMARSHALLED_REQUEST_BODY, unmarshalled);
+                } catch (final Exception e) {
+                    metaData.get(LOGGER).warn(e, "exception during marshalling");
+                }
             }
         });
     }
