@@ -94,7 +94,6 @@ public final class MarshallingModule implements ChainModule {
         extender.prependProcessor(POST_INVOKE, this::processMarshalling);
     }
 
-    @SuppressWarnings("unchecked")
     private void processUnmarshalling(final MetaData metaData) {
         metaData.getOptional(REQUEST_BODY_STRING).ifPresent(body -> {
             final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
@@ -157,9 +156,15 @@ public final class MarshallingModule implements ChainModule {
             return defaultResponseContentType()
                     .orElseThrow(() -> ResponseContentTypeCouldNotBeDeterminedException.responseContentTypeCouldNotBeDeterminedException(metaData));
         }
-        return metaData.getOptional(REQUEST_CONTENT_TYPE)
-                .filter(candidates::contains)
-                .orElseGet(() -> candidates.get(0));
+        final Optional<ContentType> requestContentType = metaData.getOptional(REQUEST_CONTENT_TYPE)
+                .filter(candidates::contains);
+        if (requestContentType.isPresent()) {
+            return requestContentType.get();
+        }
+        if(candidates.contains(defaultContentType)) {
+            return defaultContentType;
+        }
+        return candidates.get(0);
     }
 
     private Optional<ContentType> defaultResponseContentType() {

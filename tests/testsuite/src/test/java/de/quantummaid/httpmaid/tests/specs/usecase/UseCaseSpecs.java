@@ -21,22 +21,17 @@
 
 package de.quantummaid.httpmaid.tests.specs.usecase;
 
-import com.google.gson.Gson;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapUsing;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllPathParameters;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
-import static de.quantummaid.httpmaid.http.headers.ContentType.json;
-import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 
 public final class UseCaseSpecs {
 
@@ -110,9 +105,6 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", StringReturningUseCase.class)
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Map.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -126,9 +118,6 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", IntReturningUseCase.class)
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Map.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -142,9 +131,6 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", SingleStringParameterUseCase.class)
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Object.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
@@ -159,9 +145,6 @@ public final class UseCaseSpecs {
                 anHttpMaid()
                         .get("/<parameter>", SingleStringParameterUseCase.class)
                         .configured(toEnrichTheIntermediateMapWithAllPathParameters())
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Object.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().withContentType("application/json").isIssued()
@@ -175,9 +158,6 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", SingleDtoParameterUseCase.class)
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Object.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"fieldA\": \"foo\", \"fieldB\": \"bar\" }").withContentType("application/json").isIssued()
@@ -197,9 +177,6 @@ public final class UseCaseSpecs {
                                 map.overwriteTopLevel("parameter", parameter);
                             });
                         }))
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Object.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": \"foo\" }").withContentType("application/json").isIssued()
@@ -219,9 +196,6 @@ public final class UseCaseSpecs {
                                 map.overwriteTopLevel("parameter", parameter);
                             });
                         }))
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Object.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" } }").withContentType("application/json").isIssued()
@@ -235,9 +209,6 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", TwoStringsParameterUseCase.class)
-                        .configured(toMarshallContentType(json(),
-                                string -> new Gson().fromJson(string, Object.class),
-                                map -> new Gson().toJson(map)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter1\": \"foo\", \"parameter2\": \"bar\" }").withContentType("application/json").isIssued()

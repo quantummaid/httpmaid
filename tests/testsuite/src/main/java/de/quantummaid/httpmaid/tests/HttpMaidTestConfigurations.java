@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests;
 
-import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
@@ -42,8 +41,6 @@ import de.quantummaid.httpmaid.tests.usecases.simple.TestUseCase;
 import de.quantummaid.httpmaid.tests.usecases.twoparameters.TwoParametersUseCase;
 import de.quantummaid.httpmaid.tests.usecases.vooooid.VoidUseCase;
 
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
@@ -54,9 +51,7 @@ import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
-import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
-import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
 import static de.quantummaid.httpmaid.tests.MapDeserializer.deserializeFromMap;
 import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
 
@@ -81,9 +76,6 @@ public final class HttpMaidTestConfigurations {
                 .get("/twoparameters", TwoParametersUseCase.class)
                 .get("/void", VoidUseCase.class)
 
-                .configured(toMarshallContentType(json(),
-                        string -> new Gson().fromJson(string, Map.class),
-                        map -> new Gson().toJson(map)))
                 .configured(toEnrichTheIntermediateMapWithAllRequestData())
 
                 .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {

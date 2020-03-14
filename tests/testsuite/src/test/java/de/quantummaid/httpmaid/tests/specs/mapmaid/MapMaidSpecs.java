@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.specs.mapmaid;
 
-import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
@@ -34,9 +33,9 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
-import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
-import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.*;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentTypeInResponses;
+import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallContentTypeInRequests;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.ALL_ENVIRONMENTS;
 import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedUnmarshaller.urlEncodedUnmarshaller;
 
@@ -74,18 +73,16 @@ public final class MapMaidSpecs {
         testEnvironment.given(httpMaid())
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("a=b").withContentType("application/x-www-form-urlencoded").isIssued()
                 .theStatusCodeWas(200)
-                .theResponseContentTypeWas("custom")
-                .theResponseBodyWas("custom_marshalled");
+                .theResponseContentTypeWas("application/json")
+                .theResponseBodyWas("{\"a\":\"b\"}");
     }
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void mapMaidIntegrationCorrectlyUnmarshallsWithoutSpecifiedRequestContentType(final TestEnvironment testEnvironment) {
-        final Gson gson = new Gson();
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", MyUseCase.class)
-                        .configured(toMarshallContentType(json(), string -> gson.fromJson(string, Map.class), gson::toJson))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"foo\", \"field2\": \"bar\"}").isIssued()
@@ -96,13 +93,9 @@ public final class MapMaidSpecs {
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void mapMaidIntegrationCanHelpWithValidation(final TestEnvironment testEnvironment) {
-        final Gson gson = new Gson();
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", MyUseCase.class)
-                        .configured(toMarshallContentType(json(),
-                                string -> gson.fromJson(string, Map.class),
-                                gson::toJson))
                         .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
                                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
                         .build()

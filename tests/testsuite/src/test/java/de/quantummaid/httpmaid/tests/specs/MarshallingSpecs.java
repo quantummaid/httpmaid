@@ -103,6 +103,8 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("wrong"), body -> Map.of("a", "wrong")))
                         .configured(toUnmarshallContentTypeInRequests(fromString("right"), body -> Map.of("a", "right")))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("right")))
+                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                                mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().isIssued()
@@ -158,6 +160,8 @@ public final class MarshallingSpecs {
                         .configured(toMarshallContentTypeInResponses(fromString("wrong/x"), map -> "the wrong marshaller"))
                         .configured(toMarshallContentTypeInResponses(fromString("right/x"), map -> "the right marshaller"))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("wrong/x")))
+                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                                mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withTheHeader("Accept", "right/*")
@@ -197,6 +201,8 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("asdf"), body -> Map.of("a", "c")))
                         .configured(toMarshallContentTypeInResponses(fromString("qwer"), map -> "right"))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
+                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                                mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("asdf").isIssued()

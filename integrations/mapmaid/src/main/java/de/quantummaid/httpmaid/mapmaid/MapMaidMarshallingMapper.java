@@ -36,6 +36,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedMarshallerRecipe.urlEncoded;
+import static de.quantummaid.mapmaid.mapper.marshalling.MarshallingType.JSON;
 import static java.util.Arrays.asList;
 import static java.util.Map.of;
 
@@ -96,5 +97,9 @@ final class MapMaidMarshallingMapper {
                 });
         contentTypeMappingsForMarshalling.forEach((contentType, marshallingType) -> marshallingModule
                 .addMarshaller(contentType, map -> mapMaid.serializer().serializeFromUniversalObject(map, marshallingType)));
+
+        if (mapMaid.deserializer().supportedMarshallingTypes().contains(JSON)) {
+            marshallingModule.setDefaultContentType(ContentType.json());
+        }
     }
 }
