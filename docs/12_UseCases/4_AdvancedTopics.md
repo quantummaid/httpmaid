@@ -109,10 +109,9 @@ input from the query parameters instead of the request body:
 <!---[CodeSnippet] (calculationWithQueryParametersExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/multiply", MultiplicationUseCase.class)
-        .get("/divide", DivisionUseCase.class)
+        .get("/multiply", MultiplicationUseCase.class, mappingQueryParameter("factor1"), mappingQueryParameter("factor2"))
+        .get("/divide", DivisionUseCase.class, mappingQueryParameter("dividend"), mappingQueryParameter("divisor"))
         .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-        .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
         .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
             mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
         }))
