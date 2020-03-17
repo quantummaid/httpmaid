@@ -81,26 +81,6 @@ public final class HttpMaidSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testHeadersInRequest(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
-                .when().aRequestToThePath("/headers").viaTheGetMethod().withAnEmptyBody().withTheHeader("testheader", "foo").isIssued()
-                .theStatusCodeWas(200)
-                .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("\"foo\"");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testWildcardRoute(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
-                .when().aRequestToThePath("/wild/foo/card").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(200)
-                .theResponseContentTypeWas("application/json")
-                .theResponseBodyWas("\"foo\"");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testWildcardRouteWithEmptyMiddleWildcard(final TestEnvironment testEnvironment) {
         testEnvironment.given(theHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/wild/card").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -110,67 +90,11 @@ public final class HttpMaidSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testQueryParameters(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
-                .when().aRequestToThePath("/queryparameters?param1=derp&param2=").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(200)
-                .theResponseContentTypeWas("application/json")
-                .theResponseBodyContains("param1=derp")
-                .theResponseBodyContains("param2=");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testQueryParametersAndPathParameters(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
-                .when().aRequestToThePath("/echo_path_and_query_parameters/foo?test=bar").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(200)
-                .theResponseContentTypeWas("application/json")
-                .theResponseBodyContains("test=bar")
-                .theResponseBodyContains("wildcard=foo");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testUseCaseNotFoundExceptionHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(theHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/this_has_no_usecase").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(405)
                 .theResponseBodyWas("No use case found.");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testMapMaid(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
-                .when().aRequestToThePath("/mapmaid/derp").viaThePostMethod().withTheBody("{\"value1\": \"derp\",\"value2\": \"merp\",\"value3\": \"herp\",\"value4\": \"qerp\"}").withContentType("application/json").isIssued()
-                .theStatusCodeWas(200)
-                .theResponseContentTypeWas("application/json")
-                .theJsonResponseEquals("" +
-                        "{" +
-                        "   \"value1\": \"derp\"," +
-                        "   \"value2\": \"merp\"," +
-                        "   \"value3\": \"herp\"," +
-                        "   \"value4\": \"qerp\"" +
-                        "}"
-                );
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testMapMaidWithInjection(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
-                .when().aRequestToThePath("/mapmaid/derp?value2=merp").viaThePostMethod().withTheBody("{\"value4\": \"qerp\"}").withTheHeader("value3", "herp").withContentType("application/json").isIssued()
-                .theStatusCodeWas(200)
-                .theResponseContentTypeWas("application/json")
-                .theJsonResponseEquals("" +
-                        "{" +
-                        "   \"value1\": \"derp\"," +
-                        "   \"value2\": \"merp\"," +
-                        "   \"value3\": \"herp\"," +
-                        "   \"value4\": \"qerp\"" +
-                        "}"
-                );
     }
 
     @ParameterizedTest

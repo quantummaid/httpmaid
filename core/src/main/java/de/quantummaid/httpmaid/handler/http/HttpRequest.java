@@ -87,14 +87,24 @@ public final class HttpRequest {
         return metaData.get(REQUEST_BODY_STREAM);
     }
 
-    public Optional<Object> authenticationInformation() {
+    @SuppressWarnings("unchecked")
+    public <T> T authenticationInformationAs(final Class<T> type) {
+        return (T) authenticationInformation();
+    }
+
+    public Object authenticationInformation() {
+        return optionalAuthenticationInformation()
+                .orElseThrow(() -> new RuntimeException("Request is not authenticated"));
+    }
+
+    public Optional<Object> optionalAuthenticationInformation() {
         return metaData.getOptional(AUTHENTICATION_INFORMATION);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> authenticationInformationAs(final Class<T> type) {
+    public <T> Optional<T> optionalAuthenticationInformationAs(final Class<T> type) {
         validateNotNull(type, "type");
-        return (Optional<T>) authenticationInformation();
+        return (Optional<T>) optionalAuthenticationInformation();
     }
 
     public Map<String, Object> bodyMap() {

@@ -21,12 +21,12 @@
 
 package de.quantummaid.httpmaid.events;
 
-import de.quantummaid.httpmaid.chains.Configurator;
 import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.httpmaid.PerRouteConfigurator;
+import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.events.enriching.Enricher;
 
-import java.util.Map;
-
-import static de.quantummaid.httpmaid.chains.Configurator.allOf;
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
@@ -41,45 +41,6 @@ public final class EventConfigurators {
         return configuratorForType(EventModule.class, eventModule -> eventModule.setMessageBus(messageBus));
     }
 
-    public static Configurator toEnrichTheIntermediateMapUsing(final RequestMapEnricher enricher) {
-        validateNotNull(enricher, "enricher");
-        return configuratorForType(EventModule.class, eventModule -> eventModule.addRequestMapEnricher(enricher));
-    }
-
-    public static Configurator toEnrichTheIntermediateMapWithAllHeaders() {
-        return toEnrichTheIntermediateMapUsing((map, request) -> {
-            final Map<String, String> headersMap = request.headers().asStringMap();
-            map.enrichEitherTopOrSecondLevelWithoutOverwriting(headersMap);
-        });
-    }
-
-    public static Configurator toEnrichTheIntermediateMapWithAllQueryParameters() {
-        return toEnrichTheIntermediateMapUsing((map, request) -> {
-            final Map<String, String> queryParametersMap = request.queryParameters().asStringMap();
-            map.enrichEitherTopOrSecondLevelWithoutOverwriting(queryParametersMap);
-        });
-    }
-
-    public static Configurator toEnrichTheIntermediateMapWithAllPathParameters() {
-        return toEnrichTheIntermediateMapUsing((map, request) -> {
-            final Map<String, String> pathParametersMap = request.pathParameters().asStringMap();
-            map.enrichEitherTopOrSecondLevelWithoutOverwriting(pathParametersMap);
-        });
-    }
-
-    public static Configurator toEnrichTheIntermediateMapWithAllRequestData() {
-        return allOf(toEnrichTheIntermediateMapWithAllQueryParameters(),
-                toEnrichTheIntermediateMapWithAllPathParameters(),
-                toEnrichTheIntermediateMapWithAllHeaders());
-    }
-
-    public static Configurator toEnrichTheIntermediateMapWithTheAuthenticationInformationAs(final String key) {
-        validateNotNullNorEmpty(key, "key");
-        return toEnrichTheIntermediateMapUsing((map, request) ->
-                request.authenticationInformation()
-                        .ifPresent(authenticationInforamtion -> map.enrichOnSecondLevelWithOverwriting(key, authenticationInforamtion)));
-    }
-
     public static Configurator toExtractFromTheResponseMapUsing(final ResponseMapExtractor extractor) {
         validateNotNull(extractor, "extractor");
         return configuratorForType(EventModule.class, eventModule -> eventModule.addResponseMapExtractor(extractor));
@@ -89,12 +50,62 @@ public final class EventConfigurators {
         validateNotNullNorEmpty(headerKey, "headerKey");
         validateNotNullNorEmpty(mapKey, "mapKey");
         return toExtractFromTheResponseMapUsing((map, response) -> {
-            if(!map.containsKey(mapKey)) {
+            if (!map.containsKey(mapKey)) {
                 return;
             }
             final String value = (String) map.get(mapKey);
             map.remove(mapKey);
             response.addHeader(headerKey, value);
         });
+    }
+
+    public static PerRouteConfigurator mappingPathParameter(final String name) {
+        return mappingPathParameter(name, name);
+    }
+
+    public static PerRouteConfigurator mappingPathParameter(final String parameterName, final String mapKey) {
+        return mapping((request, map) -> {
+            final String pathParameter = request.pathParameters().getPathParameter(parameterName);
+            map.enrichEitherTopOrSecondLevel(mapKey, pathParameter);
+        });
+    }
+
+    public static PerRouteConfigurator mappingQueryParameter(final String name) {
+        return mappingQueryParameter(name, name);
+    }
+
+    public static PerRouteConfigurator mappingQueryParameter(final String parameterName, final String mapKey) {
+        return mapping((request, map) -> {
+            final String queryParameter = request.queryParameters().getQueryParameter(parameterName);
+            map.enrichEitherTopOrSecondLevel(mapKey, queryParameter);
+        });
+    }
+
+    public static PerRouteConfigurator mappingHeader(final String name) {
+        return mappingHeader(name, name);
+    }
+
+    public static PerRouteConfigurator mappingHeader(final String headerName, final String mapKey) {
+        return mapping((request, map) -> {
+            final String header = request.headers().getHeader(headerName);
+            map.enrichEitherTopOrSecondLevel(mapKey, header);
+        });
+    }
+
+    public static PerRouteConfigurator mappingAuthenticationInformation(final String key) {
+        return mapping((request, map) -> {
+            final Object authenticationInformation = request.authenticationInformation();
+            map.enrichEitherTopOrSecondLevel(key, authenticationInformation);
+        });
+    }
+
+    private static PerRouteConfigurator mapping(final Enricher enricher) {
+        return (generationCondition, handler, dependencyRegistry) -> {
+            if (!(handler instanceof EventType)) {
+                return;
+            }
+            final EventModule eventModule = dependencyRegistry.getDependency(EventModule.class);
+            eventModule.addEnricher((EventType) handler, enricher);
+        };
     }
 }

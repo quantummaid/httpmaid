@@ -26,7 +26,6 @@ import de.quantummaid.httpmaid.generator.builder.ConditionStage;
 import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +33,14 @@ import lombok.ToString;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.time.Duration.between;
+import static java.util.Arrays.asList;
 
 @ToString
 @EqualsAndHashCode
@@ -50,7 +51,7 @@ public final class HttpMaidBuilder {
     private final List<Configurator> configurators;
 
     static HttpMaidBuilder httpMaidBuilder() {
-        return new HttpMaidBuilder(CoreModule.coreModule(), new LinkedList<>());
+        return new HttpMaidBuilder(CoreModule.coreModule(), new ArrayList<>());
     }
 
     public HttpMaidBuilder disableAutodectectionOfModules() {
@@ -58,19 +59,19 @@ public final class HttpMaidBuilder {
         return this;
     }
 
-    public HttpMaidBuilder get(final String url, final Object handler) {
+    public HttpMaidBuilder get(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
-                .serving(handler)
+                .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.GET);
     }
 
-    public HttpMaidBuilder get(final String url, final HttpHandler handler) {
-        return get(url, (Object) handler);
+    public HttpMaidBuilder get(final String url, final HttpHandler handler, final PerRouteConfigurator... perRouteConfigurators) {
+        return get(url, (Object) handler, perRouteConfigurators);
     }
 
-    public HttpMaidBuilder get(final String url, final Processor handler) {
-        return get(url, (Handler) handler::apply);
+    public HttpMaidBuilder get(final String url, final Processor handler, final PerRouteConfigurator... perRouteConfigurators) {
+        return get(url, (Handler) handler::apply, perRouteConfigurators);
     }
 
     public HttpMaidBuilder post(final String url, final Object handler) {
@@ -118,26 +119,26 @@ public final class HttpMaidBuilder {
         return delete(url, (Handler) handler::accept);
     }
 
-    public ConditionStage<HttpMaidBuilder> serving(final Object handler) {
-        Validators.validateNotNull(handler, "handler");
-        return condition -> {
-            coreModule.registerHandler(condition, handler);
-            return this;
-        };
-    }
-
     public ConditionStage<HttpMaidBuilder> serving(final Handler handler) {
         return serving((Object) handler);
     }
 
+    public ConditionStage<HttpMaidBuilder> serving(final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
+        validateNotNull(handler, "handler");
+        return condition -> {
+            coreModule.registerHandler(condition, handler, asList(perRouteConfigurators));
+            return this;
+        };
+    }
+
     public HttpMaidBuilder configured(final ConfiguratorBuilder configuratorBuilder) {
-        Validators.validateNotNull(configuratorBuilder, "configuratorBuilder");
+        validateNotNull(configuratorBuilder, "configuratorBuilder");
         final Configurator configurator = configuratorBuilder.build();
         return configured(configurator);
     }
 
     public HttpMaidBuilder configured(final Configurator configurator) {
-        Validators.validateNotNull(configurator, "configurator");
+        validateNotNull(configurator, "configurator");
         configurators.add(configurator);
         return this;
     }

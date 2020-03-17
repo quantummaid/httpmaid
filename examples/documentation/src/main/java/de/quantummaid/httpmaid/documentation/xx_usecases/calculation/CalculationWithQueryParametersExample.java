@@ -29,7 +29,7 @@ import de.quantummaid.httpmaid.documentation.xx_usecases.calculation.validationS
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllQueryParameters;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingQueryParameter;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
@@ -38,14 +38,12 @@ import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJava
 public final class CalculationWithQueryParametersExample {
     private static final Gson GSON = new Gson();
 
-    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
         //Showcase start calculationWithQueryParametersExample
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/multiply", MultiplicationUseCase.class)
-                .get("/divide", DivisionUseCase.class)
+                .get("/multiply", MultiplicationUseCase.class, mappingQueryParameter("factor1"), mappingQueryParameter("factor2"))
+                .get("/divide", DivisionUseCase.class, mappingQueryParameter("dividend"), mappingQueryParameter("divisor"))
                 .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-                .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
                 .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
                     mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
                 }))

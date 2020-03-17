@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.handler.distribution;
 
+import de.quantummaid.httpmaid.chains.DependencyRegistry;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
-import de.quantummaid.httpmaid.generator.GenerationCondition;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,6 @@ import lombok.ToString;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributor.handlerDistributor;
@@ -48,13 +47,16 @@ public final class HandlerDistributors {
         return new HandlerDistributors(new LinkedList<>());
     }
 
-    public void register(final Predicate<Object> predicate,
-                         final BiConsumer<Object, GenerationCondition> handlerConsumer) {
+    public void register(final Predicate<DistributableHandler> predicate,
+                         final DistributerAndFollowUps handlerConsumer) {
         final HandlerDistributor handlerDistributor = handlerDistributor(predicate, handlerConsumer);
         distributors.add(handlerDistributor);
     }
 
-    public void distribute(final Object handler, final GenerationCondition condition) {
+    public void distribute(final DistributableHandler handler,
+                           final DependencyRegistry dependencyRegistry) {
+        handler.perRouteConfigurators()
+                .forEach(perRouteConfigurator -> perRouteConfigurator.configure(handler.condition(), handler.handler(), dependencyRegistry));
         final Optional<HandlerDistributor> match = distributors.stream()
                 .filter(handlerDistributor -> handlerDistributor.appliesTo(handler))
                 .findFirst();
@@ -62,6 +64,7 @@ public final class HandlerDistributors {
             throw HandlerDistributorException.handlerDistributorException(handler);
         }
         final HandlerDistributor handlerDistributor = match.get();
-        handlerDistributor.consume(handler, condition);
+        final List<DistributableHandler> followUps = handlerDistributor.distributeAndProvideFollowUps(handler);
+        followUps.forEach(followUp -> distribute(followUp, dependencyRegistry));
     }
 }

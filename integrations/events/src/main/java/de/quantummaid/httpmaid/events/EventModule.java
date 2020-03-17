@@ -26,6 +26,7 @@ import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import de.quantummaid.httpmaid.events.enriching.Enricher;
 import de.quantummaid.httpmaid.events.processors.DetermineEventProcessor;
 import de.quantummaid.httpmaid.events.processors.DispatchEventProcessor;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
@@ -50,13 +51,16 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.events.EventsChains.MAP_REQUEST_TO_EVENT;
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor.handleExternalEventProcessor;
+import static de.quantummaid.httpmaid.events.processors.PerRequestEnrichersProcessor.enrichersProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.generator.Generator.generator;
 import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 
 @ToString
@@ -75,22 +79,26 @@ public final class EventModule implements ChainModule {
     private volatile boolean closeMessageBusOnClose = true;
     private final List<Generator<EventType>> eventTypeGenerators = new LinkedList<>();
     private final Map<EventType, EventFactory> eventFactories = new HashMap<>();
+    private final Map<EventType, List<Enricher>> enrichers = new HashMap<>();
 
-    private final List<RequestMapEnricher> requestMapEnrichers = new LinkedList<>();
     private final List<ResponseMapExtractor> responseMapExtractors = new LinkedList<>();
 
     private final Map<EventType, ExternalEventMapping> externalEventMappings = new HashMap<>();
 
     public static EventModule eventModule() {
         final EventModule eventModule = new EventModule();
-        //eventModule.addRequestMapEnricher((map, request) -> { TODO
-        //    request.optionalBodyMap().ifPresent(map::putAll);
-        //});
         final MessageBus defaultMessageBus = aMessageBus().forType(ASYNCHRONOUS)
                 .withAsynchronousConfiguration(constantPoolSizeAsynchronousConfiguration(DEFAULT_POOL_SIZE))
                 .build();
         eventModule.setMessageBus(defaultMessageBus);
         return eventModule;
+    }
+
+    public void addEnricher(final EventType eventType, final Enricher enricher) {
+        if (!enrichers.containsKey(eventType)) {
+            enrichers.put(eventType, new ArrayList<>(1));
+        }
+        enrichers.get(eventType).add(enricher);
     }
 
     public void setMessageBus(final MessageBus messageBus) {
@@ -99,11 +107,6 @@ public final class EventModule implements ChainModule {
 
     public void setCloseMessageBusOnClose(final boolean closeMessageBusOnClose) {
         this.closeMessageBusOnClose = closeMessageBusOnClose;
-    }
-
-    public void addRequestMapEnricher(final RequestMapEnricher enricher) {
-        validateNotNull(enricher, "enricher");
-        requestMapEnrichers.add(enricher);
     }
 
     public void addResponseMapExtractor(final ResponseMapExtractor extractor) {
@@ -143,25 +146,28 @@ public final class EventModule implements ChainModule {
     @Override
     public void init(final MetaData configurationMetaData) {
         final HandlerDistributors handlerDistributors = configurationMetaData.get(HANDLER_DISTRIBUTORS);
-        handlerDistributors.register(handler -> handler instanceof EventType,
-                (handler, condition) -> addEventMapping((EventType) handler, condition));
+        handlerDistributors.register(handler -> handler.handler() instanceof EventType,
+                handler -> {
+                    addEventMapping((EventType) handler.handler(), handler.condition());
+                    return emptyList();
+                });
         configurationMetaData.set(MESSAGE_BUS, messageBus);
     }
 
     @Override
     public void register(final ChainExtender extender) {
         extender.appendProcessor(DETERMINE_HANDLER, DetermineEventProcessor.determineEventProcessor(generators(eventTypeGenerators)));
-        extender.routeIfSet(PREPARE_RESPONSE, jumpTo(EventsChains.MAP_REQUEST_TO_EVENT), EVENT_TYPE);
+        extender.routeIfSet(PREPARE_RESPONSE, jumpTo(MAP_REQUEST_TO_EVENT), EVENT_TYPE);
 
-        extender.createChain(EventsChains.MAP_REQUEST_TO_EVENT, jumpTo(EventsChains.SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
-        extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, metaData -> {
+        extender.createChain(MAP_REQUEST_TO_EVENT, jumpTo(EventsChains.SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, metaData -> {
             final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(null);
             final EventType eventType = metaData.get(EVENT_TYPE);
             final EventFactory eventFactory = eventFactories.get(eventType);
             final EnrichableMap event = eventFactory.createEvent(unmarshalled);
             metaData.set(EVENT, event);
         });
-        requestMapEnrichers.forEach(enricher -> extender.appendProcessor(EventsChains.MAP_REQUEST_TO_EVENT, enricher));
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, enrichersProcessor(enrichers));
 
         extender.createChain(EventsChains.SUBMIT_EVENT, jumpTo(EventsChains.MAP_EVENT_TO_RESPONSE), jumpTo(EXCEPTION_OCCURRED));
         extender.appendProcessor(EventsChains.SUBMIT_EVENT, DispatchEventProcessor.dispatchEventProcessor(messageBus));

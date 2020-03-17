@@ -28,8 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapUsing;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllPathParameters;
+import static de.quantummaid.httpmaid.events.EventConfigurators.*;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 
@@ -143,8 +142,7 @@ public final class UseCaseSpecs {
     public void useCaseCanHaveASingleStringAsParameterViaPathParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
-                        .get("/<parameter>", SingleStringParameterUseCase.class)
-                        .configured(toEnrichTheIntermediateMapWithAllPathParameters())
+                        .get("/<parameter>", SingleStringParameterUseCase.class, mappingPathParameter("parameter"))
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().withContentType("application/json").isIssued()
@@ -167,44 +165,6 @@ public final class UseCaseSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void useCaseCanHaveASingleStringAsParameter(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .post("/", SingleStringParameterUseCase.class)
-                        .configured(toEnrichTheIntermediateMapUsing((map, request) -> {
-                            request.optionalBodyMap().ifPresent(stringObjectMap -> {
-                                final Object parameter = stringObjectMap.get("parameter");
-                                map.overwriteTopLevel("parameter", parameter);
-                            });
-                        }))
-                        .build()
-        )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": \"foo\" }").withContentType("application/json").isIssued()
-                .theStatusCodeWas(200)
-                .theResponseBodyWas("\"foo\"");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void useCaseCanHaveASingleDtoAsParameter(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .post("/", SingleDtoParameterUseCase.class)
-                        .configured(toEnrichTheIntermediateMapUsing((map, request) -> {
-                            request.optionalBodyMap().ifPresent(stringObjectMap -> {
-                                final Object parameter = stringObjectMap.get("parameter");
-                                map.overwriteTopLevel("parameter", parameter);
-                            });
-                        }))
-                        .build()
-        )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" } }").withContentType("application/json").isIssued()
-                .theStatusCodeWas(200)
-                .theResponseBodyWas("\"MyDto(fieldA=foo, fieldB=bar)\"");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void useCaseCanHaveTwoStringsAsParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -213,6 +173,81 @@ public final class UseCaseSpecs {
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter1\": \"foo\", \"parameter2\": \"bar\" }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
+                .theResponseBodyWas("\"foobar\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void pathParameterEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/<parameter>", SingleStringParameterUseCase.class, mappingPathParameter("parameter"))
+                        .build()
+        )
+                .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void queryParameterEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", SingleStringParameterUseCase.class, mappingQueryParameter("parameter"))
+                        .build()
+        )
+                .when().aRequestToThePath("/?parameter=foo").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void queryParameterFromEnrichmentCanBeEmpty(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", SingleStringParameterUseCase.class, mappingQueryParameter("parameter"))
+                        .build()
+        )
+                .when().aRequestToThePath("/?parameter=").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void twoQueryParametersCanBeEnriched(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", TwoStringsParameterUseCase.class, mappingQueryParameter("parameter1"), mappingQueryParameter("parameter2"))
+                        .build()
+        )
+                .when().aRequestToThePath("/?parameter1=foo&parameter2=bar").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"foobar\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void headerEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", SingleStringParameterUseCase.class, mappingHeader("parameter"))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("parameter", "foo").isIssued()
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void multipleEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/<pathParameter>", TwoStringsParameterUseCase.class,
+                                mappingPathParameter("pathParameter", "parameter1"),
+                                mappingQueryParameter("queryParameter", "parameter2")
+                        )
+                        .build()
+        )
+                .when().aRequestToThePath("/foo?queryParameter=bar").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("\"foobar\"");
     }
 }

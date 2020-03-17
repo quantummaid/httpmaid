@@ -27,7 +27,6 @@ import websockets.givenwhenthen.configurations.TestConfiguration;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.PATH;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllRequestData;
 import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogUsing;
 import static de.quantummaid.httpmaid.websockets.WebSocketsConfigurator.toUseWebSockets;
 import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.IS_WEBSOCKET_MESSAGE;
@@ -53,7 +52,7 @@ public final class LowLevelConfiguration {
                         .acceptingWebSocketsToThePath("/foobar").taggedBy("FOOBAR")
                         .acceptingWebSocketsToThePath("/logger").taggedBy("LOGGER"))
                 .configured(toLogUsing(logger()))
-                .configured(toEnrichTheIntermediateMapWithAllRequestData())
+                //.configured(toEnrichTheIntermediateMapWithAllRequestData())
                 .build();
         return testConfiguration(httpMaid);
     }
