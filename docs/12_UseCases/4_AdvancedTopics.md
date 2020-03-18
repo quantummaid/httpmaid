@@ -27,7 +27,7 @@ The established workflow looks like this:
 Request Body    --->    Map<String, Object>    --->    Domain Object
 ```
 If we now want to include other aspect of the request (headers, query parameters,
-path parameters, authentication data, etc.), we can enrich the intermediate
+path parameters, authentication data, etc.), we can enrich the request
 map with exactly this data. The resulting workflow would look like
 this:
 ```
@@ -42,19 +42,19 @@ a ton of convenient configurator methods to choose from.
 You can even provide more than one of them and they are cascaded in the order they were configured.
 
 #### mappingQueryParameter()
-Enriches the intermediate map with a query parameter.
+Enriches the request map with a query parameter.
 Requires the request to contain the configured query parameter and will abort the request otherwise.
 
 #### mappingPathParameter()
-Enriches the intermediate map with a path parameter.
+Enriches the request map with a path parameter.
 Requires the request to contain the configured path parameter and will abort the request otherwise.
 
 #### mappingHeader()
-Enriches the intermediate map with a request header.
+Enriches the request map with a request header.
 Requires the request to contain the configured header and will abort the request otherwise.
 
 #### mappingAuthenticationInformation()
-Enriches the intermediate map with the authentication information.
+Enriches the request map with the authentication information.
 Takes as parameter a `String` that will be used as key.
 Requires the request to be authenticated and will abort the request otherwise.
 
@@ -68,7 +68,7 @@ Domain Object    --->    Map<String, Object>    --->    Response Body
 ```
 
 Now, if we want some of the map to be e.g. set as a response header - instead of ending
-up in the response body - we need to extract the respective data from the intermediate
+up in the response body - we need to extract the respective data from the response
 map and set the headers accordingly. This procedure is visualized in this extended workflow: 
 ```
 Domain Object    --->    Map<String, Object>    --->    Response Body
