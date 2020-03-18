@@ -26,6 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @ToString
@@ -45,6 +46,11 @@ public final class AddMapEntryEnricher implements InternalEnricher {
     public Object enrich(final String key, final Object enrichable) {
         if (this.key.equals(key)) {
             return value;
+        }
+        if (enrichable == null) {
+            final Map<String, Object> map = new HashMap<>();
+            map.put(key, value);
+            return map;
         }
         if (enrichable instanceof Map) {
             final Map<String, Object> map = (Map<String, Object>) enrichable;

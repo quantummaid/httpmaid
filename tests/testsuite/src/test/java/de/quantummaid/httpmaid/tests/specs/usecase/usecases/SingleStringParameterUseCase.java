@@ -24,6 +24,9 @@ package de.quantummaid.httpmaid.tests.specs.usecase.usecases;
 public final class SingleStringParameterUseCase {
 
     public String performUseCase(final String parameter) {
+        if (parameter == null) {
+            throw new IllegalArgumentException("parameter must not be null");
+        }
         return parameter;
     }
 }

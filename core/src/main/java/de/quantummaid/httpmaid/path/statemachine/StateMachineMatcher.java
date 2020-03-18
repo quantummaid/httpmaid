@@ -21,9 +21,12 @@
 
 package de.quantummaid.httpmaid.path.statemachine;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface StateMachineMatcher<T> {
     Optional<Map<String, String>> matchAndReturnCaptures(T element);
+
+    List<String> captures();
 }

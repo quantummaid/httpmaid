@@ -25,8 +25,6 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
-import de.quantummaid.httpmaid.tests.usecases.mapmaid.MapMaidUseCase;
-import de.quantummaid.httpmaid.tests.usecases.parameter.ParameterizedUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responsecontenttype.SetContentTypeInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responseheaders.HeadersInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.simple.TestUseCase;
@@ -38,7 +36,6 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
@@ -54,15 +51,9 @@ public final class HttpMaidTestConfigurations {
         return anHttpMaid()
                 .serving(TestUseCase.class).forRequestPath("/test").andRequestMethods(GET, POST, PUT, DELETE)
                 .serving(EchoBodyUseCase.class).forRequestPath("/echo_body").andRequestMethods(GET, POST, PUT, DELETE)
-                .get("/parameterized", ParameterizedUseCase.class)
                 .get("/headers_response", HeadersInResponseUseCase.class)
                 .get("/echo_contenttype", EchoContentTypeUseCase.class)
                 .get("/set_contenttype_in_response", SetContentTypeInResponseUseCase.class)
-                .serving(MapMaidUseCase.class,
-                        mappingPathParameter("value1"),
-                        mappingHeader("value2"),
-                        mappingHeader("value3"),
-                        mappingHeader("value4")).forRequestPath("/mapmaid/<value1>").andRequestMethods(GET, POST)
                 .get("/twoparameters", TwoParametersUseCase.class, mappingHeader("param1"), mappingHeader("param2"))
                 .get("/void", VoidUseCase.class)
 

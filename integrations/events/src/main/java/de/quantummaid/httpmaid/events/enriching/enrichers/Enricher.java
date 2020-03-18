@@ -19,23 +19,14 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.generator;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
-import java.util.List;
+import java.util.Optional;
 
-import static java.util.Collections.emptyList;
+public interface Enricher {
+    String mapKey();
 
-public interface GenerationCondition {
-
-    default boolean isSubsetOf(final GenerationCondition other) {
-        return false;
-    }
-
-    boolean generate(MetaData metaData);
-
-    default List<String> pathParameters() {
-        return emptyList();
-    }
+    Optional<?> extractValue(HttpRequest request);
 }

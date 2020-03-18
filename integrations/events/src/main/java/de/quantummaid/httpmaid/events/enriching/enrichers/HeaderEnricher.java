@@ -19,14 +19,36 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.parameter;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-@RequiredArgsConstructor
-public final class ParameterizedUseCase {
+import java.util.Optional;
 
-    public String parameterized(final Parameter parameter) {
-        return parameter.toString();
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class HeaderEnricher implements Enricher {
+    private final String headerName;
+    private final String mapKey;
+
+    public static HeaderEnricher headerEnricher(final String headerName,
+                                                final String mapKey) {
+        return new HeaderEnricher(headerName, mapKey);
+    }
+
+    @Override
+    public String mapKey() {
+        return mapKey;
+    }
+
+    @Override
+    public Optional<?> extractValue(final HttpRequest request) {
+        return request.headers()
+                .getOptionalHeader(headerName);
     }
 }

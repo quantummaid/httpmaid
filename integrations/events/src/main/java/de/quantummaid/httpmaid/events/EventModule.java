@@ -26,7 +26,8 @@ import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
-import de.quantummaid.httpmaid.events.enriching.Enricher;
+import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
+import de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher;
 import de.quantummaid.httpmaid.events.processors.DetermineEventProcessor;
 import de.quantummaid.httpmaid.events.processors.DispatchEventProcessor;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
@@ -38,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
 import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
@@ -53,6 +55,8 @@ import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
 import static de.quantummaid.httpmaid.events.EventsChains.MAP_REQUEST_TO_EVENT;
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
+import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEventEnrichers;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
 import static de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor.handleExternalEventProcessor;
 import static de.quantummaid.httpmaid.events.processors.PerRequestEnrichersProcessor.enrichersProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
@@ -79,7 +83,7 @@ public final class EventModule implements ChainModule {
     private volatile boolean closeMessageBusOnClose = true;
     private final List<Generator<EventType>> eventTypeGenerators = new LinkedList<>();
     private final Map<EventType, EventFactory> eventFactories = new HashMap<>();
-    private final Map<EventType, List<Enricher>> enrichers = new HashMap<>();
+    private final Map<EventType, PerEventEnrichers> enrichers = new HashMap<>();
 
     private final List<ResponseMapExtractor> responseMapExtractors = new LinkedList<>();
 
@@ -94,11 +98,12 @@ public final class EventModule implements ChainModule {
         return eventModule;
     }
 
-    public void addEnricher(final EventType eventType, final Enricher enricher) {
+    public void addEnricher(final EventType eventType, final Consumer<PerEventEnrichers> enricher) {
         if (!enrichers.containsKey(eventType)) {
-            enrichers.put(eventType, new ArrayList<>(1));
+            enrichers.put(eventType, perEventEnrichers());
         }
-        enrichers.get(eventType).add(enricher);
+        final PerEventEnrichers perEventEnrichers = enrichers.get(eventType);
+        enricher.accept(perEventEnrichers);
     }
 
     public void setMessageBus(final MessageBus messageBus) {
@@ -117,6 +122,11 @@ public final class EventModule implements ChainModule {
     public void addEventMapping(final EventType eventType,
                                 final GenerationCondition condition) {
         addEventMapping(eventType, condition, object -> emptyEnrichableMap());
+        final List<String> pathParameters = condition.pathParameters();
+        pathParameters.forEach(name -> {
+            final PathParameterEnricher enricher = pathParameterEnricher(name, name);
+            addEnricher(eventType, perEventEnrichers -> perEventEnrichers.addPathParameterEnricher(enricher));
+        });
     }
 
     public void addEventMapping(final EventType eventType,

@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.generator;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
+import de.quantummaid.httpmaid.http.PathParameters;
 import de.quantummaid.httpmaid.path.Path;
 import de.quantummaid.httpmaid.path.PathTemplate;
 import de.quantummaid.httpmaid.util.Validators;
@@ -36,7 +37,6 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
-import static de.quantummaid.httpmaid.http.PathParameters.pathParameters;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -64,6 +64,11 @@ public final class PathAndMethodGenerationCondition implements GenerationConditi
     }
 
     @Override
+    public List<String> pathParameters() {
+        return pathTemplate.parameters();
+    }
+
+    @Override
     public boolean isSubsetOf(final GenerationCondition other) {
         Validators.validateNotNull(other, "other");
         return equals(other);
@@ -87,7 +92,7 @@ public final class PathAndMethodGenerationCondition implements GenerationConditi
         }
 
         final Map<String, String> pathParameters = pathTemplate.extractPathParameters(path);
-        metaData.set(PATH_PARAMETERS, pathParameters(pathParameters));
+        metaData.set(PATH_PARAMETERS, PathParameters.pathParameters(pathParameters));
         return true;
     }
 }

@@ -26,8 +26,11 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.util.Collections.emptyList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -44,6 +47,11 @@ public final class AnyMatcher implements StateMachineMatcher<String> {
     @Override
     public Optional<Map<String, String>> matchAndReturnCaptures(final String element) {
         return Optional.of(Map.of());
+    }
+
+    @Override
+    public List<String> captures() {
+        return emptyList();
     }
 
     @Override

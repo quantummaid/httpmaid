@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -59,5 +60,10 @@ final class CaptureMatcher implements StateMachineMatcher<String> {
     @Override
     public Optional<Map<String, String>> matchAndReturnCaptures(final String element) {
         return Optional.of(Map.of(name, element));
+    }
+
+    @Override
+    public List<String> captures() {
+        return List.of(name);
     }
 }

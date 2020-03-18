@@ -19,10 +19,36 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events.enriching;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-public interface Enricher {
-    void enrich(HttpRequest request, EnrichableMap map);
+import java.util.Optional;
+
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PathParameterEnricher implements Enricher {
+    private final String parameterName;
+    private final String mapKey;
+
+    public static PathParameterEnricher pathParameterEnricher(final String parameterName,
+                                                              final String mapKey) {
+        return new PathParameterEnricher(parameterName, mapKey);
+    }
+
+    @Override
+    public String mapKey() {
+        return mapKey;
+    }
+
+    @Override
+    public Optional<?> extractValue(final HttpRequest request) {
+        return request.pathParameters()
+                .getOptionalPathParameter(parameterName);
+    }
 }

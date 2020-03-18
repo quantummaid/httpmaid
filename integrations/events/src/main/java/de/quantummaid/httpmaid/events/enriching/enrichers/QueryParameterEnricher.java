@@ -19,45 +19,36 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.path;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-import de.quantummaid.httpmaid.path.statemachine.StateMachineMatcher;
-import de.quantummaid.httpmaid.util.Validators;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
-
+@ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class StaticMatcher implements StateMachineMatcher<String> {
-    private final String value;
+public class QueryParameterEnricher implements Enricher {
+    private final String parameterName;
+    private final String mapKey;
 
-    static StateMachineMatcher<String> fromStringSpecification(final String stringSpecification) {
-        Validators.validateNotNullNorEmpty(stringSpecification, "stringSpecification");
-        return new StaticMatcher(stringSpecification);
+    public static QueryParameterEnricher queryParameterEnricher(final String parameterName,
+                                                                final String mapKey) {
+        return new QueryParameterEnricher(parameterName, mapKey);
     }
 
     @Override
-    public Optional<Map<String, String>> matchAndReturnCaptures(final String element) {
-        if(this.value.equals(element)) {
-            return Optional.of(Map.of());
-        }
-        return Optional.empty();
+    public String mapKey() {
+        return mapKey;
     }
 
     @Override
-    public String toString() {
-        return this.value;
-    }
-
-    @Override
-    public List<String> captures() {
-        return emptyList();
+    public Optional<?> extractValue(final HttpRequest request) {
+        return request.queryParameters()
+                .getOptionalQueryParameter(parameterName);
     }
 }

@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.regex.Pattern.compile;
@@ -86,5 +87,10 @@ public final class RegexMatcher implements StateMachineMatcher<String> {
             }
         });
         return of(captures);
+    }
+
+    @Override
+    public List<String> captures() {
+        return unmodifiableList(names);
     }
 }

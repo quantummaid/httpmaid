@@ -25,14 +25,13 @@ import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
-import de.quantummaid.httpmaid.events.enriching.Enricher;
+import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.events.EventModule.EVENT;
@@ -43,9 +42,9 @@ import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PerRequestEnrichersProcessor implements Processor {
-    private final Map<EventType, List<Enricher>> enrichers;
+    private final Map<EventType, PerEventEnrichers> enrichers;
 
-    public static Processor enrichersProcessor(final Map<EventType, List<Enricher>> enrichers) {
+    public static Processor enrichersProcessor(final Map<EventType, PerEventEnrichers> enrichers) {
         return new PerRequestEnrichersProcessor(enrichers);
     }
 
@@ -57,7 +56,7 @@ public final class PerRequestEnrichersProcessor implements Processor {
             }
             final EnrichableMap event = metaData.get(EVENT);
             final HttpRequest httpRequest = httpRequest(metaData);
-            enrichers.get(eventType).forEach(enricher -> enricher.enrich(httpRequest, event));
+            enrichers.get(eventType).enrich(httpRequest, event);
         });
     }
 }

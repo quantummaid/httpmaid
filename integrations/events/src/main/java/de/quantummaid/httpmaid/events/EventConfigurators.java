@@ -25,9 +25,17 @@ import de.quantummaid.eventmaid.messageBus.MessageBus;
 import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.httpmaid.PerRouteConfigurator;
 import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.events.enriching.Enricher;
+import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
+import de.quantummaid.httpmaid.events.enriching.enrichers.*;
+
+import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.AuthenticationInformationEnricher.authenticationInformationEnricher;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.CookieEnricher.cookieEnricher;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.HeaderEnricher.headerEnricher;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.QueryParameterEnricher.queryParameterEnricher;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
@@ -64,10 +72,13 @@ public final class EventConfigurators {
     }
 
     public static PerRouteConfigurator mappingPathParameter(final String parameterName, final String mapKey) {
-        return mapping((request, map) -> {
-            final String pathParameter = request.pathParameters().getPathParameter(parameterName);
-            map.enrichEitherTopOrSecondLevel(mapKey, pathParameter);
-        });
+        final PathParameterEnricher enricher = pathParameterEnricher(parameterName, mapKey);
+        return mapping(perEventEnrichers -> perEventEnrichers.addPathParameterEnricher(enricher));
+    }
+
+    public static PerRouteConfigurator ignorePathParameter(final String name) {
+        final PathParameterEnricher enricher = pathParameterEnricher(name, name);
+        return mapping(perEventEnrichers -> perEventEnrichers.removePathParameterEnricher(enricher));
     }
 
     public static PerRouteConfigurator mappingQueryParameter(final String name) {
@@ -75,10 +86,8 @@ public final class EventConfigurators {
     }
 
     public static PerRouteConfigurator mappingQueryParameter(final String parameterName, final String mapKey) {
-        return mapping((request, map) -> {
-            final String queryParameter = request.queryParameters().getQueryParameter(parameterName);
-            map.enrichEitherTopOrSecondLevel(mapKey, queryParameter);
-        });
+        final QueryParameterEnricher enricher = queryParameterEnricher(parameterName, mapKey);
+        return mapping(perEventEnrichers -> perEventEnrichers.addQueryParameterEnricher(enricher));
     }
 
     public static PerRouteConfigurator mappingHeader(final String name) {
@@ -86,20 +95,25 @@ public final class EventConfigurators {
     }
 
     public static PerRouteConfigurator mappingHeader(final String headerName, final String mapKey) {
-        return mapping((request, map) -> {
-            final String header = request.headers().getHeader(headerName);
-            map.enrichEitherTopOrSecondLevel(mapKey, header);
-        });
+        final HeaderEnricher enricher = headerEnricher(headerName, mapKey);
+        return mapping(perEventEnrichers -> perEventEnrichers.addHeaderEnricher(enricher));
+    }
+
+    public static PerRouteConfigurator mappingCookie(final String name) {
+        return mappingCookie(name, name);
+    }
+
+    public static PerRouteConfigurator mappingCookie(final String cookieName, final String mapKey) {
+        final CookieEnricher enricher = cookieEnricher(cookieName, mapKey);
+        return mapping(perEventEnrichers -> perEventEnrichers.addCookieEnricher(enricher));
     }
 
     public static PerRouteConfigurator mappingAuthenticationInformation(final String key) {
-        return mapping((request, map) -> {
-            final Object authenticationInformation = request.authenticationInformation();
-            map.enrichEitherTopOrSecondLevel(key, authenticationInformation);
-        });
+        final AuthenticationInformationEnricher enricher = authenticationInformationEnricher(key);
+        return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
     }
 
-    private static PerRouteConfigurator mapping(final Enricher enricher) {
+    private static PerRouteConfigurator mapping(final Consumer<PerEventEnrichers> enricher) {
         return (generationCondition, handler, dependencyRegistry) -> {
             if (!(handler instanceof EventType)) {
                 return;

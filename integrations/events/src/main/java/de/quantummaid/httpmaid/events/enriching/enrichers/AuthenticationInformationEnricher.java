@@ -19,12 +19,33 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.parameter;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-public final class Parameter {
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
+import java.util.Optional;
+
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AuthenticationInformationEnricher implements Enricher {
+    private final String mapKey;
+
+    public static AuthenticationInformationEnricher authenticationInformationEnricher(final String mapKey) {
+        return new AuthenticationInformationEnricher(mapKey);
+    }
 
     @Override
-    public String toString() {
-        return "parameter";
+    public String mapKey() {
+        return mapKey;
+    }
+
+    @Override
+    public Optional<?> extractValue(final HttpRequest request) {
+        return request.optionalAuthenticationInformation();
     }
 }

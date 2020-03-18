@@ -19,23 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.generator;
+package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.generator.GenerationCondition;
 
-import java.util.List;
-
-import static java.util.Collections.emptyList;
-
-public interface GenerationCondition {
-
-    default boolean isSubsetOf(final GenerationCondition other) {
-        return false;
-    }
-
-    boolean generate(MetaData metaData);
-
-    default List<String> pathParameters() {
-        return emptyList();
-    }
+public interface PerRouteConfiguratorGenerator {
+    PerRouteConfigurator generate(GenerationCondition condition);
 }

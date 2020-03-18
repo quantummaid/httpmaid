@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import static java.util.stream.Collectors.toList;
 public final class PathTemplate {
     private final List<String> elements;
     private final StateMachine<String> stateMachine;
+    private final List<String> parameters;
 
     public static PathTemplate pathTemplate(final String asString) {
         final List<String> elementsAsStrings = splitIntoElements(asString);
@@ -47,8 +49,8 @@ public final class PathTemplate {
 
         final StateMachineBuilder<String> stateMachineBuilder = StateMachineBuilder.stateMachineBuilder();
         State currentState = stateMachineBuilder.createState();
-        for(final StateMachineMatcher<String> matcher : matchers) {
-            if(matcher instanceof AnyMatcher) {
+        for (final StateMachineMatcher<String> matcher : matchers) {
+            if (matcher instanceof AnyMatcher) {
                 stateMachineBuilder.addTransition(currentState, Transition.transition(matcher, currentState));
             } else {
                 final State nextState = stateMachineBuilder.createState();
@@ -59,11 +61,19 @@ public final class PathTemplate {
         stateMachineBuilder.markAsFinal(currentState);
         final StateMachine<String> stateMachine = stateMachineBuilder.build();
 
-        return new PathTemplate(elementsAsStrings, stateMachine);
+        final List<String> parameters = matchers.stream()
+                .map(StateMachineMatcher::captures)
+                .flatMap(Collection::stream)
+                .collect(toList());
+        return new PathTemplate(elementsAsStrings, stateMachine, parameters);
     }
 
     public boolean matches(final Path path) {
         return match(path).isSuccessful();
+    }
+
+    public List<String> parameters() {
+        return parameters;
     }
 
     public Map<String, String> extractPathParameters(final Path path) {
@@ -89,7 +99,7 @@ public final class PathTemplate {
         if (CaptureMatcher.isWildcard(stringSpecification)) {
             return CaptureMatcher.fromStringSpecification(stringSpecification);
         }
-        if(RegexMatcher.isRegex(stringSpecification)) {
+        if (RegexMatcher.isRegex(stringSpecification)) {
             return RegexMatcher.fromStringSpecification(stringSpecification);
         }
         return StaticMatcher.fromStringSpecification(stringSpecification);
