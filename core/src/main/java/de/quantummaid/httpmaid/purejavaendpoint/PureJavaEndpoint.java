@@ -21,39 +21,44 @@
 
 package de.quantummaid.httpmaid.purejavaendpoint;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import de.quantummaid.httpmaid.HttpMaid;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
+import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
 import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpointHandler.javaOnlyEndpointHandler;
 
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PureJavaEndpoint implements AutoCloseable {
-    private final HttpServer httpServer;
+    private final HttpMaid httpMaid;
 
     public static PortStage pureJavaEndpointFor(final HttpMaid httpMaid) {
         return port -> {
-            final HttpServer httpServer;
             try {
-                httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+                final HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
                 final HttpHandler httpHandler = javaOnlyEndpointHandler(httpMaid);
                 httpServer.createContext("/", httpHandler);
                 httpServer.setExecutor(null);
                 httpServer.start();
+                httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(() -> httpServer.stop(0));
             } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
-            return new PureJavaEndpoint(httpServer);
+            return new PureJavaEndpoint(httpMaid);
         };
     }
 
     @Override
     public void close() {
-        httpServer.stop(0);
+        httpMaid.close();
     }
 }
