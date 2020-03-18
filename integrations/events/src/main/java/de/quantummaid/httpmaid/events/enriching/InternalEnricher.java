@@ -19,18 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.pathparameter;
+package de.quantummaid.httpmaid.events.enriching;
 
-import lombok.RequiredArgsConstructor;
+public interface InternalEnricher {
+    Object enrich(String key, Object enrichable);
 
-import java.util.Map;
-
-@RequiredArgsConstructor
-public final class WildcardParameter {
-    private final Map<String, Object> map;
-
-    @Override
-    public String toString() {
-        return (String) map.get("parameter");
-    }
+    String description();
 }

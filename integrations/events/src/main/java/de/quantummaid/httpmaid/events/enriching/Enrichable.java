@@ -36,8 +36,8 @@ import java.util.List;
 public final class Enrichable {
     private final String key;
     private Object value = new HashMap<>();
-    private final List<Enricher> enrichersWithoutOverwrite = new ArrayList<>();
-    private final List<Enricher> enrichersWithOverwrite = new ArrayList<>();
+    private final List<InternalEnricher> enrichersWithoutOverwrite = new ArrayList<>();
+    private final List<InternalEnricher> enrichersWithOverwrite = new ArrayList<>();
 
     public static Enrichable enrichable(final String key) {
         return new Enrichable(key);
@@ -47,19 +47,19 @@ public final class Enrichable {
         this.value = value;
     }
 
-    public void enrichWithoutOverwrite(final Enricher enricher) {
+    public void enrichWithoutOverwrite(final InternalEnricher enricher) {
         enrichersWithoutOverwrite.add(enricher);
     }
 
-    public void enrichWithOverwrite(final Enricher enricher) {
+    public void enrichWithOverwrite(final InternalEnricher enricher) {
         enrichersWithOverwrite.add(enricher);
     }
 
     public Object compile() {
-        for (final Enricher enricher : enrichersWithoutOverwrite) {
+        for (final InternalEnricher enricher : enrichersWithoutOverwrite) {
             value = enricher.enrich(key, value);
         }
-        for (final Enricher enricher : enrichersWithOverwrite) {
+        for (final InternalEnricher enricher : enrichersWithOverwrite) {
             value = enricher.enrich(key, value);
         }
         return value;

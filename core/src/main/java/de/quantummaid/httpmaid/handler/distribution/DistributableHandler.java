@@ -21,34 +21,38 @@
 
 package de.quantummaid.httpmaid.handler.distribution;
 
-import de.quantummaid.httpmaid.util.Validators;
+import de.quantummaid.httpmaid.PerRouteConfigurator;
+import de.quantummaid.httpmaid.generator.GenerationCondition;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HandlerDistributor {
-    private final Predicate<DistributableHandler> predicate;
-    private final DistributerAndFollowUps distributerAndFollowUps;
+public final class DistributableHandler {
+    private final GenerationCondition condition;
+    private final Object handler;
+    private final List<PerRouteConfigurator> perRouteConfigurators;
 
-    public static HandlerDistributor handlerDistributor(final Predicate<DistributableHandler> predicate,
-                                                        final DistributerAndFollowUps distributerAndFollowUps) {
-        Validators.validateNotNull(predicate, "predicate");
-        Validators.validateNotNull(distributerAndFollowUps, "distributerAndFollowUps");
-        return new HandlerDistributor(predicate, distributerAndFollowUps);
+    public static DistributableHandler distributableHandler(final GenerationCondition condition,
+                                                            final Object handler,
+                                                            final List<PerRouteConfigurator> perRouteConfigurators) {
+        return new DistributableHandler(condition, handler, perRouteConfigurators);
     }
 
-    public boolean appliesTo(final DistributableHandler handler) {
-        return predicate.test(handler);
+    public GenerationCondition condition() {
+        return condition;
     }
 
-    public List<DistributableHandler> distributeAndProvideFollowUps(final DistributableHandler handler) {
-        return distributerAndFollowUps.distribute(handler);
+    public Object handler() {
+        return handler;
+    }
+
+    public List<PerRouteConfigurator> perRouteConfigurators() {
+        return perRouteConfigurators;
     }
 }

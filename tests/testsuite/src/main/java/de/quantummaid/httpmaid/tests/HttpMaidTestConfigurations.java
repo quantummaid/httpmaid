@@ -25,16 +25,8 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
-import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersUseCase;
-import de.quantummaid.httpmaid.tests.usecases.echopathandqueryparameters.EchoPathAndQueryParametersValue;
-import de.quantummaid.httpmaid.tests.usecases.headers.HeaderUseCase;
-import de.quantummaid.httpmaid.tests.usecases.headers.HeadersParameter;
 import de.quantummaid.httpmaid.tests.usecases.mapmaid.MapMaidUseCase;
 import de.quantummaid.httpmaid.tests.usecases.parameter.ParameterizedUseCase;
-import de.quantummaid.httpmaid.tests.usecases.pathparameter.WildCardUseCase;
-import de.quantummaid.httpmaid.tests.usecases.pathparameter.WildcardParameter;
-import de.quantummaid.httpmaid.tests.usecases.queryparameters.QueryParametersParameter;
-import de.quantummaid.httpmaid.tests.usecases.queryparameters.QueryParametersUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responsecontenttype.SetContentTypeInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responseheaders.HeadersInResponseUseCase;
 import de.quantummaid.httpmaid.tests.usecases.simple.TestUseCase;
@@ -45,15 +37,13 @@ import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllRequestData;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
-import static de.quantummaid.httpmaid.tests.MapDeserializer.deserializeFromMap;
-import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
 
 public final class HttpMaidTestConfigurations {
 
@@ -64,26 +54,17 @@ public final class HttpMaidTestConfigurations {
         return anHttpMaid()
                 .serving(TestUseCase.class).forRequestPath("/test").andRequestMethods(GET, POST, PUT, DELETE)
                 .serving(EchoBodyUseCase.class).forRequestPath("/echo_body").andRequestMethods(GET, POST, PUT, DELETE)
-                .get("/wild/<parameter>/card", WildCardUseCase.class)
                 .get("/parameterized", ParameterizedUseCase.class)
-                .get("/queryparameters", QueryParametersUseCase.class)
-                .get("/headers", HeaderUseCase.class)
                 .get("/headers_response", HeadersInResponseUseCase.class)
                 .get("/echo_contenttype", EchoContentTypeUseCase.class)
                 .get("/set_contenttype_in_response", SetContentTypeInResponseUseCase.class)
-                .serving(MapMaidUseCase.class).forRequestPath("/mapmaid/<value1>").andRequestMethods(GET, POST)
-                .get("/echo_path_and_query_parameters/<wildcard>", EchoPathAndQueryParametersUseCase.class)
-                .get("/twoparameters", TwoParametersUseCase.class)
+                .serving(MapMaidUseCase.class,
+                        mappingPathParameter("value1"),
+                        mappingHeader("value2"),
+                        mappingHeader("value3"),
+                        mappingHeader("value4")).forRequestPath("/mapmaid/<value1>").andRequestMethods(GET, POST)
+                .get("/twoparameters", TwoParametersUseCase.class, mappingHeader("param1"), mappingHeader("param2"))
                 .get("/void", VoidUseCase.class)
-
-                .configured(toEnrichTheIntermediateMapWithAllRequestData())
-
-                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
-                    mapMaidBuilder.deserializing(deserializationOnlyType(QueryParametersParameter.class, deserializeFromMap(QueryParametersParameter::new)));
-                    mapMaidBuilder.deserializing(deserializationOnlyType(HeadersParameter.class, deserializeFromMap(HeadersParameter::new)));
-                    mapMaidBuilder.deserializing(deserializationOnlyType(EchoPathAndQueryParametersValue.class, deserializeFromMap(EchoPathAndQueryParametersValue::new)));
-                    mapMaidBuilder.deserializing(deserializationOnlyType(WildcardParameter.class, deserializeFromMap(WildcardParameter::new)));
-                }))
 
                 .configured(toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> {
                     response.setStatus(METHOD_NOT_ALLOWED);

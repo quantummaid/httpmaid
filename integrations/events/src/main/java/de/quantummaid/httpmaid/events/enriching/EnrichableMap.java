@@ -71,12 +71,12 @@ public final class EnrichableMap {
         map.get(key).setValue(value);
     }
 
-    public void enrichEitherTopOrSecondLevelWithoutOverwriting(final Map<String, ?> values) {
-        values.forEach(this::enrichEitherTopOrSecondLevelWithoutOverwriting);
+    public void enrichEitherTopOrSecondLevel(final Map<String, ?> values) {
+        values.forEach(this::enrichEitherTopOrSecondLevel);
     }
 
-    public void enrichEitherTopOrSecondLevelWithoutOverwriting(final String key, final Object value) {
-        if (map.containsKey(key) && map.get(key) == null) {
+    public void enrichEitherTopOrSecondLevel(final String key, final Object value) {
+        if (map.containsKey(key)) {
             overwriteTopLevel(key, value);
         } else {
             enrichOnSecondLevelWithoutOverwriting(key, value);

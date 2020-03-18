@@ -31,12 +31,12 @@ import java.util.Map;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AddMapEntryEnricher implements Enricher {
+public final class AddMapEntryEnricher implements InternalEnricher {
     private final String key;
     private final Object value;
 
-    public static Enricher mapEntry(final String key,
-                                    final Object value) {
+    public static InternalEnricher mapEntry(final String key,
+                                            final Object value) {
         return new AddMapEntryEnricher(key, value);
     }
 

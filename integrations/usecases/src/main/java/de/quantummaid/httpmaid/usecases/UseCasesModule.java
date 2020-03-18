@@ -34,6 +34,7 @@ import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.Use
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.events.EventFactory;
 import de.quantummaid.httpmaid.events.EventModule;
+import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
@@ -53,6 +54,7 @@ import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiat
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
+import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
 import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEventFactory.singleParameterEventFactory;
@@ -98,12 +100,13 @@ public final class UseCasesModule implements ChainModule {
     @Override
     public void init(final MetaData configurationMetaData) {
         final HandlerDistributors handlerDistributors = configurationMetaData.get(HANDLER_DISTRIBUTORS);
-        handlerDistributors.register(handler -> handler instanceof Class, (handler, condition) -> {
-            final Class<?> useCaseClass = (Class<?>) handler;
+        handlerDistributors.register(handler -> handler.handler() instanceof Class, handler -> {
+            final Class<?> useCaseClass = (Class<?>) handler.handler();
             final EventType eventType = eventTypeFromClass(useCaseClass);
             useCaseToEventMappings.put(useCaseClass, eventType);
-            handlerDistributors.distribute(eventType, condition);
             useCaseMethods.add(useCaseMethodOf(useCaseClass));
+            final DistributableHandler eventHandler = distributableHandler(handler.condition(), eventType, handler.perRouteConfigurators());
+            return singletonList(eventHandler);
         });
     }
 

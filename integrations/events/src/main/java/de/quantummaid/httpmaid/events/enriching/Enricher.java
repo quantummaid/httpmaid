@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.events.enriching;
 
-public interface Enricher {
-    Object enrich(String key, Object enrichable);
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
-    String description();
+public interface Enricher {
+    void enrich(HttpRequest request, EnrichableMap map);
 }

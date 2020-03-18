@@ -39,7 +39,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElseThrow();
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingHeader("username", Optional::of))
@@ -55,7 +55,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElseThrow();
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingCookie("username", Optional::of))
@@ -71,7 +71,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElseThrow();
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingQueryParameter("username", Optional::of))
@@ -87,7 +87,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username/<username>", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElseThrow();
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingPathParameter("username", Optional::of))
@@ -103,7 +103,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElseThrow();
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
                             response.setBody(username);
                         })
                         .configured(toAuthenticateRequestsUsing(request -> of(request.bodyString())).afterBodyProcessing())
@@ -119,7 +119,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElseThrow();
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingOAuth2BearerToken(Optional::of))
@@ -135,7 +135,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElse("guest");
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElse("guest");
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingHeader("username", Optional::of).exceptRequestsTo("/username", "/somethingElse"))
@@ -151,7 +151,7 @@ public final class AuthenticationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/username", (request, response) -> {
-                            final String username = request.authenticationInformationAs(String.class).orElse("guest");
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElse("guest");
                             response.setBody(username);
                         })
                         .configured(toAuthenticateUsingHeader("username", Optional::of).onlyRequestsTo("/somethingElse"))

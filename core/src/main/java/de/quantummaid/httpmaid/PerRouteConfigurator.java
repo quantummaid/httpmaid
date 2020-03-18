@@ -19,14 +19,14 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.headers;
+package de.quantummaid.httpmaid;
 
-import lombok.RequiredArgsConstructor;
+import de.quantummaid.httpmaid.chains.DependencyRegistry;
+import de.quantummaid.httpmaid.generator.GenerationCondition;
 
-@RequiredArgsConstructor
-public final class HeaderUseCase {
+public interface PerRouteConfigurator {
 
-    public String header(final HeadersParameter headersParameter) {
-        return headersParameter.toString();
-    }
+    void configure(GenerationCondition generationCondition,
+                   Object handler,
+                   DependencyRegistry dependencyRegistry);
 }

@@ -58,7 +58,6 @@ import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFrom
 import static de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseInvocationBuilder.anUseCaseAdapter;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toEnrichTheIntermediateMapWithAllRequestData;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toUseTheMessageBus;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
@@ -156,7 +155,7 @@ public final class ArtificialConfiguration {
                         .acceptingWebSocketsToThePath("/header").taggedBy("HEADER")
                         .acceptingWebSocketsToThePath("/exception").taggedBy("EXCEPTION"))
 
-                .configured(toEnrichTheIntermediateMapWithAllRequestData())
+                //.configured(toEnrichTheIntermediateMapWithAllRequestData())
                 .configured(toUseModules(eventModule()))
                 .build();
 

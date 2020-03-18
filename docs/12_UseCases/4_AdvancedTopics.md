@@ -41,35 +41,22 @@ To configure this enrichment in HttpMaid, the class `EventConfigurators` offers
 a ton of convenient configurator methods to choose from.
 You can even provide more than one of them and they are cascaded in the order they were configured.
 
-#### toEnrichTheIntermediateMapUsing()
-Takes as parameter an implementation of `RequestMapEnricher` which consumes
-the current intermediate map and the current `HttpRequest`. You
-can make arbitrary changes to the intermediate map. 
+#### mappingQueryParameter()
+Enriches the intermediate map with a query parameter.
+Requires the request to contain the configured query parameter and will abort the request otherwise.
 
-#### toEnrichTheIntermediateMapWithAllHeaders()
-Enriches the intermediate map with all request headers. Each header
-is directly put into the map at top level with its header key as key and its
-header value as value.
+#### mappingPathParameter()
+Enriches the intermediate map with a path parameter.
+Requires the request to contain the configured path parameter and will abort the request otherwise.
 
-#### toEnrichTheIntermediateMapWithAllQueryParameters()
-The same as `toEnrichTheIntermediateMapWithAllHeaders()`, but with
-query parameters instead of headers.
+#### mappingHeader()
+Enriches the intermediate map with a request header.
+Requires the request to contain the configured header and will abort the request otherwise.
 
-#### toEnrichTheIntermediateMapWithAllPathParameters()
-The same as `toEnrichTheIntermediateMapWithAllHeaders()`, but with
-path parameters instead of headers.
-
-#### toEnrichTheIntermediateMapWithAllRequestData()
-The combination of `toEnrichTheIntermediateMapWithAllHeaders()`,
-`toEnrichTheIntermediateMapWithAllQueryParameters()` and
-`toEnrichTheIntermediateMapWithAllPathParameters()`.
-
-#### toEnrichTheIntermediateMapWithTheAuthenticationInformationAs()
+#### mappingAuthenticationInformation()
+Enriches the intermediate map with the authentication information.
 Takes as parameter a `String` that will be used as key.
-If the request has been authenticated and there is an authentication information
-object, it will be stored in the intermediate map at top level
-under the provided key.
-
+Requires the request to be authenticated and will abort the request otherwise.
 
 
 ### Extracting response data
@@ -109,10 +96,9 @@ input from the query parameters instead of the request body:
 <!---[CodeSnippet] (calculationWithQueryParametersExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/multiply", MultiplicationUseCase.class)
-        .get("/divide", DivisionUseCase.class)
+        .get("/multiply", MultiplicationUseCase.class, mappingQueryParameter("factor1"), mappingQueryParameter("factor2"))
+        .get("/divide", DivisionUseCase.class, mappingQueryParameter("dividend"), mappingQueryParameter("divisor"))
         .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-        .configured(toEnrichTheIntermediateMapWithAllQueryParameters())
         .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
             mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
         }))

@@ -19,19 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.usecases.queryparameters;
+package de.quantummaid.httpmaid.handler.distribution;
 
-import java.util.Map;
+import java.util.List;
 
-public final class QueryParametersParameter {
-    private final Map<String, Object> queryParameters;
-
-    public QueryParametersParameter(final Map<String, Object> queryParameters) {
-        this.queryParameters = queryParameters;
-    }
-
-    @Override
-    public String toString() {
-        return queryParameters.toString();
-    }
+public interface DistributerAndFollowUps {
+    List<DistributableHandler> distribute(DistributableHandler distributableHandler);
 }
