@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager.activeDeployers;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager.activeDeployersWithOnlyShittyClient;
@@ -68,7 +69,11 @@ public final class TestEnvironment {
                 .collect(toList());
     }
 
+    public Given given(final Supplier<HttpMaid> httpMaidSupplier) {
+        return Given.given(httpMaidSupplier, deployer, clientFactory);
+    }
+
     public Given given(final HttpMaid httpMaid) {
-        return Given.given(httpMaid, deployer, clientFactory);
+        return given(() -> httpMaid);
     }
 }

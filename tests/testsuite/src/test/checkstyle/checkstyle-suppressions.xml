@@ -44,4 +44,5 @@
     <suppress checks="Regexp" files="FreePortPool" />
     <suppress checks="Regexp" files="ResourceDeallocationSpecs" />
     <suppress checks="MagicNumber|IllegalCatch" files="Deployer" />
+    <suppress checks="IllegalCatch" files="Given" />
 </suppressions>

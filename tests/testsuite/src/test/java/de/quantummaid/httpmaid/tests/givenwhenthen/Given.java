@@ -21,27 +21,35 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.tests.givenwhenthen.builders.PathBuilder;
 import lombok.RequiredArgsConstructor;
+
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public final class Given {
-    private final HttpMaid httpMaid;
+    private final Supplier<HttpMaid> httpMaidSupplier;
     private final Deployer deployer;
     private final ClientFactory clientFactory;
 
-    public static Given given(final HttpMaid httpMaid, final Deployer deployer, final ClientFactory clientFactory) {
-        return new Given(httpMaid, deployer, clientFactory);
+    public static Given given(final Supplier<HttpMaid> httpMaidSupplier, final Deployer deployer, final ClientFactory clientFactory) {
+        return new Given(httpMaidSupplier, deployer, clientFactory);
     }
 
-    public PathBuilder when() {
+    public FirstWhenStage when() {
+        final HttpMaid httpMaid;
+        try {
+            httpMaid = httpMaidSupplier.get();
+        } catch (final Throwable e) {
+            return When.failureWhen(e);
+        }
         final Deployment deployment = deployer.deploy(httpMaid);
         final HttpClientWrapper clientWrapper = clientFactory.createClient(deployment);
-        return When.theWhen(clientWrapper);
+        return When.successWhen(clientWrapper);
     }
 }

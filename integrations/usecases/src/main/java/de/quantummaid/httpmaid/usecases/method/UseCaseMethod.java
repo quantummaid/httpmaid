@@ -33,6 +33,8 @@ import java.util.*;
 
 import static de.quantummaid.eventmaid.internal.reflections.ForbiddenUseCaseMethods.NOT_ALLOWED_USECASE_PUBLIC_METHODS;
 import static de.quantummaid.eventmaid.useCases.useCaseAdapter.methodInvoking.MethodInvocationException.methodInvocationException;
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -46,8 +48,12 @@ public final class UseCaseMethod {
     private final Parameters parameters;
     private final Class<?> returnType;
 
-    public static UseCaseMethod useCaseMethodOf(final Class<?> useCase) {
+    public static UseCaseMethod useCaseMethodOf(final Class<?> useCase) throws IllegalArgumentException {
+        validateUseCaseClass(useCase);
         final Method method = locateUseCaseMethod(useCase);
+        if (method.getTypeParameters().length != 0) {
+            throw new IllegalArgumentException(format("use case method '%s' in class '%s' must not declare any type variables", method.getName(), useCase.getName()));
+        }
         final Parameters parameters = Parameters.parametersOf(method);
         final Class<?> returnType;
         if (method.getReturnType() == Void.TYPE) {
@@ -120,7 +126,7 @@ public final class UseCaseMethod {
         if (useCaseMethods.size() == 1) {
             return useCaseMethods.get(0);
         } else {
-            final String message = String.format("Use case classes must have exactly one public instance method. Found the methods %s " +
+            final String message = format("Use case classes must have exactly one public instance method. Found the methods %s " +
                             "for class %s",
                     useCaseMethods, useCaseClass);
             throw new IllegalArgumentException(message);
@@ -132,9 +138,89 @@ public final class UseCaseMethod {
         return stream(methods)
                 .filter(method -> Modifier.isPublic(method.getModifiers()))
                 .filter(method -> !Modifier.isStatic(method.getModifiers()))
-                .filter(method -> !Modifier.isAbstract(method.getModifiers()))
+                .filter(method -> !isAbstract(method.getModifiers()))
                 .filter(method -> method.getDeclaringClass().equals(useCaseClass))
                 .filter(method -> !excludedMethods.contains(method.getName()))
                 .collect(toList());
+    }
+
+    private static void validateUseCaseClass(final Class<?> useCase) {
+        validateNotAnonymousClass(useCase);
+        validateNotLocalClass(useCase);
+        validatePublicClass(useCase);
+        validateNotPrimitiveClass(useCase);
+        validateNotArrayClass(useCase);
+        validateNotAnnotationClass(useCase);
+        validateNotInterface(useCase);
+        validateNotAbstractClass(useCase);
+        validateNotEnumClass(useCase);
+        validateNotInnerClass(useCase);
+        validateNoClassScopedTypeVariables(useCase);
+    }
+
+    private static void validateNotAnonymousClass(final Class<?> useCase) {
+        if (useCase.isAnonymousClass()) {
+            throw new IllegalArgumentException(format("use case must not be an anonymous class but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotLocalClass(final Class<?> useCase) {
+        if (useCase.isLocalClass()) {
+            throw new IllegalArgumentException(format("use case must not be a local class but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validatePublicClass(final Class<?> useCase) {
+        if (!Modifier.isPublic(useCase.getModifiers())) {
+            throw new IllegalArgumentException(format("use case class must be public but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotPrimitiveClass(final Class<?> useCase) {
+        if (useCase.isPrimitive()) {
+            throw new IllegalArgumentException(format("use case must not be a primitive but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotArrayClass(final Class<?> useCase) {
+        if (useCase.isArray()) {
+            throw new IllegalArgumentException(format("use case must not be an array but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotAnnotationClass(final Class<?> useCase) {
+        if (useCase.isAnnotation()) {
+            throw new IllegalArgumentException(format("use case must not be an annotation but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotInterface(final Class<?> useCase) {
+        if (useCase.isInterface()) {
+            throw new IllegalArgumentException(format("use case must not be an interface but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotAbstractClass(final Class<?> useCase) {
+        if (isAbstract(useCase.getModifiers())) {
+            throw new IllegalArgumentException(format("use case must not be an abstract class but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotEnumClass(final Class<?> useCase) {
+        if (useCase.isEnum()) {
+            throw new IllegalArgumentException(format("use case must not be an enum but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNotInnerClass(final Class<?> useCase) {
+        if (useCase.getEnclosingClass() != null) {
+            throw new IllegalArgumentException(format("use case must not be an inner class but got '%s'", useCase.getName()));
+        }
+    }
+
+    private static void validateNoClassScopedTypeVariables(final Class<?> useCase) {
+        if (useCase.getTypeParameters().length != 0) {
+            throw new IllegalArgumentException(format("use case class '%s' must not declare any type variables", useCase.getName()));
+        }
     }
 }

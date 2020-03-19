@@ -37,4 +37,12 @@
     <Match>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
     </Match>
+    <Match>
+        <Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS" />
+        <Class name="de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.SpecialUseCaseSpecs$1UseCase" />
+    </Match>
+    <Match>
+        <Bug pattern="DM_NEW_FOR_GETCLASS" />
+        <Class name="de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.SpecialUseCaseSpecs" />
+    </Match>
 </FindBugsFilter>

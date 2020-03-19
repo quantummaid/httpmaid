@@ -19,8 +19,13 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.builders;
+package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
 
-public interface PathBuilder {
-    MethodBuilder aRequestToThePath(String path);
+import java.util.List;
+
+public final class UseCaseWithWildcardInParameter {
+
+    public void method(final List<?> list) {
+        throw new UnsupportedOperationException();
+    }
 }

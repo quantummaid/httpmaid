@@ -32,15 +32,25 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class When implements PathBuilder, MethodBuilder, BodyBuilder, HeaderBuilder {
+public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, HeaderBuilder {
     private final HttpClientWrapper clientWrapper;
     private String path;
     private String method;
     private final Map<String, String> headers = new HashMap<>();
     private Object body;
+    private final Throwable initializationException;
 
-    static When theWhen(final HttpClientWrapper clientWrapper) {
-        return new When(clientWrapper);
+    static When successWhen(final HttpClientWrapper clientWrapper) {
+        return new When(clientWrapper, null);
+    }
+
+    static When failureWhen(final Throwable initializationException) {
+        return new When(null, initializationException);
+    }
+
+    @Override
+    public Then httpMaidIsInitialized() {
+        return Then.then(null, initializationException);
     }
 
     @Override
@@ -120,7 +130,7 @@ public final class When implements PathBuilder, MethodBuilder, BodyBuilder, Head
             } else {
                 response = clientWrapper.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
             }
-            return Then.then(response);
+            return Then.then(response, initializationException);
         }
     }
 }
