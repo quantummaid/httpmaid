@@ -31,11 +31,12 @@ import de.quantummaid.httpmaid.events.enriching.enrichers.*;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
-import static de.quantummaid.httpmaid.events.enriching.enrichers.AuthenticationInformationEnricher.authenticationInformationEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.CookieEnricher.cookieEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.HeaderEnricher.headerEnricher;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.OptionalAuthenticationInformationEnricher.optionalAuthenticationInformationEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.QueryParameterEnricher.queryParameterEnricher;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.RequiredAuthenticationInformationEnricher.requiredAuthenticationInformationEnricher;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
@@ -109,7 +110,12 @@ public final class EventConfigurators {
     }
 
     public static PerRouteConfigurator mappingAuthenticationInformation(final String key) {
-        final AuthenticationInformationEnricher enricher = authenticationInformationEnricher(key);
+        final RequiredAuthenticationInformationEnricher enricher = requiredAuthenticationInformationEnricher(key);
+        return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
+    }
+
+    public static PerRouteConfigurator mappingOptionalAuthenticationInformation(final String key) {
+        final OptionalAuthenticationInformationEnricher enricher = optionalAuthenticationInformationEnricher(key);
         return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
     }
 

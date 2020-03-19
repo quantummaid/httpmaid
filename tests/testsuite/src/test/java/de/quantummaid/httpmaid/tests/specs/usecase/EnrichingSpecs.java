@@ -33,6 +33,7 @@ import java.util.Optional;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.*;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingPathParameter;
+import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingQueryParameter;
 
 public class EnrichingSpecs {
 
@@ -42,6 +43,18 @@ public class EnrichingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/<parameter>", SingleStringParameterUseCase.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void pathParameterEnrichmentIsAddedAutomaticallyForRegexPaths(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/|(?<parameter>.*)|", SingleStringParameterUseCase.class)
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -159,5 +172,48 @@ public class EnrichingSpecs {
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void whenAuthenticationInformationIsMissingTheRequestIsAborted(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", SingleStringParameterUseCase.class, mappingAuthenticationInformation("parameter"))
+                        .configured(toAuthenticateUsingQueryParameter("user", Optional::ofNullable)
+                                .notFailingOnMissingAuthentication())
+                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("Request is not authenticated");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void optionalAuthenticationInformationEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/<user>", SingleStringParameterUseCase.class, mappingOptionalAuthenticationInformation("parameter"))
+                        .configured(toAuthenticateUsingPathParameter("user", Optional::ofNullable))
+                        .build()
+        )
+                .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void whenAuthenticationInformationIsMissingTheRequestIsNotAbortedForOptionalAuthenticationInformation(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", SingleStringParameterUseCase.class, mappingOptionalAuthenticationInformation("parameter"))
+                        .configured(toAuthenticateUsingQueryParameter("user", Optional::ofNullable)
+                                .notFailingOnMissingAuthentication())
+                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("parameter must not be null");
     }
 }

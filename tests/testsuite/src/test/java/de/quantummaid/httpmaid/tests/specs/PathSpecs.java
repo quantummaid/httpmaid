@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.specs;
 
+import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
+import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -63,5 +65,30 @@ public final class PathSpecs {
         )
                 .when().aRequestToThePath("/aaa/bbb/ccc").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("handler has been called");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void multipleWildcardsMatchIfThePathHasTheIntermediateElements(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/*/a/*/b/*/c", (request, response) -> response.setBody("handler has been called"))
+                        .build()
+        )
+                .when().aRequestToThePath("/x/x/x/a/y/y/y/b/z/z/z/c").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("handler has been called");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void multipleWildcardsMatchNotIfThePathDoesNotHaveTheIntermediateElements(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/*/a/*/b/*/c", (request, response) -> response.setBody("handler has been called"))
+                        .configured(ExceptionConfigurators.toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> response.setBody("no handler")))
+                        .build()
+        )
+                .when().aRequestToThePath("/x/x/x/a/y/y/y/z/z/z/c").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("no handler");
     }
 }

@@ -21,5 +21,32 @@
 
 package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-public interface AuthenticationInformationEnricher extends Enricher {
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
+import java.util.Optional;
+
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RequiredAuthenticationInformationEnricher implements AuthenticationInformationEnricher {
+    private final String mapKey;
+
+    public static RequiredAuthenticationInformationEnricher requiredAuthenticationInformationEnricher(final String mapKey) {
+        return new RequiredAuthenticationInformationEnricher(mapKey);
+    }
+
+    @Override
+    public String mapKey() {
+        return mapKey;
+    }
+
+    @Override
+    public Optional<?> extractValue(final HttpRequest request) {
+        final Object authenticationInformation = request.authenticationInformation();
+        return Optional.of(authenticationInformation);
+    }
 }

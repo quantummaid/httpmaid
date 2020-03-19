@@ -47,16 +47,26 @@ Requires the request to contain the configured query parameter and will abort th
 
 #### mappingPathParameter()
 Enriches the request map with a path parameter.
-Requires the request to contain the configured path parameter and will abort the request otherwise.
+This configurator is added automatically to any route that contains path parameters.
+
+#### ignorePathParameter()
+Tells MapMaid to not add a default path parameter mapping for the specified path parameter.
 
 #### mappingHeader()
 Enriches the request map with a request header.
-Requires the request to contain the configured header and will abort the request otherwise.
+
+#### mappingCookie()
+Enriches the request map with a request header.
 
 #### mappingAuthenticationInformation()
 Enriches the request map with the authentication information.
 Takes as parameter a `String` that will be used as key.
 Requires the request to be authenticated and will abort the request otherwise.
+
+#### mappingOptionalAuthenticationInformation()
+Enriches the request map with the authentication information.
+Takes as parameter a `String` that will be used as key.
+Does **NOT** require the request to be authenticated and will **NOT** abort the request otherwise.
 
 
 ### Extracting response data
