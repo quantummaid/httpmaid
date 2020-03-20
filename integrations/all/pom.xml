@@ -43,7 +43,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-jackson</artifactId>
-            <version>0.9.23</version>
+            <version>0.9.24</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.examples</groupId>
