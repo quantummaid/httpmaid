@@ -30,12 +30,12 @@ import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
-import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.UseCaseInstantiator;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.events.EventFactory;
 import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
+import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization;
@@ -50,7 +50,6 @@ import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapB
 import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
 import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
 import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromClass;
-import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
@@ -58,6 +57,7 @@ import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
 import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEventFactory.singleParameterEventFactory;
+import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
@@ -69,7 +69,7 @@ public final class UseCasesModule implements ChainModule {
     public static final MetaDataKey<SerializedMessageBus> SERIALIZED_MESSAGE_BUS = metaDataKey("SERIALIZED_MESSAGE_BUS");
 
     private SerializationAndDeserializationProvider serializationAndDeserializationProvider;
-    private UseCaseInstantiator useCaseInstantiator;
+    private UseCaseInstantiator useCaseInstantiator = zeroArgumentsConstructorUseCaseInstantiator();
     private final Map<Class<?>, EventType> useCaseToEventMappings = new HashMap<>();
     private final List<UseCaseMethod> useCaseMethods = new ArrayList<>();
 
@@ -139,11 +139,7 @@ public final class UseCasesModule implements ChainModule {
             });
         });
 
-        if (useCaseInstantiator != null) {
-            lowLevelUseCaseAdapterBuilder.setUseCaseInstantiator(useCaseInstantiator);
-        } else {
-            lowLevelUseCaseAdapterBuilder.setUseCaseInstantiator(zeroArgumentsConstructorUseCaseInstantiator());
-        }
+        lowLevelUseCaseAdapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);
 
         lowLevelUseCaseAdapterBuilder.setRequestSerializers(failingPredicateMap());
         lowLevelUseCaseAdapterBuilder.setRequestDeserializers(failingFilterMap());

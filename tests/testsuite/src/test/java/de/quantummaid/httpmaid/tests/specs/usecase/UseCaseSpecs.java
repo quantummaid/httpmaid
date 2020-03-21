@@ -21,14 +21,13 @@
 
 package de.quantummaid.httpmaid.tests.specs.usecase;
 
-import de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiating.ZeroArgumentsConstructorUseCaseInstantiatorException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.*;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 
@@ -41,40 +40,6 @@ public final class UseCaseSpecs {
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("{}");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void exceptionInInitializerCanBeCaughtInSpecializedHandler(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/", FailInInitializerUseCase.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class, (exception, response) -> {
-                            response.setBody("The correct exception has been thrown");
-                            response.setStatus(505);
-                        }))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> {
-                            response.setBody("The incorrect exception has been thrown");
-                            response.setStatus(501);
-                        }))
-                        .build()
-        )
-                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(505)
-                .theResponseBodyWas("The correct exception has been thrown");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void exceptionInInitializerCanBeCaughtInDefaultHandler(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/", FailInInitializerUseCase.class)
-                        .build()
-        )
-                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(500)
-                .theResponseBodyWas("");
     }
 
     @ParameterizedTest

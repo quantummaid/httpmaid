@@ -19,23 +19,9 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases;
+package de.quantummaid.httpmaid.usecases.instantiation;
 
-import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+public interface UseCaseInstantiator {
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-
-public final class UseCaseConfigurators {
-
-    private UseCaseConfigurators() {
-    }
-
-    public static Configurator toCreateUseCaseInstancesUsing(final UseCaseInstantiator useCaseInstantiator) {
-        validateNotNull(useCaseInstantiator, "useCaseInstantiator");
-        return dependencyRegistry -> {
-            final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-            useCasesModule.setUseCaseInstantiator(useCaseInstantiator);
-        };
-    }
+    <T> T instantiate(Class<T> type);
 }

@@ -23,10 +23,12 @@ package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.*;
+import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
 
 public final class SpecialUseCaseSpecs {
 
@@ -39,7 +41,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Use case classes must have exactly one public instance method.");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case classes must have exactly one public instance (non-static) method.");
     }
 
     @ParameterizedTest
@@ -51,7 +53,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Use case classes must have exactly one public instance method.");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case classes must have exactly one public instance (non-static) method.");
     }
 
     @ParameterizedTest
@@ -214,24 +216,38 @@ public final class SpecialUseCaseSpecs {
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void useCaseThatIsAnInterface(final TestEnvironment testEnvironment) {
         testEnvironment.given(
-                () -> anHttpMaid()
+                anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
+                        .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
+                            @SuppressWarnings("unchecked")
+                            @Override
+                            public <T> T instantiate(final Class<T> type) {
+                                return (T) new UseCaseThatIsAnInterface() {};
+                            }
+                        }))
                         .build()
         )
-                .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an interface but got 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface'");
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"method\"");
     }
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void useCaseThatIsAnAbstractClass(final TestEnvironment testEnvironment) {
         testEnvironment.given(
-                () -> anHttpMaid()
+                anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
+                        .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
+                            @SuppressWarnings("unchecked")
+                            @Override
+                            public <T> T instantiate(final Class<T> type) {
+                                return (T) new UseCaseThatIsAnAbstractClass() {};
+                            }
+                        }))
                         .build()
         )
-                .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an abstract class but got 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass'");
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"method1\"");
     }
 
     @ParameterizedTest
@@ -257,7 +273,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an anonymous class but got 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.SpecialUseCaseSpecs$1'");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an anonymous class but got 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.SpecialUseCaseSpecs$");
     }
 
     @ParameterizedTest
@@ -283,6 +299,8 @@ public final class SpecialUseCaseSpecs {
                 .when().httpMaidIsInitialized()
                 .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an inner class but got 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInnerClass$StaticInnerClass'");
     }
+
+    // isMemberClass
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)

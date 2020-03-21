@@ -126,7 +126,7 @@ public final class UseCaseMethod {
         if (useCaseMethods.size() == 1) {
             return useCaseMethods.get(0);
         } else {
-            final String message = format("Use case classes must have exactly one public instance method. Found the methods %s " +
+            final String message = format("use case classes must have exactly one public instance (non-static) method. Found the methods %s " +
                             "for class %s",
                     useCaseMethods, useCaseClass);
             throw new IllegalArgumentException(message);
@@ -151,8 +151,6 @@ public final class UseCaseMethod {
         validateNotPrimitiveClass(useCase);
         validateNotArrayClass(useCase);
         validateNotAnnotationClass(useCase);
-        validateNotInterface(useCase);
-        validateNotAbstractClass(useCase);
         validateNotEnumClass(useCase);
         validateNotInnerClass(useCase);
         validateNoClassScopedTypeVariables(useCase);
@@ -191,18 +189,6 @@ public final class UseCaseMethod {
     private static void validateNotAnnotationClass(final Class<?> useCase) {
         if (useCase.isAnnotation()) {
             throw new IllegalArgumentException(format("use case must not be an annotation but got '%s'", useCase.getName()));
-        }
-    }
-
-    private static void validateNotInterface(final Class<?> useCase) {
-        if (useCase.isInterface()) {
-            throw new IllegalArgumentException(format("use case must not be an interface but got '%s'", useCase.getName()));
-        }
-    }
-
-    private static void validateNotAbstractClass(final Class<?> useCase) {
-        if (isAbstract(useCase.getModifiers())) {
-            throw new IllegalArgumentException(format("use case must not be an abstract class but got '%s'", useCase.getName()));
         }
     }
 
