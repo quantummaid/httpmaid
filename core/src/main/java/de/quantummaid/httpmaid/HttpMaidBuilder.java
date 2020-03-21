@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.generator.builder.ConditionStage;
 import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
+import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
+import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.time.Duration.between;
 import static java.util.Arrays.asList;
@@ -47,6 +49,7 @@ import static java.util.Arrays.asList;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidBuilder {
     private boolean autodetectionOfModules = true;
+    private boolean startupChecks = true;
     private final CoreModule coreModule;
     private final List<Configurator> configurators;
 
@@ -56,6 +59,11 @@ public final class HttpMaidBuilder {
 
     public HttpMaidBuilder disableAutodectectionOfModules() {
         autodetectionOfModules = false;
+        return this;
+    }
+
+    public HttpMaidBuilder disableStartupChecks() {
+        startupChecks = false;
         return this;
     }
 
@@ -157,6 +165,10 @@ public final class HttpMaidBuilder {
         final HttpMaid httpMaid = HttpMaid.httpMaid(chainRegistry);
         final Instant end = Instant.now();
         final Duration startUpTime = between(begin, end);
+        if (startupChecks) {
+            final StartupChecks startupChecks = chainRegistry.getMetaDatum(STARTUP_CHECKS);
+            startupChecks.check();
+        }
         chainRegistry.addMetaDatum(STARTUP_TIME, startUpTime);
         return httpMaid;
     }

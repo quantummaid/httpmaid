@@ -51,6 +51,7 @@ import de.quantummaid.httpmaid.processors.MapExceptionProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ApplyResponseTemplateProcessor;
 import de.quantummaid.httpmaid.responsetemplate.InitResponseProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ResponseTemplate;
+import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,8 @@ import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.h
 import static de.quantummaid.httpmaid.processors.StreamToStringProcessor.streamToStringProcessor;
 import static de.quantummaid.httpmaid.processors.StringBodyToStreamProcessor.stringBodyToStreamProcessor;
 import static de.quantummaid.httpmaid.processors.TranslateToValueObjectsProcessor.translateToValueObjectsProcessor;
+import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
+import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.emptyList;
 
@@ -127,6 +130,8 @@ public final class CoreModule implements ChainModule {
 
     @Override
     public void init(final MetaData configurationMetaData) {
+        final StartupChecks startupChecks = startupChecks();
+        configurationMetaData.set(STARTUP_CHECKS, startupChecks);
         final HandlerDistributors handlerDistributers = handlerDistributors();
         configurationMetaData.set(HANDLER_DISTRIBUTORS, handlerDistributers);
         handlerDistributers.register(handler -> handler.handler() instanceof Handler, handler -> {

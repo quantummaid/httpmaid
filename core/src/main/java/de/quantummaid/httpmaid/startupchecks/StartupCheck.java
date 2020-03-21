@@ -19,13 +19,9 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.instantiation;
+package de.quantummaid.httpmaid.startupchecks;
 
-public interface UseCaseInstantiator {
+public interface StartupCheck {
 
-    <T> T instantiate(Class<T> type);
-
-    default void check(final Class<?> type) {
-        instantiate(type);
-    }
+    void check();
 }

@@ -35,6 +35,7 @@ import de.quantummaid.httpmaid.events.EventFactory;
 import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
+import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
@@ -55,6 +56,7 @@ import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
+import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
 import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEventFactory.singleParameterEventFactory;
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
@@ -126,6 +128,7 @@ public final class UseCasesModule implements ChainModule {
         final LowLevelUseCaseAdapterBuilder lowLevelUseCaseAdapterBuilder = LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods);
 
+        final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
         useCaseMethods.forEach(useCaseMethod -> {
             final Class<?> useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
@@ -137,6 +140,7 @@ public final class UseCasesModule implements ChainModule {
                         .map(serializationAndDeserialization::serializeReturnValue)
                         .orElse(null);
             });
+            startupChecks.addStartupCheck(() -> useCaseInstantiator.check(useCaseClass));
         });
 
         lowLevelUseCaseAdapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);

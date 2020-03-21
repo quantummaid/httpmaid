@@ -37,6 +37,18 @@ public final class InstantiationSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void exceptionInInitializerIsThrownOnStartup(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/", FailInInitializerUseCase.class)
+                        .build()
+        )
+                .when().httpMaidIsInitialized()
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.usecases.FailInInitializerUseCase using zero argument constructor");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void exceptionInInitializerCanBeCaughtInSpecializedHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -49,6 +61,7 @@ public final class InstantiationSpecs {
                             response.setBody("The incorrect exception has been thrown");
                             response.setStatus(501);
                         }))
+                        .disableStartupChecks()
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -62,6 +75,7 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", FailInInitializerUseCase.class)
+                        .disableStartupChecks()
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -77,6 +91,7 @@ public final class InstantiationSpecs {
                         .get("/", UseCaseThatIsAnInterface.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
                                 (exception, response) -> response.setBody(exception.getMessage())))
+                        .disableStartupChecks()
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -86,16 +101,47 @@ public final class InstantiationSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void useCaseThatIsAnAbstractClass(final TestEnvironment testEnvironment) {
+    public void defaultInstantiatorFailsForInterfacesOnStartup(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/", UseCaseThatIsAnInterface.class)
+                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
+                                (exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().httpMaidIsInitialized()
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface using zero argument constructor: " +
+                        "must not be an interface");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void defaultInstantiatorFailsForAbstractClassOnRuntime(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
                                 (exception, response) -> response.setBody(exception.getMessage())))
+                        .disableStartupChecks()
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass using zero argument constructor: " +
+                        "must not be an abstract class");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void defaultInstantiatorFailsForAbstractClassOnStartup(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/", UseCaseThatIsAnAbstractClass.class)
+                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
+                                (exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().httpMaidIsInitialized()
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass using zero argument constructor: " +
                         "must not be an abstract class");
     }
 }
