@@ -300,8 +300,6 @@ public final class SpecialUseCaseSpecs {
                 .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an inner class but got 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInnerClass$StaticInnerClass'");
     }
 
-    // isMemberClass
-
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void useCaseThatIsALocalClass(final TestEnvironment testEnvironment) {
