@@ -26,13 +26,17 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>httpmaid-parent</artifactId>
-        <version>0.9.31</version>
+        <version>0.9.32</version>
     </parent>
 
     <artifactId>httpmaid-bom</artifactId>
     <packaging>pom</packaging>
 
     <name>HttpMaid - BOM</name>
+
+    <properties>
+        <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
+    </properties>
 
     <dependencyManagement>
         <dependencies>

@@ -30,7 +30,7 @@
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.31</version>
+    <version>0.9.32</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
@@ -85,7 +85,7 @@
 
     <properties>
         <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
-        <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
+        <plugin-update-file-checksum>915baffd77985e9da0d3cfee67e149eb</plugin-update-file-checksum>
     </properties>
 
     <dependencyManagement>
@@ -107,6 +107,27 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>de.quantummaid</groupId>
+                <artifactId>documaid</artifactId>
+                <version>0.9.12</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>

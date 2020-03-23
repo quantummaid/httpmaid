@@ -61,13 +61,16 @@ Enriches the request map with a request header.
 #### mappingAuthenticationInformation()
 Enriches the request map with the authentication information.
 Takes as parameter a `String` that will be used as key.
+The authentication information can be any object you choose to set during authentication.
+It does not need to be a `String`.
 Requires the request to be authenticated and will abort the request otherwise.
 
 #### mappingOptionalAuthenticationInformation()
 Enriches the request map with the authentication information.
 Takes as parameter a `String` that will be used as key.
+The authentication information can be any object you choose to set during authentication.
+It does not need to be a `String`.
 Does **NOT** require the request to be authenticated and will **NOT** abort the request otherwise.
-
 
 ### Extracting response data
 Now let's consider the opposite direction, where the returned domain object
@@ -145,6 +148,19 @@ final HttpMaid httpMaid = anHttpMaid()
         .build();
 ```
 
+### Start-Up Checks
+HttpMaid will attempt to instantiate all use cases on start-up time to make sure that
+all use cases can be instantiated. If you do not want this check to occur, you can disable
+it like this:
+<!---[CodeSnippet] (disableStartupChecksExample)-->
+```java
+final HttpMaid httpMaid = anHttpMaid()
+        /*...*/
+        .configured(toCreateUseCaseInstancesUsing(injector))
+        .disableStartupChecks()
+        .build();
+```
+ 
 
 <!---[Nav]-->
 [&larr;](3_Validation.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../13_CORS.md)

@@ -22,13 +22,16 @@
 package de.quantummaid.httpmaid.tests.specs.aaa;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.specs.aaa.domain.AuthenticatedUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingAuthenticationInformation;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.*;
+import static de.quantummaid.httpmaid.tests.specs.aaa.domain.User.user;
 import static java.util.Optional.of;
 
 public final class AuthenticationSpecs {
@@ -159,5 +162,18 @@ public final class AuthenticationSpecs {
         )
                 .when().aRequestToThePath("/username").viaTheGetMethod().withAnEmptyBody().withTheHeader("username", "asdf").isIssued()
                 .theResponseBodyWas("guest");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void authenticationCanBeADomainObject(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", AuthenticatedUseCase.class, mappingAuthenticationInformation("user"))
+                        .configured(toAuthenticateUsingHeader("user", challenge -> Optional.of(user(challenge))))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("user", "foo").isIssued()
+                .theResponseBodyWas("\"authenticated as foo\"");
     }
 }

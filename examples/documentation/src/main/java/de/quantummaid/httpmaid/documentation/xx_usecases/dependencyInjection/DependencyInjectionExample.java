@@ -32,7 +32,6 @@ import static de.quantummaid.eventmaid.useCases.useCaseAdapter.usecaseInstantiat
 
 public final class DependencyInjectionExample {
 
-    @SuppressWarnings("unchecked")
     public static void main(final String[] args) {
         final UseCaseInstantiator injector = zeroArgumentsConstructorUseCaseInstantiator();
 

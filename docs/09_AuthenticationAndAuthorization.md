@@ -296,7 +296,7 @@ Any time you get access to a `HttpRequest` object, you can query the authenticat
 Additionally, the object offers a `authenticationInformationAs()` method which allows you to receive the authentication
 method in a typesafe manner so you do not have to deal with plain `Object`s.
 If you are working with use cases, you can map authentication information into the request's body map that
- will be used to map use case parameters (see the corresponding chapter).
+will be used to map use case parameters (see the corresponding chapter).
 
 ## Additional configurator methods
 The `SecurityConfigurators` class contains configurator methods that work with a lot of different request features.
