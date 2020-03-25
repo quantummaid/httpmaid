@@ -19,22 +19,20 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-import de.quantummaid.mapmaid.MapMaid;
-import de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
+import de.quantummaid.httpmaid.events.Event;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
-public final class ZeroParametersDeserializationWrapper implements MethodParameterDeserializationWrapper {
+public interface TypeEnricher extends Enricher {
 
-    public static MethodParameterDeserializationWrapper zeroParameters() {
-        return new de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.ZeroParametersDeserializationWrapper();
-    }
+    Optional<?> extractValue(HttpRequest request);
 
     @Override
-    public Map<String, Object> deserializeParameters(final Object input, final MapMaid mapMaid) {
-        return new HashMap<>(0);
+    default void enrich(final HttpRequest httpRequest, final Event event) {
+        extractValue(httpRequest)
+                .ifPresent(event::addTypeInjection);
     }
 }

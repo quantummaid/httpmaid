@@ -31,6 +31,7 @@ import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
 import de.quantummaid.httpmaid.chains.*;
+import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.events.EventFactory;
 import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
@@ -52,6 +53,7 @@ import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapB
 import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
 import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
 import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromClass;
+import static de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
@@ -127,7 +129,7 @@ public final class UseCasesModule implements ChainModule {
 
     @Override
     public void register(final ChainExtender extender) {
-        final LowLevelUseCaseAdapterBuilder lowLevelUseCaseAdapterBuilder = LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder();
+        final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods);
 
         final List<Class<?>> useCaseClasses = useCaseMethods.stream()
@@ -140,7 +142,8 @@ public final class UseCasesModule implements ChainModule {
             final Class<?> useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
 
-            lowLevelUseCaseAdapterBuilder.addUseCase(useCaseClass, eventType, (useCase, event, callingContext) -> {
+            adapterBuilder.addUseCase(useCaseClass, eventType, (useCase, untypedEvent, callingContext) -> {
+                final Event event = (Event) untypedEvent;
                 final Map<String, Object> parameters = serializationAndDeserialization.deserializeParameters(event, useCaseClass);
                 final Optional<Object> returnValue = useCaseMethod.invoke(useCase, parameters, event);
                 return returnValue
@@ -150,21 +153,26 @@ public final class UseCasesModule implements ChainModule {
             startupChecks.addStartupCheck(() -> useCaseInstantiator.check(useCaseClass));
         });
 
-        lowLevelUseCaseAdapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);
+        adapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);
 
-        lowLevelUseCaseAdapterBuilder.setRequestSerializers(failingPredicateMap());
-        lowLevelUseCaseAdapterBuilder.setRequestDeserializers(failingFilterMap());
-        lowLevelUseCaseAdapterBuilder.setReseponseSerializers(failingPredicateMap());
-        lowLevelUseCaseAdapterBuilder.setResponseDeserializers(failingFilterMap());
         final PredicateMapBuilder<Exception, Mapifier<Exception>> exceptionSerializers = predicateMapBuilder();
         exceptionSerializers.setDefaultValue(defaultExceptionMapifier());
-        lowLevelUseCaseAdapterBuilder.setExceptionSerializers(exceptionSerializers);
+        adapterBuilder.setExceptionSerializers(exceptionSerializers);
 
-        final UseCaseAdapter useCaseAdapter = lowLevelUseCaseAdapterBuilder.build();
+        final UseCaseAdapter useCaseAdapter = adapterBuilder.build();
         final MessageBus messageBus = extender.getMetaDatum(MESSAGE_BUS);
 
         final SerializedMessageBus serializedMessageBus = useCaseAdapter.attachAndEnhance(messageBus);
         extender.addMetaDatum(SERIALIZED_MESSAGE_BUS, serializedMessageBus);
+    }
+
+    private static LowLevelUseCaseAdapterBuilder createAdapterBuilder() {
+        final LowLevelUseCaseAdapterBuilder adapterBuilder = aLowLevelUseCaseInvocationBuilder();
+        adapterBuilder.setRequestSerializers(failingPredicateMap());
+        adapterBuilder.setRequestDeserializers(failingFilterMap());
+        adapterBuilder.setReseponseSerializers(failingPredicateMap());
+        adapterBuilder.setResponseDeserializers(failingFilterMap());
+        return adapterBuilder;
     }
 
     private static FilterMapBuilder<Class<?>, Object, Demapifier<?>> failingFilterMap() {

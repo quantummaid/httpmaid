@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.events.enriching;
 
-import de.quantummaid.httpmaid.events.enriching.enrichers.Enricher;
+import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.events.enriching.enrichers.*;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import lombok.AccessLevel;
@@ -41,7 +41,7 @@ public final class PerEventEnrichers {
     private final List<QueryParameterEnricher> queryParameterEnrichers = new ArrayList<>();
     private final List<HeaderEnricher> headerEnrichers = new ArrayList<>();
     private final List<CookieEnricher> cookieEnrichers = new ArrayList<>();
-    private final List<AuthenticationInformationEnricher> authenticationInformationEnrichers = new ArrayList<>();
+    private final List<Enricher> authenticationInformationEnrichers = new ArrayList<>();
 
     public static PerEventEnrichers perEventEnrichers() {
         return new PerEventEnrichers();
@@ -67,22 +67,16 @@ public final class PerEventEnrichers {
         cookieEnrichers.add(enricher);
     }
 
-    public void addAuthenticationInformationEnricher(final AuthenticationInformationEnricher enricher) {
-        authenticationInformationEnrichers.add(enricher);
+    public void addAuthenticationInformationEnricher(final Enricher enricher) {
+        this.authenticationInformationEnrichers.add(enricher);
     }
 
-    public void enrich(final HttpRequest httpRequest, final EnrichableMap event) {
+    public void enrich(final HttpRequest httpRequest, final Event event) {
         pathParameterEnrichers.removeAll(removedPathParameterEnrichers);
-        pathParameterEnrichers.forEach(enricher -> enrich(enricher, httpRequest, event));
-        queryParameterEnrichers.forEach(enricher -> enrich(enricher, httpRequest, event));
-        headerEnrichers.forEach(enricher -> enrich(enricher, httpRequest, event));
-        cookieEnrichers.forEach(enricher -> enrich(enricher, httpRequest, event));
-        authenticationInformationEnrichers.forEach(enricher -> enrich(enricher, httpRequest, event));
-    }
-
-    private void enrich(final Enricher enricher, final HttpRequest httpRequest, final EnrichableMap event) {
-        final String mapKey = enricher.mapKey();
-        enricher.extractValue(httpRequest)
-                .ifPresent(value -> event.enrichEitherTopOrSecondLevel(mapKey, value));
+        pathParameterEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
+        queryParameterEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
+        headerEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
+        cookieEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
+        authenticationInformationEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
     }
 }

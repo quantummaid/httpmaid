@@ -21,12 +21,9 @@
 
 package de.quantummaid.httpmaid.events.enriching.enrichers;
 
+import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
-import java.util.Optional;
-
 public interface Enricher {
-    String mapKey();
-
-    Optional<?> extractValue(HttpRequest request);
+    void enrich(HttpRequest httpRequest, Event event);
 }

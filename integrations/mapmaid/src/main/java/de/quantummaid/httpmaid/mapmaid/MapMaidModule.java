@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
 import de.quantummaid.httpmaid.http.headers.ContentType;
+import de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.httpmaid.marshalling.MarshallingModule;
 import de.quantummaid.httpmaid.usecases.UseCasesModule;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
@@ -33,7 +34,6 @@ import de.quantummaid.httpmaid.usecases.serializing.UseCaseParamaterProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseReturnValueSerializer;
 import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
-import de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
 import de.quantummaid.mapmaid.mapper.marshalling.MarshallingType;
 import lombok.AccessLevel;
@@ -107,7 +107,11 @@ public final class MapMaidModule implements ChainModule {
 
             final Map<Class<?>, UseCaseParamaterProvider> parameterProviders = new HashMap<>();
             deserializationWrappers.forEach((type, wrapper) ->
-                    parameterProviders.put(type, event -> wrapper.deserializeParameters(event, mapMaid)));
+                    parameterProviders.put(type, event -> {
+                        final Map<String, Object> map = event.asMap();
+                        final List<Object> typeInjections = event.typeInjections();
+                        return wrapper.deserializeParameters(map, typeInjections, mapMaid);
+                    }));
 
             final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
             mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
@@ -118,19 +122,23 @@ public final class MapMaidModule implements ChainModule {
         useCasesModule.setSerializationAndDeserializationProvider(serializationAndDeserializationProvider);
 
         if (addAggregatedExceptionHandler) {
-            final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
-            coreModule.addExceptionMapper(throwable -> throwable instanceof AggregatedValidationException,
-                    (exception, metaData) -> {
-                        final AggregatedValidationException aggregatedException = (AggregatedValidationException) exception;
-                        final List<Object> errorsList = aggregatedException.getValidationErrors()
-                                .stream()
-                                .map(validationError -> Map.of(
-                                        "message", validationError.message,
-                                        "path", validationError.propertyPath))
-                                .collect(toList());
-                        metaData.set(RESPONSE_BODY_OBJECT, Map.of("errors", errorsList));
-                    });
+            addExceptionHandler(dependencyRegistry);
         }
+    }
+
+    private static void addExceptionHandler(final DependencyRegistry dependencyRegistry) {
+        final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
+        coreModule.addExceptionMapper(throwable -> throwable instanceof AggregatedValidationException,
+                (exception, metaData) -> {
+                    final AggregatedValidationException aggregatedException = (AggregatedValidationException) exception;
+                    final List<Object> errorsList = aggregatedException.getValidationErrors()
+                            .stream()
+                            .map(validationError -> Map.of(
+                                    "message", validationError.message,
+                                    "path", validationError.propertyPath))
+                            .collect(toList());
+                    metaData.set(RESPONSE_BODY_OBJECT, Map.of("errors", errorsList));
+                });
     }
 
     @Override

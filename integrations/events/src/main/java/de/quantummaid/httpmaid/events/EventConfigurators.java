@@ -27,7 +27,9 @@ import de.quantummaid.httpmaid.PerRouteConfigurator;
 import de.quantummaid.httpmaid.chains.Configurator;
 import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
 import de.quantummaid.httpmaid.events.enriching.enrichers.*;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
@@ -114,8 +116,21 @@ public final class EventConfigurators {
         return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
     }
 
+    public static PerRouteConfigurator mappingAuthenticationInformation() {
+        final TypeEnricher enricher = request -> {
+            final Object authenticationInformation = request.authenticationInformation();
+            return Optional.of(authenticationInformation);
+        };
+        return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
+    }
+
     public static PerRouteConfigurator mappingOptionalAuthenticationInformation(final String key) {
         final OptionalAuthenticationInformationEnricher enricher = optionalAuthenticationInformationEnricher(key);
+        return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
+    }
+
+    public static PerRouteConfigurator mappingOptionalAuthenticationInformation() {
+        final TypeEnricher enricher = HttpRequest::optionalAuthenticationInformation;
         return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
     }
 

@@ -32,7 +32,7 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PathParameterEnricher implements Enricher {
+public final class PathParameterEnricher implements TopEnricher {
     private final String parameterName;
     private final String mapKey;
 

@@ -19,32 +19,46 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers;
+package de.quantummaid.httpmaid.events;
 
-import de.quantummaid.mapmaid.MapMaid;
-import de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
-import de.quantummaid.mapmaid.shared.types.ResolvedType;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.Collections.unmodifiableList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SingleParameterDeserializationWrapper implements MethodParameterDeserializationWrapper {
-    private final String name;
-    private final ResolvedType type;
+public final class Event {
+    private final EnrichableMap map;
+    private final List<Object> typeInjections;
 
-    public static MethodParameterDeserializationWrapper singleParameter(final String name, final ResolvedType type) {
-        return new SingleParameterDeserializationWrapper(name, type);
+    public static Event event(final EnrichableMap map) {
+        return new Event(map, new ArrayList<>());
     }
 
-    @Override
-    public Map<String, Object> deserializeParameters(final Object input, final MapMaid mapMaid) {
-        final Object value = mapMaid.deserializer().deserializeFromUniversalObject(input, this.type);
-        return Map.of(this.name, value);
+    public void enrich(final String key, final Object value) {
+        map.enrichEitherTopOrSecondLevel(key, value);
+    }
+
+    public void addTypeInjection(final Object injection) {
+        validateNotNull(injection, "injection");
+        this.typeInjections.add(injection);
+    }
+
+    public Map<String, Object> asMap() {
+        return map.asMap();
+    }
+
+    public List<Object> typeInjections() {
+        return unmodifiableList(typeInjections);
     }
 }

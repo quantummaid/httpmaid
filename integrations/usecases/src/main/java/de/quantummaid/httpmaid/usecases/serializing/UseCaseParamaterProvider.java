@@ -21,8 +21,10 @@
 
 package de.quantummaid.httpmaid.usecases.serializing;
 
+import de.quantummaid.httpmaid.events.Event;
+
 import java.util.Map;
 
 public interface UseCaseParamaterProvider {
-    Map<String, Object> provideParameters(Object event);
+    Map<String, Object> provideParameters(Event event);
 }

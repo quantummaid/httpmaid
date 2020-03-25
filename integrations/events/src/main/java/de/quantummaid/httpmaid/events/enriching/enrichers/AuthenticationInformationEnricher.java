@@ -21,5 +21,5 @@
 
 package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-public interface AuthenticationInformationEnricher extends Enricher {
+public interface AuthenticationInformationEnricher extends TopEnricher {
 }

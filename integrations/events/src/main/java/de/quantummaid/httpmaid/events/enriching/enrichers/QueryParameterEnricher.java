@@ -32,7 +32,7 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class QueryParameterEnricher implements Enricher {
+public class QueryParameterEnricher implements TopEnricher {
     private final String parameterName;
     private final String mapKey;
 

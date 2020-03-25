@@ -32,7 +32,7 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HeaderEnricher implements Enricher {
+public final class HeaderEnricher implements TopEnricher {
     private final String headerName;
     private final String mapKey;
 

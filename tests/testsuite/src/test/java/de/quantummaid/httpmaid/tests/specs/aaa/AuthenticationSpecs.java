@@ -169,7 +169,7 @@ public final class AuthenticationSpecs {
     public void authenticationCanBeADomainObject(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
-                        .get("/", AuthenticatedUseCase.class, mappingAuthenticationInformation("user"))
+                        .get("/", AuthenticatedUseCase.class, mappingAuthenticationInformation())
                         .configured(toAuthenticateUsingHeader("user", challenge -> Optional.of(user(challenge))))
                         .build()
         )

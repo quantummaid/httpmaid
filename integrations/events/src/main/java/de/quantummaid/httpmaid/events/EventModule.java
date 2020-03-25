@@ -53,6 +53,7 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.events.Event.event;
 import static de.quantummaid.httpmaid.events.EventsChains.MAP_REQUEST_TO_EVENT;
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEventEnrichers;
@@ -74,7 +75,7 @@ public final class EventModule implements ChainModule {
     public static final MetaDataKey<MessageBus> MESSAGE_BUS = metaDataKey("MESSAGE_BUS");
     public static final MetaDataKey<Boolean> IS_EXTERNAL_EVENT = metaDataKey("IS_EXTERNAL_EVENT");
     public static final MetaDataKey<EventType> EVENT_TYPE = metaDataKey("EVENT_TYPE");
-    public static final MetaDataKey<EnrichableMap> EVENT = metaDataKey("EVENT");
+    public static final MetaDataKey<Event> EVENT = metaDataKey("EVENT");
     public static final MetaDataKey<Optional<Object>> RECEIVED_EVENT = metaDataKey("RECEIVED_EVENT");
 
     private static final int DEFAULT_POOL_SIZE = 4;
@@ -174,7 +175,8 @@ public final class EventModule implements ChainModule {
             final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(null);
             final EventType eventType = metaData.get(EVENT_TYPE);
             final EventFactory eventFactory = eventFactories.get(eventType);
-            final EnrichableMap event = eventFactory.createEvent(unmarshalled);
+            final EnrichableMap map = eventFactory.createEvent(unmarshalled);
+            final Event event = event(map);
             metaData.set(EVENT, event);
         });
         extender.appendProcessor(MAP_REQUEST_TO_EVENT, enrichersProcessor(enrichers));

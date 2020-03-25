@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 @ToString
@@ -36,12 +37,18 @@ import java.util.Map;
 public final class MultipleParametersDeserializationWrapper implements MethodParameterDeserializationWrapper {
     private final TypeIdentifier typeIdentifier;
 
-    public static MethodParameterDeserializationWrapper multipleParamters(final TypeIdentifier typeIdentifier) {
+    public static MethodParameterDeserializationWrapper multipleParameters(final TypeIdentifier typeIdentifier) {
         return new MultipleParametersDeserializationWrapper(typeIdentifier);
     }
 
     @Override
-    public Map<String, Object> deserializeParameters(final Map<String, Object> input, final MapMaid mapMaid) {
-        return mapMaid.deserializer().deserializeFromUniversalObject(input, this.typeIdentifier);
+    public Map<String, Object> deserializeParameters(final Map<String, Object> input,
+                                                     final List<Object> typeInjections,
+                                                     final MapMaid mapMaid) {
+        return mapMaid.deserializer().deserializeFromUniversalObject(
+                input,
+                this.typeIdentifier,
+                injector -> typeInjections.forEach(injector::put)
+        );
     }
 }

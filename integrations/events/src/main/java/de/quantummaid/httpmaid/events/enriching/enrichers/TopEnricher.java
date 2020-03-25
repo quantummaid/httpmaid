@@ -19,24 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events;
+package de.quantummaid.httpmaid.events.enriching.enrichers;
 
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
+import java.util.Optional;
 
-public interface RequestMapEnricher extends Processor {
+public interface TopEnricher extends Enricher {
+    String mapKey();
+
+    Optional<?> extractValue(HttpRequest request);
 
     @Override
-    default void apply(final MetaData metaData) {
-        final EnrichableMap event = metaData.get(EVENT);
-        final HttpRequest httpRequest = httpRequest(metaData);
-        enrich(event, httpRequest);
+    default void enrich(final HttpRequest httpRequest, final Event event) {
+        final String mapKey = mapKey();
+        extractValue(httpRequest)
+                .ifPresent(value -> event.enrich(mapKey, value));
     }
-
-    void enrich(EnrichableMap map, HttpRequest request);
 }

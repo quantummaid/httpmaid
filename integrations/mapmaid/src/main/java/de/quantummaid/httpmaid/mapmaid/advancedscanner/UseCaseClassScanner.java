@@ -21,11 +21,11 @@
 
 package de.quantummaid.httpmaid.mapmaid.advancedscanner;
 
+import de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.mapmaid.builder.GenericType;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
 import de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType;
-import de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.mapmaid.mapper.deserialization.deserializers.TypeDeserializer;
 import de.quantummaid.mapmaid.shared.identifier.TypeIdentifier;
 import de.quantummaid.mapmaid.shared.types.ResolvedType;
@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.VirtualDeserializer.virtualDeserializerFor;
+import static de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MultipleParametersDeserializationWrapper.multipleParameters;
 import static de.quantummaid.mapmaid.builder.GenericType.genericType;
 import static de.quantummaid.mapmaid.builder.RequiredCapabilities.deserialization;
 import static de.quantummaid.mapmaid.builder.RequiredCapabilities.serialization;
 import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
-import static de.quantummaid.mapmaid.builder.recipes.advancedscanner.deserialization_wrappers.MultipleParametersDeserializationWrapper.multipleParamters;
 import static de.quantummaid.mapmaid.shared.identifier.VirtualTypeIdentifier.uniqueVirtualTypeIdentifier;
 import static de.quantummaid.mapmaid.shared.validators.NotNullValidator.validateNotNull;
 import static java.lang.String.format;
@@ -80,7 +80,7 @@ public final class UseCaseClassScanner {
 
         final DeserializationOnlyType<?> virtualType = createVirtualObjectFor(method.describe(), parameters);
         builder.deserializing(virtualType);
-        return multipleParamters(virtualType.type());
+        return multipleParameters(virtualType.type());
     }
 
     private static DeserializationOnlyType<?> createVirtualObjectFor(final String method, final Map<String, Class<?>> parameters) {

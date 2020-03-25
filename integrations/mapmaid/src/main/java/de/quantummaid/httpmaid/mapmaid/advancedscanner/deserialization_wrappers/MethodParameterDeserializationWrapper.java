@@ -23,8 +23,9 @@ package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers
 
 import de.quantummaid.mapmaid.MapMaid;
 
+import java.util.List;
 import java.util.Map;
 
 public interface MethodParameterDeserializationWrapper {
-    Map<String, Object> deserializeParameters(Map<String, Object> input, MapMaid mapMaid);
+    Map<String, Object> deserializeParameters(Map<String, Object> input, List<Object> typeInjections, MapMaid mapMaid);
 }

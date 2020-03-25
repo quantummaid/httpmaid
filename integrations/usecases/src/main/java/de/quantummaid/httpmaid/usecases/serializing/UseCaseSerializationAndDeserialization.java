@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.usecases.serializing;
 
+import de.quantummaid.httpmaid.events.Event;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public final class UseCaseSerializationAndDeserialization {
         return returnValueSerializer;
     }
 
-    public Map<String, Object> deserializeParameters(final Object event, final Class<?> useCaseClass) {
+    public Map<String, Object> deserializeParameters(final Event event, final Class<?> useCaseClass) {
         final UseCaseParamaterProvider useCaseParamaterProvider = parameterProviders.get(useCaseClass);
         return useCaseParamaterProvider.provideParameters(event);
     }

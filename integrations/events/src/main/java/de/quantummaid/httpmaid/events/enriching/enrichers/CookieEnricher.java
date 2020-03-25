@@ -32,7 +32,7 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CookieEnricher implements Enricher {
+public final class CookieEnricher implements TopEnricher {
     private final String cookieName;
     private final String mapKey;
 

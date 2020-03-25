@@ -21,14 +21,14 @@
 
 package de.quantummaid.httpmaid.events.processors;
 
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.eventmaid.messageBus.MessageBus;
 import de.quantummaid.eventmaid.messageFunction.MessageFunction;
 import de.quantummaid.eventmaid.messageFunction.ResponseFuture;
 import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.eventmaid.processingContext.ProcessingContext;
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.events.Event;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +37,9 @@ import lombok.ToString;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import static de.quantummaid.eventmaid.messageFunction.MessageFunctionBuilder.aMessageFunction;
 import static de.quantummaid.httpmaid.events.EventModule.*;
 import static de.quantummaid.httpmaid.events.processors.EventDispatchingException.eventDispatchingException;
-import static de.quantummaid.eventmaid.messageFunction.MessageFunctionBuilder.aMessageFunction;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
 
@@ -58,8 +58,8 @@ public final class DispatchEventProcessor implements Processor {
     @Override
     public void apply(final MetaData metaData) {
         final EventType eventType = metaData.get(EVENT_TYPE);
-        final EnrichableMap event = metaData.get(EVENT);
-        final ResponseFuture request = messageFunction.request(eventType, event.asMap());
+        final Event event = metaData.get(EVENT);
+        final ResponseFuture request = messageFunction.request(eventType, event);
         try {
             final ProcessingContext<Object> raw = request.getRaw();
             if (raw.getErrorPayload() != null) {
