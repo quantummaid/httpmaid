@@ -19,23 +19,16 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases;
+package de.quantummaid.httpmaid.tests.specs.guice.domain;
 
-import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+public final class SingleConstructorUseCase {
+    private final SimpleComponent simpleComponent;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-
-public final class UseCaseConfigurators {
-
-    private UseCaseConfigurators() {
+    public SingleConstructorUseCase(final SimpleComponent simpleComponent) {
+        this.simpleComponent = simpleComponent;
     }
 
-    public static Configurator toCreateUseCaseInstancesUsing(final UseCaseInstantiator useCaseInstantiator) {
-        validateNotNull(useCaseInstantiator, "useCaseInstantiator");
-        return dependencyRegistry -> {
-            final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-            useCasesModule.setUseCaseInstantiatorFactory(requiredTypes -> useCaseInstantiator);
-        };
+    public String act() {
+        return simpleComponent.act();
     }
 }

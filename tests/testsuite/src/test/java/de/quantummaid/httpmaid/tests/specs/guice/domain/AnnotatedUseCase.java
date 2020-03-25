@@ -19,23 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases;
+package de.quantummaid.httpmaid.tests.specs.guice.domain;
 
-import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import javax.inject.Inject;
+import java.io.InputStream;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+public final class AnnotatedUseCase {
+    private final SimpleComponent simpleComponent;
 
-public final class UseCaseConfigurators {
-
-    private UseCaseConfigurators() {
+    @Inject
+    public AnnotatedUseCase(final SimpleComponent simpleComponent) {
+        this.simpleComponent = simpleComponent;
     }
 
-    public static Configurator toCreateUseCaseInstancesUsing(final UseCaseInstantiator useCaseInstantiator) {
-        validateNotNull(useCaseInstantiator, "useCaseInstantiator");
-        return dependencyRegistry -> {
-            final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-            useCasesModule.setUseCaseInstantiatorFactory(requiredTypes -> useCaseInstantiator);
-        };
+    public AnnotatedUseCase() {
+        throw new UnsupportedOperationException("wrong constructor");
+    }
+
+    public AnnotatedUseCase(final InputStream distraction1, final System distraction2) {
+        throw new UnsupportedOperationException("wrong constructor");
+    }
+
+    public String act() {
+        return simpleComponent.act();
     }
 }

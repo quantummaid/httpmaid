@@ -19,23 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases;
+package de.quantummaid.httpmaid.guice;
 
-import de.quantummaid.httpmaid.chains.Configurator;
+import com.google.inject.Injector;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
-public final class UseCaseConfigurators {
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class GuiceUseCaseInstantiator implements UseCaseInstantiator {
+    private final Injector injector;
 
-    private UseCaseConfigurators() {
+    public static UseCaseInstantiator guiceUseCaseInstantiator(final Injector injector) {
+        validateNotNull(injector, "injector");
+        return new GuiceUseCaseInstantiator(injector);
     }
 
-    public static Configurator toCreateUseCaseInstancesUsing(final UseCaseInstantiator useCaseInstantiator) {
-        validateNotNull(useCaseInstantiator, "useCaseInstantiator");
-        return dependencyRegistry -> {
-            final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-            useCasesModule.setUseCaseInstantiatorFactory(requiredTypes -> useCaseInstantiator);
-        };
+    @Override
+    public <T> T instantiate(final Class<T> type) {
+        return injector.getInstance(type);
     }
 }

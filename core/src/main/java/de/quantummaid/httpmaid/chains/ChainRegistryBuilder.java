@@ -71,8 +71,8 @@ public final class ChainRegistryBuilder {
         dependencyRegistry.modules().stream().forEach(module -> module.init(metaData));
         configurators.forEach(configurator -> configurator.init(metaData));
 
-        dependencyRegistry.modules().stream().forEach(module -> module.configure(dependencyRegistry));
         configurators.forEach(configurator -> configurator.configure(dependencyRegistry));
+        dependencyRegistry.modules().stream().forEach(module -> module.configure(dependencyRegistry));
         return dependencyRegistry.buildChainRegistry();
     }
 

@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +33,7 @@ import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 /**
  * A configured {@link HttpMaid} instance. Can be deployed using an endpoint like
@@ -46,7 +46,7 @@ public final class HttpMaid implements AutoCloseable {
     private final ChainRegistry chainRegistry;
 
     public static HttpMaid httpMaid(final ChainRegistry chainRegistry) {
-        Validators.validateNotNull(chainRegistry, "chainRegistry");
+        validateNotNull(chainRegistry, "chainRegistry");
         return new HttpMaid(chainRegistry);
     }
 
@@ -68,12 +68,12 @@ public final class HttpMaid implements AutoCloseable {
     }
 
     public <T> T getMetaDatum(final MetaDataKey<T> key) {
-        Validators.validateNotNull(key, "key");
+        validateNotNull(key, "key");
         return chainRegistry.getMetaDatum(key);
     }
 
     public <T> Optional<T> getOptionalMetaDatum(final MetaDataKey<T> key) {
-        Validators.validateNotNull(key, "key");
+        validateNotNull(key, "key");
         return chainRegistry.getOptionalMetaDatum(key);
     }
 

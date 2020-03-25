@@ -37,6 +37,7 @@ import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization;
@@ -63,6 +64,7 @@ import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstr
 import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
@@ -71,7 +73,7 @@ public final class UseCasesModule implements ChainModule {
     public static final MetaDataKey<SerializedMessageBus> SERIALIZED_MESSAGE_BUS = metaDataKey("SERIALIZED_MESSAGE_BUS");
 
     private SerializationAndDeserializationProvider serializationAndDeserializationProvider;
-    private UseCaseInstantiator useCaseInstantiator = zeroArgumentsConstructorUseCaseInstantiator();
+    private UseCaseInstantiatorFactory useCaseInstantiatorFactory = types -> zeroArgumentsConstructorUseCaseInstantiator();
     private final Map<Class<?>, EventType> useCaseToEventMappings = new HashMap<>();
     private final List<UseCaseMethod> useCaseMethods = new ArrayList<>();
 
@@ -79,8 +81,8 @@ public final class UseCasesModule implements ChainModule {
         return new UseCasesModule();
     }
 
-    public void setUseCaseInstantiator(final UseCaseInstantiator useCaseInstantiator) {
-        this.useCaseInstantiator = useCaseInstantiator;
+    public void setUseCaseInstantiatorFactory(final UseCaseInstantiatorFactory useCaseInstantiatorFactory) {
+        this.useCaseInstantiatorFactory = useCaseInstantiatorFactory;
     }
 
     public void addUseCaseToEventMapping(final Class<?> useCaseClass,
@@ -128,6 +130,11 @@ public final class UseCasesModule implements ChainModule {
         final LowLevelUseCaseAdapterBuilder lowLevelUseCaseAdapterBuilder = LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods);
 
+        final List<Class<?>> useCaseClasses = useCaseMethods.stream()
+                .map(UseCaseMethod::useCaseClass)
+                .collect(toList());
+        final UseCaseInstantiator useCaseInstantiator = useCaseInstantiatorFactory.createInstantiator(useCaseClasses);
+
         final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
         useCaseMethods.forEach(useCaseMethod -> {
             final Class<?> useCaseClass = useCaseMethod.useCaseClass();
@@ -149,7 +156,6 @@ public final class UseCasesModule implements ChainModule {
         lowLevelUseCaseAdapterBuilder.setRequestDeserializers(failingFilterMap());
         lowLevelUseCaseAdapterBuilder.setReseponseSerializers(failingPredicateMap());
         lowLevelUseCaseAdapterBuilder.setResponseDeserializers(failingFilterMap());
-
         final PredicateMapBuilder<Exception, Mapifier<Exception>> exceptionSerializers = predicateMapBuilder();
         exceptionSerializers.setDefaultValue(defaultExceptionMapifier());
         lowLevelUseCaseAdapterBuilder.setExceptionSerializers(exceptionSerializers);
