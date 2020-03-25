@@ -30,9 +30,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
 import static de.quantummaid.httpmaid.guice.GuiceConfigurators.toInstantiateUseCaseInstancesWith;
-import static de.quantummaid.httpmaid.guice.GuiceModule.guiceModule;
 
 public final class GuiceSpecs {
 
@@ -42,7 +40,6 @@ public final class GuiceSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", SingleConstructorUseCase.class)
-                        .configured(toUseModules(guiceModule()))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -55,7 +52,6 @@ public final class GuiceSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .get("/", AnnotatedUseCase.class)
-                        .configured(toUseModules(guiceModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()

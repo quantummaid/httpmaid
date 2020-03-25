@@ -28,7 +28,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
+import static de.quantummaid.httpmaid.events.EventModule.eventModule;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
+import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
 
 public final class SpecialUseCaseSpecs {
 
@@ -218,6 +222,8 @@ public final class SpecialUseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
                             @SuppressWarnings("unchecked")
                             @Override
@@ -237,6 +243,8 @@ public final class SpecialUseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
                             @SuppressWarnings("unchecked")
                             @Override

@@ -30,8 +30,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
+import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
+import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
 
 public final class InstantiationSpecs {
 
@@ -41,6 +45,8 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .get("/", FailInInitializerUseCase.class)
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
@@ -62,6 +68,8 @@ public final class InstantiationSpecs {
                             response.setStatus(501);
                         }))
                         .disableStartupChecks()
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -92,6 +100,8 @@ public final class InstantiationSpecs {
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
                                 (exception, response) -> response.setBody(exception.getMessage())))
                         .disableStartupChecks()
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -107,6 +117,8 @@ public final class InstantiationSpecs {
                         .get("/", UseCaseThatIsAnInterface.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
                                 (exception, response) -> response.setBody(exception.getMessage())))
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
@@ -123,6 +135,8 @@ public final class InstantiationSpecs {
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
                                 (exception, response) -> response.setBody(exception.getMessage())))
                         .disableStartupChecks()
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -138,6 +152,8 @@ public final class InstantiationSpecs {
                         .get("/", UseCaseThatIsAnAbstractClass.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
                                 (exception, response) -> response.setBody(exception.getMessage())))
+                        .disableAutodectectionOfModules()
+                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
