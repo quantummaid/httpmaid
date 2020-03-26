@@ -60,16 +60,18 @@ Enriches the request map with a request header.
 
 #### mappingAuthenticationInformation()
 Enriches the request map with the authentication information.
-Takes as parameter a `String` that will be used as key.
-The authentication information can be any object you choose to set during authentication.
-It does not need to be a `String`.
+If used with a `String` parameter, that `String` will be used as the key under which the authentication
+information will be added.
+If the key parameter is omitted, the authentication information will be used whenever
+the usecase expects an object of the type of the authentication information.
 Requires the request to be authenticated and will abort the request otherwise.
 
 #### mappingOptionalAuthenticationInformation()
 Enriches the request map with the authentication information.
-Takes as parameter a `String` that will be used as key.
-The authentication information can be any object you choose to set during authentication.
-It does not need to be a `String`.
+If used with a `String` parameter, that `String` will be used as the key under which the authentication
+information will be added.
+If the key parameter is omitted, the authentication information will be used whenever
+the usecase expects an object of the type of the authentication information.
 Does **NOT** require the request to be authenticated and will **NOT** abort the request otherwise.
 
 ### Extracting response data
@@ -147,6 +149,9 @@ final HttpMaid httpMaid = anHttpMaid()
         .configured(toCreateUseCaseInstancesUsing(injector::instantiate))
         .build();
 ```
+
+### Guice
+To 
 
 ### Start-Up Checks
 HttpMaid will attempt to instantiate all use cases on start-up time to make sure that

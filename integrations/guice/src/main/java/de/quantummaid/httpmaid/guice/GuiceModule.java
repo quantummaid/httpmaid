@@ -22,40 +22,47 @@
 package de.quantummaid.httpmaid.guice;
 
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
 import de.quantummaid.httpmaid.usecases.UseCasesModule;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.guice.GuiceUseCaseInstantiator.guiceUseCaseInstantiator;
+import java.util.ArrayList;
+import java.util.List;
+
 import static de.quantummaid.httpmaid.guice.GuiceUseCaseInstantiatorFactory.guiceUseCaseInstantiatorFactory;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GuiceModule implements ChainModule {
-    private UseCaseInstantiatorFactory factory = guiceUseCaseInstantiatorFactory();
+    private Injector configuredInjector;
+    private final List<Module> configuredModules = new ArrayList<>();
 
     public static GuiceModule guiceModule() {
         return new GuiceModule();
     }
 
     public void setInjector(final Injector injector) {
-        Validators.validateNotNull(injector, "injector");
-        final UseCaseInstantiator useCaseInstantiator = guiceUseCaseInstantiator(injector);
-        this.factory = requiredTypes -> useCaseInstantiator;
+        validateNotNull(injector, "injector");
+        this.configuredInjector = injector;
+    }
+
+    public void addModules(final List<Module> modules) {
+        this.configuredModules.addAll(modules);
     }
 
     @Override
     public void configure(final DependencyRegistry dependencyRegistry) {
         final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
+        final UseCaseInstantiatorFactory factory = guiceUseCaseInstantiatorFactory(configuredInjector, configuredModules);
         useCasesModule.setUseCaseInstantiatorFactory(factory);
     }
 

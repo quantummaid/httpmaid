@@ -19,26 +19,19 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.guice;
+package de.quantummaid.httpmaid.tests.specs.guice.domain;
 
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import javax.inject.Inject;
 
-import java.util.List;
+public final class ConfigurableUseCase {
+    private final ConfigurableComponent configuration;
 
-import static java.util.Arrays.asList;
-
-public final class GuiceConfigurators {
-
-    private GuiceConfigurators() {
+    @Inject
+    public ConfigurableUseCase(final ConfigurableComponent configuration) {
+        this.configuration = configuration;
     }
 
-    public static GuiceConfigurator toUseTheGuiceModules(final Module... modules) {
-        final List<Module> modulesList = asList(modules);
-        return guiceModule -> guiceModule.addModules(modulesList);
-    }
-
-    public static GuiceConfigurator toInstantiateUseCaseInstancesWith(final Injector injector) {
-        return guiceModule -> guiceModule.setInjector(injector);
+    public String act() {
+        return this.configuration.getConfiguration();
     }
 }

@@ -19,26 +19,26 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.guice;
+package de.quantummaid.httpmaid.tests.specs.guice.domain;
 
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
+import java.io.InputStream;
 
-import static java.util.Arrays.asList;
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class HardToInstantiateComponent {
+    public static final HardToInstantiateComponent HARD_TO_INSTANTIATE_COMPONENT = new HardToInstantiateComponent(null, null, null);
 
-public final class GuiceConfigurators {
+    private final InputStream distraction1;
+    private final System distraction2;
+    private final Thread distraction3;
 
-    private GuiceConfigurators() {
-    }
-
-    public static GuiceConfigurator toUseTheGuiceModules(final Module... modules) {
-        final List<Module> modulesList = asList(modules);
-        return guiceModule -> guiceModule.addModules(modulesList);
-    }
-
-    public static GuiceConfigurator toInstantiateUseCaseInstancesWith(final Injector injector) {
-        return guiceModule -> guiceModule.setInjector(injector);
+    public String act() {
+        return "the hard-to-instantiate component";
     }
 }

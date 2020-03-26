@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.guice;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory;
 import lombok.AccessLevel;
@@ -40,17 +40,26 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GuiceUseCaseInstantiatorFactory implements UseCaseInstantiatorFactory {
+    private final Injector configuredInjector;
+    private final List<Module> configuredModules;
 
-    public static UseCaseInstantiatorFactory guiceUseCaseInstantiatorFactory() {
-        return new GuiceUseCaseInstantiatorFactory();
+    public static UseCaseInstantiatorFactory guiceUseCaseInstantiatorFactory(final Injector configuredInjector,
+                                                                             final List<Module> configuredModules) {
+        return new GuiceUseCaseInstantiatorFactory(configuredInjector, configuredModules);
     }
 
     @Override
     public UseCaseInstantiator createInstantiator(final List<Class<?>> requiredTypes) {
-        final List<AbstractModule> modules = requiredTypes.stream()
-                .map(SinglePublicConstructorModule::singlePublicConstructorModule)
-                .collect(toList());
-        final Injector injector = createInjector(modules);
+        final Injector injector;
+        if (configuredInjector == null) {
+            final List<Module> modules = requiredTypes.stream()
+                    .map(SinglePublicConstructorModule::singlePublicConstructorModule)
+                    .collect(toList());
+            modules.addAll(this.configuredModules);
+            injector = createInjector(modules);
+        } else {
+            injector = configuredInjector;
+        }
         return guiceUseCaseInstantiator(injector);
     }
 }

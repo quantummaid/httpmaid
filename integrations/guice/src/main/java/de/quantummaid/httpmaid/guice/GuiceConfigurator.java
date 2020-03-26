@@ -21,24 +21,27 @@
 
 package de.quantummaid.httpmaid.guice;
 
-import com.google.inject.Injector;
-import com.google.inject.Module;
+import de.quantummaid.httpmaid.chains.ChainModule;
+import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.chains.DependencyRegistry;
 
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import static de.quantummaid.httpmaid.guice.GuiceModule.guiceModule;
+import static java.util.Collections.singletonList;
 
-public final class GuiceConfigurators {
+public interface GuiceConfigurator extends Configurator {
 
-    private GuiceConfigurators() {
+    void configure(GuiceModule guiceModule);
+
+    @Override
+    default void configure(DependencyRegistry dependencyRegistry) {
+        final GuiceModule guiceModule = dependencyRegistry.getDependency(GuiceModule.class);
+        configure(guiceModule);
     }
 
-    public static GuiceConfigurator toUseTheGuiceModules(final Module... modules) {
-        final List<Module> modulesList = asList(modules);
-        return guiceModule -> guiceModule.addModules(modulesList);
-    }
-
-    public static GuiceConfigurator toInstantiateUseCaseInstancesWith(final Injector injector) {
-        return guiceModule -> guiceModule.setInjector(injector);
+    @Override
+    default List<ChainModule> supplyModulesIfNotAlreadyPresent() {
+        return singletonList(guiceModule());
     }
 }
