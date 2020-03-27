@@ -38,6 +38,15 @@ HttpMaid offers integrations for the following dependency injection frameworks:
 HttpMaid supports dependency injection using the [Guice framework](https://github.com/google/guice).
 In order to use it, the following dependency needs to be added to the project:
 
+<!---[CodeSnippet] (guicedependency)-->
+```xml
+<dependency>
+    <groupId>de.quantummaid.httpmaid.integrations</groupId>
+    <artifactId>httpmaid-guice</artifactId>
+    <version>0.9.35</version>
+</dependency>
+```
+
 The `GuiceConfigurators` class provides several configurator methods:
 
 #### toCreateUseCaseInstancesUsingGuice(Module... modules)
@@ -55,14 +64,28 @@ It will not alter the injector in any way.
 HttpMaid supports dependency injection using the [Dagger framework](https://dagger.dev/).
 In order to use it, the following dependency needs to be added to the project:
 
+<!---[CodeSnippet] (daggerdependency)-->
+```xml
+<dependency>
+    <groupId>de.quantummaid.httpmaid.integrations</groupId>
+    <artifactId>httpmaid-dagger</artifactId>
+    <version>0.9.35</version>
+</dependency>
+```
+
 The `DaggerConfigurators` class provides several configurator methods:
 
 #### toCreateUseCaseInstancesUsingDagger()
+Configures HttpMaid to create a look for generated Dagger factories and use them to instantiate usecases.
 
 #### toCreateUseCaseInstancesUsingDagger(NamePattern factoryClassNamePattern, String factoryConstructorName, NamePattern factoryMethodNamePattern)
+Configures HttpMaid to create a look for generated Dagger factories and use them to instantiate usecases.
+The provided parameters can be used to configure the expected names of the Dagger factory classes, the expected name of the factory method
+to instantiate the Dagger factory and the expected name of the factory method used to actually instantiate the usecase. 
 
 #### toCreateUseCaseInstancesUsingDagger(DaggerFactoryFinder factoryFinder)
-
+Configures HttpMaid to create a look for generated Dagger factories and use them to instantiate usecases.
+The way Dagger factories are discovered can be configured by implementing the `DaggerFactoryFinder` parameter.
 
 <!---[Nav]-->
 [&larr;](4_Enriching.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../13_CORS.md)
