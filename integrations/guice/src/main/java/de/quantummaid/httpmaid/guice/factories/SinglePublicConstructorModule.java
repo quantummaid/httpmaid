@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.guice;
+package de.quantummaid.httpmaid.guice.factories;
 
 import com.google.inject.AbstractModule;
 import lombok.AccessLevel;

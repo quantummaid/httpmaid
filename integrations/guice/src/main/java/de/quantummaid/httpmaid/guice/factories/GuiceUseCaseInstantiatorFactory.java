@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.guice;
+package de.quantummaid.httpmaid.guice.factories;
 
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -34,32 +34,30 @@ import java.util.List;
 
 import static com.google.inject.Guice.createInjector;
 import static de.quantummaid.httpmaid.guice.GuiceUseCaseInstantiator.guiceUseCaseInstantiator;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GuiceUseCaseInstantiatorFactory implements UseCaseInstantiatorFactory {
-    private final Injector configuredInjector;
     private final List<Module> configuredModules;
 
-    public static UseCaseInstantiatorFactory guiceUseCaseInstantiatorFactory(final Injector configuredInjector,
-                                                                             final List<Module> configuredModules) {
-        return new GuiceUseCaseInstantiatorFactory(configuredInjector, configuredModules);
+    public static UseCaseInstantiatorFactory guiceUseCaseInstantiatorFactory() {
+        return new GuiceUseCaseInstantiatorFactory(emptyList());
+    }
+
+    public static UseCaseInstantiatorFactory guiceUseCaseInstantiatorFactory(final List<Module> configuredModules) {
+        return new GuiceUseCaseInstantiatorFactory(configuredModules);
     }
 
     @Override
     public UseCaseInstantiator createInstantiator(final List<Class<?>> requiredTypes) {
-        final Injector injector;
-        if (configuredInjector == null) {
-            final List<Module> modules = requiredTypes.stream()
-                    .map(SinglePublicConstructorModule::singlePublicConstructorModule)
-                    .collect(toList());
-            modules.addAll(this.configuredModules);
-            injector = createInjector(modules);
-        } else {
-            injector = configuredInjector;
-        }
+        final List<Module> modules = requiredTypes.stream()
+                .map(SinglePublicConstructorModule::singlePublicConstructorModule)
+                .collect(toList());
+        modules.addAll(this.configuredModules);
+        final Injector injector = createInjector(modules);
         return guiceUseCaseInstantiator(injector);
     }
 }

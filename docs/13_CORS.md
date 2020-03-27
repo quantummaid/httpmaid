@@ -59,5 +59,5 @@ final HttpMaid httpMaid = anHttpMaid()
 
 
 <!---[Nav]-->
-[&larr;](12_UseCases/4_AdvancedTopics.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](14_Endpoints.md)
+[&larr;](12_UseCases/5_DependencyInjection.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](14_Endpoints.md)
 

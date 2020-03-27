@@ -1,12 +1,5 @@
-# Usecases IV: Advanced topics
+# Usecases IV: Mapping headers/query parameters/etc.
 
-You now know how to configure HttpMaid to directly serve usecases and
-how to facilitate the MapMaid integration to map request and responses
-to usecase parameters and return values. This chapter will talk about
-some aspects that arise in most projects and how to configure aspects that
-are more advanced. 
-
-## Mapping headers/query parameters/etc.
 In the second usecases chapter we showed you how to map
 a request body to usecase parameters and the usecase's return value
 to the response body.
@@ -20,7 +13,7 @@ Depending on the circumstances, this could be a more usable approach
 since it's accessible from a normal web browser.
 Either way, HttpMaid has you covered.
 
-### Enriching requests with other data
+## Enriching requests with other data
 Let's first look at request processing i.e. parsing the usecase parameters.
 The established workflow looks like this:
 ```
@@ -41,24 +34,24 @@ To configure this enrichment in HttpMaid, the class `EventConfigurators` offers
 a ton of convenient configurator methods to choose from.
 You can even provide more than one of them and they are cascaded in the order they were configured.
 
-#### mappingQueryParameter()
+### mappingQueryParameter()
 Enriches the request map with a query parameter.
 Requires the request to contain the configured query parameter and will abort the request otherwise.
 
-#### mappingPathParameter()
+### mappingPathParameter()
 Enriches the request map with a path parameter.
 This configurator is added automatically to any route that contains path parameters.
 
-#### ignorePathParameter()
+### ignorePathParameter()
 Tells MapMaid to not add a default path parameter mapping for the specified path parameter.
 
-#### mappingHeader()
+### mappingHeader()
 Enriches the request map with a request header.
 
-#### mappingCookie()
+### mappingCookie()
 Enriches the request map with a request header.
 
-#### mappingAuthenticationInformation()
+### mappingAuthenticationInformation()
 Enriches the request map with the authentication information.
 If used with a `String` parameter, that `String` will be used as the key under which the authentication
 information will be added.
@@ -66,7 +59,7 @@ If the key parameter is omitted, the authentication information will be used whe
 the usecase expects an object of the type of the authentication information.
 Requires the request to be authenticated and will abort the request otherwise.
 
-#### mappingOptionalAuthenticationInformation()
+### mappingOptionalAuthenticationInformation()
 Enriches the request map with the authentication information.
 If used with a `String` parameter, that `String` will be used as the key under which the authentication
 information will be added.
@@ -74,7 +67,7 @@ If the key parameter is omitted, the authentication information will be used whe
 the usecase expects an object of the type of the authentication information.
 Does **NOT** require the request to be authenticated and will **NOT** abort the request otherwise.
 
-### Extracting response data
+## Extracting response data
 Now let's consider the opposite direction, where the returned domain object
 gets mapped to the response body with the intermediate step of
 creating a map:
@@ -94,18 +87,18 @@ Domain Object    --->    Map<String, Object>    --->    Response Body
 To configure the extraction, you can again choose from a variety of
 configurator methods in `ÈventConfigurators`:
 
-#### toExtractFromTheResponseMapUsing()
+### toExtractFromTheResponseMapUsing()
 Takes as parameter an implementation of `ResponseMapExtractor` which consumes
 the current response map and the `HttpResponse` that is associated with the current request.
 You can query and/or remove arbitrary values from the map and set them as headers, etc.
 
-#### toExtractFromTheResponseMapTheHeader()
+### toExtractFromTheResponseMapTheHeader()
 Takes a header key and a map key as parameters - when the map key is omitted, it will be
 the same as the header key. If the response map contains a value under the provided map key,
 the value will be removed from the map and added as a response header value with the
 provided header key.
 
-### Example
+## Example
 As stated above, we can now change the multiplication example to use take its
 input from the query parameters instead of the request body:
 <!---[CodeSnippet] (calculationWithQueryParametersExample)-->
@@ -131,43 +124,5 @@ Also the division of 12 by 4 should work via the url http://localhost:1337/divid
 {"result":"3"}
 ```
 
-## Dependency Injection
-Until now, we assumed that all usecase classes have a public constructor with
-zero arguments and HttpMaid would call this constructor when instantiating the 
-usecases. Of course, this assumption is often not feasible. Serious projects
-oftentimes facilitate dependency injection frameworks and/or the usecase classes
-have dependencies like database objects that need to be provided in the constructor.
-It is very easy to reflect these requirements in the HttpMaid configuration.
-In order to configure usecase instantiation to your needs and e.g. register
-the injector of your choice, the `UseCaseConfigurators.toCreateUseCaseInstancesUsing()`
-configurator method exists. If for example you would like
-to register a Guice injector, the configuration would look like this:
-<!---[CodeSnippet] (dependencyInjectionSample)-->
-```java
-final HttpMaid httpMaid = anHttpMaid()
-        /*...*/
-        .configured(toCreateUseCaseInstancesUsing(injector::instantiate))
-        .build();
-```
-
-### Guice
-To 
-
-### Start-Up Checks
-HttpMaid will attempt to instantiate all use cases on start-up time to make sure that
-all use cases can be instantiated. If you do not want this check to occur, you can disable
-it like this:
-<!---[CodeSnippet] (disableStartupChecksExample)-->
-```java
-final HttpMaid httpMaid = anHttpMaid()
-        /*...*/
-        .configured(toCreateUseCaseInstancesUsing(injector))
-        .disableStartupChecks()
-        .build();
-```
- 
-
 <!---[Nav]-->
-[&larr;](3_Validation.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../13_CORS.md)
-
-
+[&larr;](3_Validation.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](5_DependencyInjection.md)

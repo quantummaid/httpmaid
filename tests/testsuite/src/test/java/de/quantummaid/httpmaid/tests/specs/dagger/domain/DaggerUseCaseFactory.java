@@ -19,29 +19,12 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.guice;
+package de.quantummaid.httpmaid.tests.specs.dagger.domain;
 
-import de.quantummaid.httpmaid.chains.ChainModule;
-import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.chains.DependencyRegistry;
+import dagger.Component;
 
-import java.util.List;
+@Component
+public interface DaggerUseCaseFactory {
 
-import static de.quantummaid.httpmaid.guice.GuiceModule.guiceModule;
-import static java.util.Collections.singletonList;
-
-public interface GuiceConfigurator extends Configurator {
-
-    void configure(GuiceModule guiceModule);
-
-    @Override
-    default void configure(DependencyRegistry dependencyRegistry) {
-        final GuiceModule guiceModule = dependencyRegistry.getDependency(GuiceModule.class);
-        configure(guiceModule);
-    }
-
-    @Override
-    default List<ChainModule> supplyModulesIfNotAlreadyPresent() {
-        return singletonList(guiceModule());
-    }
+    DaggerUseCase daggerUseCase();
 }

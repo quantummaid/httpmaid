@@ -25,14 +25,15 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import de.quantummaid.httpmaid.tests.specs.guice.domain.*;
+import de.quantummaid.httpmaid.tests.specs.guice.domain.AnnotatedUseCase;
+import de.quantummaid.httpmaid.tests.specs.guice.domain.HardToInstantiateComponent;
+import de.quantummaid.httpmaid.tests.specs.guice.domain.HardToInstantiateUseCase;
+import de.quantummaid.httpmaid.tests.specs.guice.domain.SingleConstructorUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.guice.GuiceConfigurators.toInstantiateUseCaseInstancesWith;
-import static de.quantummaid.httpmaid.guice.GuiceConfigurators.toUseTheGuiceModules;
-import static de.quantummaid.httpmaid.tests.specs.guice.domain.ConfigurableComponent.configurableComponent;
+import static de.quantummaid.httpmaid.guice.GuiceConfigurators.toCreateUseCaseInstancesUsingGuice;
 import static de.quantummaid.httpmaid.tests.specs.guice.domain.HardToInstantiateComponent.HARD_TO_INSTANTIATE_COMPONENT;
 
 public final class GuiceSpecs {
@@ -43,6 +44,7 @@ public final class GuiceSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", SingleConstructorUseCase.class)
+                        .configured(toCreateUseCaseInstancesUsingGuice())
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -55,6 +57,7 @@ public final class GuiceSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .get("/", AnnotatedUseCase.class)
+                        .configured(toCreateUseCaseInstancesUsingGuice())
                         .build()
         )
                 .when().httpMaidIsInitialized()
@@ -69,7 +72,7 @@ public final class GuiceSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", AnnotatedUseCase.class)
-                        .configured(toInstantiateUseCaseInstancesWith(injector))
+                        .configured(toCreateUseCaseInstancesUsingGuice(injector))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -82,7 +85,7 @@ public final class GuiceSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", HardToInstantiateUseCase.class)
-                        .configured(toUseTheGuiceModules(new AbstractModule() {
+                        .configured(toCreateUseCaseInstancesUsingGuice(new AbstractModule() {
                             @Override
                             protected void configure() {
                                 bind(HardToInstantiateComponent.class).toProvider(() -> HARD_TO_INSTANTIATE_COMPONENT);
@@ -92,32 +95,5 @@ public final class GuiceSpecs {
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("\"the hard-to-instantiate component\"");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void modulesAreNotUsedWhenInjectorIsProvidedManually(final TestEnvironment testEnvironment) {
-        final Injector injector = Guice.createInjector(
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(ConfigurableComponent.class).toProvider(() -> configurableComponent("correct"));
-                    }
-                }
-        );
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/", ConfigurableUseCase.class)
-                        .configured(toInstantiateUseCaseInstancesWith(injector))
-                        .configured(toUseTheGuiceModules(new AbstractModule() {
-                            @Override
-                            protected void configure() {
-                                bind(ConfigurableComponent.class).toProvider(() -> configurableComponent("wrong"));
-                            }
-                        }))
-                        .build()
-        )
-                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("\"correct\"");
     }
 }
