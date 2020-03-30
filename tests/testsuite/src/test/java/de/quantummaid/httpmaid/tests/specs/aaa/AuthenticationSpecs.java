@@ -23,6 +23,9 @@ package de.quantummaid.httpmaid.tests.specs.aaa;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.aaa.domain.AuthenticatedUseCase;
+import de.quantummaid.httpmaid.tests.specs.aaa.domain.AuthenticatedWithGenericsUseCase;
+import de.quantummaid.httpmaid.tests.specs.aaa.domain.GenericUser;
+import de.quantummaid.httpmaid.tests.specs.aaa.domain.User;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -30,8 +33,8 @@ import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingAuthenticationInformation;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.*;
-import static de.quantummaid.httpmaid.tests.specs.aaa.domain.User.user;
 import static java.util.Optional.of;
 
 public final class AuthenticationSpecs {
@@ -166,14 +169,28 @@ public final class AuthenticationSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void authenticationCanBeADomainObject(final TestEnvironment testEnvironment) {
+    public void authenticationInformationCanBeADomainObject(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", AuthenticatedUseCase.class, mappingAuthenticationInformation())
-                        .configured(toAuthenticateUsingHeader("user", challenge -> Optional.of(user(challenge))))
+                        .configured(toAuthenticateUsingHeader("user", challenge -> Optional.of(User.user(challenge))))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("user", "foo").isIssued()
                 .theResponseBodyWas("\"authenticated as foo\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void authenticationInformationCanBeADomainObjectWithGenerics(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", AuthenticatedWithGenericsUseCase.class, mappingAuthenticationInformation())
+                        .configured(toAuthenticateUsingHeader("user", challenge -> Optional.of(GenericUser.user(challenge))))
+                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("user", "foo").isIssued()
+                .theResponseBodyWas("Unable to resolve type variables based on object 'GenericUser(name=foo)'");
     }
 }
