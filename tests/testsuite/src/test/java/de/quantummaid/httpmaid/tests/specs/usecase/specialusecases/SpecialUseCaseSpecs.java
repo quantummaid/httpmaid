@@ -30,9 +30,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
 import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
+import static de.quantummaid.reflectmaid.GenericType.genericType;
 
 public final class SpecialUseCaseSpecs {
 
@@ -45,7 +47,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case classes must have exactly one public instance (non-static) method.");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Use case classes must have exactly one public instance (non-static) method.");
     }
 
     @ParameterizedTest
@@ -57,7 +59,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case classes must have exactly one public instance (non-static) method.");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Use case classes must have exactly one public instance (non-static) method.");
     }
 
     @ParameterizedTest
@@ -105,7 +107,21 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsDirectReturnType' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
+                        "type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsDirectReturnType' " +
+                        "contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseWithClassScopeTypeVariableAsDirectReturnTypeWithGenericType(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/", genericType(UseCaseWithClassScopeTypeVariableAsDirectReturnType.class, String.class))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -117,7 +133,21 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsIndirectReturnType' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
+                        "type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsIndirectReturnType' " +
+                        "contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseWithClassScopeTypeVariableAsIndirectReturnTypeWithGenericType(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/", genericType(UseCaseWithClassScopeTypeVariableAsIndirectReturnType.class, String.class))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("[\"a\",\"b\",\"c\"]");
     }
 
     @ParameterizedTest
@@ -125,11 +155,25 @@ public final class SpecialUseCaseSpecs {
     public void useCaseWithClassScopeTypeVariableAsDirectParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
-                        .get("/", UseCaseWithClassScopeTypeVariableAsDirectParameter.class)
+                        .post("/", UseCaseWithClassScopeTypeVariableAsDirectParameter.class)
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsDirectParameter' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsDirectParameter' " +
+                        "contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseWithClassScopeTypeVariableAsDirectParameterRegisteredAsGenericType(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .post("/", genericType(UseCaseWithClassScopeTypeVariableAsDirectParameter.class, String.class))
+                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
+                .theResponseBodyWas("foo");
     }
 
     @ParameterizedTest
@@ -137,11 +181,26 @@ public final class SpecialUseCaseSpecs {
     public void useCaseWithClassScopeTypeVariableAsIndirectParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
-                        .get("/", UseCaseWithClassScopeTypeVariableAsIndirectParameter.class)
+                        .post("/", UseCaseWithClassScopeTypeVariableAsIndirectParameter.class)
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsIndirectParameter' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
+                        "type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsIndirectParameter' " +
+                        "contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseWithClassScopeTypeVariableAsIndirectParameterWithGenericType(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .post("/", genericType(UseCaseWithClassScopeTypeVariableAsIndirectParameter.class, String.class))
+                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\", \"b\", \"c\"]").withContentType("application/json").isIssued()
+                .theResponseBodyWas("{a, b, c}");
     }
 
     @ParameterizedTest
@@ -153,7 +212,9 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case method 'method' in class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsDirectReturnType' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Use case classes must have exactly one public instance (non-static) method. " +
+                        "Found the methods [] for class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsDirectReturnType'. " +
+                        "(Note that methods that declare new type variables (\"generics\") are not taken into account)");
     }
 
     @ParameterizedTest
@@ -165,7 +226,10 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case method 'method' in class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsIndirectReturnType' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
+                        "Use case classes must have exactly one public instance (non-static) method. " +
+                        "Found the methods [] for class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsIndirectReturnType'. " +
+                        "(Note that methods that declare new type variables (\"generics\") are not taken into account)");
     }
 
     @ParameterizedTest
@@ -177,7 +241,9 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case method 'method' in class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsDirectParameter' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Use case classes must have exactly one public instance (non-static) method. " +
+                        "Found the methods [] for class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsDirectParameter'. " +
+                        "(Note that methods that declare new type variables (\"generics\") are not taken into account)");
     }
 
     @ParameterizedTest
@@ -189,7 +255,10 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case method 'method' in class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsIndirectParameter' must not declare any type variables");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
+                        "Use case classes must have exactly one public instance (non-static) method. " +
+                        "Found the methods [] for class 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithMethodScopeTypeVariableAsIndirectParameter'. " +
+                        "(Note that methods that declare new type variables (\"generics\") are not taken into account)");
     }
 
     @ParameterizedTest
@@ -201,7 +270,43 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Type variables of 'java.util.List' cannot be resolved");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("[type '?' is not supported because it contains wildcard generics (\"?\")]\n" +
+                        "\n" +
+                        "?:\n" +
+                        "Mode: duplex\n" +
+                        "How it is serialized:\n" +
+                        "\tNo serializer available\n" +
+                        "Why it needs to be serializable:\n" +
+                        "\t- because of java.util.List<?>\n" +
+                        "How it is deserialized:\n" +
+                        "\tNo deserializer available\n" +
+                        "Why it needs to be deserializable:\n" +
+                        "\t- because of java.util.List<?>");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseWithGenericsInReturnType(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/", UseCaseWithGenericsInReturnType.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("[\"a\",\"b\",\"c\"]");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void useCaseWithGenericsInParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .post("/", UseCaseWithGenericsInParameter.class)
+                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\",\"b\",\"c\"]").withContentType("application/json").isIssued()
+                .theResponseBodyWas("{a, b, c}");
     }
 
     @ParameterizedTest
@@ -213,7 +318,18 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Type variables of 'java.util.List' cannot be resolved");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("[type '?' is not supported because it contains wildcard generics (\"?\")]\n" +
+                        "\n" +
+                        "?:\n" +
+                        "Mode: duplex\n" +
+                        "How it is serialized:\n" +
+                        "\tNo serializer available\n" +
+                        "Why it needs to be serializable:\n" +
+                        "\t- because of java.util.List<?>\n" +
+                        "How it is deserialized:\n" +
+                        "\tNo deserializer available\n" +
+                        "Why it needs to be deserializable:\n" +
+                        "\t- because of java.util.List<?>");
     }
 
     @ParameterizedTest
@@ -360,6 +476,6 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an array but got '[Ljava.lang.String;'");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("use case must not be an array but got 'java.lang.String[]'");
     }
 }

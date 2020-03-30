@@ -23,10 +23,9 @@ package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
 
 import java.util.List;
 
-public final class UseCaseWithClassScopeTypeVariableAsIndirectReturnType<T> {
+public final class UseCaseWithGenericsInReturnType {
 
-    @SuppressWarnings("unchecked")
-    public List<T> method() {
-        return (List<T>) List.of("a", "b", "c");
+    public List<String> act() {
+        return List.of("a", "b", "c");
     }
 }

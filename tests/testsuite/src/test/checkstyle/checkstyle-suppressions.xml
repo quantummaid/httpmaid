@@ -45,4 +45,5 @@
     <suppress checks="Regexp" files="ResourceDeallocationSpecs" />
     <suppress checks="MagicNumber|IllegalCatch" files="Deployer" />
     <suppress checks="IllegalCatch" files="Given" />
+    <suppress checks="FileLength|MethodCount" files="SpecialUseCaseSpecs" />
 </suppressions>

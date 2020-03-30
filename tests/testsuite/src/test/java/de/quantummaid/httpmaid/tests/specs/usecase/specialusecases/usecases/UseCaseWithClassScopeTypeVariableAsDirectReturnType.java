@@ -23,7 +23,8 @@ package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
 
 public final class UseCaseWithClassScopeTypeVariableAsDirectReturnType<T> {
 
+    @SuppressWarnings("unchecked")
     public T method() {
-        throw new UnsupportedOperationException();
+        return (T) "foo";
     }
 }

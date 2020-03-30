@@ -28,4 +28,5 @@
     <suppress checks=".*" files="ClientSpecs" />
     <suppress checks="ClassFanOutComplexity" files="RealIssuer" />
     <suppress checks="IllegalCatch" files="Given" />
+    <suppress checks="Regex" files="FreePortPool" />
 </suppressions>

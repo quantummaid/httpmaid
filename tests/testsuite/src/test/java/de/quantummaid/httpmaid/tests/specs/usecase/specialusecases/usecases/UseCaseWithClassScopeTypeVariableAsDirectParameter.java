@@ -21,9 +21,11 @@
 
 package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
 
+import java.util.Objects;
+
 public final class UseCaseWithClassScopeTypeVariableAsDirectParameter<T> {
 
     public void method(final T t) {
-        throw new UnsupportedOperationException();
+        throw new RuntimeException(Objects.toString(t));
     }
 }

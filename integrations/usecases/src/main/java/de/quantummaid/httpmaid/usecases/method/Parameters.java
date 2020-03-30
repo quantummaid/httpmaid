@@ -21,17 +21,17 @@
 
 package de.quantummaid.httpmaid.usecases.method;
 
+import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.resolver.ResolvedMethod;
+import de.quantummaid.reflectmaid.resolver.ResolvedParameter;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -39,30 +39,30 @@ import static java.util.stream.Collectors.toMap;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Parameters {
-    private final List<Parameter> parameters;
+    private final List<ResolvedParameter> parameters;
 
-    public static Parameters parametersOf(final Method method) {
-        final List<Parameter> parameters = asList(method.getParameters());
+    public static Parameters parametersOf(final ResolvedMethod method) {
+        final List<ResolvedParameter> parameters = method.parameters();
         return new Parameters(parameters);
     }
 
     public List<String> names() {
         return parameters.stream()
-                .map(Parameter::getName)
+                .map(ResolvedParameter::name)
                 .collect(toList());
     }
 
-    public Map<String, Class<?>> asMap() {
+    public Map<String, ResolvedType> asMap() {
         return this.parameters.stream()
                 .collect(toMap(
-                        Parameter::getName,
-                        Parameter::getType
+                        ResolvedParameter::name,
+                        ResolvedParameter::type
                 ));
     }
 
     public Object[] toArray(final Map<String, Object> parameterInstances) {
         return this.parameters.stream()
-                .map(Parameter::getName)
+                .map(ResolvedParameter::name)
                 .map(parameterInstances::get)
                 .toArray();
     }

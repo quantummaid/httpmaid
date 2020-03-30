@@ -21,11 +21,16 @@
 
 package de.quantummaid.httpmaid.usecases.instantiation;
 
-public interface UseCaseInstantiator {
+import de.quantummaid.reflectmaid.GenericType;
+
+public interface UseCaseInstantiator extends GenericUseCaseInstantiator {
 
     <T> T instantiate(Class<T> type);
 
-    default void check(final Class<?> type) {
-        instantiate(type);
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T> T instantiate(final GenericType<T> type) {
+        final Class<?> clazz = type.toResolvedType().assignableType();
+        return (T) instantiate(clazz);
     }
 }

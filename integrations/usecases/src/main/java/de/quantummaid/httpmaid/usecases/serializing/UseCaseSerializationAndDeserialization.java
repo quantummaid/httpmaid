@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.usecases.serializing;
 
 import de.quantummaid.httpmaid.events.Event;
+import de.quantummaid.reflectmaid.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,11 @@ import java.util.Map;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UseCaseSerializationAndDeserialization {
-    private final Map<Class<?>, UseCaseParamaterProvider> parameterProviders;
+    private final Map<ResolvedType, UseCaseParamaterProvider> parameterProviders;
     private final UseCaseReturnValueSerializer returnValueSerializer;
 
     public static UseCaseSerializationAndDeserialization useCaseSerializationAndDeserialization(
-            final Map<Class<?>, UseCaseParamaterProvider> parameterProviders,
+            final Map<ResolvedType, UseCaseParamaterProvider> parameterProviders,
             final UseCaseReturnValueSerializer returnValueSerializer) {
         return new UseCaseSerializationAndDeserialization(parameterProviders, returnValueSerializer);
     }
@@ -46,12 +47,12 @@ public final class UseCaseSerializationAndDeserialization {
         return returnValueSerializer;
     }
 
-    public Map<String, Object> deserializeParameters(final Event event, final Class<?> useCaseClass) {
+    public Map<String, Object> deserializeParameters(final Event event, final ResolvedType useCaseClass) {
         final UseCaseParamaterProvider useCaseParamaterProvider = parameterProviders.get(useCaseClass);
         return useCaseParamaterProvider.provideParameters(event);
     }
 
-    public Object serializeReturnValue(final Object returnValue) {
-        return this.returnValueSerializer.serialize(returnValue);
+    public Object serializeReturnValue(final Object returnValue, final ResolvedType type) {
+        return this.returnValueSerializer.serialize(returnValue, type);
     }
 }

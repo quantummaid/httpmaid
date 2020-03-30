@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.usecases.serializing;
 
+import de.quantummaid.reflectmaid.ResolvedType;
+
 public interface UseCaseReturnValueSerializer {
-    Object serialize(Object returnValue);
+    Object serialize(Object returnValue, ResolvedType type);
 }

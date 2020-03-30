@@ -19,14 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
+package de.quantummaid.httpmaid.usecases.instantiation;
 
-import java.util.List;
+import de.quantummaid.reflectmaid.GenericType;
 
-public final class UseCaseWithClassScopeTypeVariableAsIndirectReturnType<T> {
+public interface GenericUseCaseInstantiator {
 
-    @SuppressWarnings("unchecked")
-    public List<T> method() {
-        return (List<T>) List.of("a", "b", "c");
+    <T> T instantiate(GenericType<T> type);
+
+    default void check(final GenericType<?> type) {
+        instantiate(type);
     }
 }

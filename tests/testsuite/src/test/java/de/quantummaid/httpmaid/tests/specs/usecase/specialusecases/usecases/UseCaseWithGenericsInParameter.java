@@ -23,10 +23,13 @@ package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
 
 import java.util.List;
 
-public final class UseCaseWithClassScopeTypeVariableAsIndirectReturnType<T> {
+import static java.util.stream.Collectors.joining;
 
-    @SuppressWarnings("unchecked")
-    public List<T> method() {
-        return (List<T>) List.of("a", "b", "c");
+public final class UseCaseWithGenericsInParameter {
+
+    public void act(final List<String> parameter) {
+        final String joined = parameter.stream()
+                .collect(joining(", ", "{", "}"));
+        throw new UnsupportedOperationException(joined);
     }
 }

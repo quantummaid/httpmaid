@@ -22,10 +22,16 @@
 package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases;
 
 import java.util.List;
+import java.util.Objects;
+
+import static java.util.stream.Collectors.joining;
 
 public final class UseCaseWithClassScopeTypeVariableAsIndirectParameter<T> {
 
-    public void method(final List<T> t) {
-        throw new UnsupportedOperationException();
+    public void method(final List<T> list) {
+        final String joined = list.stream()
+                .map(Objects::toString)
+                .collect(joining(", ", "{", "}"));
+        throw new UnsupportedOperationException(joined);
     }
 }

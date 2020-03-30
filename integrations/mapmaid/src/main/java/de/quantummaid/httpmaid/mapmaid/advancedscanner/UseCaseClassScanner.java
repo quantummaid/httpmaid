@@ -23,12 +23,12 @@ package de.quantummaid.httpmaid.mapmaid.advancedscanner;
 
 import de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
-import de.quantummaid.mapmaid.builder.GenericType;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
 import de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType;
 import de.quantummaid.mapmaid.mapper.deserialization.deserializers.TypeDeserializer;
 import de.quantummaid.mapmaid.shared.identifier.TypeIdentifier;
-import de.quantummaid.mapmaid.shared.types.ResolvedType;
+import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.reflectmaid.ResolvedType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,6 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.VirtualDeserializer.virtualDeserializerFor;
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MultipleParametersDeserializationWrapper.multipleParameters;
-import static de.quantummaid.mapmaid.builder.GenericType.genericType;
 import static de.quantummaid.mapmaid.builder.RequiredCapabilities.deserialization;
 import static de.quantummaid.mapmaid.builder.RequiredCapabilities.serialization;
 import static de.quantummaid.mapmaid.builder.customtypes.DeserializationOnlyType.deserializationOnlyType;
@@ -49,11 +48,11 @@ public final class UseCaseClassScanner {
     private UseCaseClassScanner() {
     }
 
-    public static Map<Class<?>, MethodParameterDeserializationWrapper> addAllReferencedClassesIn(final List<UseCaseMethod> useCaseMethods,
+    public static Map<ResolvedType, MethodParameterDeserializationWrapper> addAllReferencedClassesIn(final List<UseCaseMethod> useCaseMethods,
                                                                                                  final MapMaidBuilder builder) {
         validateNotNull(useCaseMethods, "useCaseMethods");
         validateNotNull(builder, "builder");
-        final Map<Class<?>, MethodParameterDeserializationWrapper> deserializationWrappers = new HashMap<>(useCaseMethods.size());
+        final Map<ResolvedType, MethodParameterDeserializationWrapper> deserializationWrappers = new HashMap<>(useCaseMethods.size());
         useCaseMethods.forEach(useCaseMethod -> {
             final MethodParameterDeserializationWrapper deserializationWrapper = addMethod(useCaseMethod, builder);
             deserializationWrappers.put(useCaseMethod.useCaseClass(), deserializationWrapper);
@@ -63,15 +62,14 @@ public final class UseCaseClassScanner {
 
     private static MethodParameterDeserializationWrapper addMethod(final UseCaseMethod method,
                                                                    final MapMaidBuilder builder) {
-        final Map<String, Class<?>> parameters = method.parameters();
+        final Map<String, ResolvedType> parameters = method.parameters();
         parameters.values().stream()
-                .map(ResolvedType::resolvedType)
                 .map(GenericType::fromResolvedType)
                 .forEach(type -> builder.withType(
                         type, deserialization(), format("because parameter type of method %s", method.describe())));
 
         method.returnType().ifPresent(type -> {
-            final GenericType<?> genericType = genericType(type);
+            final GenericType<?> genericType = GenericType.fromResolvedType(type);
             builder.withType(
                     genericType,
                     serialization(),
@@ -83,7 +81,7 @@ public final class UseCaseClassScanner {
         return multipleParameters(virtualType.type());
     }
 
-    private static DeserializationOnlyType<?> createVirtualObjectFor(final String method, final Map<String, Class<?>> parameters) {
+    private static DeserializationOnlyType<?> createVirtualObjectFor(final String method, final Map<String, ResolvedType> parameters) {
         final TypeIdentifier typeIdentifier = uniqueVirtualTypeIdentifier();
         final TypeDeserializer deserializer = virtualDeserializerFor(method, parameters);
         return deserializationOnlyType(typeIdentifier, deserializer);

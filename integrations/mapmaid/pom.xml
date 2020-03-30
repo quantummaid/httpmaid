@@ -48,7 +48,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid</groupId>
             <artifactId>core</artifactId>
-            <version>0.9.29</version>
+            <version>0.9.32</version>
         </dependency>
     </dependencies>
 </project>

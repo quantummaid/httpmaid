@@ -30,10 +30,12 @@ import de.quantummaid.eventmaid.processingContext.EventType;
 import de.quantummaid.eventmaid.serializedMessageBus.SerializedMessageBus;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder;
 import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
+import de.quantummaid.httpmaid.PerRouteConfigurator;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.events.EventFactory;
 import de.quantummaid.httpmaid.events.EventModule;
+import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
@@ -42,6 +44,8 @@ import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization;
+import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.reflectmaid.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +56,7 @@ import java.util.*;
 import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
 import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
 import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
-import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromClass;
+import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
 import static de.quantummaid.eventmaid.useCases.useCaseAdapter.LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
@@ -65,6 +69,8 @@ import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEve
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
+import static de.quantummaid.reflectmaid.GenericType.genericType;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -76,7 +82,7 @@ public final class UseCasesModule implements ChainModule {
 
     private SerializationAndDeserializationProvider serializationAndDeserializationProvider;
     private UseCaseInstantiatorFactory useCaseInstantiatorFactory = types -> zeroArgumentsConstructorUseCaseInstantiator();
-    private final Map<Class<?>, EventType> useCaseToEventMappings = new HashMap<>();
+    private final Map<ResolvedType, EventType> useCaseToEventMappings = new HashMap<>();
     private final List<UseCaseMethod> useCaseMethods = new ArrayList<>();
 
     public static UseCasesModule useCasesModule() {
@@ -87,7 +93,7 @@ public final class UseCasesModule implements ChainModule {
         this.useCaseInstantiatorFactory = useCaseInstantiatorFactory;
     }
 
-    public void addUseCaseToEventMapping(final Class<?> useCaseClass,
+    public void addUseCaseToEventMapping(final ResolvedType useCaseClass,
                                          final EventType eventType) {
         validateNotNull(useCaseClass, "useCaseClass");
         validateNotNull(eventType, "eventType");
@@ -106,21 +112,33 @@ public final class UseCasesModule implements ChainModule {
     @Override
     public void init(final MetaData configurationMetaData) {
         final HandlerDistributors handlerDistributors = configurationMetaData.get(HANDLER_DISTRIBUTORS);
-        handlerDistributors.register(handler -> handler.handler() instanceof Class, handler -> {
-            final Class<?> useCaseClass = (Class<?>) handler.handler();
-            final EventType eventType = eventTypeFromClass(useCaseClass);
-            useCaseToEventMappings.put(useCaseClass, eventType);
-            useCaseMethods.add(useCaseMethodOf(useCaseClass));
-            final DistributableHandler eventHandler = distributableHandler(handler.condition(), eventType, handler.perRouteConfigurators());
-            return singletonList(eventHandler);
+        handlerDistributors.register(handler -> handler.handler() instanceof GenericType, handler -> {
+            final GenericType<?> useCaseClass = (GenericType<?>) handler.handler();
+            return registerUseCase(useCaseClass, handler.condition(), handler.perRouteConfigurators());
         });
+        handlerDistributors.register(handler -> handler.handler() instanceof Class, handler -> {
+            final Class<?> clazz = (Class<?>) handler.handler();
+            final GenericType<?> useCaseClass = genericType(clazz);
+            return registerUseCase(useCaseClass, handler.condition(), handler.perRouteConfigurators());
+        });
+    }
+
+    private List<DistributableHandler> registerUseCase(final GenericType<?> genericType,
+                                                       final GenerationCondition condition,
+                                                       final List<PerRouteConfigurator> perRouteConfigurators) {
+        final ResolvedType resolvedType = genericType.toResolvedType();
+        final EventType eventType = eventTypeFromString(resolvedType.description());
+        useCaseToEventMappings.put(resolvedType, eventType);
+        useCaseMethods.add(useCaseMethodOf(resolvedType));
+        final DistributableHandler eventHandler = distributableHandler(condition, eventType, perRouteConfigurators);
+        return singletonList(eventHandler);
     }
 
     @Override
     public void configure(final DependencyRegistry dependencyRegistry) {
         final EventModule eventModule = dependencyRegistry.getDependency(EventModule.class);
         useCaseMethods.forEach(useCaseMethod -> {
-            final Class<?> useCaseClass = useCaseMethod.useCaseClass();
+            final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
             final EventFactory eventFactory = buildEventFactory(useCaseMethod);
             eventModule.setEventFactoryFor(eventType, eventFactory);
@@ -134,23 +152,23 @@ public final class UseCasesModule implements ChainModule {
 
         final List<Class<?>> useCaseClasses = useCaseMethods.stream()
                 .map(UseCaseMethod::useCaseClass)
+                .map(ResolvedType::assignableType)
                 .collect(toList());
         final UseCaseInstantiator useCaseInstantiator = useCaseInstantiatorFactory.createInstantiator(useCaseClasses);
 
         final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
         useCaseMethods.forEach(useCaseMethod -> {
-            final Class<?> useCaseClass = useCaseMethod.useCaseClass();
+            final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
-
-            adapterBuilder.addUseCase(useCaseClass, eventType, (useCase, untypedEvent, callingContext) -> {
+            adapterBuilder.addUseCase(useCaseClass.assignableType(), eventType, (useCase, untypedEvent, callingContext) -> {
                 final Event event = (Event) untypedEvent;
                 final Map<String, Object> parameters = serializationAndDeserialization.deserializeParameters(event, useCaseClass);
                 final Optional<Object> returnValue = useCaseMethod.invoke(useCase, parameters, event);
                 return returnValue
-                        .map(serializationAndDeserialization::serializeReturnValue)
+                        .map(object -> serializationAndDeserialization.serializeReturnValue(object, useCaseMethod.returnType().orElseThrow()))
                         .orElse(null);
             });
-            startupChecks.addStartupCheck(() -> useCaseInstantiator.check(useCaseClass));
+            startupChecks.addStartupCheck(() -> useCaseInstantiator.check(fromResolvedType(useCaseClass)));
         });
 
         adapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);

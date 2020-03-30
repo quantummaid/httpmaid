@@ -22,10 +22,18 @@
 package de.quantummaid.httpmaid.tests;
 
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.client.HttpMaidClient;
+import de.quantummaid.httpmaid.tests.givenwhenthen.FreePortPool;
 import de.quantummaid.httpmaid.tests.givenwhenthen.Given;
 import org.junit.jupiter.api.Test;
 
+import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aPostRequestToThePath;
+import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
+import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class ClientSpecs {
     private static final String charactersThatNeedEncoding = "[]{}\"§#";
@@ -63,5 +71,22 @@ public final class ClientSpecs {
         Given.givenAnHttpServer()
                 .when().aRequestIsMade(aPostRequestToThePath("/test"))
                 .theServerReceivedARequestToThePath("/test");
+    }
+
+    @Test
+    public void emptyReturnValuesAreNotNull() {
+        try (final HttpMaid httpMaid = HttpMaid.anHttpMaid()
+                .get("/", (request, response) -> response.setBody(""))
+                .build()) {
+            final int port = FreePortPool.freePort();
+            pureJavaEndpointFor(httpMaid).listeningOnThePort(port);
+
+            final HttpMaidClient client = aHttpMaidClientForTheHost("localhost")
+                    .withThePort(port)
+                    .viaHttp()
+                    .build();
+            final String response = client.issue(aGetRequestToThePath("/").mappedToString());
+            assertThat(response, is(""));
+        }
     }
 }

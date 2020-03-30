@@ -36,6 +36,7 @@ import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
 import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
 import de.quantummaid.mapmaid.mapper.marshalling.MarshallingType;
+import de.quantummaid.reflectmaid.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,8 @@ import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshal
 import static de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization.useCaseSerializationAndDeserialization;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
+import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdentifierFor;
+import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -99,13 +102,13 @@ public final class MapMaidModule implements ChainModule {
 
         final SerializationAndDeserializationProvider serializationAndDeserializationProvider = useCaseMethods -> {
             final MapMaidBuilder mapMaidBuilder = aMapMaid();
-            final Map<Class<?>, MethodParameterDeserializationWrapper> deserializationWrappers =
+            final Map<ResolvedType, MethodParameterDeserializationWrapper> deserializationWrappers =
                     addAllReferencedClassesIn(useCaseMethods, mapMaidBuilder);
 
             dependencyRegistry.getMetaData().getOptional(RECIPES).ifPresent(recipes -> recipes.forEach(mapMaidBuilder::usingRecipe));
             final MapMaid mapMaid = mapMaidBuilder.build();
 
-            final Map<Class<?>, UseCaseParamaterProvider> parameterProviders = new HashMap<>();
+            final Map<ResolvedType, UseCaseParamaterProvider> parameterProviders = new HashMap<>();
             deserializationWrappers.forEach((type, wrapper) ->
                     parameterProviders.put(type, event -> {
                         final Map<String, Object> map = event.asMap();
@@ -116,7 +119,9 @@ public final class MapMaidModule implements ChainModule {
             final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
             mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
 
-            final UseCaseReturnValueSerializer serializer = returnValue -> mapMaid.serializer().serializeToUniversalObject(returnValue);
+            final UseCaseReturnValueSerializer serializer = (returnValue, type) -> {
+                return mapMaid.serializer().serializeToUniversalObject(returnValue, typeIdentifierFor(fromResolvedType(type)));
+            };
             return useCaseSerializationAndDeserialization(parameterProviders, serializer);
         };
         useCasesModule.setSerializationAndDeserializationProvider(serializationAndDeserializationProvider);
