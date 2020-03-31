@@ -1,5 +1,6 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2892/badge)](https://bestpractices.coreinfrastructure.org/projects/2892)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <img src="httpmaid_logo.png" align="left"/>
 
