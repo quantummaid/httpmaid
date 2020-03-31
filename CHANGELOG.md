@@ -7,3 +7,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Apache2 badge (Issue [#28](https://github.com/quantummaid/httpmaid/issues/28)).
+### Removed
+- outdated CII badge (Issue [#30](https://github.com/quantummaid/httpmaid/issues/30)).
