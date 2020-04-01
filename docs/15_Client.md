@@ -9,7 +9,7 @@ In access it, you need to include the client integration.
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-client</artifactId>
-    <version>0.9.37</version>
+    <version>0.9.38</version>
 </dependency>
 ```
 ## Configuring a client
