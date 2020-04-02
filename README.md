@@ -1,53 +1,39 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core)
+[![Code Size](https://img.shields.io/github/languages/code-size/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Slack](https://img.shields.io/badge/chat%20on-Slack-brightgreen)](https://join.slack.com/t/quantummaid/shared_invite/zt-cx5qd605-vG10I~WazfgH9WOnXMzl3Q)
+[![Gitter](https://img.shields.io/badge/chat%20on-Gitter-brightgreen)](https://gitter.im/quantum-maid-framework/community)
+[![Twitter](https://img.shields.io/twitter/follow/quantummaid)](https://twitter.com/quantummaid)
+
 
 <img src="httpmaid_logo.png" align="left"/>
 
 # HttpMaid
-
-HttpMaid is an http framework that allows you to "just publish my business logic as HTTP endpoint".
+HttpMaid is an HTTP framework that allows you to "just publish my business logic as HTTP endpoint".
 It's non-invasive, flexible and ultra-extendable.
 
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+Let's see an example:
 
-Let's see some low-level example:
 
 ```
 final HttpMaid httpMaid = HttpMaid.anHttpMaid()
-        .get("/api/hello", new HttpHandler() {
-            @Override
-            public void handle(final HttpRequest request, final HttpResponse httpResponse) {
-                httpResponse.setBody("Hello World!");
-                httpResponse.setStatus(200);
-            }
+        .get("/api/hello", (request, response) -> {
+            httpResponse.setBody("Hello World!");
+            httpResponse.setStatus(200);
         })
         .build();
 ```
 
-Treat the HttpMaid instance as a description of your endpoints: we have here a request handler, for the path `api/hello`, 
-with the request method `GET`, which handles the request by setting the response to the String `Hello World!` and the 
-status to 200. Pretty descriptive, right?
+Once your usecase is more complicated than just saying hello, you want to focus on implementing it
+instead of dealing with protocol details.
 
-This way of saying hello gives you full control over the HTTP protocol. Once your UseCase is more complicated than just 
-saying hello, you want to focus on implementing it instead of dealing with protocol details.
-
-Let's say we have a UseCase of sending an email:
+Let's say we have the usecase of sending an email:
 
 ```
 public class SendEmail {
-    private final EmailService emailService;
-
-    //    @Inject if you so wish
-    public SendEmail(final EmailService emailService) {
-        this.emailService = emailService;
-    }
 
     public Receipt sendEmail(final Email email) {
-        final String trackingId = emailService.send(email.sender, email.receiver, email.subject, email.body);
+        final String trackingId = send(email.sender, email.receiver, email.subject, email.body);
         final String timestamp = String.valueOf(Instant.now().toEpochMilli());
 
         return new Receipt(trackingId, timestamp);
@@ -55,142 +41,60 @@ public class SendEmail {
 }
 ```
 
-Now we can expose this UseCase using HttpMaid:
+Now we can expose this usecase using HttpMaid:
 
 ```
-final HttpMaid useCaseDrivenHttpMaid = HttpMaid.anHttpMaid()
+final HttpMaid httpMaid = HttpMaid.anHttpMaid()
         .post("/api/sendEmail", SendEmail.class)
-        .configured(toUseMapMaid(MAP_MAID))
-        .configured(toCreateUseCaseInstancesUsing(INJECTOR::getInstance))
         .build();
 ```
-
-Want to extract the sender from the authorization, the receiver and subject from path and 
-the email contents from the request body?
-
-```java
-final HttpMaid useCaseDrivenHttpMaid = HttpMaid.anHttpMaid()
-        .post("/api/sendEmail/<receiver>/<subject>", SendEmail.class)
-        .configured(toUseMapMaid(MAP_MAID))
-        .configured(toCreateUseCaseInstancesUsing(INJECTOR::getInstance))
-        .configured(toEnrichTheIntermediateMapWithAllPathParameters())
-        .configured(toAuthenticateRequestsUsing(request -> {
-            final Optional<String> jwtToken = request.headers().getHeader("Authorization");
-            final Optional<String> userEmail = TOKEN_SERVICE.decrypt(jwtToken);
-            return userEmail; 
-        }).afterBodyProcessing())
-        .configured(toEnrichTheIntermediateMapUsing((map, request) -> {
-            final Optional<String> userEmail = request.authenticationInformationAs(String.class);
-            userEmail.ifPresent(email -> {
-                map.put("sender", email);
-            });
-        }))
-        .build();
-```
-
-Want to use the very same UseCase to handle SendEmail events coming from an SNS topic? Refer to the 
-"Event Driven HttpMaid" (TODO) part of the README to see what modifications should be done to the httpMaid object to 
-achieve that. 
+It's that simple - and stays that simple, even when things get more complicated.
+Look [here](https://github.com/quantummaid/quantummaid-tutorials/blob/master/basic-tutorial/README.md) for a complete tutorial.
 
 ## What is HttpMaid doing for you?
 
-> A good architecture is less about the decisions you make and more about the decisions you defer making.
+> Good architecture is less about the decisions you make and more about the decisions you defer making.
 
-HttpMaid allows you to write your UseCases decoupled from the underlying hazards of an Http/Rest infrastructure.
-
-Debating questions like:
+HttpMaid allows you to write your usecases decoupled from the underlying hazards of an HTTP/REST infrastructure.
+Stop debating tiresome questions like:
  
-- "Should it be a PUT or a POST?"
-- "Is the Username coming from the request body, the JWT token or a plain text header value?"
-- "Are we talking JSON, YAML, XML or a custom (binary?) ContentType?"
+- "*Should it be a `PUT` or a `POST`*?"
+- "*Is the username coming from the request body, the JWT token or a plain text header value?*"
+- "*Are we talking Json, YAML, XML or a custom (binary?) content type?*"
 
-is tiresome because you can't possibly know the answer until you've faced the customer. Furthermore, he might just change
-his mind.   
-
-And that's what HttMaid is doing for you.
+You can't possibly know the answer until you've faced the customer. And then she might just change
+her mind.
 
 ## Other Features
 
-Besides providing you with the described interface to build http request handlers, expose UseCases or handle events, 
-HttpMaid offers following features:
+Besides allowing you to easily export usecases, HttpMaid offers the following features:
 
-* Several endpoint integrations such as 
-        - AWS Lambda
-        - Jetty
-        - Spark
-        - Servlet
-* Integration with (de)serialization framework MapMaid
-* Websockets
-* Predefined CORS configurations
-* Predefined MultiPart support 
+* dependency injection with built-in support for [Guice](https://github.com/google/guice) and [Dagger](https://dagger.dev/)
+* seamless endpoint integrations such as 
+    - AWS Lambda
+    - Jetty
+    - Servlet
+* authentication and authorization using JWT
+* predefined CORS configurations
+* multipart request handling
 
 ## Why another HTTP framework?
 
-_The goal of refactoring is to actively counteract the natural increase in the degree of chaos_ 
+> The goal of refactoring is to actively counteract the natural increase in the degree of chaos.
 
-We did not find any framework that would allow us to develop a web application and claim in good conscience that its 
-business logic does not depend on the underlying HTTP server, persistence layer or (de)serialization mechanism (also
-referred to as "infrastructure code" in DDD).
+We did not find any framework that would allow us to develop a web application and claim in good conscience
+that our business logic does not depend on the underlying HTTP server, persistence layer or (de-)serialization mechanism
+(also referred to as *infrastructure code* in Domain-Driven Design).
 
 ## Getting started
+HttpMaid is part of the QuantumMaid framework. You can find easy-to-follow and
+interesting tutorials [here](https://github.com/quantummaid/quantummaid-tutorials/blob/master/README.md).
 
- Add the dependency:
-
-```
-<dependency>
-    <groupId>de.quantummaid.httpmaid</groupId>
-    <artifactId>core</artifactId>
-    <version>${httmaid.version}</version>
-</dependency>
-```
-
-Configure HttpMaid with an HttpHandler and expose as a PureJavaEndpoint
-
-```
-public class Application {
-    public static void main(String[] args) {
-        final HttpMaid httpMaid = HttpMaid.anHttpMaid()
-                .get("/api/hello", new HttpHandler() {
-                    @Override
-                    public void handle(final HttpRequest request, final HttpResponse httpResponse) {
-                        httpResponse.setBody("Hello World!");
-                        httpResponse.setStatus(200);
-                    }
-                })
-                .build();
-
-        PureJavaEndpoint.pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
-    }
-}
-```
-
-Run the example and try
-
-```
-    curl http://localhost:1337/api/hello
-```
-
-## Changing the endpoint
-
-Since HttpMaid separates the _how_ is from the _what_, you can focus on defining _what_ your http endpoints should do and decide on _how_ to serve them best separately, based on the requirements of your infrastructure.
- 
-To expose the same httpMaid instance using a Jetty endpoint, include the following dependency:
-
-```
-<dependency>
-    <groupId>de.quantummaid.httpmaid.integrations</groupId>
-    <artifactId>httpmaid-jetty</artifactId>
-    <version>${httpmaid.version}</version>
-</dependency>
-```
-
-And replace the `PureJavaEndpoint` line with:
-
-```
-    JettyEndpoint.jettyEndpointFor(httpMaid).listeningOnThePort(1337);
-```
-
-Restart the application and enjoy the benefits of Jetty.
+## Get in touch
+Feel free to join us on [Slack](https://join.slack.com/t/quantummaid/shared_invite/zt-cx5qd605-vG10I~WazfgH9WOnXMzl3Q)
+or [Gitter](https://gitter.im/quantum-maid-framework/community) to ask questions, give feedback or just discuss software
+architecture with the team behind HttpMaid. Also, don't forget to visit our [website](https://quantummaid.de) and follow
+us on [Twitter](https://twitter.com/quantummaid)!
 
 ## Documentation
 <!---[TOC](./docs)-->
