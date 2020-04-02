@@ -273,19 +273,17 @@ public final class SpecialUseCaseSpecs {
                 .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
                         "The following classes could not be detected properly:\n" +
                         "\n" +
-                        "?: unable to detect duplex:\n" +
-                        "no duplex detected:\n" +
+                        "?: unable to detect serializer:\n" +
+                        "no serializer detected:\n" +
                         "[type '?' is not supported because it contains wildcard generics (\"?\")]\n" +
                         "\n" +
                         "?:\n" +
-                        "Mode: duplex\n" +
+                        "Mode: serialization-only\n" +
                         "How it is serialized:\n" +
                         "\tNo serializer available\n" +
                         "Why it needs to be serializable:\n" +
-                        "\t- java.util.List<?> -> because return type of method 'List method()' [public java.util.List<?> de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInReturnType.method()]\n" +
-                        "How it is deserialized:\n" +
-                        "\tNo deserializer available\n" +
-                        "Why it needs to be deserializable:");
+                        "\t- java.util.List<?> -> because return type of method 'List method()' [public java.util.List<?> " +
+                        "de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInReturnType.method()]");
     }
 
     @ParameterizedTest
@@ -325,20 +323,17 @@ public final class SpecialUseCaseSpecs {
                 .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
                         "The following classes could not be detected properly:\n" +
                         "\n" +
-                        "?: unable to detect duplex:\n" +
-                        "no duplex detected:\n" +
+                        "?: unable to detect deserializer:\n" +
+                        "no deserializer detected:\n" +
                         "[type '?' is not supported because it contains wildcard generics (\"?\")]\n" +
                         "\n" +
                         "?:\n" +
-                        "Mode: duplex\n" +
-                        "How it is serialized:\n" +
-                        "\tNo serializer available\n" +
-                        "Why it needs to be serializable:\n" +
+                        "Mode: deserialization-only\n" +
                         "How it is deserialized:\n" +
                         "\tNo deserializer available\n" +
                         "Why it needs to be deserializable:\n" +
-                        "\t- java.util.List<?> -> because parameter type of method 'void method(List<?> list)' [public void de.quantummaid.httpmaid.tests" +
-                        ".specs.usecase.specialusecases.usecases.UseCaseWithWildcardInParameter.method(java.util.List<?>)]\n");
+                        "\t- java.util.List<?> -> because parameter type of method 'void method(List<?> list)' [public void " +
+                        "de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInParameter.method(java.util.List<?>)]");
     }
 
     @ParameterizedTest
