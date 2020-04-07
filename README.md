@@ -1,3 +1,4 @@
+[![Last Commit](https://img.shields.io/github/last-commit/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core)
 [![Code Size](https://img.shields.io/github/languages/code-size/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -9,8 +10,8 @@
 <img src="httpmaid_logo.png" align="left"/>
 
 # HttpMaid
-HttpMaid is an HTTP framework that allows you to "just publish my business logic as HTTP endpoint".
-It's non-invasive, flexible and ultra-extendable.
+HttpMaid directly publishes your business logic as an HTTP endpoint.
+It's non-invasive, secure and flexible.
 
 Let's see an example:
 
@@ -65,7 +66,7 @@ Stop debating tiresome questions like:
 You can't possibly know the answer until you've faced the customer. And then she might just change
 her mind.
 
-## Other Features
+## Other features
 
 Besides allowing you to easily export usecases, HttpMaid offers the following features:
 
