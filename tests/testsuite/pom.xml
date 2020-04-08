@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.39</version>
+        <version>0.9.40</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -107,13 +107,13 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-lambda</artifactId>
-            <version>1.11.731</version>
+            <version>1.11.761</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.731</version>
+            <version>1.11.761</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.tests.specs;
 
 import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
-import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
+import de.quantummaid.httpmaid.handler.PageNotFoundException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -85,7 +85,7 @@ public final class PathSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/*/a/*/b/*/c", (request, response) -> response.setBody("handler has been called"))
-                        .configured(ExceptionConfigurators.toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> response.setBody("no handler")))
+                        .configured(ExceptionConfigurators.toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody("no handler")))
                         .build()
         )
                 .when().aRequestToThePath("/x/x/x/a/y/y/y/z/z/z/c").viaTheGetMethod().withAnEmptyBody().isIssued()
