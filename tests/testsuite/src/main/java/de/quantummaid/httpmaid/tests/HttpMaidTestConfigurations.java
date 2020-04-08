@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.tests;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.handler.NoHandlerFoundException;
+import de.quantummaid.httpmaid.handler.PageNotFoundException;
 import de.quantummaid.httpmaid.tests.usecases.echobody.EchoBodyUseCase;
 import de.quantummaid.httpmaid.tests.usecases.echocontenttype.EchoContentTypeUseCase;
 import de.quantummaid.httpmaid.tests.usecases.responsecontenttype.SetContentTypeInResponseUseCase;
@@ -57,7 +57,7 @@ public final class HttpMaidTestConfigurations {
                 .get("/twoparameters", TwoParametersUseCase.class, mappingHeader("param1"), mappingHeader("param2"))
                 .get("/void", VoidUseCase.class)
 
-                .configured(toMapExceptionsOfType(NoHandlerFoundException.class, (exception, response) -> {
+                .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> {
                     response.setStatus(METHOD_NOT_ALLOWED);
                     response.setBody("No use case found.");
                 }))

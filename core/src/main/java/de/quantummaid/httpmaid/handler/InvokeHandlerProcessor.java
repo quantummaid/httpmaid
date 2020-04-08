@@ -42,7 +42,7 @@ public final class InvokeHandlerProcessor implements Processor {
     @Override
     public void apply(final MetaData metaData) {
         final Handler handler = metaData.getOptional(HANDLER)
-                .orElseThrow(() -> NoHandlerFoundException.noHandlerFoundException(metaData));
+                .orElseThrow(() -> PageNotFoundException.pageNotFoundException(metaData));
         handler.handle(metaData);
     }
 }

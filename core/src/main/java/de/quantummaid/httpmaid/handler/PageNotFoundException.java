@@ -22,14 +22,24 @@
 package de.quantummaid.httpmaid.handler;
 
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.http.HttpRequestMethod;
+import de.quantummaid.httpmaid.path.Path;
 
-public final class NoHandlerFoundException extends RuntimeException {
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.METHOD;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.PATH;
+import static java.lang.String.format;
 
-    private NoHandlerFoundException(final String message) {
+public final class PageNotFoundException extends RuntimeException {
+
+    private PageNotFoundException(final String message) {
         super(message);
     }
 
-    public static NoHandlerFoundException noHandlerFoundException(final MetaData metaData) {
-        return new NoHandlerFoundException("No handler found for: " + metaData);
+    public static PageNotFoundException pageNotFoundException(final MetaData metaData) {
+        final Path path = metaData.get(PATH);
+        final HttpRequestMethod requestMethod = metaData.get(METHOD);
+        return new PageNotFoundException(format(
+                "No handler found for path '%s' and method '%s'%n%n%s",
+                path.raw(), requestMethod.name(), metaData.prettyPrint()));
     }
 }
