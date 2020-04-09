@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid</groupId>
         <artifactId>integrations-parent</artifactId>
-        <version>0.9.40</version>
+        <version>0.9.41</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-jackson</artifactId>
-            <version>0.9.35</version>
+            <version>0.9.36</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.examples</groupId>
