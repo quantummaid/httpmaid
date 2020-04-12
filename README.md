@@ -1,3 +1,4 @@
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3875/badge)](https://bestpractices.coreinfrastructure.org/projects/3875)
 [![Last Commit](https://img.shields.io/github/last-commit/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core)
 [![Code Size](https://img.shields.io/github/languages/code-size/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)

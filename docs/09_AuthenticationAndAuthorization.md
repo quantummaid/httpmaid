@@ -152,7 +152,7 @@ In order to use them, we must ditch the Basic Auth mechanism, which had the conv
 login mechanism (the browser pop-up window).
 Without it, we need to implement it ourselves. Let's create a simple login form as a Java resource in the classpath
 called `login.html`:
-<!---[CodeSnippet] (file=../examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_authentication/login.html)-->
+<!---[CodeSnippet] (file=../examples/documentation/src/test/java/de/quantummaid/httpmaid/documentation/authentication/login.html)-->
 ```
 <html>
 <body>
@@ -170,9 +170,6 @@ to a body map (see [marshalling](11_Marshalling/1_MarshallingForms.md)).
 This will lead to the following configuration:
 <!---[CodeSnippet] (customLoginStep1)-->
 ```java
-final MapMaid mapMaid = aMapMaid()
-        .usingRecipe(urlEncodedMarshaller())
-        .build();
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
         .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
@@ -195,7 +192,6 @@ final HttpMaid httpMaid = anHttpMaid()
         )
                 .onlyRequestsTo("/admin")
                 .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-        .configured(toUseMapMaid(mapMaid))
         .build();
 ```
 
@@ -238,9 +234,6 @@ authorize requests based on the stored `admin` claim.
 final Key key = secretKeyFor(SignatureAlgorithm.HS256);
 final JwtParser jwtParser = parserBuilder().setSigningKey(key).build();
 
-final MapMaid mapMaid = aMapMaid()
-        .usingRecipe(urlEncodedMarshaller())
-        .build();
 final UserDatabase userDatabase = new InMemoryUserDatabase();
 final HttpMaid httpMaid = anHttpMaid()
         .get("/login", (request, response) -> response.setJavaResourceAsBody("login.html"))
@@ -268,7 +261,7 @@ final HttpMaid httpMaid = anHttpMaid()
                 .orElse(false))
                 .onlyRequestsTo("/admin")
                 .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-        .configured(toUseMapMaid(mapMaid))
+        .configured(toConfigureMapMaidUsingRecipe(urlEncodedMarshaller()))
         .build();
 ```
 

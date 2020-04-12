@@ -21,13 +21,14 @@
 
 package de.quantummaid.httpmaid.client.issuer.bypass;
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.client.HttpClientRequest;
 import de.quantummaid.httpmaid.client.RawClientResponse;
 import de.quantummaid.httpmaid.client.RequestPath;
 import de.quantummaid.httpmaid.client.UriString;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.util.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -65,7 +66,8 @@ public final class BypassIssuer implements Issuer {
         metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
         metaData.set(RAW_METHOD, request.method());
         metaData.set(RAW_REQUEST_HEADERS, mapToMultiMap(request.headers()));
-        request.body().ifPresent(inputStream -> metaData.set(REQUEST_BODY_STREAM, inputStream));
+        final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
+        metaData.set(REQUEST_BODY_STREAM, body);
         metaData.set(IS_HTTP_REQUEST, true);
 
         final SynchronizationWrapper<MetaData> wrapper = new SynchronizationWrapper<>();

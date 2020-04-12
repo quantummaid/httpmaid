@@ -8,8 +8,6 @@
     <file url="file://$PROJECT_DIR$/examples/aws-lambda" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/aws-lambda/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/documentation" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/examples/documentation/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/examples/documentation/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/hello-world" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/examples/hello-world/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations" charset="UTF-8" />

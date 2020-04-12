@@ -33,7 +33,8 @@ public final class FileDoesNotExistException extends RuntimeException {
                                                                        final String type,
                                                                        final Throwable cause) {
         validateNotNull(path, "path");
-        final String message = String.format("Could not find %s at %s", type, path);
+        final String workingDirectory = System.getProperty("user.dir");
+        final String message = String.format("Could not find %s at %s (current working directory: %s", type, path, workingDirectory);
         return new FileDoesNotExistException(message, cause);
     }
 

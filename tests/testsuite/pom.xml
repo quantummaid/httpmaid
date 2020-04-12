@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.41</version>
+        <version>0.9.42</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-jackson</artifactId>
-            <version>0.9.36</version>
+            <version>0.9.37</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.27.v20200227</version>
+            <version>9.4.28.v20200408</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

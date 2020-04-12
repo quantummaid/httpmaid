@@ -59,7 +59,7 @@ of the current request using the `path()` method:
 <!---[CodeSnippet] (pathExample)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
-        .get("/", (request, response) -> {
+        .get("/*", (request, response) -> {
             final Path path = request.path();
             System.out.println("path = " + path);
         })
@@ -125,10 +125,14 @@ final HttpMaid httpMaid = anHttpMaid()
 ```
 
 Unfortunately, it is not possible to set custom headers with requests in a generic web browser.
-Nonetheless, we can issue a request with the command line tool `curl` to try out the example.
-```bash
-curl --header "name: bob" http://localhost:1337/hello
+Nonetheless, we can issue a request with the command line tool `curl` to try out the example:
+
+<!---[CodeSnippet] (file=../examples/documentation/src/test/resources/requestheader.curl)-->
 ```
+$ curl --header "name: bob" http://localhost:1337/hello
+```
+
+
 This call should result in the response `hi bob!`.
 
 ### Request Body
@@ -146,12 +150,14 @@ final HttpMaid httpMaid = anHttpMaid()
         .build();
 ```
 
-Again, setting request bodies is not possbile with generic web browsers, so
-we once again call `curl` for help to try out our example:
+Again, setting request bodies is not possible with generic web browsers, so
+we once again fall back to `curl` to try out the example:
 
-```bash
-curl --data "bob" http://localhost:1337/hello
+<!---[CodeSnippet] (file=../examples/documentation/src/test/resources/body.curl)-->
 ```
+$ curl --data "bob" http://localhost:1337/hello
+```
+
 As always, the output should be `hi bob!`.
 
 ## The `HttpResponse` object
@@ -194,8 +200,9 @@ final HttpMaid httpMaid = anHttpMaid()
 
 Since browsers normally don't show response status codes, we will fall back to curl again to try out the example:
 
-```bash
-curl -v http://localhost:1337/test
+<!---[CodeSnippet] (file=../examples/documentation/src/test/resources/statuscode.curl)-->
+```
+$ curl -v http://localhost:1337/test
 ```
 
 The output should look vaguely like this, with the `< HTTP/1.1 201 Created` line
@@ -227,9 +234,13 @@ final HttpMaid httpMaid = anHttpMaid()
 ```
 
 You can try it out with this curl command:
-```bash
-curl -v http://localhost:1337/test
+
+<!---[CodeSnippet] (file=../examples/documentation/src/test/resources/responseheader.curl)-->
 ```
+$ curl -v http://localhost:1337/test
+```
+
+
 and see an output like this, with the `< Name: Bob` line being of interest:
 ```
 *   Trying 127.0.0.1...

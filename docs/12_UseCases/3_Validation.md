@@ -49,9 +49,12 @@ the MapMaid configuration from the previous example will auto-detect the new cla
 not need to be changed.
 
 You can try it out with the following curl command:
-```bash
-curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "3"}' http://localhost:1337/divide
+
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division1.curl)-->
 ```
+$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "3"}' http://localhost:1337/divide
+```
+
 The output will be the correct result to the division of 12 by 3:
 ```json
 {"result":"4"}
@@ -60,9 +63,11 @@ The output will be the correct result to the division of 12 by 3:
 ## Illegal input
 Now, school taught every single one of us that there is one highly illegal thing you should never ever even think of doing: dividing by zero.
 Let's go:
-```bash
-curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
+$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+```
+
 Unlike us, Java actually respects the laws of math and we should see the following exception on the console:
 ```
 ERROR: java.lang.ArithmeticException: / by zero
@@ -108,8 +113,10 @@ public final class DivisionRequest {
 
 
 Let's devide through zero again:
-```bash
-curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
+```
+$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
 ```
 
 Now, we see an `UnrecognizedExceptionOccurredException` on the console. This is actually an exception of the MapMaid project,
@@ -136,9 +143,11 @@ final HttpMaid httpMaid = anHttpMaid()
 
 Now, when we devide by zero (again):
 
-```bash
-curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
+$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+```
+
 we actually get something meaningful out of it:
 ```json
 {"errors":[{"path":"","message":"the divisor must not be 0"}]}
@@ -202,9 +211,9 @@ public final class Divisor {
 
 
 We will call these kinds of classes *custom primitives* throughout this guide since
-they act pretty much the same as primitive data types like int, double, or even String
-(which is technically not a primitve data type but it is used like one).
-In the world of domain-driven design (DDD) they are also called *value objects*,
+they act pretty much the same as primitive data types like `int`, `double`, or even `String`
+(which is technically not a primitive data type but it is used like one).
+In the world of Domain-Driven Design (DDD) they are also called *value objects*,
 but it does not really matter how you call them. 
 They encapsulate all aspects of a specific type of data and make sure that its
 value is valid. We can now change the `DivisionRequest` accordingly:
@@ -243,9 +252,12 @@ public final class DivisionUseCase {
 
 
 When you once again request the division by zero like this:
-```bash
-curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
+$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+```
+
 you will receive the following validation output:
 ```json
 {"errors":[{"path":"divisor","message":"the divisor must not be 0"}]}
