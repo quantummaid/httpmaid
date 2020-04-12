@@ -37,6 +37,7 @@ import java.util.Optional;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.http.headers.cookies.Cookies.cookiesFromHeaders;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.lang.String.format;
 
 @Getter
 @ToString
@@ -109,7 +110,7 @@ public final class HttpRequest {
 
     public Map<String, Object> bodyMap() {
         return optionalBodyMap()
-                .orElseThrow(() -> new RuntimeException("Request does not have a body map"));
+                .orElseThrow(() -> new RuntimeException(format("Request does not have a body map.%n%n%s", metaData.prettyPrint())));
     }
 
     @SuppressWarnings("unchecked")

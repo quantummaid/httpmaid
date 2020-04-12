@@ -1,0 +1,1 @@
+$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "3"}' http://localhost:1337/divide

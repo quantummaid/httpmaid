@@ -5,7 +5,7 @@ Let's suppose we need a web server, where users can upload files.
 In order to upload a file to our server, we need to give the user the
 ability to choose the uploaded file. This is achieved by the following web frontend that we will create
 in the classpath as the Java resource `upload.html`:
-<!---[CodeSnippet] (file=../examples/documentation/src/main/java/de/quantummaid/httpmaid/documentation/xx_multipart/upload.html)-->
+<!---[CodeSnippet] (file=../examples/documentation/src/test/java/de/quantummaid/httpmaid/documentation/multipart/upload.html)-->
 ```
 <html>
 <body>

@@ -63,15 +63,9 @@ and again does not contain a single dependency on any infrastructure code.
 We can now add the usecase to our configuration:
 <!---[CodeSnippet] (multiplicationUseCaseWithoutMappingExample)-->
 ```java
-public final class MultiplicationUseCaseWithoutMappingExample {
-
-    public static void main(final String[] args) {
-        final HttpMaid httpMaid = anHttpMaid()
-                .post("/multiply", MultiplicationUseCase.class)
-                .build();
-        pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
-    }
-}
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/multiply", MultiplicationUseCase.class)
+        .build();
 ```
 
 If we would start the application now, a `POST` request to `/multiply` would fail, because HttpMaid
@@ -79,12 +73,12 @@ does not yet know how to create the `MultiplicationRequest` parameter and what t
 return value.
 
 Sending a `POST` request using curl
-```bash
-curl -X POST http://localhost:1337/multiply
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/multiply1.curl)-->
 ```
+$ curl --request POST http://localhost:1337/multiply
+```
+
 would result in a `java.lang.NullPointerException`.
-Providing data with `-data="factor1=1&factor2=2"`
-would not yield a different result.
 
 ## Object mapping
 Until this point, it is unclear how HttpMaid could get the `MultiplicationRequest` parameter needed to call
@@ -129,7 +123,7 @@ to (de-)serialize our domain objects (`MultiplicationRequest`, `CalculationRespo
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-mapmaid</artifactId>
-    <version>0.9.41</version>
+    <version>0.9.42</version>
 </dependency>
 ```
 Please refer to MapMaid's documentation if you want to learn more about this feature.
@@ -144,9 +138,12 @@ final HttpMaid httpMaid = anHttpMaid()
 ```
 
 You can try the configuration with the following curl command:
-```bash
-curl --request POST --header 'Content-Type: application/json' --data '{"factor1": "3", "factor2": "4"}' http://localhost:1337/multiply
+
+<!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/multiply2.curl)-->
 ```
+$ curl --request POST --header 'Content-Type: application/json' --data '{"factor1": "3", "factor2": "4"}' http://localhost:1337/multiply
+```
+
 And see the correct result for the multiplication of 3 and 4:
 ```json
 {"result":"12"}

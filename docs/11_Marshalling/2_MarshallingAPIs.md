@@ -138,7 +138,7 @@ The `Content-Type` to be used in the response can be explicitly configured using
 the `setContentType()` method of the response object:
 <!---[CodeSnippet] (marshallingHandlerWithContentType)-->
 ```java
-public class MarshallingHandlerWithContentType implements HttpHandler {
+public final class MarshallingHandlerWithContentType implements HttpHandler {
     @Override
     public void handle(final HttpRequest request, final HttpResponse response) {
         final Map<String, Object> responseMap = Map.of(

@@ -20,7 +20,7 @@ In the console output of the application, you will see the complete stacktrace
 of the thrown exception:
 ```bash
 ERROR: java.lang.RuntimeException: this is an example
-	at de.quantummaid.httpmaid.documentation.xx_exceptions.ExceptionInHandlerExample.lambda$main$0(ExceptionInHandlerExample.java:36)
+	at de.quantummaid.httpmaid.documentation.exceptions.ExceptionExampleTests.lambda$main$0(ExceptionInHandlerExample.java:36)
 	at de.quantummaid.httpmaid.handler.http.HttpHandler.handle(HttpHandler.java:33)
 	at de.quantummaid.httpmaid.handler.InvokeHandlerProcessor.apply(InvokeHandlerProcessor.java:46)
 	[...]

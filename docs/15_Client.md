@@ -9,16 +9,16 @@ In access it, you need to include the client integration.
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-client</artifactId>
-    <version>0.9.41</version>
+    <version>0.9.42</version>
 </dependency>
 ```
 ## Configuring a client
 Before a client can be used, it needs to be configured. Example:
 <!---[CodeSnippet] (clientExample)-->
 ```java
-final HttpMaidClient httpMaidClient = aHttpMaidClientForTheHost("example.org")
+final HttpMaidClient httpMaidClient = aHttpMaidClientForTheHost("localhost")
         .withThePort(8080)
-        .viaHttps()
+        .viaHttp()
         .build();
 ```
 
@@ -48,12 +48,6 @@ final SimpleHttpResponseObject response = httpMaidClient.issue(aGetRequestToTheP
 
 final String stringResponse = httpMaidClient.issue(aGetRequestToThePath("/foo").mappedToString());
 
-final OrderConfirmation orderConfirmation = httpMaidClient.issue(
-        aPostRequestToThePath("/placeOrder")
-                .withTheBody("{articleId: 4324923}")
-                .mappedTo(OrderConfirmation.class));
-
-final InputStream myStream = null;
 final SimpleHttpResponseObject httpResponseObject = httpMaidClient.issue(
         aPostRequestToThePath("/upload")
                 .withAMultipartBodyWithTheParts(

@@ -6,19 +6,19 @@ The most lightweight endpoint is called `PureJavaEndpoint`. It relies entirely o
 other than HttpMaid core.
 <!---[CodeSnippet] (javaEndpoint)-->
 ```java
-pureJavaEndpointFor(httpMaid).listeningOnThePort(1337);
+pureJavaEndpointFor(httpMaid).listeningOnThePort(port);
 ```
 It does not support websockets.
 ## Jetty
 Another option is the Jetty endpoint:
 <!---[CodeSnippet] (jettyEndpoint)-->
 ```java
-jettyEndpointFor(httpMaid).listeningOnThePort(1337);
+jettyEndpointFor(httpMaid).listeningOnThePort(port);
 ```
 If you intend to use websockets, you can go with the Jetty-for-websockets variant:
 <!---[CodeSnippet] (jettyWebsocketsEndpoint)-->
 ```java
-jettyEndpointWithWebSocketsSupportFor(httpMaid).listeningOnThePort(1337);
+jettyEndpointWithWebSocketsSupportFor(httpMaid).listeningOnThePort(port);
 ```
 ## Servlet
 If you intend to host your application using standard Java servlet technology, you can go with the servlet endpoint.
