@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @ToString
@@ -34,7 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Enrichable {
     private final String key;
-    private Object value;
+    private Object value = new HashMap<>();
     private final List<InternalEnricher> enrichersWithoutOverwrite = new ArrayList<>();
     private final List<InternalEnricher> enrichersWithOverwrite = new ArrayList<>();
 

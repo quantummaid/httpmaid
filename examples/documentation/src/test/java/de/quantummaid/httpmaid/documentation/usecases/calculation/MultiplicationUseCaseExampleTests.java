@@ -29,7 +29,6 @@ import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.documentation.support.Deployer;
 import de.quantummaid.httpmaid.documentation.usecases.calculation.usecases.MultiplicationUseCase;
 import de.quantummaid.httpmaid.documentation.usecases.calculation.validationStep3.useCases.DivisionUseCase;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -110,14 +109,19 @@ public final class MultiplicationUseCaseExampleTests {
         });
     }
 
-    @Disabled
     @Test
     public void calculationWithQueryParametersExample() {
         final Gson GSON = new Gson();
         //Showcase start calculationWithQueryParametersExample
         final HttpMaid httpMaid = anHttpMaid()
-                .get("/multiply", MultiplicationUseCase.class, mappingQueryParameter("factor1"), mappingQueryParameter("factor2"))
-                .get("/divide", DivisionUseCase.class, mappingQueryParameter("dividend"), mappingQueryParameter("divisor"))
+                .get("/multiply", MultiplicationUseCase.class,
+                        mappingQueryParameter("factor1", "multiplicationRequest.factor1"),
+                        mappingQueryParameter("factor2", "multiplicationRequest.factor2")
+                )
+                .get("/divide", DivisionUseCase.class,
+                        mappingQueryParameter("dividend", "divisionRequest.dividend"),
+                        mappingQueryParameter("divisor", "divisionRequest.divisor")
+                )
                 .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
                 .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
                     mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);

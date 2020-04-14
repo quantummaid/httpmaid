@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.specs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.usecases.mapmaid.MapMaidUseCase;
+import de.quantummaid.httpmaid.tests.usecases.twoparameters.TwoParametersUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -97,10 +98,10 @@ public final class HttpMaidSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/mapmaid/<value1>", MapMaidUseCase.class,
-                                mappingPathParameter("value1"),
-                                mappingHeader("value2"),
-                                mappingHeader("value3"),
-                                mappingHeader("value4"))
+                                mappingPathParameter("value1", "dataTransferObject.value1"),
+                                mappingHeader("value2", "dataTransferObject.value2"),
+                                mappingHeader("value3", "dataTransferObject.value3"),
+                                mappingHeader("value4", "dataTransferObject.value4"))
                         .build()
         )
                 .when().aRequestToThePath("/mapmaid/derp").viaTheGetMethod().withAnEmptyBody()
@@ -120,7 +121,11 @@ public final class HttpMaidSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testTwoUseCaseParameters(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/twoparameters", TwoParametersUseCase.class, mappingHeader("param1"), mappingHeader("param2"))
+                        .build()
+        )
                 .when().aRequestToThePath("/twoparameters").viaTheGetMethod().withAnEmptyBody().withTheHeader("param1", "Hello").withTheHeader("param2", "World").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")

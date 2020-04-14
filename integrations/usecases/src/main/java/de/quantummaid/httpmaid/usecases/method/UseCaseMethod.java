@@ -92,21 +92,22 @@ public final class UseCaseMethod {
                                    final Map<String, Object> parameters,
                                    final Object event) throws Exception {
         final Object[] parameterInstances = this.parameters.toArray(parameters);
+        final Method method = this.method.method();
         try {
-            final Object returnValue = this.method.method().invoke(useCase, parameterInstances);
+            final Object returnValue = method.invoke(useCase, parameterInstances);
             return ofNullable(returnValue);
         } catch (final IllegalAccessException e) {
             final Class<?> useCaseClass = useCase.getClass();
-            throw methodInvocationException(useCaseClass, useCase, this.method.method(), event, e);
+            throw methodInvocationException(useCaseClass, useCase, method, event, e);
         } catch (final InvocationTargetException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
-            } else if (isDeclaredByMethod(cause, this.method.method())) {
+            } else if (isDeclaredByMethod(cause, method)) {
                 throw (Exception) cause;
             } else {
                 final Class<?> useCaseClass = useCase.getClass();
-                throw methodInvocationException(useCaseClass, useCase, this.method.method(), event, e);
+                throw methodInvocationException(useCaseClass, useCase, method, event, e);
             }
         }
     }

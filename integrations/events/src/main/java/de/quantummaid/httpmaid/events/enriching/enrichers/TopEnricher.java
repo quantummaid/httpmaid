@@ -34,7 +34,6 @@ public interface TopEnricher extends Enricher {
     @Override
     default void enrich(final HttpRequest httpRequest, final Event event) {
         final String mapKey = mapKey();
-        extractValue(httpRequest)
-                .ifPresent(value -> event.enrich(mapKey, value));
+        extractValue(httpRequest).ifPresent(value -> event.addInjection(mapKey, (String) value));
     }
 }

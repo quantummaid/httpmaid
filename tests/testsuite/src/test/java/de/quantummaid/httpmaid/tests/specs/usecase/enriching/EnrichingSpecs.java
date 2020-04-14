@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.SingleStringParameterUseCase;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.TwoStringsParameterUseCase;
-import org.junit.jupiter.api.Disabled;
+import de.quantummaid.mapmaid.debug.MapMaidException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -68,11 +68,11 @@ public class EnrichingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/<parameter>", SingleStringParameterUseCase.class, ignorePathParameter("parameter"))
-                        .configured(ExceptionConfigurators.toMapExceptionsOfType(IllegalArgumentException.class, (exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(ExceptionConfigurators.toMapExceptionsOfType(MapMaidException.class, (exception, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("parameter must not be null");
+                .theResponseBodyContains("Requiring the input to be an 'string' but found '{}' at 'parameter'");
     }
 
     @ParameterizedTest
@@ -123,13 +123,15 @@ public class EnrichingSpecs {
                 .theResponseBodyWas("\"foobar\"");
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void twoQueryParametersCanEnrichedATopLevelDto(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
-                        .get("/", DtoUseCase.class, mappingQueryParameter("value1"), mappingQueryParameter("value2"))
+                        .get("/", DtoUseCase.class,
+                                mappingQueryParameter("value1", "dataTransferObject.value1"),
+                                mappingQueryParameter("value2", "dataTransferObject.value2")
+                        )
                         .build()
         )
                 .when().aRequestToThePath("/?value1=foo&value2=bar").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -228,6 +230,6 @@ public class EnrichingSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("parameter must not be null");
+                .theResponseBodyContains("Requiring the input to be an 'string' but found '{}' at 'parameter'");
     }
 }
