@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers;
 
+import de.quantummaid.httpmaid.events.enriching.Injection;
 import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.shared.identifier.TypeIdentifier;
 import lombok.AccessLevel;
@@ -43,12 +44,16 @@ public final class MultipleParametersDeserializationWrapper implements MethodPar
 
     @Override
     public Map<String, Object> deserializeParameters(final Map<String, Object> input,
+                                                     final List<Injection> injections,
                                                      final List<Object> typeInjections,
                                                      final MapMaid mapMaid) {
         return mapMaid.deserializer().deserializeFromUniversalObject(
                 input,
                 this.typeIdentifier,
-                injector -> typeInjections.forEach(injector::put)
+                injector -> {
+                    injections.forEach(injection -> injector.put(injection.key(), injection.value()));
+                    typeInjections.forEach(injector::put);
+                }
         );
     }
 }

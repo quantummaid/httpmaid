@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.events;
 
 import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import de.quantummaid.httpmaid.events.enriching.Injection;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.events.enriching.Injection.injection;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.unmodifiableList;
 
@@ -39,14 +41,20 @@ import static java.util.Collections.unmodifiableList;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Event {
     private final EnrichableMap map;
+    private final List<Injection> injections;
     private final List<Object> typeInjections;
 
     public static Event event(final EnrichableMap map) {
-        return new Event(map, new ArrayList<>());
+        return new Event(map, new ArrayList<>(), new ArrayList<>());
     }
 
     public void enrich(final String key, final Object value) {
         map.enrichEitherTopOrSecondLevel(key, value);
+    }
+
+    public void addInjection(final String key, final String value) {
+        final Injection injection = injection(key, value);
+        this.injections.add(injection);
     }
 
     public void addTypeInjection(final Object injection) {
@@ -56,6 +64,10 @@ public final class Event {
 
     public Map<String, Object> asMap() {
         return map.asMap();
+    }
+
+    public List<Injection> injections() {
+        return unmodifiableList(this.injections);
     }
 
     public List<Object> typeInjections() {

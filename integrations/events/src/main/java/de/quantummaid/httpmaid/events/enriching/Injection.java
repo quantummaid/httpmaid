@@ -19,21 +19,34 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.events.enriching.enrichers;
+package de.quantummaid.httpmaid.events.enriching;
 
-import de.quantummaid.httpmaid.events.Event;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.Optional;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
-public interface TopEnricher extends Enricher {
-    String mapKey();
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Injection {
+    private final String key;
+    private final String value;
 
-    Optional<?> extractValue(HttpRequest request);
+    public static Injection injection(final String key,
+                                      final String object) {
+        validateNotNull(key, "key");
+        validateNotNull(object, "object");
+        return new Injection(key, object);
+    }
 
-    @Override
-    default void enrich(final HttpRequest httpRequest, final Event event) {
-        final String mapKey = mapKey();
-        extractValue(httpRequest).ifPresent(value -> event.addInjection(mapKey, (String) value));
+    public String key() {
+        return key;
+    }
+
+    public String value() {
+        return value;
     }
 }
