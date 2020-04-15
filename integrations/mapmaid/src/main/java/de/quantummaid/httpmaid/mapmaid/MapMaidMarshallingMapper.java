@@ -22,10 +22,10 @@
 package de.quantummaid.httpmaid.mapmaid;
 
 import de.quantummaid.httpmaid.http.headers.ContentType;
-import de.quantummaid.httpmaid.marshalling.Marshaller;
 import de.quantummaid.httpmaid.marshalling.MarshallingModule;
 import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.mapper.marshalling.MarshallingType;
+import de.quantummaid.mapmaid.mapper.marshalling.Unmarshaller;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.http.headers.ContentType.formUrlEncoded;
-import static de.quantummaid.httpmaid.marshalling.urlencoded.UrlEncodedMarshaller.urlEncodedMarshaller;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedMarshallerRecipe.urlEncoded;
+import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedUnmarshaller.urlEncodedUnmarshaller;
 import static de.quantummaid.mapmaid.mapper.marshalling.MarshallingType.JSON;
 import static java.util.Arrays.asList;
 import static java.util.Map.of;
@@ -80,8 +80,8 @@ final class MapMaidMarshallingMapper {
     }
 
     void mapMarshalling(final MapMaid mapMaid, final MarshallingModule marshallingModule) {
-        final Marshaller urlEncodedMarshaller = urlEncodedMarshaller();
-        marshallingModule.addUnmarshaller(formUrlEncoded(), urlEncodedMarshaller::marshall);
+        final Unmarshaller urlEncodedMarshaller = urlEncodedUnmarshaller();
+        marshallingModule.addUnmarshaller(formUrlEncoded(), urlEncodedMarshaller::unmarshal);
 
         mapMaid.deserializer().supportedMarshallingTypes().stream()
                 .filter(marshallingType -> !contentTypeMappingsForUnmarshalling.containsValue(marshallingType))

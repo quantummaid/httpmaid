@@ -21,6 +21,10 @@
 
 package de.quantummaid.httpmaid.marshalling;
 
-public interface Unmarshaller {
-    Object unmarshall(String string) throws Exception;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.http.headers.ContentType;
+
+public interface DefaultContentTypeProvider {
+
+    ContentType provideDefaultContentType(HttpRequest request);
 }

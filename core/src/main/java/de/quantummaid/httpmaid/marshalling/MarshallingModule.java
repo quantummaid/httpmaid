@@ -24,9 +24,9 @@ package de.quantummaid.httpmaid.marshalling;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.http.headers.accept.Accept;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +41,11 @@ import java.util.function.Supplier;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.HttpMaidChains.POST_INVOKE;
 import static de.quantummaid.httpmaid.HttpMaidChains.PROCESS_BODY_STRING;
+import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
 import static de.quantummaid.httpmaid.http.headers.accept.Accept.fromMetaData;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Objects.isNull;
 import static java.util.Optional.*;
 import static java.util.stream.Collectors.toList;
@@ -52,7 +54,7 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MarshallingModule implements ChainModule {
-    private volatile ContentType defaultContentType;
+    private volatile DefaultContentTypeProvider defaultContentType;
     private final Map<ContentType, Unmarshaller> unmarshallers;
     private final Map<ContentType, Marshaller> marshallers;
     private volatile boolean throwExceptionIfNoMarshallerFound;
@@ -62,25 +64,30 @@ public final class MarshallingModule implements ChainModule {
     }
 
     public void addUnmarshaller(final ContentType contentType, final Unmarshaller unmarshaller) {
-        Validators.validateNotNull(contentType, "contentType");
-        Validators.validateNotNull(unmarshaller, "unmarshaller");
+        validateNotNull(contentType, "contentType");
+        validateNotNull(unmarshaller, "unmarshaller");
         unmarshallers.put(contentType, unmarshaller);
         if (defaultContentType == null) {
-            defaultContentType = contentType;
+            setDefaultContentType(contentType);
         }
     }
 
     public void addMarshaller(final ContentType contentType, final Marshaller marshaller) {
-        Validators.validateNotNull(contentType, "contentType");
-        Validators.validateNotNull(marshaller, "marshaller");
+        validateNotNull(contentType, "contentType");
+        validateNotNull(marshaller, "marshaller");
         marshallers.put(contentType, marshaller);
         if (defaultContentType == null) {
-            defaultContentType = contentType;
+            setDefaultContentType(contentType);
         }
     }
 
     public void setDefaultContentType(final ContentType defaultContentType) {
-        Validators.validateNotNull(defaultContentType, "defaultContentType");
+        validateNotNull(defaultContentType, "defaultContentType");
+        setDefaultContentType(request -> defaultContentType);
+    }
+
+    public void setDefaultContentType(final DefaultContentTypeProvider defaultContentType) {
+        validateNotNull(defaultContentType, "defaultContentType");
         this.defaultContentType = defaultContentType;
     }
 
@@ -100,6 +107,8 @@ public final class MarshallingModule implements ChainModule {
 
             final Unmarshaller unmarshaller;
             if (contentType.isEmpty()) {
+                final HttpRequest request = httpRequest(metaData);
+                final ContentType defaultContentType = this.defaultContentType.provideDefaultContentType(request);
                 unmarshaller = unmarshallers.get(defaultContentType);
             } else {
                 unmarshaller = unmarshallers.get(contentType);
@@ -153,7 +162,7 @@ public final class MarshallingModule implements ChainModule {
                 .filter(accept::contentTypeIsAccepted)
                 .collect(toList());
         if (candidates.isEmpty()) {
-            return defaultResponseContentType()
+            return defaultResponseContentType(metaData)
                     .orElseThrow(() -> ResponseContentTypeCouldNotBeDeterminedException.responseContentTypeCouldNotBeDeterminedException(metaData));
         }
         final Optional<ContentType> requestContentType = metaData.getOptional(REQUEST_CONTENT_TYPE)
@@ -161,16 +170,20 @@ public final class MarshallingModule implements ChainModule {
         if (requestContentType.isPresent()) {
             return requestContentType.get();
         }
+        final HttpRequest request = httpRequest(metaData);
+        final ContentType defaultContentType = this.defaultContentType.provideDefaultContentType(request);
         if(candidates.contains(defaultContentType)) {
             return defaultContentType;
         }
         return candidates.get(0);
     }
 
-    private Optional<ContentType> defaultResponseContentType() {
+    private Optional<ContentType> defaultResponseContentType(final MetaData metaData) {
         if (marshallers.isEmpty()) {
             return empty();
         }
+        final HttpRequest request = httpRequest(metaData);
+        final ContentType defaultContentType = this.defaultContentType.provideDefaultContentType(request);
         if (marshallers.containsKey(defaultContentType)) {
             return ofNullable(defaultContentType);
         }
