@@ -26,11 +26,11 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>quantummaid-opensource-parent</artifactId>
-        <version>0.9.24</version>
+        <version>0.9.29</version>
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.43</version>
+    <version>0.9.44</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
@@ -113,7 +113,7 @@
             <plugin>
                 <groupId>de.quantummaid</groupId>
                 <artifactId>documaid</artifactId>
-                <version>0.9.14</version>
+                <version>${documaid-version}</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>

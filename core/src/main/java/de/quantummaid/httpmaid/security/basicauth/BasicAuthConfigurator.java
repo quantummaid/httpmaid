@@ -78,7 +78,7 @@ public final class BasicAuthConfigurator implements SecurityConfigurator<BasicAu
         authenticatorConfigurator.rejectingUnauthenticatedRequestsUsing((request, response) -> {
             final StringBuilder headerBuilder = new StringBuilder();
             headerBuilder.append("Basic");
-            if(nonNull(realm)) {
+            if (nonNull(realm)) {
                 headerBuilder.append(format(" realm=\"%s\"", realm));
             }
             response.addHeader(WWW_AUTHENTICATE, headerBuilder.toString());
