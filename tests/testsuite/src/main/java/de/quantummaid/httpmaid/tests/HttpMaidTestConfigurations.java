@@ -54,7 +54,6 @@ public final class HttpMaidTestConfigurations {
                 .get("/headers_response", HeadersInResponseUseCase.class)
                 .get("/echo_contenttype", EchoContentTypeUseCase.class)
                 .get("/set_contenttype_in_response", SetContentTypeInResponseUseCase.class)
-                .get("/twoparameters", TwoParametersUseCase.class, mappingHeader("param1"), mappingHeader("param2"))
                 .get("/void", VoidUseCase.class)
 
                 .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> {

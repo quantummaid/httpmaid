@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.CoreModule;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
+import de.quantummaid.httpmaid.events.enriching.Injection;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.httpmaid.marshalling.MarshallingModule;
@@ -113,8 +114,9 @@ public final class MapMaidModule implements ChainModule {
             deserializationWrappers.forEach((type, wrapper) ->
                     parameterProviders.put(type, event -> {
                         final Map<String, Object> map = event.asMap();
+                        final List<Injection> injections = event.injections();
                         final List<Object> typeInjections = event.typeInjections();
-                        return wrapper.deserializeParameters(map, typeInjections, mapMaid);
+                        return wrapper.deserializeParameters(map, injections, typeInjections, mapMaid);
                     }));
 
             final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
