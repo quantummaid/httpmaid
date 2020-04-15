@@ -22,10 +22,8 @@
 package de.quantummaid.httpmaid.tests.specs.mapmaid;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyUseCase;
-import de.quantummaid.mapmaid.mapper.marshalling.Unmarshaller;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -37,23 +35,14 @@ import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMa
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentTypeInResponses;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallContentTypeInRequests;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.ALL_ENVIRONMENTS;
-import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedUnmarshaller.urlEncodedUnmarshaller;
 
 public final class MapMaidSpecs {
 
     private static HttpMaid httpMaid() {
-        final Unmarshaller urlEncodedUnmarshaller = urlEncodedUnmarshaller();
         return anHttpMaid()
                 .post("/", (request, response) -> request.optionalBodyMap().ifPresent(response::setBody))
                 .configured(toUnmarshallContentTypeInRequests(fromString("custom"), string -> Map.of("key", "value")))
                 .configured(toMarshallContentTypeInResponses(fromString("custom"), map -> "custom_marshalled"))
-                .configured(toUnmarshallContentTypeInRequests(ContentType.formUrlEncoded(), string -> {
-                    try {
-                        return urlEncodedUnmarshaller.unmarshal(string);
-                    } catch (final Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }))
                 .build();
     }
 
@@ -70,7 +59,14 @@ public final class MapMaidSpecs {
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void mapMaidIntegrationCanUnmarshalFormEncodedButDoesNotMarshalFormEncodedByDefault(final TestEnvironment testEnvironment) {
-        testEnvironment.given(httpMaid())
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", (request, response) -> {
+                            final Map<String, Object> bodyMap = request.bodyMap();
+                            response.setBody(bodyMap);
+                        })
+                        .build()
+        )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("a=b").withContentType("application/x-www-form-urlencoded").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/json")

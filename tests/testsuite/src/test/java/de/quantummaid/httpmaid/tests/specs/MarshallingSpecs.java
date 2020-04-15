@@ -229,7 +229,7 @@ public final class MarshallingSpecs {
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("asdf").isIssued()
                 .theStatusCodeWas(501)
-                .theResponseBodyWas("Content type 'asdf' is not supported; supported content types are: 'qwer'");
+                .theResponseBodyWas("Content type 'asdf' is not supported; supported content types are: 'application/x-www-form-urlencoded, qwer'");
     }
 
     @ParameterizedTest
