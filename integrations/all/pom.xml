@@ -51,8 +51,8 @@
             <version>0.9.44</version>
         </dependency>
         <dependency>
-            <groupId>de.quantummaid.httpmaid.examples</groupId>
-            <artifactId>aws-lambda</artifactId>
+            <groupId>de.quantummaid.httpmaid.integrations</groupId>
+            <artifactId>httpmaid-awslambda</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
