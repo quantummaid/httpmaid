@@ -30,7 +30,7 @@
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.46</version>
+    <version>0.9.47</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
