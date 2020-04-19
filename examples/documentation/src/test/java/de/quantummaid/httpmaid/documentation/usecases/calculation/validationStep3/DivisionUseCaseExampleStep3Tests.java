@@ -21,6 +21,9 @@
 
 package de.quantummaid.httpmaid.documentation.usecases.calculation.validationStep3;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.HttpClientRequestBuilder;
@@ -35,6 +38,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.documentation.support.curl.Curl.parseFromCurlFile;
+import static de.quantummaid.httpmaid.documentation.usecases.calculation.ValidationMatcher.isJson;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
@@ -78,6 +82,15 @@ public final class DivisionUseCaseExampleStep3Tests {
         final int statusCode = response.getStatusCode();
         assertThat(statusCode, is(500));
         final String body = response.getBody();
-        assertThat(body, is("{\"errors\":[{\"path\":\"divisionRequest.divisor\",\"message\":\"the divisor must not be 0\"}]}"));
+        assertThat(body, isJson("{\"errors\":[{\"message\":\"the divisor must not be 0\",\"path\":\"divisionRequest.divisor\"}]}"));
+    }
+
+    private static JsonNode parseJson(final String json) {
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readTree(json);
+        } catch (final JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

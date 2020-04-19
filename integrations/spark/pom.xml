@@ -34,10 +34,6 @@
 
     <name>HttpMaid - Integrations - Spark</name>
 
-    <properties>
-        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>de.quantummaid.httpmaid</groupId>

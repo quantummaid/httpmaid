@@ -35,6 +35,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.documentation.support.curl.Curl.parseFromCurlFile;
+import static de.quantummaid.httpmaid.documentation.usecases.calculation.ValidationMatcher.isJson;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
@@ -78,6 +79,6 @@ public final class DivisionUseCaseExampleStep2Tests {
         final int statusCode = response.getStatusCode();
         assertThat(statusCode, is(500));
         final String body = response.getBody();
-        assertThat(body, is("{\"errors\":[{\"message\":\"the divisor must not be 0\",\"path\":\"divisionRequest\"}]}"));
+        assertThat(body, isJson("{\"errors\":[{\"message\":\"the divisor must not be 0\",\"path\":\"divisionRequest\"}]}"));
     }
 }
