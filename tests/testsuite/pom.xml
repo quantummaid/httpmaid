@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.48</version>
+        <version>0.9.49</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -40,7 +40,7 @@
         <spotbugs.excludeFilterFile>
             ${project.basedir}/src/test/spotbugs/spotbugs-exclude.xml
         </spotbugs.excludeFilterFile>
-        <plugin-update-file-checksum>915baffd77985e9da0d3cfee67e149eb</plugin-update-file-checksum>
+        <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
@@ -108,13 +108,24 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-lambda</artifactId>
-            <version>1.11.762</version>
+            <version>1.11.764</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.dataformat</groupId>
+                    <artifactId>jackson-dataformat-cbor</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <version>2.11.0.rc1</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.762</version>
+            <version>1.11.764</version>
             <scope>test</scope>
         </dependency>
         <dependency>

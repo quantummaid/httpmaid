@@ -30,7 +30,7 @@
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.48</version>
+    <version>0.9.49</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
@@ -111,33 +111,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacobo-maven-plugin-version}</version>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <!--
-                        <configuration>
-                            <append>true</append>
-                            <destFile>/home/marco/repositories/quantummaid/httpmaid/coverage/target/jacoco2.exec</destFile>
-                        </configuration>
-                        -->
-                    </execution>
-                    <!--
-                    <execution>
-                        <id>report-aggregate</id>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                    </execution>
-                    -->
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>de.quantummaid</groupId>
                 <artifactId>documaid</artifactId>
