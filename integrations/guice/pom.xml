@@ -35,6 +35,7 @@
     <name>HttpMaid - Integrations - Guice</name>
 
     <properties>
+        <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>

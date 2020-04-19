@@ -38,6 +38,7 @@
         <checkstyle.suppressions.location>
             ${project.basedir}/src/test/checkstyle/checkstyle-suppressions.xml
         </checkstyle.suppressions.location>
+        <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
