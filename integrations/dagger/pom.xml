@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid</groupId>
         <artifactId>integrations-parent</artifactId>
-        <version>0.9.48</version>
+        <version>0.9.49</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
@@ -35,7 +35,7 @@
     <name>HttpMaid - Integrations - Dagger</name>
 
     <properties>
-        <sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>

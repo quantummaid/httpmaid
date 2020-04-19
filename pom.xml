@@ -30,7 +30,7 @@
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.48</version>
+    <version>0.9.49</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
@@ -86,8 +86,7 @@
     <properties>
         <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
         <plugin-update-file-checksum>915baffd77985e9da0d3cfee67e149eb</plugin-update-file-checksum>
-        <aggregate.report.dir>tests/testsuite/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
-        <sonar.coverage.jacoco.xmlReportPaths>tests/testsuite/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -145,6 +144,7 @@
                 <module>integrations</module>
                 <module>tests</module>
                 <module>examples</module>
+                <module>coverage</module>
             </modules>
         </profile>
         <profile>
