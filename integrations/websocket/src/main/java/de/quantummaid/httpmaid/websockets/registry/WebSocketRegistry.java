@@ -46,7 +46,8 @@ public final class WebSocketRegistry {
     }
 
     public synchronized WebSocket byId(final WebSocketId id) {
-        return activeWebSockets.get(id).orElseThrow(() -> webSocketNotFoundException(id));
+        return activeWebSockets.get(id)
+                .orElseThrow(() -> webSocketNotFoundException(id));
     }
 
     public synchronized void register(final WebSocketId id,
@@ -56,12 +57,13 @@ public final class WebSocketRegistry {
     }
 
     public synchronized void activate(final WebSocketId id) {
-        final WebSocket webSocket = preActiveWebSockets.getAndRemove(id).orElseThrow(() -> webSocketNotFoundException(id));
+        final WebSocket webSocket = preActiveWebSockets.getAndRemove(id)
+                .orElseThrow(() -> webSocketNotFoundException(id));
         activeWebSockets.put(id, webSocket);
     }
 
     public synchronized void unregister(final WebSocketId id) {
-        activeWebSockets.getAndRemove(id).orElseThrow(() -> webSocketNotFoundException(id));
+        activeWebSockets.remove(id, () -> webSocketNotFoundException(id));
         updateMetrics();
     }
 

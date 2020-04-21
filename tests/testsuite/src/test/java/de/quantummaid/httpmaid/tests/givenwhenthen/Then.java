@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
-import de.quantummaid.httpmaid.tests.specs.LowLevelHttpMaidConfiguration;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +40,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public final class Then {
     private final HttpClientResponse response;
     private final Throwable initializationException;
+    private final TestLogger logger;
 
-    static Then then(final HttpClientResponse response, final Throwable initializationException) {
-        return new Then(response, initializationException);
+    static Then then(final HttpClientResponse response,
+                     final Throwable initializationException,
+                     final TestLogger logger) {
+        return new Then(response, initializationException, logger);
     }
 
     public Then anExceptionHasBeenThrownDuringInitializationWithAMessageContaining(final String expectedMessage) {
@@ -87,7 +89,7 @@ public final class Then {
     }
 
     public Then theLogOutputStartedWith(final String expectedPrefix) {
-        final String logContent = LowLevelHttpMaidConfiguration.logger.toString();
+        final String logContent = logger.logContent();
         assertThat(logContent, startsWith(expectedPrefix));
         return this;
     }

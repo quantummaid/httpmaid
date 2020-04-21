@@ -19,8 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.purejavaendpoint;
+package de.quantummaid.httpmaid.endpoint;
 
-public interface PortStage {
-    PureJavaEndpoint listeningOnThePort(int port);
+public interface RawRequestExtractor {
+    RawRequest extract() throws Exception;
 }

@@ -39,18 +39,21 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     private final Map<String, String> headers = new HashMap<>();
     private Object body;
     private final Throwable initializationException;
+    private final TestLogger logger;
 
-    static When successWhen(final HttpClientWrapper clientWrapper) {
-        return new When(clientWrapper, null);
+    static When successWhen(final HttpClientWrapper clientWrapper,
+                            final TestLogger logger) {
+        return new When(clientWrapper, null, logger);
     }
 
-    static When failureWhen(final Throwable initializationException) {
-        return new When(null, initializationException);
+    static When failureWhen(final Throwable initializationException,
+                            final TestLogger logger) {
+        return new When(null, initializationException, logger);
     }
 
     @Override
     public Then httpMaidIsInitialized() {
-        return Then.then(null, initializationException);
+        return Then.then(null, initializationException, logger);
     }
 
     @Override
@@ -130,7 +133,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
             } else {
                 response = clientWrapper.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
             }
-            return Then.then(response, initializationException);
+            return Then.then(response, initializationException, logger);
         }
     }
 }

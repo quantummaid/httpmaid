@@ -19,24 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.handlers;
+package de.quantummaid.httpmaid.endpoint.purejavaendpoint;
 
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.handler.Handler;
-import de.quantummaid.httpmaid.http.headers.ContentType;
-
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_CONTENT_TYPE;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_STRING;
-
-public final class EchoContentTypeHandler implements Handler {
-
-    public static Handler echoContentTypeHandler() {
-        return new EchoContentTypeHandler();
-    }
-
-    @Override
-    public void handle(final MetaData metaData) {
-        final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
-        metaData.set(RESPONSE_BODY_STRING, contentType.internalValueForMapping());
-    }
+public interface PortStage {
+    PureJavaEndpoint listeningOnThePort(int port);
 }

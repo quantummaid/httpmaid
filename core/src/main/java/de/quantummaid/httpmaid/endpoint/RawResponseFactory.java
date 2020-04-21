@@ -19,21 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.handlers;
+package de.quantummaid.httpmaid.endpoint;
 
-import de.quantummaid.httpmaid.handler.http.HttpHandler;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
-import de.quantummaid.httpmaid.handler.http.HttpResponse;
-import de.quantummaid.httpmaid.handler.Handler;
-
-public final class HeadersInResponseHandler implements HttpHandler {
-
-    public static Handler headersInResponseHandler() {
-        return new HeadersInResponseHandler();
-    }
-
-    @Override
-    public void handle(final HttpRequest request, final HttpResponse httpResponse) {
-        httpResponse.addHeader("foo", "bar");
-    }
+public interface RawResponseFactory<T> {
+    T createResponse(RawResponse response) throws Exception;
 }

@@ -55,7 +55,7 @@
         <dependency>
             <groupId>de.quantummaid.reflectmaid</groupId>
             <artifactId>reflectmaid-parent</artifactId>
-            <version>0.1.10</version>
+            <version>0.1.13</version>
         </dependency>
     </dependencies>
 </project>

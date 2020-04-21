@@ -21,14 +21,7 @@
 
 package de.quantummaid.httpmaid.documentation.multipart;
 
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.multipart.MultipartPart;
-import de.quantummaid.httpmaid.multipart.handler.MultipartHandler;
-import org.junit.jupiter.api.Test;
-
-import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.multipart.MultipartConfigurators.toExposeMultipartBodiesUsingMultipartIteratorBody;
-import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
 public final class MultipartIteratorExample {
 

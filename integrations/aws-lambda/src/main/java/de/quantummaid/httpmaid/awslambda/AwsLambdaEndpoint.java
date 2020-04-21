@@ -25,30 +25,25 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
 import de.quantummaid.httpmaid.logger.LoggerImplementation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaLogger.awsLambdaLogger;
-import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
-import static de.quantummaid.httpmaid.util.Maps.mapToMultiMap;
-import static de.quantummaid.httpmaid.util.Streams.inputStreamToString;
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
+import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AwsLambdaEndpoint {
 
-    public static final MetaDataKey<Context> CONTEXT_KEY = metaDataKey("awsLambdaContext");
+    public static final MetaDataKey<Context> CONTEXT = metaDataKey("awsLambdaContext");
 
     private final HttpMaid httpMaid;
 
@@ -62,30 +57,29 @@ public final class AwsLambdaEndpoint {
     }
 
     public APIGatewayProxyResponseEvent delegate(final APIGatewayProxyRequestEvent event, final Context context) {
-        final String httpRequestMethod = event.getHttpMethod();
-        final Map<String, String> pathParameters = event.getPathParameters();
-        final String path = pathParameters.get("path");
-        final Map<String, String> headers = event.getHeaders();
-        final String body = ofNullable(event.getBody()).orElse("");
-        final InputStream bodyStream = stringToInputStream(body);
-        final Map<String, String> queryParameters = ofNullable(event.getQueryStringParameters()).orElseGet(HashMap::new);
-
-        final MetaData metaData = emptyMetaData();
-        metaData.set(RAW_REQUEST_HEADERS, mapToMultiMap(headers));
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
-        metaData.set(RAW_METHOD, httpRequestMethod);
-        metaData.set(RAW_PATH, path);
-        metaData.set(REQUEST_BODY_STREAM, bodyStream);
-        metaData.set(CONTEXT_KEY, context);
-        metaData.set(IS_HTTP_REQUEST, true);
-
-        httpMaid.handleRequest(metaData, response -> {
+        return httpMaid.handleRequestSynchronously(() -> {
+            final RawRequestBuilder builder = rawRequestBuilder();
+            final String httpRequestMethod = event.getHttpMethod();
+            builder.withMethod(httpRequestMethod);
+            final Map<String, String> pathParameters = event.getPathParameters();
+            final String path = pathParameters.get("path");
+            builder.withPath(path);
+            final Map<String, String> headers = event.getHeaders();
+            builder.withUniqueHeaders(headers);
+            final Map<String, String> queryParameters = ofNullable(event.getQueryStringParameters()).orElseGet(HashMap::new);
+            builder.withQueryParameters(queryParameters);
+            final String body = ofNullable(event.getBody()).orElse("");
+            builder.withBody(body);
+            builder.withAdditionalMetaData(CONTEXT, context);
+            return builder.build();
+        }, response -> {
+            final int statusCode = response.status();
+            final Map<String, String> responseHeaders = response.uniqueHeaders();
+            final String responseBody = response.stringBody();
+            return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(statusCode)
+                    .withHeaders(responseHeaders)
+                    .withBody(responseBody);
         });
-
-        final int statusCode = metaData.get(RESPONSE_STATUS);
-        final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-        final InputStream responseStream = metaData.getOptional(RESPONSE_STREAM).orElseGet(() -> stringToInputStream(""));
-        final String responseBody = inputStreamToString(responseStream);
-        return new APIGatewayProxyResponseEvent().withStatusCode(statusCode).withHeaders(responseHeaders).withBody(responseBody);
     }
 }

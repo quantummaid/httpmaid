@@ -63,7 +63,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-jackson</artifactId>
-            <version>0.9.44</version>
+            <version>0.9.45</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -108,7 +108,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-lambda</artifactId>
-            <version>1.11.764</version>
+            <version>1.11.765</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.764</version>
+            <version>1.11.765</version>
             <scope>test</scope>
         </dependency>
         <dependency>

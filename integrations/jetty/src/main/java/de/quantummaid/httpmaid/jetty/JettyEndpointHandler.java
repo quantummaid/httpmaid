@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.jetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.server.Request;
@@ -30,7 +30,6 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -38,10 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
-import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
-import static de.quantummaid.httpmaid.util.Streams.streamInputStreamToOutputStream;
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
+import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
 
@@ -58,30 +54,27 @@ final class JettyEndpointHandler extends AbstractHandler {
     public void handle(final String target,
                        final Request request,
                        final HttpServletRequest httpServletRequest,
-                       final HttpServletResponse httpServletResponse) throws IOException {
-        final String method = request.getMethod();
-        final String path = request.getPathInfo();
-        final Map<String, List<String>> headers = extractHeaders(request);
-        final Map<String, String> queryParameters = extractQueryParameters(request);
-        final InputStream body = request.getInputStream();
-
-        final MetaData metaData = emptyMetaData();
-        metaData.set(RAW_REQUEST_HEADERS, headers);
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
-        metaData.set(RAW_METHOD, method);
-        metaData.set(RAW_PATH, path);
-        metaData.set(REQUEST_BODY_STREAM, body);
-        metaData.set(IS_HTTP_REQUEST, true);
-
-        httpMaid.handleRequest(metaData, httpResponse -> {
-            final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-            responseHeaders.forEach(httpServletResponse::setHeader);
-            final int responseStatus = metaData.get(RESPONSE_STATUS);
-            httpServletResponse.setStatus(responseStatus);
-            final OutputStream outputStream = httpServletResponse.getOutputStream();
-            final InputStream inputStream = metaData.getOptional(RESPONSE_STREAM).orElseGet(() -> stringToInputStream(""));
-            streamInputStreamToOutputStream(inputStream, outputStream);
-        });
+                       final HttpServletResponse httpServletResponse) {
+        httpMaid.handleRequest(() -> {
+                    final RawRequestBuilder builder = rawRequestBuilder();
+                    final String path = request.getPathInfo();
+                    builder.withPath(path);
+                    final String method = request.getMethod();
+                    builder.withMethod(method);
+                    final Map<String, List<String>> headers = extractHeaders(request);
+                    builder.withHeaders(headers);
+                    final Map<String, String> queryParameters = extractQueryParameters(request);
+                    builder.withQueryParameters(queryParameters);
+                    final InputStream body = request.getInputStream();
+                    builder.withBody(body);
+                    return builder.build();
+                },
+                response -> {
+                    response.setHeaders(httpServletResponse::setHeader);
+                    httpServletResponse.setStatus(response.status());
+                    final OutputStream outputStream = httpServletResponse.getOutputStream();
+                    response.streamBodyToOutputStream(outputStream);
+                });
     }
 
     private static Map<String, List<String>> extractHeaders(final HttpServletRequest request) {

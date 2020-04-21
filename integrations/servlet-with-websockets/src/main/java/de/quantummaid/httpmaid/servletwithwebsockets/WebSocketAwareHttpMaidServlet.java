@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.servletwithwebsockets;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
 import de.quantummaid.httpmaid.websockets.registry.WebSocketId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -33,10 +34,10 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static de.quantummaid.httpmaid.servlet.ServletHandling.extractMetaDataFromHttpServletRequest;
 import static de.quantummaid.httpmaid.servlet.ServletHandling.handle;
+import static de.quantummaid.httpmaid.servletwithwebsockets.JettyStyleWebSocket.jettyStyleSocket;
 import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.*;
 import static de.quantummaid.httpmaid.websockets.registry.WebSocketId.randomWebSocketId;
 
@@ -55,10 +56,12 @@ public final class WebSocketAwareHttpMaidServlet extends WebSocketServlet {
     @Override
     public void configure(final WebSocketServletFactory webSocketServletFactory) {
         webSocketServletFactory.setCreator((servletUpgradeRequest, servletUpgradeResponse) -> {
-            final MetaData metaData = extractMetaDataFromHttpServletRequest(servletUpgradeRequest.getHttpServletRequest());
+            final RawRequestBuilder builder = extractMetaDataFromHttpServletRequest(servletUpgradeRequest.getHttpServletRequest());
+            final MetaData metaData = MetaData.emptyMetaData();
+            builder.build().enter(metaData);
             final WebSocketId webSocketId = randomWebSocketId();
             metaData.set(WEBSOCKET_ID, webSocketId);
-            final JettyStyleWebSocket jettyStyleSocket = JettyStyleWebSocket.jettyStyleSocket(httpMaid, webSocketId);
+            final JettyStyleWebSocket jettyStyleSocket = jettyStyleSocket(httpMaid, webSocketId);
             metaData.set(WEBSOCKET_DELEGATE, jettyStyleSocket);
 
             httpMaid.handleRequest(metaData, m -> {
@@ -74,31 +77,31 @@ public final class WebSocketAwareHttpMaidServlet extends WebSocketServlet {
 
     @Override
     protected void doGet(final HttpServletRequest request,
-                         final HttpServletResponse response) throws IOException {
+                         final HttpServletResponse response) {
         handle(httpMaid, request, response);
     }
 
     @Override
     protected void doPost(final HttpServletRequest request,
-                          final HttpServletResponse response) throws IOException {
+                          final HttpServletResponse response) {
         handle(httpMaid, request, response);
     }
 
     @Override
     protected void doPut(final HttpServletRequest request,
-                         final HttpServletResponse response) throws IOException {
+                         final HttpServletResponse response) {
         handle(httpMaid, request, response);
     }
 
     @Override
     protected void doDelete(final HttpServletRequest request,
-                            final HttpServletResponse response) throws IOException {
+                            final HttpServletResponse response) {
         handle(httpMaid, request, response);
     }
 
     @Override
     protected void doOptions(final HttpServletRequest request,
-                             final HttpServletResponse response) throws IOException {
+                             final HttpServletResponse response) {
         handle(httpMaid, request, response);
     }
 }

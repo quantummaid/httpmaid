@@ -19,28 +19,31 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.handlers;
+package de.quantummaid.httpmaid.endpoint;
 
-import de.quantummaid.httpmaid.handler.http.HttpHandler;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
-import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ExceptionThrowingHandler implements HttpHandler {
+public final class SynchronizationWrapper<T> {
+    private volatile T object;
 
-    public static ExceptionThrowingHandler exceptionThrowingHandler() {
-        return new ExceptionThrowingHandler();
+    public static <T> SynchronizationWrapper<T> synchronizationWrapper() {
+        return new SynchronizationWrapper<>();
     }
 
-    @Override
-    public void handle(final HttpRequest request,
-                       final HttpResponse httpResponse) {
-        throw new RuntimeException();
+    public T getObject() {
+        validateNotNull(object, "object");
+        return object;
+    }
+
+    public void setObject(final T object) {
+        this.object = object;
     }
 }
