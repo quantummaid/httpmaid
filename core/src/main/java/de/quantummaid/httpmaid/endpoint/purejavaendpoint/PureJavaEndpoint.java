@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.purejavaendpoint;
+package de.quantummaid.httpmaid.endpoint.purejavaendpoint;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
-import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpointHandler.javaOnlyEndpointHandler;
+import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpointHandler.javaOnlyEndpointHandler;
 
 @ToString
 @EqualsAndHashCode

@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.logger.LoggerImplementation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
@@ -29,27 +30,30 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.RequiredArgsConstructor;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public final class Given {
-    private final Supplier<HttpMaid> httpMaidSupplier;
+    private final Function<LoggerImplementation, HttpMaid> httpMaidSupplier;
     private final Deployer deployer;
     private final ClientFactory clientFactory;
 
-    public static Given given(final Supplier<HttpMaid> httpMaidSupplier, final Deployer deployer, final ClientFactory clientFactory) {
+    public static Given given(final Function<LoggerImplementation, HttpMaid> httpMaidSupplier,
+                              final Deployer deployer,
+                              final ClientFactory clientFactory) {
         return new Given(httpMaidSupplier, deployer, clientFactory);
     }
 
     public FirstWhenStage when() {
         final HttpMaid httpMaid;
+        final TestLogger logger = TestLogger.testLogger();
         try {
-            httpMaid = httpMaidSupplier.get();
+            httpMaid = httpMaidSupplier.apply(logger);
         } catch (final Throwable e) {
-            return When.failureWhen(e);
+            return When.failureWhen(e, logger);
         }
         final Deployment deployment = deployer.deploy(httpMaid);
         final HttpClientWrapper clientWrapper = clientFactory.createClient(deployment);
-        return When.successWhen(clientWrapper);
+        return When.successWhen(clientWrapper, logger);
     }
 }

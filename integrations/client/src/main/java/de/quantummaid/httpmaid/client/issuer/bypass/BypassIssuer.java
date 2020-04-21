@@ -22,12 +22,12 @@
 package de.quantummaid.httpmaid.client.issuer.bypass;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.client.HttpClientRequest;
 import de.quantummaid.httpmaid.client.RawClientResponse;
 import de.quantummaid.httpmaid.client.RequestPath;
 import de.quantummaid.httpmaid.client.UriString;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
+import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
 import de.quantummaid.httpmaid.util.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Function;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
-import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
-import static de.quantummaid.httpmaid.util.Maps.mapToMultiMap;
+import static de.quantummaid.httpmaid.client.RawClientResponse.rawClientResponse;
+import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toMap;
 
@@ -54,31 +53,24 @@ public final class BypassIssuer implements Issuer {
     @Override
     public <T> T issue(final HttpClientRequest<T> request,
                        final Function<RawClientResponse, T> responseMapper) {
-        final MetaData metaData = emptyMetaData();
         final RequestPath requestPath = request.path();
-        metaData.set(RAW_PATH, requestPath.path());
         final Map<String, String> queryParameters = requestPath.queryParameters()
                 .stream()
                 .collect(toMap(
                         queryParameter -> queryParameter.key().encoded(),
                         queryParameter -> queryParameter.value().map(UriString::encoded).orElse(""))
                 );
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
-        metaData.set(RAW_METHOD, request.method());
-        metaData.set(RAW_REQUEST_HEADERS, mapToMultiMap(request.headers()));
-        final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
-        metaData.set(REQUEST_BODY_STREAM, body);
-        metaData.set(IS_HTTP_REQUEST, true);
-
-        final SynchronizationWrapper<MetaData> wrapper = new SynchronizationWrapper<>();
-        this.httpMaid.handleRequest(metaData, wrapper::setObject);
-
-        final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-        final int responseStatus = metaData.get(RESPONSE_STATUS);
-        final InputStream responseBody = metaData.get(RESPONSE_STREAM);
-
-        final RawClientResponse response = RawClientResponse.rawClientResponse(responseStatus, responseHeaders, responseBody);
-        return responseMapper.apply(response);
+        final RawClientResponse rawClientResponse = httpMaid.handleRequestSynchronously(() -> {
+            final RawRequestBuilder builder = rawRequestBuilder();
+            builder.withPath(requestPath.path());
+            builder.withMethod(request.method());
+            builder.withUniqueHeaders(request.headers());
+            builder.withQueryParameters(queryParameters);
+            final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
+            builder.withBody(body);
+            return builder.build();
+        }, response -> rawClientResponse(response.status(), response.uniqueHeaders(), response.body()));
+        return responseMapper.apply(rawClientResponse);
     }
 
     @Override

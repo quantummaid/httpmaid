@@ -23,7 +23,8 @@ package de.quantummaid.httpmaid;
 
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
-import de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint;
+import de.quantummaid.httpmaid.endpoint.*;
+import de.quantummaid.httpmaid.logger.Logger;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -32,13 +33,13 @@ import java.time.Duration;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.LOGGER;
+import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
+import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
+import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
-/**
- * A configured {@link HttpMaid} instance. Can be deployed using an endpoint like
- * {@link PureJavaEndpoint}
- */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
     public static final MetaDataKey<Duration> STARTUP_TIME = metaDataKey("STARTUP_TIME");
@@ -56,13 +57,49 @@ public final class HttpMaid implements AutoCloseable {
         });
     }
 
+    public <T> T handleRequestSynchronously(final RawRequestExtractor rawRequestExtractor,
+                                            final RawResponseFactory<T> rawResponseFactory) {
+        final SynchronizationWrapper<T> synchronizationWrapper = synchronizationWrapper();
+        handleRequest(rawRequestExtractor, response -> {
+            final T returnedResponse = rawResponseFactory.createResponse(response);
+            synchronizationWrapper.setObject(returnedResponse);
+        });
+        return synchronizationWrapper.getObject();
+    }
+
+    public void handleRequest(final RawRequestExtractor rawRequestExtractor,
+                              final RawResponseHandler rawResponseHandler) {
+        final RawRequest rawRequest;
+        try {
+            rawRequest = rawRequestExtractor.extract();
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return;
+            // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
+        }
+        final MetaData metaData = emptyMetaData();
+        rawRequest.enter(metaData);
+        chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
+            final RawResponse rawResponse = rawResponse(finalMetaData);
+            try {
+                rawResponseHandler.handle(rawResponse);
+            } catch (final Exception e) {
+                final Logger logger = finalMetaData.get(LOGGER);
+                logger.error(e);
+                // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
+            }
+        });
+    }
+
     public void handleRequest(final MetaData metaData,
                               final FinalConsumer responseHandler) {
         chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
             try {
                 responseHandler.consume(metaData);
             } catch (final IOException e) {
-                throw new RuntimeException(e);
+                final Logger logger = finalMetaData.get(LOGGER);
+                logger.error(e);
+                // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
             }
         });
     }

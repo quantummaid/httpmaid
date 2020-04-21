@@ -17,7 +17,7 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.documentation.support.FreePortPool.freePort;
 import static de.quantummaid.httpmaid.jetty.JettyEndpoint.jettyEndpointFor;
 import static de.quantummaid.httpmaid.jettywithwebsockets.JettyEndpointWithWebSocketsSupport.jettyEndpointWithWebSocketsSupportFor;
-import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static de.quantummaid.httpmaid.servlet.ServletEndpoint.servletEndpointFor;
 import static de.quantummaid.httpmaid.servletwithwebsockets.WebSocketAwareHttpMaidServlet.webSocketAwareHttpMaidServlet;
 import static org.hamcrest.CoreMatchers.is;

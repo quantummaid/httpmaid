@@ -22,11 +22,11 @@
 package de.quantummaid.httpmaid.servlet;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.endpoint.RawRequest;
+import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -34,10 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
-import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
-import static de.quantummaid.httpmaid.util.Streams.streamInputStreamToOutputStream;
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
 import static java.util.Collections.singletonList;
 
 public final class ServletHandling {
@@ -47,35 +43,32 @@ public final class ServletHandling {
 
     public static void handle(final HttpMaid httpMaid,
                               final HttpServletRequest request,
-                              final HttpServletResponse response) throws IOException {
-        final MetaData metaData = extractMetaDataFromHttpServletRequest(request);
-        final InputStream body = request.getInputStream();
-        metaData.set(REQUEST_BODY_STREAM, body);
-        metaData.set(IS_HTTP_REQUEST, true);
-
-        httpMaid.handleRequest(metaData, httpResponse -> {
-            final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-            responseHeaders.forEach(response::setHeader);
-            final int responseStatus = metaData.get(RESPONSE_STATUS);
+                              final HttpServletResponse response) {
+        httpMaid.handleRequest(() -> {
+            final RawRequestBuilder builder = extractMetaDataFromHttpServletRequest(request);
+            final InputStream body = request.getInputStream();
+            builder.withBody(body);
+            return builder.build();
+        }, rawResponse -> {
+            rawResponse.setHeaders(response::setHeader);
+            final int responseStatus = rawResponse.status();
             response.setStatus(responseStatus);
             final OutputStream outputStream = response.getOutputStream();
-            final InputStream responseBody = metaData.getOptional(RESPONSE_STREAM).orElseGet(() -> stringToInputStream(""));
-            streamInputStreamToOutputStream(responseBody, outputStream);
+            rawResponse.streamBodyToOutputStream(outputStream);
         });
     }
 
-    public static MetaData extractMetaDataFromHttpServletRequest(final HttpServletRequest request) {
+    public static RawRequestBuilder extractMetaDataFromHttpServletRequest(final HttpServletRequest request) {
+        final RawRequestBuilder builder = RawRequest.rawRequestBuilder();
         final String path = request.getPathInfo();
+        builder.withPath(path);
         final String method = request.getMethod();
+        builder.withMethod(method);
         final Map<String, List<String>> headers = extractHeaders(request);
+        builder.withHeaders(headers);
         final Map<String, String> queryParameters = extractQueryParameters(request);
-
-        final MetaData metaData = emptyMetaData();
-        metaData.set(RAW_REQUEST_HEADERS, headers);
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
-        metaData.set(RAW_METHOD, method);
-        metaData.set(RAW_PATH, path);
-        return metaData;
+        builder.withQueryParameters(queryParameters);
+        return builder;
     }
 
     private static Map<String, List<String>> extractHeaders(final HttpServletRequest request) {

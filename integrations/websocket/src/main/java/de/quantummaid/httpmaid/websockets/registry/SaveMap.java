@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Optional.ofNullable;
@@ -57,6 +58,14 @@ final class SaveMap<K, V> {
         final Optional<V> value = ofNullable(map.get(key));
         value.ifPresent(x -> map.remove(key));
         return value;
+    }
+
+    void remove(final K key, final Supplier<RuntimeException> exceptionSupplier) {
+        if(map.containsKey(key)) {
+            map.remove(key);
+        } else {
+            throw exceptionSupplier.get();
+        }
     }
 
     Set<V> copyOfValues() {

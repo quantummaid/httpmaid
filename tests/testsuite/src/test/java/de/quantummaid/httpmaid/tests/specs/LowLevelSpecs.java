@@ -22,25 +22,27 @@
 package de.quantummaid.httpmaid.tests.specs;
 
 import de.quantummaid.httpmaid.handler.PageNotFoundException;
+import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
+import static de.quantummaid.httpmaid.debug.DebugConfigurator.toBeInDebugMode;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
-import static de.quantummaid.httpmaid.http.HttpRequestMethod.DELETE;
-import static de.quantummaid.httpmaid.tests.specs.LowLevelHttpMaidConfiguration.theLowLevelHttpMaidInstanceUsedForTesting;
-import static de.quantummaid.httpmaid.tests.specs.handlers.EchoBodyHandler.echoBodyHandler;
+import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogUsing;
 
 public final class LowLevelSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void pageNotFoundExceptionContainsContext(final TestEnvironment testEnvironment) {
-        testEnvironment.given(() -> anHttpMaid()
-                .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody(exception.getMessage())))
-                .build()
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody(exception.getMessage())))
+                        .build()
         )
                 .when().aRequestToThePath("/foo").viaThePostMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyContains("No handler found for path '/foo' and method 'POST'");
@@ -49,7 +51,11 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testBodyOfAPostRequest(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .post("/echo", (request, response) -> response.setBody(request.bodyString()))
+                        .build()
+        )
                 .when().aRequestToThePath("/echo").viaThePostMethod().withTheBody("This is a post request.").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("This is a post request.");
@@ -58,7 +64,11 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testBodyOfAPutRequest(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .put("/echo", (request, response) -> response.setBody(request.bodyString()))
+                        .build()
+        )
                 .when().aRequestToThePath("/echo").viaThePutMethod().withTheBody("This is a put request.").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("This is a put request.");
@@ -67,9 +77,9 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testBodyOfADeleteRequest(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
+        testEnvironment.given(() ->
                 anHttpMaid()
-                        .serving(echoBodyHandler()).forRequestPath("/echo").andRequestMethods(DELETE)
+                        .delete("/echo", (request, response) -> response.setBody(request.bodyString()))
                         .build()
         )
                 .when().aRequestToThePath("/echo").viaTheDeleteMethod().withTheBody("This is a delete request.").isIssued()
@@ -80,7 +90,14 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testContentTypeInRequest(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("echo_contenttype", metaData -> {
+                            final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
+                            metaData.set(RESPONSE_BODY_STRING, contentType.internalValueForMapping());
+                        })
+                        .build()
+        )
                 .when().aRequestToThePath("/echo_contenttype").viaTheGetMethod().withAnEmptyBody().withContentType("foobar").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("foobar");
@@ -89,7 +106,14 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testRequestContentTypeIsCaseInsensitive(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("echo_contenttype", metaData -> {
+                            final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
+                            metaData.set(RESPONSE_BODY_STRING, contentType.internalValueForMapping());
+                        })
+                        .build()
+        )
                 .when().aRequestToThePath("/echo_contenttype").viaTheGetMethod().withAnEmptyBody()
                 .withTheHeader("CONTENT-TYPE", "foo").isIssued()
                 .theStatusCodeWas(200)
@@ -99,7 +123,11 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testContentTypeInResponse(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("/set_contenttype_in_response", (request, response) -> response.setContentType("foobar"))
+                        .build()
+        )
                 .when().aRequestToThePath("/set_contenttype_in_response").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("foobar");
@@ -108,7 +136,11 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testHeadersInResponse(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("/headers_response", (request, response) -> response.addHeader("foo", "bar"))
+                        .build()
+        )
                 .when().aRequestToThePath("/headers_response").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theReponseContainsTheHeader("foo", "bar");
@@ -117,7 +149,12 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testLoggerCanBeSet(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(logger ->
+                anHttpMaid()
+                        .get("/log", metaData -> metaData.get(LOGGER).info("foobar"))
+                        .configured(toLogUsing(logger))
+                        .build()
+        )
                 .when().aRequestToThePath("/log").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theLogOutputStartedWith("INFO: foobar");
@@ -126,7 +163,14 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testFileDownload(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("/download", (request, response) -> {
+                            response.setBody("download-content");
+                            response.asDownloadWithFilename("foo.txt");
+                        })
+                        .build()
+        )
                 .when().aRequestToThePath("/download").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseContentTypeWas("application/x-msdownload")
@@ -137,7 +181,11 @@ public final class LowLevelSpecs {
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testDebugModule(final TestEnvironment testEnvironment) {
-        testEnvironment.given(theLowLevelHttpMaidInstanceUsedForTesting())
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .configured(toBeInDebugMode())
+                        .build()
+        )
                 .when().aRequestToThePath("/internals").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyContains("digraph");

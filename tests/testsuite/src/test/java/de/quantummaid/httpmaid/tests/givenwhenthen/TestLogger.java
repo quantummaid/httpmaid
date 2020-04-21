@@ -19,22 +19,32 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.handlers;
+package de.quantummaid.httpmaid.tests.givenwhenthen;
 
-import de.quantummaid.httpmaid.handler.http.HttpHandler;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
-import de.quantummaid.httpmaid.handler.http.HttpResponse;
-import de.quantummaid.httpmaid.handler.Handler;
+import de.quantummaid.httpmaid.logger.LogMessage;
+import de.quantummaid.httpmaid.logger.LoggerImplementation;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-public class MyDownloadHandler implements HttpHandler {
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TestLogger implements LoggerImplementation {
+    private final StringBuilder stringBuilder;
 
-    public static Handler downloadHandler() {
-        return new MyDownloadHandler();
+    public static TestLogger testLogger() {
+        return new TestLogger(new StringBuilder());
     }
 
     @Override
-    public void handle(final HttpRequest request, final HttpResponse response) {
-        response.setBody("download-content");
-        response.asDownloadWithFilename("foo.txt");
+    public void log(final LogMessage logMessage) {
+        final String formattedMessage = logMessage.formattedMessage();
+        stringBuilder.append(formattedMessage);
+    }
+
+    public String logContent() {
+        return stringBuilder.toString();
     }
 }

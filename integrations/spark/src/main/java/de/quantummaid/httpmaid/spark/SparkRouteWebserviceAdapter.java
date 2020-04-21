@@ -22,28 +22,21 @@
 package de.quantummaid.httpmaid.spark;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
-import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
-import static de.quantummaid.httpmaid.util.Streams.streamInputStreamToOutputStream;
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
+import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
 import static java.util.Arrays.stream;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -52,34 +45,25 @@ final class SparkRouteWebserviceAdapter implements Route {
 
     @Override
     public Object handle(final Request request, final Response sparkResponse) {
-        final MetaData metaData = emptyMetaData();
-        final String httpRequestMethod = request.requestMethod();
-        metaData.set(RAW_METHOD, httpRequestMethod);
-        final String path = request.pathInfo();
-        metaData.set(RAW_PATH, path);
-        final Map<String, List<String>> headers = request.headers().stream()
-                .collect(toMap(key -> key, header -> singletonList(request.headers(header))));
-        metaData.set(RAW_REQUEST_HEADERS, headers);
-        final Map<String, String> queryParameters = extractQueryParameters(request);
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
-        final InputStream body;
-        try {
-            body = request.raw().getInputStream();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-        metaData.set(REQUEST_BODY_STREAM, body);
-        metaData.set(IS_HTTP_REQUEST, true);
-        this.httpMaid.handleRequest(metaData, rawResponse -> {
-            final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-            responseHeaders.forEach(sparkResponse::header);
-            final int responseStatus = metaData.get(RESPONSE_STATUS);
+        httpMaid.handleRequest(() -> {
+            final RawRequestBuilder builder = rawRequestBuilder();
+            final String httpRequestMethod = request.requestMethod();
+            builder.withMethod(httpRequestMethod);
+            final String path = request.pathInfo();
+            builder.withPath(path);
+            builder.extractHeaders(request.headers(), request::headers);
+            final Map<String, String> queryParameters = extractQueryParameters(request);
+            builder.withQueryParameters(queryParameters);
+            final InputStream body = request.raw().getInputStream();
+            builder.withBody(body);
+            return builder.build();
+        }, response -> {
+            response.setHeaders(sparkResponse::header);
+            final int responseStatus = response.status();
             sparkResponse.status(responseStatus);
             final OutputStream outputStream = sparkResponse.raw().getOutputStream();
-            final InputStream responseBody = metaData.getOptional(RESPONSE_STREAM).orElseGet(() -> stringToInputStream(""));
-            streamInputStreamToOutputStream(responseBody, outputStream);
+            response.streamBodyToOutputStream(outputStream);
         });
-
         return null;
     }
 

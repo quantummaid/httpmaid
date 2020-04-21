@@ -19,30 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs.handlers;
+package de.quantummaid.httpmaid.endpoint;
 
-import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.handler.Handler;
-import de.quantummaid.httpmaid.logger.Logger;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.LOGGER;
-
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class LogHandler implements Handler {
-
-    public static Handler logHandler() {
-        return new LogHandler();
-    }
-
-    @Override
-    public void handle(final MetaData metaData) {
-        final Logger logger = metaData.get(LOGGER);
-        logger.info("foobar");
-    }
+public interface RawResponseHandler {
+    void handle(RawResponse response) throws Exception;
 }

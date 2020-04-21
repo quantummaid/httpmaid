@@ -49,7 +49,7 @@ import static java.util.Arrays.asList;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidBuilder {
     private boolean autodetectionOfModules = true;
-    private boolean startupChecks = true;
+    private boolean performStartupChecks = true;
     private final CoreModule coreModule;
     private final List<Configurator> configurators;
 
@@ -63,7 +63,7 @@ public final class HttpMaidBuilder {
     }
 
     public HttpMaidBuilder disableStartupChecks() {
-        startupChecks = false;
+        performStartupChecks = false;
         return this;
     }
 
@@ -165,7 +165,7 @@ public final class HttpMaidBuilder {
         final HttpMaid httpMaid = HttpMaid.httpMaid(chainRegistry);
         final Instant end = Instant.now();
         final Duration startUpTime = between(begin, end);
-        if (startupChecks) {
+        if (performStartupChecks) {
             final StartupChecks startupChecks = chainRegistry.getMetaDatum(STARTUP_CHECKS);
             startupChecks.check();
         }

@@ -40,7 +40,7 @@ final class AwsLambdaLogger implements LoggerImplementation {
 
     @Override
     public void log(final LogMessage message) {
-        final LambdaLogger lambdaLogger = message.metaData().get(AwsLambdaEndpoint.CONTEXT_KEY).getLogger();
+        final LambdaLogger lambdaLogger = message.metaData().get(AwsLambdaEndpoint.CONTEXT).getLogger();
         lambdaLogger.log(message.formattedMessage());
     }
 }

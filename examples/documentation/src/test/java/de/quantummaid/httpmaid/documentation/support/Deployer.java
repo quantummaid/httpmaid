@@ -4,7 +4,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.HttpClientRequestBuilder;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
-import de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint;
+import de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint;
 
 import java.util.function.Consumer;
 
@@ -12,7 +12,7 @@ import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToTheP
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aPostRequestToThePath;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
 import static de.quantummaid.httpmaid.documentation.support.FreePortPool.freePort;
-import static de.quantummaid.httpmaid.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
