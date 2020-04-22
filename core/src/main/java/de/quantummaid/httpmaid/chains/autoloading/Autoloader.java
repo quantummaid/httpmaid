@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import static de.quantummaid.httpmaid.chains.autoloading.AutoloadingException.autoloadingException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static java.lang.Thread.currentThread;
 import static java.lang.reflect.Modifier.isPublic;
@@ -75,7 +76,7 @@ public final class Autoloader {
         try {
             return (ChainModule) staticInitializer.invoke(null);
         } catch (final IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw autoloadingException(e);
         }
     }
 }

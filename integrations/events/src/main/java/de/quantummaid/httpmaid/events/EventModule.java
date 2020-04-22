@@ -147,13 +147,6 @@ public final class EventModule implements ChainModule {
         eventFactories.put(eventType, eventFactory);
     }
 
-    public void addExternalEventMapping(final EventType eventType,
-                                        final ExternalEventMapping externalEventMapping) {
-        validateNotNull(eventType, "eventType");
-        validateNotNull(externalEventMapping, "externalEventMapping");
-        externalEventMappings.put(eventType, externalEventMapping);
-    }
-
     @Override
     public void init(final MetaData configurationMetaData) {
         final HandlerDistributors handlerDistributors = configurationMetaData.get(HANDLER_DISTRIBUTORS);
@@ -203,7 +196,7 @@ public final class EventModule implements ChainModule {
         registerEventHandlers(messageBus, chainRegistry);
         if (closeMessageBusOnClose) {
             final ClosingActions closingActions = chainRegistry.getMetaDatum(CLOSING_ACTIONS);
-            closingActions.addClosingAction(() -> messageBus.close());
+            closingActions.addClosingAction(messageBus::close);
         }
     }
 

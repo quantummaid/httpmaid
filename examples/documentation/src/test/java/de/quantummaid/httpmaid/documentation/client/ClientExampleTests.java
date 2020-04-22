@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint;
-import de.quantummaid.httpmaid.util.Streams;
+import de.quantummaid.httpmaid.util.streams.Streams;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;

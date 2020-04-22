@@ -60,7 +60,7 @@ public final class ZeroArgumentsConstructorUseCaseInstantiator implements UseCas
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
             } else {
-                throw new RuntimeException(e);
+                throw zeroArgumentsConstructorUseCaseInstantiatorException(type, e);
             }
         } catch (final InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw zeroArgumentsConstructorUseCaseInstantiatorException(type, e);

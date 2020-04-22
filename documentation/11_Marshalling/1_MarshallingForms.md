@@ -88,22 +88,6 @@ and
 ```
 which is exactly what we need.
 
-## Configuring unmarshalling
-Now we need to tell HttpMaid to actually unmarshall requests from the *form encoded* format.
-We can easily do that using the `MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests()` configurator
-method:
-<!---[CodeSnippet] (formMarshallingStep2)-->
-```java
-final HttpMaid httpMaid = anHttpMaid()
-        .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
-        .post("/submit", (request, response) -> response.setBody(request.bodyString()))
-        .configured(toUnmarshallFormUrlEncodedRequests())
-        .build();
-```
-
-This way, HttpMaid will automatically detect any form encoded bodies
-and unmarshall them.
-
 ## The body map
 In order to access the unmarshalled form contents, the `HttpRequest` object
 offers a method `bodyMap()`. Let's use this to change our handler to something
@@ -118,7 +102,6 @@ final HttpMaid httpMaid = anHttpMaid()
             final String profession = (String) bodyMap.get("profession");
             response.setBody("Hello " + name + " and good luck as a " + profession + "!");
         })
-        .configured(toUnmarshallFormUrlEncodedRequests())
         .build();
 ```
 

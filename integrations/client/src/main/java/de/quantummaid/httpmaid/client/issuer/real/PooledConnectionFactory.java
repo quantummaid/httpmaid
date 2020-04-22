@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
 import static java.lang.Thread.currentThread;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -54,7 +55,7 @@ final class PooledConnectionFactory implements ConnectionFactory {
             final BasicPoolEntry entry = future.get();
             return ConnectionFromPool.connectionFromPool(connectionPool, entry);
         } catch (final ExecutionException e) {
-            throw new RuntimeException(e);
+            throw httpMaidClientException(e);
         } catch (final InterruptedException e) {
             currentThread().interrupt();
             this.close();

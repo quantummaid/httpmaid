@@ -82,9 +82,9 @@ public final class ChainExtender {
         routeIf(name, action, flag, bool -> bool, flag.key());
     }
 
-    public <T> void routeIfSet(final ChainName name,
-                               final Action action,
-                               final MetaDataKey<?> key) {
+    public void routeIfSet(final ChainName name,
+                           final Action action,
+                           final MetaDataKey<?> key) {
         routeIf(name, action, key, x -> true, key.key() + " present");
     }
 

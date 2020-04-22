@@ -21,7 +21,10 @@
 
 package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.chains.*;
+import de.quantummaid.httpmaid.chains.ChainRegistry;
+import de.quantummaid.httpmaid.chains.ChainRegistryBuilder;
+import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.chains.ConfiguratorBuilder;
 import de.quantummaid.httpmaid.generator.builder.ConditionStage;
 import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
@@ -36,7 +39,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
@@ -78,10 +80,6 @@ public final class HttpMaidBuilder {
         return get(url, (Object) handler, perRouteConfigurators);
     }
 
-    public HttpMaidBuilder get(final String url, final Processor handler, final PerRouteConfigurator... perRouteConfigurators) {
-        return get(url, (Handler) handler::apply, perRouteConfigurators);
-    }
-
     public HttpMaidBuilder post(final String url, final Object handler) {
         return this
                 .serving(handler)
@@ -91,10 +89,6 @@ public final class HttpMaidBuilder {
 
     public HttpMaidBuilder post(final String url, final HttpHandler handler) {
         return post(url, (Object) handler);
-    }
-
-    public HttpMaidBuilder post(final String url, final Consumer<MetaData> handler) {
-        return post(url, (Handler) handler::accept);
     }
 
     public HttpMaidBuilder put(final String url, final Object handler) {
@@ -108,10 +102,6 @@ public final class HttpMaidBuilder {
         return put(url, (Object) handler);
     }
 
-    public HttpMaidBuilder put(final String url, final Consumer<MetaData> handler) {
-        return put(url, (Handler) handler::accept);
-    }
-
     public HttpMaidBuilder delete(final String url, final Object handler) {
         return this
                 .serving(handler)
@@ -121,10 +111,6 @@ public final class HttpMaidBuilder {
 
     public HttpMaidBuilder delete(final String url, final HttpHandler handler) {
         return delete(url, (Object) handler);
-    }
-
-    public HttpMaidBuilder delete(final String url, final Consumer<MetaData> handler) {
-        return delete(url, (Handler) handler::accept);
     }
 
     public ConditionStage<HttpMaidBuilder> serving(final Handler handler) {

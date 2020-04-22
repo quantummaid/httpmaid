@@ -36,8 +36,7 @@ final class GraphCreator {
     private GraphCreator() {
     }
 
-    static Graph createGraph(final Map<ChainName, Chain> chains,
-                             final boolean withExceptionRoutes) {
+    static Graph createGraph(final Map<ChainName, Chain> chains) {
         validateNotNull(chains, "chains");
         final ColorPool<ModuleIdentifier> colorPool = ColorPool.colorPool();
 
@@ -54,11 +53,6 @@ final class GraphCreator {
                     .map(rule -> createRuleEdge(name, rule, colorPool, nodes))
                     .flatMap(Optional::stream)
                     .forEach(edges::add);
-
-            if (withExceptionRoutes) {
-                final Action exceptionAction = chain.exceptionAction();
-                createEdge(name, exceptionAction, Color.RED, Label.emptyLabel(), nodes).ifPresent(edges::add);
-            }
         });
         return Graph.graph(nodes.values(), edges);
     }

@@ -29,11 +29,11 @@ public final class Loggers {
     }
 
     public static LoggerImplementation stderrLogger() {
-        return logTo(System.err);
+        return logTo(System.err); // NOSONAR
     }
 
     public static LoggerImplementation stdoutLogger() {
-        return logTo(System.out);
+        return logTo(System.out); // NOSONAR
     }
 
     public static LoggerImplementation logTo(final PrintStream printStream) {
@@ -43,9 +43,9 @@ public final class Loggers {
     public static LoggerImplementation stdoutAndStderrLogger() {
         return message -> {
             if (message.hasException()) {
-                writeTo(System.err, message);
+                writeTo(System.err, message); // NOSONAR
             } else {
-                writeTo(System.out, message);
+                writeTo(System.out, message); // NOSONAR
             }
         };
     }

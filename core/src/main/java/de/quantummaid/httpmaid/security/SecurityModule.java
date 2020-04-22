@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.security;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.ChainName;
-import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -33,7 +32,6 @@ import lombok.ToString;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @ToString
 @EqualsAndHashCode
@@ -48,13 +46,6 @@ public final class SecurityModule implements ChainModule {
     public void addSecurityProcessor(final SecurityProcessor securityProcessor) {
         Validators.validateNotNull(securityProcessor, "securityProcessor");
         securityProcessors.add(securityProcessor);
-    }
-
-    private static <T extends Processor> void add(final ChainName chainName,
-                                                  final T element,
-                                                  final Map<ChainName, List<T>> multiMap) {
-        final List<T> forChain = multiMap.computeIfAbsent(chainName, x -> new LinkedList<>());
-        forChain.add(element);
     }
 
     @Override

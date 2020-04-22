@@ -29,9 +29,7 @@ import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
 @FunctionalInterface
 public interface ResponseTemplate {
 
-    ResponseTemplate EMPTY_RESPONSE_TEMPLATE = metaData -> {
-        metaData.set(RESPONSE_STATUS, OK);
-    };
+    ResponseTemplate EMPTY_RESPONSE_TEMPLATE = metaData -> metaData.set(RESPONSE_STATUS, OK);
 
     void apply(MetaData metaData);
 }

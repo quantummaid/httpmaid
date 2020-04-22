@@ -24,5 +24,6 @@ package de.quantummaid.httpmaid.tests.specs.usecase.usecases;
 public final class VoidUseCase {
 
     public void doNothing() {
+        // do nothing
     }
 }

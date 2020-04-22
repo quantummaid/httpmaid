@@ -89,10 +89,10 @@ public final class CorsConfigurator implements Configurator {
 
     public CorsConfigurator withAllowedHeaders(final String... headers) {
         validateNotNull(headers, "headers");
-        final List<RequestedHeader> allowedHeaders = Arrays.stream(headers)
+        final List<RequestedHeader> allowedHeadersList = Arrays.stream(headers)
                 .map(RequestedHeader::requestedHeader)
                 .collect(toList());
-        this.allowedHeaders = allowedHeaders::contains;
+        this.allowedHeaders = allowedHeadersList::contains;
         return this;
     }
 

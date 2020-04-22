@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.events.enriching.AddMapEntryEnricher.mapEntry;
 import static de.quantummaid.httpmaid.events.enriching.Enrichable.enrichable;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
@@ -69,37 +68,5 @@ public final class EnrichableMap {
             return;
         }
         map.get(key).setValue(value);
-    }
-
-    public void enrichEitherTopOrSecondLevel(final Map<String, ?> values) {
-        values.forEach(this::enrichEitherTopOrSecondLevel);
-    }
-
-    public void enrichEitherTopOrSecondLevel(final String key, final Object value) {
-        if (map.containsKey(key)) {
-            overwriteTopLevel(key, value);
-        } else {
-            enrichOnSecondLevelWithoutOverwriting(key, value);
-        }
-    }
-
-    public void enrichOnSecondLevelWithoutOverwriting(final String key, final Object value) {
-        this.map.values().forEach(enrichable -> enrichWithoutOverwriting(key, value, enrichable));
-    }
-
-    public void enrichOnSecondLevelWithOverwriting(final String key, final Object value) {
-        this.map.values().forEach(enrichable -> enrichWithOverwriting(key, value, enrichable));
-    }
-
-    private static void enrichWithoutOverwriting(final String key,
-                                                 final Object value,
-                                                 final Enrichable enrichable) {
-        enrichable.enrichWithoutOverwrite(mapEntry(key, value));
-    }
-
-    private static void enrichWithOverwriting(final String key,
-                                              final Object value,
-                                              final Enrichable enrichable) {
-        enrichable.enrichWithOverwrite(mapEntry(key, value));
     }
 }

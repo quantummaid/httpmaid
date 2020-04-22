@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.net.URLEncoder.encode;
@@ -43,7 +43,7 @@ public final class UriString {
         return new UriString(value);
     }
 
-    public String encoded(final Function<String, String> encoder) {
+    public String encoded(final UnaryOperator<String> encoder) {
         return encoder.apply(value);
     }
 

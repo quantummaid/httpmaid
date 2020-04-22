@@ -28,7 +28,7 @@ import lombok.ToString;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
@@ -69,7 +69,7 @@ final class EscapedText {
         return chunks;
     }
 
-    private static List<String> escapeNewlines(final String text, final Function<String, String> operation) {
+    private static List<String> escapeNewlines(final String text, final UnaryOperator<String> operation) {
         final String[] lines = text.split("\n");
         final List<String> transformed = new LinkedList<>();
         for (int i = 0; i < lines.length; ++i) {

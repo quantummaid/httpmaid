@@ -21,13 +21,13 @@
 
 package de.quantummaid.httpmaid.tests.specs;
 
-import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
 import de.quantummaid.httpmaid.handler.PageNotFoundException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 
 public final class PathSpecs {
 
@@ -85,10 +85,37 @@ public final class PathSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/*/a/*/b/*/c", (request, response) -> response.setBody("handler has been called"))
-                        .configured(ExceptionConfigurators.toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody("no handler")))
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody("no handler")))
                         .build()
         )
                 .when().aRequestToThePath("/x/x/x/a/y/y/y/z/z/z/c").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("no handler");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void wrongRegexInPath(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/|*|", (request, response) -> response.setBody("OK"))
+                        .build()
+        )
+                .when().httpMaidIsInitialized()
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Dangling meta character '*' near index 0\n" +
+                        "*\n" +
+                        "^");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void overlappingPaths(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/foo", (request, response) -> response.setBody("OK"))
+                        .get("/foo", (request, response) -> response.setBody("OK"))
+                        .build()
+        )
+                .when().httpMaidIsInitialized()
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("and would therefore never trigger");
     }
 }

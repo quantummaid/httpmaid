@@ -196,4 +196,32 @@ public final class CookieSpecs {
                 .withTheHeader("Cookie", "cookie1=qwer; cookie2=asdf").isIssued()
                 .theResponseBodyWas("qwer and asdf");
     }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void cookieWithoutValue(final TestEnvironment testEnvironment) {
+        testEnvironment.given(anHttpMaid()
+                .get("/cookie", (request, response) -> {
+                    final String cookie = request.cookies().getCookie("myCookie");
+                    response.setBody(cookie);
+                })
+                .build())
+                .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("Cookie", "myCookie").isIssued()
+                .theResponseBodyWas("");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void cookieWithValueInDoubleQuotes(final TestEnvironment testEnvironment) {
+        testEnvironment.given(anHttpMaid()
+                .get("/cookie", (request, response) -> {
+                    final String cookie = request.cookies().getCookie("myCookie");
+                    response.setBody(cookie);
+                })
+                .build())
+                .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("Cookie", "myCookie=\"foo bar\"").isIssued()
+                .theResponseBodyWas("foo bar");
+    }
 }

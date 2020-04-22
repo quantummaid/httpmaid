@@ -100,11 +100,6 @@
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-spark</artifactId>
-            <version>0.9.50</version>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-usecases</artifactId>
             <version>0.9.50</version>
         </dependency>
@@ -119,11 +114,6 @@
             <version>0.9.50</version>
         </dependency>
         <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-websockets-usecases</artifactId>
-            <version>0.9.50</version>
-        </dependency>
-        <dependency>
             <groupId>de.quantummaid.httpmaid.examples</groupId>
             <artifactId>documentation</artifactId>
             <version>0.9.50</version>
@@ -131,11 +121,6 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.examples</groupId>
             <artifactId>aws-lambda</artifactId>
-            <version>0.9.50</version>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.examples</groupId>
-            <artifactId>hello-world</artifactId>
             <version>0.9.50</version>
         </dependency>
         <dependency>

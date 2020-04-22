@@ -50,11 +50,13 @@ public final class UseCaseMethod {
     private final ResolvedMethod method;
     private final Parameters parameters;
 
-    public static UseCaseMethod useCaseMethodOf(final ResolvedType useCase) throws IllegalArgumentException {
+    public static UseCaseMethod useCaseMethodOf(final ResolvedType useCase) {
         validateUseCaseClass(useCase);
         final ResolvedMethod method = locateUseCaseMethod((ClassType) useCase);
         if (method.method().getTypeParameters().length != 0) {
-            throw new IllegalArgumentException(format("use case method '%s' in class '%s' must not declare any type variables", method.describe(), useCase.simpleDescription()));
+            throw new IllegalArgumentException(
+                    format("use case method '%s' in class '%s' must not declare any type variables",
+                            method.describe(), useCase.simpleDescription()));
         }
         final Parameters parameters = Parameters.parametersOf(method);
         return new UseCaseMethod(useCase, method, parameters);
@@ -92,22 +94,20 @@ public final class UseCaseMethod {
                                    final Map<String, Object> parameters,
                                    final Object event) throws Exception {
         final Object[] parameterInstances = this.parameters.toArray(parameters);
-        final Method method = this.method.method();
+        final Method lowLevelMethod = this.method.method();
         try {
-            final Object returnValue = method.invoke(useCase, parameterInstances);
+            final Object returnValue = lowLevelMethod.invoke(useCase, parameterInstances);
             return ofNullable(returnValue);
         } catch (final IllegalAccessException e) {
-            final Class<?> useCaseClass = useCase.getClass();
-            throw methodInvocationException(useCaseClass, useCase, method, event, e);
+            throw methodInvocationException(useCase.getClass(), useCase, lowLevelMethod, event, e);
         } catch (final InvocationTargetException e) {
             final Throwable cause = e.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
-            } else if (isDeclaredByMethod(cause, method)) {
+            } else if (isDeclaredByMethod(cause, lowLevelMethod)) {
                 throw (Exception) cause;
             } else {
-                final Class<?> useCaseClass = useCase.getClass();
-                throw methodInvocationException(useCaseClass, useCase, method, event, e);
+                throw methodInvocationException(useCase.getClass(), useCase, lowLevelMethod, event, e);
             }
         }
     }

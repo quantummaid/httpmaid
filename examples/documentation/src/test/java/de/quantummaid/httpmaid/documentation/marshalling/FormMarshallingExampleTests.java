@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallFormUrlEncodedRequests;
-import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -27,24 +25,7 @@ public class FormMarshallingExampleTests {
         Deployer.test(httpMaid, client -> {
             final String form = client.issue(HttpClientRequest.aGetRequestToThePath("/form").mappedToString());
             assertThat(form, containsString("Profession:"));
-            Deployer.assertPost("/submit", "foo", "foo", client);
-        });
-    }
-
-    @Test
-    public void formMarshallingExampleStep2() {
-        //Showcase start formMarshallingStep2
-        final HttpMaid httpMaid = anHttpMaid()
-                .get("/form", (request, response) -> response.setJavaResourceAsBody("form.html"))
-                .post("/submit", (request, response) -> response.setBody(request.bodyString()))
-                .configured(toUnmarshallFormUrlEncodedRequests())
-                .build();
-        //Showcase end formMarshallingStep2
-
-        Deployer.test(httpMaid, client -> {
-            final String form = client.issue(HttpClientRequest.aGetRequestToThePath("/form").mappedToString());
-            assertThat(form, containsString("Profession:"));
-            Deployer.assertPost("/submit", "foo", "foo", client);
+            Deployer.assertPost("/submit", "name=Bob&profession=Developer", "name=Bob&profession=Developer", client);
         });
     }
 
@@ -59,7 +40,6 @@ public class FormMarshallingExampleTests {
                     final String profession = (String) bodyMap.get("profession");
                     response.setBody("Hello " + name + " and good luck as a " + profession + "!");
                 })
-                .configured(toUnmarshallFormUrlEncodedRequests())
                 .build();
         //Showcase end formMarshallingStep3
 

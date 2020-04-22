@@ -22,27 +22,16 @@
 package de.quantummaid.httpmaid.mapmaid;
 
 import de.quantummaid.httpmaid.chains.ConfiguratorBuilder;
-import de.quantummaid.mapmaid.MapMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-
-import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapMaidIntegrationBuilder implements ConfiguratorBuilder {
     private final MapMaidModule mapMaidSerializerAndDeserializer;
-
-    static MapMaidIntegrationBuilder mapMaidIntegration(final MapMaid mapMaid) {
-        validateNotNull(mapMaid, "mapMaid");
-        final MapMaidModule mapMaidSerializerAndDeserializer = mapMaidModule();
-        mapMaidSerializerAndDeserializer.setMapMaid(mapMaid);
-        return new MapMaidIntegrationBuilder(mapMaidSerializerAndDeserializer);
-    }
 
     @Override
     public MapMaidModule build() {

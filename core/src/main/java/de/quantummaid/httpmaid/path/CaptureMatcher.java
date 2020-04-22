@@ -34,6 +34,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static de.quantummaid.httpmaid.path.PathException.pathException;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,7 +53,7 @@ final class CaptureMatcher implements StateMachineMatcher<String> {
         Validators.validateNotNullNorEmpty(stringSpecification, "stringSpecification");
         final Matcher matcher = PATTERN.matcher(stringSpecification);
         if(!matcher.matches()) {
-            throw new RuntimeException("Not a wildcard: " + stringSpecification);
+            throw pathException("Not a wildcard: " + stringSpecification);
         }
         final String name = matcher.group(1);
         return new CaptureMatcher(name);

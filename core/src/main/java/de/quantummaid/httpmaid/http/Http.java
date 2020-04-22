@@ -44,6 +44,9 @@ public final class Http {
         public static final int METHOD_NOT_ALLOWED = 405;
 
         public static final int INTERNAL_SERVER_ERROR = 500;
+
+        private StatusCodes() {
+        }
     }
 
     public static final class Headers {
@@ -55,6 +58,9 @@ public final class Http {
         public static final String COOKIE = "Cookie";
         public static final String SET_COOKIE = "Set-Cookie";
         public static final String LOCATION = "Location";
+
+        private Headers() {
+        }
     }
 
     public static final class Methods {
@@ -63,5 +69,8 @@ public final class Http {
         public static final String PUT = "PUT";
         public static final String DELETE = "DELETE";
         public static final String OPTIONS = "OPTIONS";
+
+        private Methods() {
+        }
     }
 }

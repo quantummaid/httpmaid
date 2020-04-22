@@ -30,15 +30,12 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequest;
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
-import static java.util.stream.Collectors.toMap;
+import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 
 @ToString
 @EqualsAndHashCode
@@ -81,15 +78,9 @@ public final class RawRequestBuilder {
         return this;
     }
 
-    public RawRequestBuilder extractHeaders(final Collection<String> keys, final Function<String, String> query) {
-        final Map<String, String> headers = keys.stream()
-                .collect(toMap(key -> key, query));
-        return withUniqueHeaders(headers);
-    }
-
     public RawRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
-        final Map<String, String> queryParameters = queryToMap(encodedQueryParameters);
-        return withQueryParameters(queryParameters);
+        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
+        return withQueryParameters(queryParametersMap);
     }
 
     public RawRequestBuilder withQueryParameters(final Map<String, String> queryParameters) {

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpointException.pureJavaEndpointException;
 import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpointHandler.javaOnlyEndpointHandler;
 
 @ToString
@@ -51,7 +52,7 @@ public final class PureJavaEndpoint implements AutoCloseable {
                 httpServer.start();
                 httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(() -> httpServer.stop(0));
             } catch (final IOException e) {
-                throw new RuntimeException(e);
+                throw pureJavaEndpointException(e);
             }
             return new PureJavaEndpoint(httpMaid);
         };

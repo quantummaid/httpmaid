@@ -48,10 +48,6 @@ public final class Event {
         return new Event(map, new ArrayList<>(), new ArrayList<>());
     }
 
-    public void enrich(final String key, final Object value) {
-        map.enrichEitherTopOrSecondLevel(key, value);
-    }
-
     public void addInjection(final String key, final String value) {
         final Injection injection = injection(key, value);
         this.injections.add(injection);

@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static de.quantummaid.httpmaid.multipart.MultipartException.multipartException;
+
 public final class FileUpload {
 
     private FileUpload() {
@@ -40,7 +42,7 @@ public final class FileUpload {
             final HttpServletRequest request = MockHttpServletRequest.mockHttpServletRequest(body, contentType);
             return upload.getItemIterator(request);
         } catch (final FileUploadException | IOException e) {
-            throw new RuntimeException(e);
+            throw multipartException(e);
         }
     }
 }

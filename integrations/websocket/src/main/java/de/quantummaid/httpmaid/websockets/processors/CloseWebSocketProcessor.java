@@ -53,11 +53,5 @@ public final class CloseWebSocketProcessor implements Processor {
             registry.unregister(webSocket.id());
             webSocket.close();
         });
-        /*
-        final WebSocketId id = metaData.get(WEBSOCKET_ID);
-        final WebSocket webSocket = registry.byId(id);
-        registry.unregister(id);
-        webSocket.close();
-         */
     }
 }

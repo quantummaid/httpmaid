@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.client.HttpClientRequestBuilder;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
+import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.mapmaid.MapMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -34,7 +35,7 @@ import java.util.function.Consumer;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Then.then;
-import static de.quantummaid.httpmaid.util.Streams.inputStreamToString;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 
 @ToString
@@ -53,7 +54,7 @@ public final class When {
         return aRequestIsMade(httpMaidClient -> httpMaidClient.issue(aGetRequestToThePath(path)));
     }
 
-    public Then aRequestIsMade(final HttpClientRequestBuilder<?> requestBuilder) {
+    public Then aRequestIsMadeWithAMapMaidClient(final HttpClientRequestBuilder<?> requestBuilder) {
         return aRequestIsMade(httpMaidClient -> httpMaidClient.issue(requestBuilder));
     }
 
@@ -68,6 +69,15 @@ public final class When {
                 })
                 .build();
         clientConsumer.accept(client);
-        return then(requestLog);
+        return then(requestLog, null);
+    }
+
+    public Then aRequestIsMade(final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder) {
+        final HttpMaidClient client = aHttpMaidClientForTheHost("localhost")
+                .withThePort(port)
+                .viaHttp()
+                .build();
+        final SimpleHttpResponseObject response = client.issue(requestBuilder);
+        return then(null, response);
     }
 }

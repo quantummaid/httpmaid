@@ -21,18 +21,12 @@
 
 package de.quantummaid.httpmaid.websocketsevents;
 
-import de.quantummaid.httpmaid.events.ExternalEventMapping;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
-import de.quantummaid.httpmaid.websockets.WebSocketForEventFilter;
 import de.quantummaid.httpmaid.websockets.WebSocketTag;
 
-import static de.quantummaid.httpmaid.events.EventsChains.MAP_EVENT_TO_RESPONSE;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static de.quantummaid.httpmaid.websockets.WebSocketTag.webSocketTag;
-import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.*;
-import static de.quantummaid.httpmaid.websockets.WebsocketChains.WEBSOCKET_CLOSE;
-import static de.quantummaid.httpmaid.websocketsevents.WebSocketsExternalEventMapping.webSocketsExternalEventMapping;
+import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.WEBSOCKET_TAG;
 
 public final class Conditions {
 
@@ -45,23 +39,5 @@ public final class Conditions {
         return metaData -> metaData.getOptional(WEBSOCKET_TAG)
                 .map(webSocketTag::equals)
                 .orElse(false);
-    }
-
-    public static ExternalEventMapping forwardingItToAllWebSocketsThat(final WebSocketForEventFilter filter) {
-        validateNotNull(filter, "filter");
-        return webSocketsExternalEventMapping(MAP_EVENT_TO_RESPONSE, filter, (webSockets, metaData) -> {
-            metaData.set(RECIPIENT_WEBSOCKETS, webSockets);
-            metaData.set(IS_WEBSOCKET_MESSAGE, true);
-        });
-    }
-
-    public static ExternalEventMapping closingAllWebSockets() {
-        return closingAllWebSocketsThat((metaData, event) -> true);
-    }
-
-    public static ExternalEventMapping closingAllWebSocketsThat(final WebSocketForEventFilter filter) {
-        validateNotNull(filter, "filter");
-        return webSocketsExternalEventMapping(WEBSOCKET_CLOSE, filter,
-                (webSockets, metaData) -> metaData.set(WEBSOCKETS_TO_CLOSE, webSockets));
     }
 }

@@ -34,6 +34,7 @@
     <suppress checks="ClassFanOutComplexity" files="HttpMaidConfigurator"/>
     <suppress checks="ExplicitInitialization" files=".*"/>
     <suppress checks="AbbreviationAsWordInName" files="CorsConfigurators"/>
-    <suppress checks="VariableDeclarationUsageDistance" files="HttpMaidBuilder"/>
+    <suppress checks="VariableDeclarationUsageDistance|TrailingComment" files="HttpMaidBuilder"/>
     <suppress checks="IllegalCatch" files="MarshallingModule"/>
+    <suppress checks="TrailingComment" files="Loggers"/>
 </suppressions>

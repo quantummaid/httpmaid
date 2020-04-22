@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.chains.Chain.chain;
+import static de.quantummaid.httpmaid.chains.ChainException.chainException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
 import static lombok.AccessLevel.PRIVATE;
@@ -80,12 +81,12 @@ public class ChainRegistry {
         } else if (action instanceof Drop) {
             // do nothing
         } else {
-            throw new RuntimeException("Unknown action: " + action.getClass().getName());
+            throw chainException("Unknown action: " + action.getClass().getName());
         }
     }
 
     public String dump() {
-        return GraphCreator.createGraph(namedChains, false).plot();
+        return GraphCreator.createGraph(namedChains).plot();
     }
 
     public <T> T getMetaDatum(final MetaDataKey<T> key) {
@@ -112,8 +113,8 @@ public class ChainRegistry {
         validateNotNull(defaultAction, "defaultAction");
         validateNotNull(exceptionAction, "exceptionAction");
         validateNotNull(moduleIdentifier, "moduleIdentifier");
-        if(namedChains.containsKey(name)) {
-            throw new RuntimeException(format("A chain with name '%s' already exists", name.name()));
+        if (namedChains.containsKey(name)) {
+            throw chainException(format("A chain with name '%s' already exists", name.name()));
         }
         final Chain chain = chain(defaultAction, exceptionAction, name, moduleIdentifier);
         namedChains.put(name, chain);

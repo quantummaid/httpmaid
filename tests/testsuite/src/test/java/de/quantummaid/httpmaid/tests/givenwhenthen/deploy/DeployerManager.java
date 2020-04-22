@@ -23,6 +23,8 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.deploy;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.DeployerAndClient;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.bypassed.BypassedDeployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.FakeAwsDeployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jetty.JettyDeployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.purejava.PureJavaDeployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.servlet.ServletDeployer;
@@ -36,7 +38,13 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 public final class DeployerManager {
-    private static final Collection<Deployer> ACTIVE_DEPLOYERS = asList(JettyDeployer.jettyDeployer(), PureJavaDeployer.pureJavaDeployer(), ServletDeployer.servletDeployer());
+    private static final Collection<Deployer> ACTIVE_DEPLOYERS = asList(
+            JettyDeployer.jettyDeployer(),
+            PureJavaDeployer.pureJavaDeployer(),
+            ServletDeployer.servletDeployer(),
+            FakeAwsDeployer.fakeAwsDeployer(),
+            BypassedDeployer.bypassedDeployer()
+    );
 
     private DeployerManager() {
     }

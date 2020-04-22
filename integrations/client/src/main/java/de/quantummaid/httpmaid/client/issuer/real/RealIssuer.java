@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
 import static de.quantummaid.httpmaid.client.RawClientResponse.rawClientResponse;
 import static de.quantummaid.httpmaid.client.issuer.real.Endpoint.endpoint;
 import static de.quantummaid.httpmaid.client.issuer.real.NormalConnectionFactory.normalConnectionFactory;
@@ -96,7 +97,7 @@ public final class RealIssuer implements Issuer {
             final RawClientResponse rawClientResponse = rawClientResponse(statusCode, headers, body);
             return responseMapper.apply(rawClientResponse);
         } catch (final IOException | HttpException e) {
-            throw new RuntimeException(e);
+            throw httpMaidClientException(e);
         }
     }
 

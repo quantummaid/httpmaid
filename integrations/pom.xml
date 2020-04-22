@@ -37,7 +37,6 @@
 
     <modules>
         <module>all</module>
-        <module>spark</module>
         <module>aws-lambda</module>
         <module>multipart</module>
         <module>mapmaid</module>
@@ -52,7 +51,6 @@
         <module>guice</module>
         <module>dagger</module>
         <module>websockets-events</module>
-        <module>websockets-usecases</module>
     </modules>
 
     <properties>

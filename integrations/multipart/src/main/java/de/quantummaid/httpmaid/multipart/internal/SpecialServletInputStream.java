@@ -39,8 +39,8 @@ final class SpecialServletInputStream extends ServletInputStream {
     }
 
     @Override
-    public int read() throws IOException {
-        return this.inputStream.read();
+    public int read() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -53,20 +53,16 @@ final class SpecialServletInputStream extends ServletInputStream {
 
     @Override
     public boolean isFinished() {
-        try {
-            final int available = this.inputStream.available();
-            return available == 0;
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isReady() {
-        return true;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setReadListener(final ReadListener arg0) {
+        throw new UnsupportedOperationException();
     }
 }

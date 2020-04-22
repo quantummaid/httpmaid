@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package de.quantummaid.httpmaid.tests;
-
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
@@ -28,48 +6,116 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.FreePortPool;
 import de.quantummaid.httpmaid.tests.givenwhenthen.Given;
 import org.junit.jupiter.api.Test;
 
-import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
-import static de.quantummaid.httpmaid.client.HttpClientRequest.aPostRequestToThePath;
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.client.HttpClientRequest.*;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
 import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Given.givenTheHttpMaidServer;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class ClientSpecs {
-    private static final String charactersThatNeedEncoding = "[]{}\"§#";
 
     @Test
-    public void clientDoesNotAppendATrailingSlashToPathToDirectory() {
-        Given.givenAnHttpServer()
-                .when().aRequestIsMadeToThePath("/qwer")
-                .theServerReceivedARequestToThePath("/qwer");
+    public void clientCanIssueAGetRequest() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/test", (request, response) -> response.setBody("foo"))
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/test"))
+                .theResponseBodyWas("foo");
     }
 
     @Test
-    public void clientDoesNotAppendATrailingSlashToPathToFile() {
-        Given.givenAnHttpServer()
-                .when().aRequestIsMadeToThePath("/qwer/tweet.json")
-                .theServerReceivedARequestToThePath("/qwer/tweet.json");
+    public void clientCanIssueAPostRequest() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .post("/test", (request, response) -> response.setBody("foo"))
+                        .build()
+        )
+                .when().aRequestIsMade(aPostRequestToThePath("/test"))
+                .theResponseBodyWas("foo");
     }
 
     @Test
-    public void clientKeepsAnAppendedTrailingSlashInPath() {
-        Given.givenAnHttpServer()
-                .when().aRequestIsMadeToThePath("/qwer/")
-                .theServerReceivedARequestToThePath("/qwer/");
+    public void clientCanIssueAPutRequest() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .put("/test", (request, response) -> response.setBody("foo"))
+                        .build()
+        )
+                .when().aRequestIsMade(aPutRequestToThePath("/test"))
+                .theResponseBodyWas("foo");
     }
 
     @Test
-    public void clientEncodesPath() {
-        Given.givenAnHttpServer()
-                .when().aRequestIsMadeToThePath("/" + charactersThatNeedEncoding)
-                .theServerReceivedARequestToThePath("/%5B%5D%7B%7D%22%C2%A7%23");
+    public void clientCanIssueADeleteRequest() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .delete("/test", (request, response) -> response.setBody("foo"))
+                        .build()
+        )
+                .when().aRequestIsMade(aDeleteRequestToThePath("/test"))
+                .theResponseBodyWas("foo");
+    }
+
+    @Test
+    public void clientCanExplicitlyAddQueryParameters() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/test", (request, response) -> {
+                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            response.setBody(queryParameter);
+                        })
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/test").withQueryParameter("foo", "bar"))
+                .theResponseBodyWas("bar");
+    }
+
+    @Test
+    public void clientCanImplicitlyAddQueryParameters() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/test", (request, response) -> {
+                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            response.setBody(queryParameter);
+                        })
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/test?foo=bar"))
+                .theResponseBodyWas("bar");
+    }
+
+    @Test
+    public void clientResponseHasAUserfriedlyDescription() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/test", (request, response) -> response.setBody("foobar"))
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/test"))
+                .theResponseDescriptionContains("" +
+                        "|===================================================|\n" +
+                        "|                   HTTP Response                   |\n" +
+                        "|===================================================|\n"
+                )
+                .theResponseDescriptionContains("" +
+                        "| Status Code | 200                                 |\n" +
+                        "|---------------------------------------------------|\n"
+                )
+                .theResponseDescriptionContains("" +
+                        "|---------------------------------------------------|\n" +
+                        "| Body        | foobar                              |\n" +
+                        "|---------------------------------------------------|"
+                );
     }
 
     @Test
     public void emptyBodyValuesWithMapMaidDoNotCauseProblems() {
         Given.givenAnHttpServer()
-                .when().aRequestIsMade(aPostRequestToThePath("/test"))
+                .when().aRequestIsMadeWithAMapMaidClient(aPostRequestToThePath("/test"))
                 .theServerReceivedARequestToThePath("/test");
     }
 

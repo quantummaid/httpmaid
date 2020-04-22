@@ -37,7 +37,6 @@
 
     <modules>
         <module>aws-lambda</module>
-        <module>hello-world</module>
         <module>documentation</module>
     </modules>
 

@@ -27,11 +27,11 @@ public final class MultipartException extends RuntimeException {
         super(message, cause);
     }
 
-    static MultipartException multipartException(final Throwable cause) {
+    public static MultipartException multipartException(final Throwable cause) {
         return new MultipartException("Exception during multipart parsing", cause);
     }
 
-    static MultipartException multipartException(final String message) {
+    public static MultipartException multipartException(final String message) {
         return new MultipartException(message, null);
     }
 }

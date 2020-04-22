@@ -33,18 +33,19 @@ import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.client.BasePath.basePath;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.httpMaidClient;
+import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
 import static de.quantummaid.httpmaid.client.SimpleHttpResponseObject.httpClientResponse;
 import static de.quantummaid.httpmaid.client.UnsupportedTargetTypeException.unsupportedTargetTypeException;
 import static de.quantummaid.httpmaid.filtermap.FilterMapBuilder.filterMapBuilder;
-import static de.quantummaid.httpmaid.util.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static java.lang.String.format;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClientBuilder {
-    private final Function<BasePath, Issuer> issuer;
+    private final Function<BasePath, Issuer> issuerFactory;
     private final FilterMapBuilder<Class<?>, ClientResponseMapper<?>> responseMappers;
     private BasePath basePath = basePath("");
 
@@ -65,7 +66,7 @@ public final class HttpMaidClientBuilder {
             throw unsupportedTargetTypeException(SimpleHttpResponseObject.class, targetType);
         });
         builder.withDefaultResponseMapping((response, targetType) -> {
-            throw new RuntimeException(format(
+            throw httpMaidClientException(format(
                     "Cannot map response '%s' to type '%s' because no default response mapper was defined",
                     response.toString(), targetType.getName()));
         });
@@ -100,7 +101,7 @@ public final class HttpMaidClientBuilder {
     }
 
     public HttpMaidClient build() {
-        final Issuer issuer = this.issuer.apply(basePath);
+        final Issuer issuer = this.issuerFactory.apply(basePath);
         return httpMaidClient(issuer, basePath, responseMappers.build());
     }
 

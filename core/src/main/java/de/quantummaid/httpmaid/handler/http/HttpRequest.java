@@ -26,11 +26,12 @@ import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.http.PathParameters;
 import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.http.headers.cookies.Cookies;
+import de.quantummaid.httpmaid.logger.Logger;
 import de.quantummaid.httpmaid.path.Path;
 import lombok.*;
 
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,6 +76,15 @@ public final class HttpRequest {
         return cookiesFromHeaders(headers());
     }
 
+    public ContentType contentType() {
+        return optionalContentType()
+                .orElseThrow(() -> new RuntimeException(format("Request does not have a content type.%n%n%s", metaData.prettyPrint())));
+    }
+
+    public Optional<ContentType> optionalContentType() {
+        return metaData.getOptional(REQUEST_CONTENT_TYPE);
+    }
+
     public Optional<String> optionalBodyString() {
         return metaData.getOptional(REQUEST_BODY_STRING);
     }
@@ -84,13 +94,9 @@ public final class HttpRequest {
                 .orElseThrow(() -> new RuntimeException("Request does not have a body"));
     }
 
-    public InputStream bodyStream() {
-        return metaData.get(REQUEST_BODY_STREAM);
-    }
-
-    @SuppressWarnings("unchecked")
     public <T> T authenticationInformationAs(final Class<T> type) {
-        return (T) authenticationInformation();
+        return metaData.getOptionalAs(AUTHENTICATION_INFORMATION, type)
+                .orElseThrow(() -> new RuntimeException("Request is not authenticated"));
     }
 
     public Object authenticationInformation() {
@@ -123,5 +129,9 @@ public final class HttpRequest {
                         return Optional.empty();
                     }
                 });
+    }
+
+    public Logger logger() {
+        return metaData.get(LOGGER);
     }
 }

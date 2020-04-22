@@ -9,6 +9,7 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/examples/archetype-quickstart/pom.xml" />
+        <option value="$PROJECT_DIR$/integrations/websockets-usecases/pom.xml" />
         <option value="$PROJECT_DIR$/tests/aws-lambda-testfunction/pom.xml" />
       </set>
     </option>

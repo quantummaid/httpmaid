@@ -21,15 +21,12 @@
 
 package de.quantummaid.httpmaid.chains;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 
 public interface Configurator {
 
@@ -53,28 +50,6 @@ public interface Configurator {
         return dependencyRegistry -> {
             final T module = dependencyRegistry.getDependency(type);
             configurator.accept(module);
-        };
-    }
-
-    static Configurator allOf(final Configurator... configurators) {
-        return new Configurator() {
-            @Override
-            public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
-                return stream(configurators)
-                        .map(Configurator::supplyModulesIfNotAlreadyPresent)
-                        .flatMap(Collection::stream)
-                        .collect(toList());
-            }
-
-            @Override
-            public void init(final MetaData configurationMetaData) {
-                stream(configurators).forEach(configurator -> configurator.init(configurationMetaData));
-            }
-
-            @Override
-            public void configure(final DependencyRegistry dependencyRegistry) {
-                stream(configurators).forEach(configurator -> configurator.configure(dependencyRegistry));
-            }
         };
     }
 

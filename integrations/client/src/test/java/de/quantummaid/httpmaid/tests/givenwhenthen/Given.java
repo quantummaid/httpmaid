@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.HttpMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ import lombok.ToString;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
+
+import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 
 @ToString
 @EqualsAndHashCode
@@ -39,6 +42,10 @@ public final class Given {
 
     private final int port;
     private final RequestLog requestLog;
+
+    public static Given givenTheHttpMaidServer(final HttpMaid httpMaid) {
+        return given((port, requestLog) -> pureJavaEndpointFor(httpMaid).listeningOnThePort(port));
+    }
 
     public static Given givenAnHttpServer() {
         return given(Server::start);
