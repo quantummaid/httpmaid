@@ -130,5 +130,3 @@ Also the division of 12 by 4 should work via the url http://localhost:1337/divid
 {"result":"3"}
 ```
 
-<!---[Nav]-->
-[&larr;](3_Validation.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](5_DependencyInjection.md)

@@ -263,7 +263,3 @@ Since the `Content-Type` header is very prominent and commonly used,
 there also exists the `setContentType()` method to explicitly set
 this header.
 
-
-<!---[Nav]-->
-[&larr;](03_Routing.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](05_Cookies.md)
-

@@ -84,7 +84,3 @@ usecase method. You can try this by running your application. Once you
 browse to http://localhost:1337/ping, you should see
 the `Ping!` message pop up on the console.
 
-
-<!---[Nav]-->
-[&larr;](../11_Marshalling/2_MarshallingAPIs.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](2_ObjectMapping.md)
-

@@ -21,6 +21,3 @@ logic, without the need of an intermediate layer consisting of annotations and/o
 in the architectural features of HttpMaid, you may skip to the "UseCases"
 section.
 
-<!---[Nav]-->
-[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](02_QuickStart.md)
-

@@ -61,6 +61,3 @@ httpMaid.close();
 
 This will close all resources, including the endpoint.
 
-<!---[Nav]-->
-[&larr;](01_Introduction.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](03_Routing.md)
-

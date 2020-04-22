@@ -173,7 +173,3 @@ order to maintain consistency between the request's and the response's `Content-
 Otherwise, it will pick any `Content-Type` of the set. If the set is empty,
 it will pick the default `Content-Type` according to the HttpMaid configuration (if a marshaller is configured for it). 
 
-
-<!---[Nav]-->
-[&larr;](1_MarshallingForms.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../12_UseCases/1_Basics.md)
-

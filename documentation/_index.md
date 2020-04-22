@@ -1,15 +1,3 @@
-[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3875/badge)](https://bestpractices.coreinfrastructure.org/projects/3875)
-[![Last Commit](https://img.shields.io/github/last-commit/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.quantummaid.httpmaid/core)
-[![Code Size](https://img.shields.io/github/languages/code-size/quantummaid/httpmaid)](https://github.com/quantummaid/httpmaid)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Slack](https://img.shields.io/badge/chat%20on-Slack-brightgreen)](https://join.slack.com/t/quantummaid/shared_invite/zt-cx5qd605-vG10I~WazfgH9WOnXMzl3Q)
-[![Gitter](https://img.shields.io/badge/chat%20on-Gitter-brightgreen)](https://gitter.im/quantum-maid-framework/community)
-[![Twitter](https://img.shields.io/twitter/follow/quantummaid)](https://twitter.com/quantummaid)
-
-
-<img src="httpmaid_logo.png" align="left"/>
-
 # HttpMaid
 HttpMaid directly publishes your business logic as an HTTP endpoint.
 It's non-invasive, secure and flexible.
@@ -87,15 +75,3 @@ Besides allowing you to easily export usecases, HttpMaid offers the following fe
 We did not find any framework that would allow us to develop a web application and claim in good conscience
 that our business logic does not depend on the underlying HTTP server, persistence layer or (de-)serialization mechanism
 (also referred to as *infrastructure code* in Domain-Driven Design).
-
-## Getting started
-HttpMaid is part of the QuantumMaid framework. You can find easy-to-follow and
-interesting tutorials [here](https://github.com/quantummaid/quantummaid-tutorials/blob/master/README.md).
-
-The HttpMaid documentation can be found [here](https://quantummaid.de/docs.html).
-
-## Get in touch
-Feel free to join us on [Slack](https://join.slack.com/t/quantummaid/shared_invite/zt-cx5qd605-vG10I~WazfgH9WOnXMzl3Q)
-or [Gitter](https://gitter.im/quantum-maid-framework/community) to ask questions, give feedback or just discuss software
-architecture with the team behind HttpMaid. Also, don't forget to visit our [website](https://quantummaid.de) and follow
-us on [Twitter](https://twitter.com/quantummaid)!

@@ -61,6 +61,4 @@ public final class MyServlet extends WebSocketAwareHttpMaidServlet {
 }
 ```
 
-<!---[Nav]-->
-[&larr;](13_CORS.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](15_Client.md)
 

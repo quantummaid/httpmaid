@@ -86,6 +86,3 @@ to instantiate the Dagger factory and the expected name of the factory method us
 #### toCreateUseCaseInstancesUsingDagger(DaggerFactoryFinder factoryFinder)
 Configures HttpMaid to create a look for generated Dagger factories and use them to instantiate usecases.
 The way Dagger factories are discovered can be configured by implementing the `DaggerFactoryFinder` parameter.
-
-<!---[Nav]-->
-[&larr;](4_Enriching.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../13_CORS.md)

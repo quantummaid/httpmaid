@@ -129,7 +129,3 @@ final HttpMaid httpMaid = anHttpMaid()
         .get("/invalidate", (request, response) -> response.invalidateCookie("myCookie"))
         .build();
 ```
-
-<!---[Nav]-->
-[&larr;](04_HandlingRequests.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](06_ServingFiles.md)
-

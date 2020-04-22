@@ -148,7 +148,3 @@ And see the correct result for the multiplication of 3 and 4:
 ```json
 {"result":"12"}
 ```
-
-<!---[Nav]-->
-[&larr;](1_Basics.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](3_Validation.md)
-
