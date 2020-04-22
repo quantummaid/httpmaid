@@ -43,7 +43,7 @@ In order to use it, the following dependency needs to be added to the project:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-guice</artifactId>
-    <version>0.9.49</version>
+    <version>0.9.50</version>
 </dependency>
 ```
 
@@ -69,7 +69,7 @@ In order to use it, the following dependency needs to be added to the project:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-dagger</artifactId>
-    <version>0.9.49</version>
+    <version>0.9.50</version>
 </dependency>
 ```
 
@@ -86,6 +86,3 @@ to instantiate the Dagger factory and the expected name of the factory method us
 #### toCreateUseCaseInstancesUsingDagger(DaggerFactoryFinder factoryFinder)
 Configures HttpMaid to create a look for generated Dagger factories and use them to instantiate usecases.
 The way Dagger factories are discovered can be configured by implementing the `DaggerFactoryFinder` parameter.
-
-<!---[Nav]-->
-[&larr;](4_Enriching.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](../13_CORS.md)

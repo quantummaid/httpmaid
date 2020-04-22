@@ -9,7 +9,7 @@ In access it, you need to include the client integration.
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-client</artifactId>
-    <version>0.9.49</version>
+    <version>0.9.50</version>
 </dependency>
 ```
 ## Configuring a client
@@ -68,7 +68,4 @@ all "real" http handling. You can create such a client like this:
 ```java
 final HttpMaidClient connectedHttpMaidClient = aHttpMaidClientBypassingRequestsDirectlyTo(httpMaid).build();
 ```
-
-<!---[Nav]-->
-[&larr;](14_Endpoints.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](16_DependencyManagement.md)
 

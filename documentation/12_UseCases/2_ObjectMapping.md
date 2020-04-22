@@ -123,7 +123,7 @@ to (de-)serialize our domain objects (`MultiplicationRequest`, `CalculationRespo
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-mapmaid</artifactId>
-    <version>0.9.49</version>
+    <version>0.9.50</version>
 </dependency>
 ```
 Please refer to MapMaid's documentation if you want to learn more about this feature.
@@ -148,7 +148,3 @@ And see the correct result for the multiplication of 3 and 4:
 ```json
 {"result":"12"}
 ```
-
-<!---[Nav]-->
-[&larr;](1_Basics.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](3_Validation.md)
-

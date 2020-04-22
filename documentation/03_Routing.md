@@ -112,6 +112,3 @@ With the possibility of wildcards and parameters, some requests might match
 more than one route. Whenever this is the case, the route that was declared
 first in the builder will take precedence.
 
-<!---[Nav]-->
-[&larr;](02_QuickStart.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](04_HandlingRequests.md)
-

@@ -67,6 +67,3 @@ When starting the application and navigating to http://localhost:1337/exception,
 the `Operation not supported` message instead of `Something went wrong`.
 
 
-<!---[Nav]-->
-[&larr;](07_ConfiguringAndLogging.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](09_AuthenticationAndAuthorization.md)
-

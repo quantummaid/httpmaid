@@ -128,6 +128,3 @@ the resulting web page should look like this:
 Hello Bob and good luck as a Developer!
 ```
 
-<!---[Nav]-->
-[&larr;](../10_MultipartUploads.md)&nbsp;&nbsp;&nbsp;[Overview](../../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](2_MarshallingAPIs.md)
-

@@ -102,8 +102,3 @@ The implementation of static file handling has never been a priority. Therefore,
 currently lack features like support for caching. Nonetheless, if you need this feature or other features to exist,
 please fell free to open a feature request at https://github.com/quantummaid/httpmaid/issues
 
-
-
-<!---[Nav]-->
-[&larr;](05_Cookies.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](07_ConfiguringAndLogging.md)
-
