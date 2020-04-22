@@ -27,9 +27,10 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Map;
+
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.debug.DebugConfigurator.toBeInDebugMode;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogUsing;
@@ -92,9 +93,9 @@ public final class LowLevelSpecs {
     public void testContentTypeInRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
-                        .get("echo_contenttype", metaData -> {
-                            final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
-                            metaData.set(RESPONSE_BODY_STRING, contentType.internalValueForMapping());
+                        .get("echo_contenttype", (request, response) -> {
+                            final ContentType contentType = request.contentType();
+                            response.setBody(contentType.internalValueForMapping());
                         })
                         .build()
         )
@@ -108,9 +109,9 @@ public final class LowLevelSpecs {
     public void testRequestContentTypeIsCaseInsensitive(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
-                        .get("echo_contenttype", metaData -> {
-                            final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
-                            metaData.set(RESPONSE_BODY_STRING, contentType.internalValueForMapping());
+                        .get("echo_contenttype", (request, response) -> {
+                            final ContentType contentType = request.contentType();
+                            response.setBody(contentType.internalValueForMapping());
                         })
                         .build()
         )
@@ -151,7 +152,7 @@ public final class LowLevelSpecs {
     public void testLoggerCanBeSet(final TestEnvironment testEnvironment) {
         testEnvironment.given(logger ->
                 anHttpMaid()
-                        .get("/log", metaData -> metaData.get(LOGGER).info("foobar"))
+                        .get("/log", (request, response) -> request.logger().info("foobar"))
                         .configured(toLogUsing(logger))
                         .build()
         )
@@ -204,5 +205,25 @@ public final class LowLevelSpecs {
                 .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("OK");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void requestHeadersCanBeAMap(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/test", (request, response) -> {
+                            final Map<String, String> headersMap = request.headers().asStringMap();
+                            response.setBody(headersMap.toString());
+                        })
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("a", "1").withTheHeader("b", "2").withTheHeader("c", "3")
+                .isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyContains("a=1")
+                .theResponseBodyContains("b=2")
+                .theResponseBodyContains("c=3");
     }
 }

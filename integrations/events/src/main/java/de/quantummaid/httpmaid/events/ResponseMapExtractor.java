@@ -37,7 +37,7 @@ public interface ResponseMapExtractor extends Processor {
     default void apply(final MetaData metaData) {
         final Optional<Object> eventReturnValue = metaData.get(EventModule.RECEIVED_EVENT);
         eventReturnValue.ifPresent(map -> {
-            if (map instanceof Map) {
+            if (!(map instanceof Map)) {
                 return;
             }
             final HttpResponse httpResponse = httpResponse(metaData);

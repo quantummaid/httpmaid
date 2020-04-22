@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.util.Validators;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static de.quantummaid.httpmaid.path.PathException.pathException;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
@@ -71,10 +72,10 @@ final class PathResolver {
         stream(elements)
                 .forEach(element -> {
                     if ("..".equals(element)) {
-                        throw new RuntimeException(format("path '%s' is not absolute", pathString));
+                        throw pathException(format("path '%s' is not absolute", pathString));
                     }
                     if (".".equals(element)) {
-                        throw new RuntimeException(format("path '%s' is not absolute", pathString));
+                        throw pathException(format("path '%s' is not absolute", pathString));
                     }
                 });
     }

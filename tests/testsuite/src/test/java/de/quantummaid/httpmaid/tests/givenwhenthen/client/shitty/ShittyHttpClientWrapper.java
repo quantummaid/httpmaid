@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
-import de.quantummaid.httpmaid.util.Streams;
+import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -55,7 +55,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse.httpClientResponse;
-import static de.quantummaid.httpmaid.util.Streams.inputStreamToString;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static java.util.Arrays.stream;
 import static org.apache.http.protocol.HttpProcessorBuilder.create;
 

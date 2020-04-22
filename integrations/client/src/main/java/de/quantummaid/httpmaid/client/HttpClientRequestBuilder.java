@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 import static de.quantummaid.httpmaid.client.HeaderKey.headerKey;
 import static de.quantummaid.httpmaid.client.HeaderValue.headerValue;
@@ -38,7 +37,7 @@ import static de.quantummaid.httpmaid.client.HttpClientRequest.httpClientRequest
 import static de.quantummaid.httpmaid.client.QueryParameter.queryParameter;
 import static de.quantummaid.httpmaid.client.body.Body.bodyWithoutContentType;
 import static de.quantummaid.httpmaid.client.body.multipart.MultipartBodyCreator.createMultipartBody;
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
+import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
@@ -108,18 +107,6 @@ public final class HttpClientRequestBuilder<T> {
     }
 
     HttpClientRequest<T> build(final BasePath basePath) {
-        //if (isNull(rawPath)) {
-        //final String query = createQuery(explicitQueryParameters);
-        //}
         return httpClientRequest(path, method, headers, Optional.ofNullable(body), targetType);
-    }
-
-    private static String createQuery(final Map<String, String> queryParameters) {
-        if (queryParameters.isEmpty()) {
-            return "";
-        }
-        final StringJoiner joiner = new StringJoiner("&", "?", "");
-        queryParameters.forEach((key, value) -> joiner.add(key + "=" + value));
-        return joiner.toString();
     }
 }

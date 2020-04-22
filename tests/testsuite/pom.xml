@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.49</version>
+        <version>0.9.50</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -77,12 +77,6 @@
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-spark</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -103,6 +97,18 @@
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-dagger</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.quantummaid.httpmaid.integrations</groupId>
+            <artifactId>httpmaid-awslambda</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>9.4.28.v20200408</version>
             <scope>test</scope>
         </dependency>
         <dependency>

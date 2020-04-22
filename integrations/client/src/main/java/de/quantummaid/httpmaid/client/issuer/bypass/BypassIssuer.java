@@ -28,7 +28,7 @@ import de.quantummaid.httpmaid.client.RequestPath;
 import de.quantummaid.httpmaid.client.UriString;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
 import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
-import de.quantummaid.httpmaid.util.Streams;
+import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 

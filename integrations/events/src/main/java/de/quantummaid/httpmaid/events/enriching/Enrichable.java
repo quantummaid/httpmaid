@@ -47,14 +47,6 @@ public final class Enrichable {
         this.value = value;
     }
 
-    public void enrichWithoutOverwrite(final InternalEnricher enricher) {
-        enrichersWithoutOverwrite.add(enricher);
-    }
-
-    public void enrichWithOverwrite(final InternalEnricher enricher) {
-        enrichersWithOverwrite.add(enricher);
-    }
-
     public Object compile() {
         for (final InternalEnricher enricher : enrichersWithoutOverwrite) {
             value = enricher.enrich(key, value);

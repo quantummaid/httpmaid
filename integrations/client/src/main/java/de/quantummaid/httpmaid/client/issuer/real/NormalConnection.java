@@ -27,6 +27,8 @@ import org.apache.http.HttpClientConnection;
 
 import java.io.IOException;
 
+import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NormalConnection implements Connection {
     private final HttpClientConnection connection;
@@ -45,7 +47,7 @@ public final class NormalConnection implements Connection {
         try {
             connection.close();
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw httpMaidClientException(e);
         }
     }
 }

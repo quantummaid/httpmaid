@@ -41,7 +41,7 @@ abstract class AbstractHttpServletRequestWithMockImplementations implements Http
 
     @Override
     public Cookie[] getCookies() {
-        return null;
+        return new Cookie[0];
     }
 
     @Override
@@ -221,7 +221,7 @@ abstract class AbstractHttpServletRequestWithMockImplementations implements Http
 
     @Override
     public String[] getParameterValues(final String name) {
-        return null;
+        return new String[0];
     }
 
     @Override
@@ -325,13 +325,13 @@ abstract class AbstractHttpServletRequestWithMockImplementations implements Http
     }
 
     @Override
-    public AsyncContext startAsync() throws IllegalStateException {
+    public AsyncContext startAsync() {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public AsyncContext startAsync(final ServletRequest servletRequest,
-                                   final ServletResponse servletResponse) throws IllegalStateException {
+                                   final ServletResponse servletResponse) {
         throw new UnsupportedOperationException();
     }
 

@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.HttpMaidChainKeys;
 import de.quantummaid.httpmaid.http.Http;
-import de.quantummaid.httpmaid.util.Streams;
+import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

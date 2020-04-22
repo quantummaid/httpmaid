@@ -87,10 +87,6 @@ public class Chain {
         return defaultAction;
     }
 
-    Action exceptionAction() {
-        return exceptionAction;
-    }
-
     List<RegisteredProcessor> processors() {
         return processors;
     }

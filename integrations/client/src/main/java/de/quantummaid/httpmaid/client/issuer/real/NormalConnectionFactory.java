@@ -31,6 +31,7 @@ import org.apache.http.impl.pool.BasicConnFactory;
 
 import java.io.IOException;
 
+import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
 import static de.quantummaid.httpmaid.client.issuer.real.NormalConnection.normalConnection;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -49,11 +50,7 @@ public final class NormalConnectionFactory implements ConnectionFactory {
             final HttpClientConnection connection = basicConnFactory.create(target);
             return normalConnection(connection);
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw httpMaidClientException(e);
         }
-    }
-
-    @Override
-    public void close() {
     }
 }

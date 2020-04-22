@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.client.body.multipart.Part;
 
 import java.io.InputStream;
 
-import static de.quantummaid.httpmaid.util.Streams.stringToInputStream;
+import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 
 public interface ContentStage {
 

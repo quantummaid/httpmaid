@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.backchannel.BackChannelFactory;
-import de.quantummaid.httpmaid.backchannel.LocalBackChannelFactory;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
@@ -30,7 +28,6 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.builder.ChainBuilder;
 import de.quantummaid.httpmaid.chains.rules.Consume;
 import de.quantummaid.httpmaid.chains.rules.Jump;
-import de.quantummaid.httpmaid.closing.ClosingAction;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.exceptions.ExceptionMapper;
 import de.quantummaid.httpmaid.exceptions.ExceptionSerializer;
@@ -106,11 +103,6 @@ public final class CoreModule implements ChainModule {
         this.logger = logger;
     }
 
-    public void addClosingAction(final ClosingAction closingAction) {
-        validateNotNull(closingAction, "closingAction");
-        closingActions.addClosingAction(closingAction);
-    }
-
     public void setResponseTemplate(final ResponseTemplate responseTemplate) {
         validateNotNull(responseTemplate, "responseTemplate");
         this.responseTemplate = responseTemplate;
@@ -178,6 +170,5 @@ public final class CoreModule implements ChainModule {
         extender.createChain(ERROR, Consume.consume(), Consume.consume());
 
         extender.addMetaDatum(ClosingActions.CLOSING_ACTIONS, closingActions);
-        extender.addMetaDatum(BackChannelFactory.BACK_CHANNEL_FACTORY, LocalBackChannelFactory.localBackChannelFactory());
     }
 }

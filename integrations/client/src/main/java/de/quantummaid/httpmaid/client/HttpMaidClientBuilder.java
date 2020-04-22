@@ -33,11 +33,12 @@ import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.client.BasePath.basePath;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.httpMaidClient;
+import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
 import static de.quantummaid.httpmaid.client.SimpleHttpResponseObject.httpClientResponse;
 import static de.quantummaid.httpmaid.client.UnsupportedTargetTypeException.unsupportedTargetTypeException;
 import static de.quantummaid.httpmaid.filtermap.FilterMapBuilder.filterMapBuilder;
-import static de.quantummaid.httpmaid.util.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static java.lang.String.format;
 
 @ToString
@@ -65,7 +66,7 @@ public final class HttpMaidClientBuilder {
             throw unsupportedTargetTypeException(SimpleHttpResponseObject.class, targetType);
         });
         builder.withDefaultResponseMapping((response, targetType) -> {
-            throw new RuntimeException(format(
+            throw httpMaidClientException(format(
                     "Cannot map response '%s' to type '%s' because no default response mapper was defined",
                     response.toString(), targetType.getName()));
         });

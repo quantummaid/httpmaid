@@ -121,9 +121,8 @@ public final class MapMaidModule implements ChainModule {
             final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
             mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
 
-            final UseCaseReturnValueSerializer serializer = (returnValue, type) -> {
-                return mapMaid.serializer().serializeToUniversalObject(returnValue, typeIdentifierFor(fromResolvedType(type)));
-            };
+            final UseCaseReturnValueSerializer serializer = (returnValue, type) ->
+                    mapMaid.serializer().serializeToUniversalObject(returnValue, typeIdentifierFor(fromResolvedType(type)));
             return useCaseSerializationAndDeserialization(parameterProviders, serializer);
         };
         useCasesModule.setSerializationAndDeserializationProvider(serializationAndDeserializationProvider);

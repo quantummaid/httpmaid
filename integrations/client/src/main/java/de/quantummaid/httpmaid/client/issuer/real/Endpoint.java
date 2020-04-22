@@ -28,9 +28,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.Map;
-import java.util.StringJoiner;
-
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
@@ -75,14 +72,5 @@ final class Endpoint {
         final String renderedPath = requestPath.render();
         urlBuilder.append(renderedPath);
         return urlBuilder.toString();
-    }
-
-    private static String createQuery(final Map<String, String> queryParameters) {
-        if (queryParameters.isEmpty()) {
-            return "";
-        }
-        final StringJoiner joiner = new StringJoiner("&", "?", "");
-        queryParameters.forEach((key, value) -> joiner.add(key + "=" + value));
-        return joiner.toString();
     }
 }

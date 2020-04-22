@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static de.quantummaid.httpmaid.path.PathException.pathException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
@@ -55,7 +56,7 @@ public final class RegexMatcher implements StateMachineMatcher<String> {
         validateNotNullNorEmpty(stringSpecification, "stringSpecification");
         final Matcher matcher = PATTERN.matcher(stringSpecification);
         if (!matcher.matches()) {
-            throw new RuntimeException("Not a regex: " + stringSpecification);
+            throw pathException("Not a regex: " + stringSpecification);
         }
         final String regex = matcher.group(1);
 

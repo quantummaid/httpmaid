@@ -31,6 +31,7 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.jetty.JettyEndpointException.jettyEndpointException;
 import static de.quantummaid.httpmaid.jetty.JettyEndpointHandler.jettyEndpointHandler;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,7 +48,7 @@ public final class JettyEndpoint implements AutoCloseable {
                 server.start();
                 httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(closeJetty(server));
             } catch (final Exception e) {
-                throw new RuntimeException("Could not create Jetty Endpoint", e);
+                throw jettyEndpointException("Could not create Jetty Endpoint", e);
             }
             return new JettyEndpoint(httpMaid);
         };
