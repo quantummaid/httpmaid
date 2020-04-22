@@ -7,7 +7,7 @@ Add the following dependency to your `pom.xml` file:
 <dependency>
     <groupId>de.quantummaid.httpmaid</groupId>
     <artifactId>core</artifactId>
-    <version>0.9.49</version>
+    <version>0.9.50</version>
 </dependency>
 ```
 
@@ -60,7 +60,4 @@ httpMaid.close();
 ```
 
 This will close all resources, including the endpoint.
-
-<!---[Nav]-->
-[&larr;](01_Introduction.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](03_Routing.md)
 

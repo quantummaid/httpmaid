@@ -79,6 +79,4 @@ This time, we print only the content of the uploaded file to the console.
 If you restart the application and re-upload the file, you should be able to observe this.
 
 
-<!---[Nav]-->
-[&larr;](09_AuthenticationAndAuthorization.md)&nbsp;&nbsp;&nbsp;[Overview](../README.md)&nbsp;&nbsp;&nbsp;[&rarr;](11_Marshalling/1_MarshallingForms.md)
 
