@@ -94,9 +94,9 @@ public final class HttpRequest {
                 .orElseThrow(() -> new RuntimeException("Request does not have a body"));
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T authenticationInformationAs(final Class<T> type) {
-        return (T) authenticationInformation();
+        return metaData.getOptionalAs(AUTHENTICATION_INFORMATION, type)
+                .orElseThrow(() -> new RuntimeException("Request is not authenticated"));
     }
 
     public Object authenticationInformation() {

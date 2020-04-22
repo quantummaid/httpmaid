@@ -19,30 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.http.headers.cookies;
+package de.quantummaid.httpmaid.jettywithwebsockets;
 
-import de.quantummaid.httpmaid.util.Validators;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+public final class JettyEndpointException extends RuntimeException {
 
-import static java.lang.String.format;
-
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SetCookieHeader {
-    private final CookieName name;
-    private final CookieValue value;
-
-    public static SetCookieHeader setCookieHeader(final CookieName name, final CookieValue value) {
-        Validators.validateNotNull(name, "name");
-        Validators.validateNotNull(value, "value");
-        return new SetCookieHeader(name, value);
+    private JettyEndpointException(final Throwable cause) {
+        super(cause);
     }
 
-    public String compile() {
-        return format("%s=\"%s\"", name.stringValue(), value.stringValue());
+    public static JettyEndpointException jettyEndpointException(final Throwable cause) {
+        return new JettyEndpointException(cause);
     }
 }

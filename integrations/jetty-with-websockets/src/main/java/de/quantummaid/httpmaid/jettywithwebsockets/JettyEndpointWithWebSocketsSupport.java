@@ -31,6 +31,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import javax.servlet.Servlet;
 
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.jettywithwebsockets.JettyEndpointException.jettyEndpointException;
 import static de.quantummaid.httpmaid.servletwithwebsockets.WebSocketAwareHttpMaidServlet.webSocketAwareHttpMaidServlet;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -55,7 +56,7 @@ public final class JettyEndpointWithWebSocketsSupport implements AutoCloseable {
                     }
                 });
             } catch (final Exception e) {
-                throw new RuntimeException(e);
+                throw jettyEndpointException(e);
             }
             return new JettyEndpointWithWebSocketsSupport(httpMaid);
         };

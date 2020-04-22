@@ -54,7 +54,7 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MarshallingModule implements ChainModule {
-    private volatile DefaultContentTypeProvider defaultContentType;
+    private volatile DefaultContentTypeProvider defaultContentTypeProvider;
     private final Map<ContentType, Unmarshaller> unmarshallers;
     private final Map<ContentType, Marshaller> marshallers;
     private volatile boolean throwExceptionIfNoMarshallerFound;
@@ -67,8 +67,8 @@ public final class MarshallingModule implements ChainModule {
         validateNotNull(contentType, "contentType");
         validateNotNull(unmarshaller, "unmarshaller");
         unmarshallers.put(contentType, unmarshaller);
-        if (defaultContentType == null) {
-            setDefaultContentType(contentType);
+        if (defaultContentTypeProvider == null) {
+            setDefaultContentTypeProvider(contentType);
         }
     }
 
@@ -76,19 +76,19 @@ public final class MarshallingModule implements ChainModule {
         validateNotNull(contentType, "contentType");
         validateNotNull(marshaller, "marshaller");
         marshallers.put(contentType, marshaller);
-        if (defaultContentType == null) {
-            setDefaultContentType(contentType);
+        if (defaultContentTypeProvider == null) {
+            setDefaultContentTypeProvider(contentType);
         }
     }
 
-    public void setDefaultContentType(final ContentType defaultContentType) {
-        validateNotNull(defaultContentType, "defaultContentType");
-        setDefaultContentType(request -> defaultContentType);
+    public void setDefaultContentTypeProvider(final ContentType defaultContentTypeProvider) {
+        validateNotNull(defaultContentTypeProvider, "defaultContentType");
+        setDefaultContentTypeProvider(request -> defaultContentTypeProvider);
     }
 
-    public void setDefaultContentType(final DefaultContentTypeProvider defaultContentType) {
+    public void setDefaultContentTypeProvider(final DefaultContentTypeProvider defaultContentType) {
         validateNotNull(defaultContentType, "defaultContentType");
-        this.defaultContentType = defaultContentType;
+        this.defaultContentTypeProvider = defaultContentType;
     }
 
     public void setThrowExceptionIfNoMarshallerFound(final boolean throwExceptionIfNoMarshallerFound) {
@@ -108,7 +108,7 @@ public final class MarshallingModule implements ChainModule {
             final Unmarshaller unmarshaller;
             if (contentType.isEmpty()) {
                 final HttpRequest request = httpRequest(metaData);
-                final ContentType defaultContentType = this.defaultContentType.provideDefaultContentType(request);
+                final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
                 unmarshaller = unmarshallers.get(defaultContentType);
             } else {
                 unmarshaller = unmarshallers.get(contentType);
@@ -171,7 +171,7 @@ public final class MarshallingModule implements ChainModule {
             return requestContentType.get();
         }
         final HttpRequest request = httpRequest(metaData);
-        final ContentType defaultContentType = this.defaultContentType.provideDefaultContentType(request);
+        final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
         if(candidates.contains(defaultContentType)) {
             return defaultContentType;
         }
@@ -183,7 +183,7 @@ public final class MarshallingModule implements ChainModule {
             return empty();
         }
         final HttpRequest request = httpRequest(metaData);
-        final ContentType defaultContentType = this.defaultContentType.provideDefaultContentType(request);
+        final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
         if (marshallers.containsKey(defaultContentType)) {
             return ofNullable(defaultContentType);
         }

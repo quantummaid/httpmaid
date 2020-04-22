@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static de.quantummaid.httpmaid.chains.ChainException.chainException;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
@@ -71,7 +72,9 @@ public final class MetaData {
 
     @SuppressWarnings("unchecked")
     public <T> T getAs(final MetaDataKey<? super T> key, final Class<T> type) {
-        return (T) get(key);
+        final Object object = get(key);
+        ensureIsOfType(object, type, key);
+        return (T) object;
     }
 
     @SuppressWarnings("unchecked")
@@ -82,7 +85,9 @@ public final class MetaData {
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getOptionalAs(final MetaDataKey<? super T> key, final Class<T> type) {
-        return (Optional<T>) getOptional(key);
+        final Optional<?> optional = getOptional(key);
+        optional.ifPresent(o -> ensureIsOfType(o, type, key));
+        return (Optional<T>) optional;
     }
 
     public boolean contains(final MetaDataKey<?> key) {
@@ -98,5 +103,15 @@ public final class MetaData {
         return map.entrySet().stream()
                 .map(entry -> format("%s = %s", entry.getKey(), entry.getValue()))
                 .collect(joining("\n"));
+    }
+
+    private static void ensureIsOfType(final Object object,
+                                       final Class<?> type,
+                                       final MetaDataKey<?> key) {
+        if (!type.isInstance(object)) {
+            throw chainException(format(
+                    "Object '%s' (%s) needs to be of type '%s'",
+                    object, key.key(), type.getName()));
+        }
     }
 }

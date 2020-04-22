@@ -36,4 +36,5 @@
     <suppress checks="AbbreviationAsWordInName" files="CorsConfigurators"/>
     <suppress checks="VariableDeclarationUsageDistance|TrailingComment" files="HttpMaidBuilder"/>
     <suppress checks="IllegalCatch" files="MarshallingModule"/>
+    <suppress checks="TrailingComment" files="Loggers"/>
 </suppressions>

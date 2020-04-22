@@ -53,7 +53,6 @@ import static de.quantummaid.httpmaid.mapmaid.MapMaidMarshallingMapper.mapMaidMa
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.UseCaseClassScanner.addAllReferencedClassesIn;
 import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
 import static de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization.useCaseSerializationAndDeserialization;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdentifierFor;
 import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
@@ -64,17 +63,11 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapMaidModule implements ChainModule {
-    private volatile MapMaid mapMaid;
     private final MapMaidMarshallingMapper mapMaidMarshallingMapper = mapMaidMarshallingMapper();
     private volatile boolean addAggregatedExceptionHandler = true;
 
     public static MapMaidModule mapMaidModule() {
         return new MapMaidModule();
-    }
-
-    public void setMapMaid(final MapMaid mapMaid) {
-        validateNotNull(mapMaid, "mapMaid");
-        this.mapMaid = mapMaid;
     }
 
     public void doNotAddAggregatedExceptionHandler() {

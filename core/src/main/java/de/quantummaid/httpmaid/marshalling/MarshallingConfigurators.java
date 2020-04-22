@@ -58,7 +58,7 @@ public final class MarshallingConfigurators {
 
     public static MarshallingModuleConfigurator toMarshallByDefaultUsingTheContentType(final ContentType contentType) {
         validateNotNull(contentType, "contentType");
-        return marshallingModule -> marshallingModule.setDefaultContentType(contentType);
+        return marshallingModule -> marshallingModule.setDefaultContentTypeProvider(contentType);
     }
 
     public static MarshallingModuleConfigurator toThrowAnExceptionIfNoMarshallerWasFound() {

@@ -105,7 +105,7 @@ final class MapMaidMarshallingMapper {
                 .addMarshaller(contentType, map -> mapMaid.serializer().serializeFromUniversalObject(map, marshallingType)));
 
         if (mapMaid.deserializer().supportedMarshallingTypes().contains(JSON)) {
-            marshallingModule.setDefaultContentType(ContentType.json());
+            marshallingModule.setDefaultContentTypeProvider(ContentType.json());
         }
     }
 }

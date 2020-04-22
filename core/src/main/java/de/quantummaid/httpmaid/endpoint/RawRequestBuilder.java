@@ -79,8 +79,8 @@ public final class RawRequestBuilder {
     }
 
     public RawRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
-        final Map<String, String> queryParameters = queryToMap(encodedQueryParameters);
-        return withQueryParameters(queryParameters);
+        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
+        return withQueryParameters(queryParametersMap);
     }
 
     public RawRequestBuilder withQueryParameters(final Map<String, String> queryParameters) {

@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.mapmaid;
 
 import de.quantummaid.httpmaid.chains.*;
-import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.builder.recipes.Recipe;
 
 import java.util.LinkedList;
@@ -37,11 +36,6 @@ public final class MapMaidConfigurators {
     public static final MetaDataKey<List<Recipe>> RECIPES = metaDataKey("RECIPES");
 
     private MapMaidConfigurators() {
-    }
-
-    public static MapMaidIntegrationBuilder toUseMapMaid(final MapMaid mapMaid) {
-        validateNotNull(mapMaid, "mapMaid");
-        return MapMaidIntegrationBuilder.mapMaidIntegration(mapMaid);
     }
 
     public static Configurator toConfigureMapMaidUsingRecipe(final Recipe recipe) {
