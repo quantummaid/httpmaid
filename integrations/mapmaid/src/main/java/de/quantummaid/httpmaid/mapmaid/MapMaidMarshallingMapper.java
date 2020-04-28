@@ -37,8 +37,8 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.http.headers.ContentType.formUrlEncoded;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedMarshallerRecipe.urlEncoded;
-import static de.quantummaid.mapmaid.builder.recipes.marshallers.urlencoded.UrlEncodedUnmarshaller.urlEncodedUnmarshaller;
+import static de.quantummaid.mapmaid.builder.recipes.urlencoded.UrlEncodedMarshallerRecipe.urlEncoded;
+import static de.quantummaid.mapmaid.builder.recipes.urlencoded.UrlEncodedUnmarshaller.urlEncodedUnmarshaller;
 import static de.quantummaid.mapmaid.mapper.marshalling.MarshallingType.JSON;
 import static java.util.Arrays.asList;
 import static java.util.Map.of;
@@ -48,15 +48,15 @@ import static java.util.Map.of;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class MapMaidMarshallingMapper {
     private static final Map<MarshallingType, ContentType> DEFAULT_CONTENT_TYPE_MAPPINGS = of(
-            MarshallingType.json(), ContentType.json(),
-            MarshallingType.xml(), ContentType.xml(),
-            MarshallingType.yaml(), ContentType.yaml(),
+            JSON, ContentType.json(),
+            MarshallingType.XML, ContentType.xml(),
+            MarshallingType.YAML, ContentType.yaml(),
             urlEncoded(), formUrlEncoded()
     );
     private static final List<MarshallingType> DEFAULT_SUPPORTED_TYPES_FOR_UNMARSHALLING = asList(
-            MarshallingType.json(), MarshallingType.xml(), MarshallingType.yaml(), urlEncoded());
+            JSON, MarshallingType.XML, MarshallingType.YAML, urlEncoded());
     private static final List<MarshallingType> DEFAULT_SUPPORTED_TYPES_FOR_MARSHALLING = asList(
-            MarshallingType.json(), MarshallingType.xml(), MarshallingType.yaml());
+            JSON, MarshallingType.XML, MarshallingType.YAML);
 
     private final Map<ContentType, MarshallingType> contentTypeMappingsForUnmarshalling = new HashMap<>();
     private final Map<ContentType, MarshallingType> contentTypeMappingsForMarshalling = new HashMap<>();
@@ -102,7 +102,7 @@ final class MapMaidMarshallingMapper {
                     contentTypeMappingsForMarshalling.put(contentType, marshallingType);
                 });
         contentTypeMappingsForMarshalling.forEach((contentType, marshallingType) -> marshallingModule
-                .addMarshaller(contentType, map -> mapMaid.serializer().serializeFromUniversalObject(map, marshallingType)));
+                .addMarshaller(contentType, map -> mapMaid.serializer().marshalFromUniversalObject(map, marshallingType)));
 
         if (mapMaid.deserializer().supportedMarshallingTypes().contains(JSON)) {
             marshallingModule.setDefaultContentTypeProvider(ContentType.json());

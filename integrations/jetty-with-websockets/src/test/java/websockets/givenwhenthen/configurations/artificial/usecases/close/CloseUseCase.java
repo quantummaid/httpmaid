@@ -25,7 +25,7 @@ import websockets.givenwhenthen.configurations.artificial.ArtificialConfiguratio
 
 import java.util.HashMap;
 
-import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
 
 public final class CloseUseCase {
 

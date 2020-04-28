@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.events;
 
-import de.quantummaid.eventmaid.messageBus.MessageBus;
-import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.messagebus.MessageBus;
+import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
@@ -42,8 +42,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.eventmaid.messageBus.MessageBusType.ASYNCHRONOUS;
+import static de.quantummaid.eventmaid.messagebus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.messagebus.MessageBusType.ASYNCHRONOUS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.UNMARSHALLED_REQUEST_BODY;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;

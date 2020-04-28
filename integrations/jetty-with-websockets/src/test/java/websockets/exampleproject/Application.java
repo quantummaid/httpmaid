@@ -21,12 +21,12 @@
 
 package websockets.exampleproject;
 
-import de.quantummaid.eventmaid.messageBus.MessageBus;
-import de.quantummaid.eventmaid.messageBus.MessageBusType;
+import de.quantummaid.eventmaid.messagebus.MessageBus;
+import de.quantummaid.eventmaid.messagebus.MessageBusType;
 import websockets.exampleproject.domain.User;
 
 import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.messagebus.MessageBusBuilder.aMessageBus;
 
 public final class Application {
 

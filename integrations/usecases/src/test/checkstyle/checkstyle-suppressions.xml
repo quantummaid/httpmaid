@@ -25,4 +25,5 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress checks="ClassFanOutComplexity" files="UseCasesModule" />
+    <suppress checks="TrailingComment" files="UseCaseMethod" />
 </suppressions>
