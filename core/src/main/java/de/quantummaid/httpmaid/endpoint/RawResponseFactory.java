@@ -22,5 +22,5 @@
 package de.quantummaid.httpmaid.endpoint;
 
 public interface RawResponseFactory<T> {
-    T createResponse(RawResponse response) throws Exception;
+    T createResponse(RawResponse response) throws Exception; // NOSONAR
 }

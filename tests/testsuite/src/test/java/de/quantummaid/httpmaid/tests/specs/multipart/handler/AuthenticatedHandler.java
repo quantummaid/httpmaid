@@ -19,22 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests;
+package de.quantummaid.httpmaid.tests.specs.multipart.handler;
 
-import java.util.Optional;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.handler.Handler;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.AUTHENTICATION_INFORMATION;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_STRING;
+import static java.lang.String.format;
 
-public final class Util {
+public final class AuthenticatedHandler implements Handler {
 
-    private Util() {
+    public static Handler authenticatedHandler() {
+        return new AuthenticatedHandler();
     }
 
-    public static Optional<String> extractUsername(final String keyValue) {
-        if (keyValue.startsWith("username=")) {
-            return of(keyValue.substring(9));
-        }
-        return empty();
+    @Override
+    public void handle(final MetaData metaData) {
+        final String username = metaData.getAs(AUTHENTICATION_INFORMATION, String.class);
+        metaData.set(RESPONSE_BODY_STRING, format("Authenticated as: %s", username));
     }
 }

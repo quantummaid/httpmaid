@@ -13,11 +13,11 @@ import org.hamcrest.TypeSafeMatcher;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ValidationMatcher extends TypeSafeMatcher<String> {
+public final class JsonMatcher extends TypeSafeMatcher<String> {
     private final String expected;
 
     public static TypeSafeMatcher<String> isJson(final String expected) {
-        return new ValidationMatcher(expected);
+        return new JsonMatcher(expected);
     }
 
     @Override

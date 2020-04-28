@@ -60,7 +60,7 @@ public final class JettyEndpoint implements AutoCloseable {
                 server.stop();
                 server.destroy();
             } catch (final Exception e) {
-                throw new RuntimeException("Could not stop Jetty Endpoint", e);
+                throw jettyEndpointException("Could not stop Jetty Endpoint", e);
             }
         };
     }

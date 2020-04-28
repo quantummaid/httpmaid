@@ -19,35 +19,21 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.processors;
+package de.quantummaid.httpmaid.tests.specs.multipart.handler;
 
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.websockets.WebSocket;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-
-import java.util.List;
+import de.quantummaid.httpmaid.handler.Handler;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_STRING;
-import static de.quantummaid.httpmaid.websockets.WebsocketChainKeys.RECIPIENT_WEBSOCKETS;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SendToWebSocketsProcessor implements Processor {
+public final class AuthorizedHandler implements Handler {
 
-    public static Processor sendToWebSocketsProcessor() {
-        return new SendToWebSocketsProcessor();
+    public static Handler authorizedHandler() {
+        return new AuthorizedHandler();
     }
 
     @Override
-    public void apply(final MetaData metaData) {
-        metaData.getOptional(RESPONSE_BODY_STRING).ifPresent(message -> {
-            final List<WebSocket> webSockets = metaData.get(RECIPIENT_WEBSOCKETS);
-            webSockets.forEach(webSocket -> webSocket.sendText(message));
-        });
+    public void handle(final MetaData metaData) {
+        metaData.set(RESPONSE_BODY_STRING, "Welcome to the admin section!");
     }
 }

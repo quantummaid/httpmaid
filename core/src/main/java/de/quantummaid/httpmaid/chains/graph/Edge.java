@@ -26,7 +26,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.chains.graph.Color.BLACK;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
 
@@ -38,11 +37,6 @@ public final class Edge {
     private final Node to;
     private final Color color;
     private final Label label;
-
-    public static Edge edge(final Node from,
-                            final Node to) {
-        return edge(from, to, BLACK, Label.emptyLabel());
-    }
 
     public static Edge edge(final Node from,
                             final Node to,

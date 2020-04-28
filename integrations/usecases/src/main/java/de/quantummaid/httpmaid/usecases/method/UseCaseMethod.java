@@ -54,9 +54,8 @@ public final class UseCaseMethod {
         validateUseCaseClass(useCase);
         final ResolvedMethod method = locateUseCaseMethod((ClassType) useCase);
         if (method.method().getTypeParameters().length != 0) {
-            throw new IllegalArgumentException(
-                    format("use case method '%s' in class '%s' must not declare any type variables",
-                            method.describe(), useCase.simpleDescription()));
+            throw new IllegalArgumentException(format("use case method '%s' in class '%s' must not declare any " +
+                            "ype variables", method.describe(), useCase.simpleDescription()));
         }
         final Parameters parameters = Parameters.parametersOf(method);
         return new UseCaseMethod(useCase, method, parameters);
@@ -92,7 +91,7 @@ public final class UseCaseMethod {
 
     public Optional<Object> invoke(final Object useCase,
                                    final Map<String, Object> parameters,
-                                   final Object event) throws Exception {
+                                   final Object event) throws Exception { // NOSONAR
         final Object[] parameterInstances = this.parameters.toArray(parameters);
         final Method lowLevelMethod = this.method.method();
         try {

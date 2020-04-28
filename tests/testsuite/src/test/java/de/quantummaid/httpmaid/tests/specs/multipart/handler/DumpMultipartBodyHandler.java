@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.multipart;
+package de.quantummaid.httpmaid.tests.specs.multipart.handler;
 
 import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import de.quantummaid.httpmaid.handler.Handler;

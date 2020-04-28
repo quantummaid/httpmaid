@@ -100,5 +100,5 @@ should have popped up offering to store the file under the name `hello-world.txt
 HttpMaid was intended to facilitate architecturally sane web applications, first and foremost APIs.
 The implementation of static file handling has never been a priority. Therefore, it might
 currently lack features like support for caching. Nonetheless, if you need this feature or other features to exist,
-please fell free to open a feature request at https://github.com/quantummaid/httpmaid/issues
+please fell free to open a feature request at <a href="https://github.com/quantummaid/httpmaid/issues" target="_blank">Github</a>.
 

@@ -38,10 +38,8 @@ public final class WebsocketChainKeys {
 
     public static final MetaDataKey<WebSocketRegistry> WEBSOCKET_REGISTRY = metaDataKey("WEBSOCKET_REGISTRY");
     public static final MetaDataKey<List<WebSocket>> RECIPIENT_WEBSOCKETS = metaDataKey("RECIPIENT_WEBSOCKETS");
-    public static final MetaDataKey<List<WebSocket>> WEBSOCKETS_TO_CLOSE = metaDataKey("WEBSOCKETS_TO_CLOSE");
 
     public static final MetaDataKey<WebSocketTag> WEBSOCKET_TAG = metaDataKey("WEBSOCKET_TAG");
-    public static final MetaDataKey<Boolean> IS_WEBSOCKET = metaDataKey("IS_WEBSOCKET");
 
     private WebsocketChainKeys() {
     }

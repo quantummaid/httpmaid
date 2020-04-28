@@ -122,7 +122,7 @@ public class ChainRegistry {
 
     void prependProcessorToChain(final ChainName chainName,
                                  final RegisteredProcessor processor) {
-        validateNotNull(chainName, "chainName");
+        validateNotNull(chainName, "chainName"); // NOSONAR
         validateNotNull(processor, "processor");
         final Chain chain = getChainFor(chainName);
         chain.prependProcessor(processor);
@@ -130,7 +130,7 @@ public class ChainRegistry {
 
     void appendProcessorToChain(final ChainName chainName,
                                 final RegisteredProcessor processor) {
-        validateNotNull(chainName, "chainName");
+        validateNotNull(chainName, "chainName"); // NOSONAR
         validateNotNull(processor, "processor");
         final Chain chain = getChainFor(chainName);
         chain.appendProcessor(processor);
@@ -138,14 +138,14 @@ public class ChainRegistry {
 
     void addRoutingRouleToChain(final ChainName chainName,
                                 final Rule rule) {
-        validateNotNull(chainName, "chainName");
+        validateNotNull(chainName, "chainName"); // NOSONAR
         validateNotNull(rule, "rule");
         final Chain chain = getChainFor(chainName);
         chain.addRoutingRule(rule);
     }
 
     private Chain getChainFor(final ChainName chainName) {
-        validateNotNull(chainName, "chainName");
+        validateNotNull(chainName, "chainName"); // NOSONAR
         if (namedChains.containsKey(chainName)) {
             return namedChains.get(chainName);
         } else {

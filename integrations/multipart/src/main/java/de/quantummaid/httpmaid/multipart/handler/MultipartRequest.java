@@ -22,11 +22,7 @@
 package de.quantummaid.httpmaid.multipart.handler;
 
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
-import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.PathParameters;
-import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.multipart.MultipartIteratorBody;
-import de.quantummaid.httpmaid.path.Path;
 import lombok.*;
 
 import static de.quantummaid.httpmaid.multipart.MultipartChainKeys.MULTIPART_ITERATOR_BODY;
@@ -44,20 +40,8 @@ public final class MultipartRequest {
         return new MultipartRequest(request);
     }
 
-    public Path path() {
-        return request.path();
-    }
-
-    public PathParameters pathParameters() {
-        return request.pathParameters();
-    }
-
-    public QueryParameters queryParameters() {
-        return request.queryParameters();
-    }
-
-    public Headers headers() {
-        return request.headers();
+    public HttpRequest httpRequest() {
+        return this.request;
     }
 
     public MultipartIteratorBody partIterator() {

@@ -25,6 +25,8 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.concurrent.TimeUnit;
+
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.cors.CorsConfigurators.toActivateCORSWithoutValidatingTheOrigin;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
@@ -63,6 +65,7 @@ public final class CorsSpecs {
                         .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setStatus(500)))
                         .configured(toActivateCORSWithoutValidatingTheOrigin()
                                 .exposingTheResponseHeaders("Some-Header", "Another-Header", "Yet-Another-Header")
+                                .withTimeOutAfter(10, TimeUnit.DAYS)
                                 .allowingCredentials())
                         .build()
         )

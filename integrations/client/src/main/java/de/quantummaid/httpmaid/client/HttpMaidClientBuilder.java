@@ -66,9 +66,8 @@ public final class HttpMaidClientBuilder {
             throw unsupportedTargetTypeException(SimpleHttpResponseObject.class, targetType);
         });
         builder.withDefaultResponseMapping((response, targetType) -> {
-            throw httpMaidClientException(format(
-                    "Cannot map response '%s' to type '%s' because no default response mapper was defined",
-                    response.toString(), targetType.getName()));
+            throw httpMaidClientException(format("Cannot map response '%s' to type '%s' because no default " +
+                            "response mapper was defined", response.toString(), targetType.getName()));
         });
         return builder;
     }
@@ -79,7 +78,7 @@ public final class HttpMaidClientBuilder {
     }
 
     public HttpMaidClientBuilder withDefaultResponseMapping(final ClientResponseMapper<?> mapper) {
-        validateNotNull(mapper, "mapper");
+        validateNotNull(mapper, "mapper"); // NOSONAR
         responseMappers.setDefaultValue(mapper);
         return this;
     }
@@ -87,7 +86,7 @@ public final class HttpMaidClientBuilder {
     public <T> HttpMaidClientBuilder withResponseMapping(final Class<T> type,
                                                          final ClientResponseMapper<T> mapper) {
         validateNotNull(type, "type");
-        validateNotNull(mapper, "mapper");
+        validateNotNull(mapper, "mapper"); // NOSONAR
         return withResponseMapping(subtype(type), mapper);
     }
 
@@ -95,7 +94,7 @@ public final class HttpMaidClientBuilder {
     public <T> HttpMaidClientBuilder withResponseMapping(final Predicate<Class<T>> filter,
                                                          final ClientResponseMapper<T> mapper) {
         validateNotNull(filter, "filter");
-        validateNotNull(mapper, "mapper");
+        validateNotNull(mapper, "mapper"); // NOSONAR
         responseMappers.put((Predicate<Class<?>>) (Object) filter, mapper);
         return this;
     }

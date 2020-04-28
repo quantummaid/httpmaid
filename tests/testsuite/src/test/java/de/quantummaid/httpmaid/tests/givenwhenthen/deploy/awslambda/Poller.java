@@ -43,8 +43,8 @@ final class Poller {
 
     static void sleep(final int seconds) {
         try {
-            Thread.sleep(ONE_SECOND * seconds);
-        } catch (InterruptedException e) {
+            Thread.sleep(ONE_SECOND * seconds); // NOSONAR
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }

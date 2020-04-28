@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs;
+package de.quantummaid.httpmaid.tests.specs.multipart;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.MultipartBuilder.startingWith;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement.aFile;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement.aFormControl;
-import static de.quantummaid.httpmaid.tests.multipart.MultipartHttpMaidConfiguration.theMultipartHttpMaidInstanceUsedForTesting;
+import static de.quantummaid.httpmaid.tests.specs.multipart.handler.MultipartHttpMaidConfiguration.theMultipartHttpMaidInstanceUsedForTesting;
 
 public final class MultipartSpecs {
 

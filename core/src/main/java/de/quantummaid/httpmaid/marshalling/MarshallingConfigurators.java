@@ -33,7 +33,7 @@ public final class MarshallingConfigurators {
     public static MarshallingModuleConfigurator toMarshallContentType(final ContentType contentType,
                                                                       final Unmarshaller unmarshaller,
                                                                       final Marshaller marshaller) {
-        validateNotNull(contentType, "contentType");
+        validateNotNull(contentType, "contentType"); // NOSONAR
         validateNotNull(unmarshaller, "unmarshaller");
         validateNotNull(marshaller, "marshaller");
         return marshallingModule -> {
@@ -44,20 +44,20 @@ public final class MarshallingConfigurators {
 
     public static MarshallingModuleConfigurator toUnmarshallContentTypeInRequests(final ContentType contentType,
                                                                                   final Unmarshaller unmarshaller) {
-        validateNotNull(contentType, "contentType");
+        validateNotNull(contentType, "contentType"); // NOSONAR
         validateNotNull(unmarshaller, "unmarshaller");
         return marshallingModule -> marshallingModule.addUnmarshaller(contentType, unmarshaller);
     }
 
     public static MarshallingModuleConfigurator toMarshallContentTypeInResponses(final ContentType contentType,
                                                                                  final Marshaller marshaller) {
-        validateNotNull(contentType, "contentType");
+        validateNotNull(contentType, "contentType"); // NOSONAR
         validateNotNull(marshaller, "marshaller");
         return marshallingModule -> marshallingModule.addMarshaller(contentType, marshaller);
     }
 
     public static MarshallingModuleConfigurator toMarshallByDefaultUsingTheContentType(final ContentType contentType) {
-        validateNotNull(contentType, "contentType");
+        validateNotNull(contentType, "contentType"); // NOSONAR
         return marshallingModule -> marshallingModule.setDefaultContentTypeProvider(contentType);
     }
 

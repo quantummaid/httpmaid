@@ -31,7 +31,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MetaDataKey<T> {
+public final class MetaDataKey<T> { // NOSONAR
     private final String key;
 
     public static <T> MetaDataKey<T> metaDataKey(final String key) {

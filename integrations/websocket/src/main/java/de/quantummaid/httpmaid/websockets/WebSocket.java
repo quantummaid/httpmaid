@@ -49,14 +49,6 @@ public final class WebSocket {
         return id;
     }
 
-    public SavedMetaDataEntries savedMetaDataEntries() {
-        return savedMetaDataEntries;
-    }
-
-    public synchronized void sendText(final String message) {
-        webSocketDelegate.sendText(message);
-    }
-
     public synchronized void close() {
         webSocketDelegate.close();
     }

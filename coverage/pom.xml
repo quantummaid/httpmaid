@@ -119,11 +119,6 @@
             <version>0.9.50</version>
         </dependency>
         <dependency>
-            <groupId>de.quantummaid.httpmaid.examples</groupId>
-            <artifactId>aws-lambda</artifactId>
-            <version>0.9.50</version>
-        </dependency>
-        <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
             <artifactId>testsuite</artifactId>
             <version>0.9.50</version>

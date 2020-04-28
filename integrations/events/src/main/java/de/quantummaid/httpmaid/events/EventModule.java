@@ -48,7 +48,6 @@ import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.UNMARSHALLED_REQUEST_BODY;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
 import static de.quantummaid.httpmaid.chains.ChainRegistry.CHAIN_REGISTRY;
-import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
@@ -58,7 +57,6 @@ import static de.quantummaid.httpmaid.events.EventsChains.MAP_REQUEST_TO_EVENT;
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEventEnrichers;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
-import static de.quantummaid.httpmaid.events.processors.HandleExternalEventProcessor.handleExternalEventProcessor;
 import static de.quantummaid.httpmaid.events.processors.PerRequestEnrichersProcessor.enrichersProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.generator.Generator.generator;
@@ -66,7 +64,6 @@ import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.emptyList;
-import static java.util.Optional.of;
 
 @ToString
 @EqualsAndHashCode
@@ -87,8 +84,6 @@ public final class EventModule implements ChainModule {
     private final Map<EventType, PerEventEnrichers> enrichers = new HashMap<>();
 
     private final List<ResponseMapExtractor> responseMapExtractors = new LinkedList<>();
-
-    private final Map<EventType, ExternalEventMapping> externalEventMappings = new HashMap<>();
 
     public static EventModule eventModule() {
         final EventModule eventModule = new EventModule();
@@ -186,29 +181,12 @@ public final class EventModule implements ChainModule {
 
         extender.appendProcessor(PREPARE_EXCEPTION_RESPONSE, unwrapDispatchingExceptionProcessor());
         extender.createChain(EventsChains.EXTERNAL_EVENT, drop(), jumpTo(EXCEPTION_OCCURRED));
-        extender.appendProcessor(EventsChains.EXTERNAL_EVENT, handleExternalEventProcessor(externalEventMappings));
         extender.routeIfFlagIsSet(INIT, jumpTo(EventsChains.EXTERNAL_EVENT), IS_EXTERNAL_EVENT);
-        externalEventMappings.forEach((eventType, externalEventMapping) ->
-                externalEventMapping.jumpTarget().ifPresent(chainName ->
-                        extender.routeIfEquals(EventsChains.EXTERNAL_EVENT, jumpTo(chainName), EVENT_TYPE, eventType)));
 
         final ChainRegistry chainRegistry = extender.getMetaDatum(CHAIN_REGISTRY);
-        registerEventHandlers(messageBus, chainRegistry);
         if (closeMessageBusOnClose) {
             final ClosingActions closingActions = chainRegistry.getMetaDatum(CLOSING_ACTIONS);
             closingActions.addClosingAction(messageBus::close);
         }
-    }
-
-    private void registerEventHandlers(final MessageBus messageBus,
-                                       final ChainRegistry chainRegistry) {
-        externalEventMappings.forEach((type, mapping) -> messageBus.subscribe(type, event -> {
-            final MetaData metaData = emptyMetaData();
-            metaData.set(RECEIVED_EVENT, of(event));
-            metaData.set(EVENT_TYPE, type);
-            metaData.set(IS_EXTERNAL_EVENT, true);
-            chainRegistry.putIntoChain(INIT, metaData, m -> {
-            });
-        }));
     }
 }

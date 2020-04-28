@@ -30,11 +30,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class SpecialServletInputStream extends ServletInputStream {
+public final class SpecialServletInputStream extends ServletInputStream {
     private static final int READ_LIMIT = -1;
     private final InputStream inputStream;
 
-    static ServletInputStream servletInputStreamBackedBy(final InputStream inputStream) {
+    public static ServletInputStream servletInputStreamBackedBy(final InputStream inputStream) {
         return new SpecialServletInputStream(inputStream);
     }
 

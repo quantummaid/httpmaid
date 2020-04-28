@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
-import java.util.StringJoiner;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Arrays.stream;
@@ -43,14 +42,6 @@ public final class BasePath {
         validateNotNull(basePath, "basePath");
         final List<String> basePathElements = splitPath(basePath);
         return new BasePath(basePathElements);
-    }
-
-    public String concatenateWithStartingAndTrailingSlash(final String subPath) {
-        final StringJoiner pathJoiner = new StringJoiner("/", "/", "");
-        elements.forEach(pathJoiner::add);
-        final List<String> subElements = splitPath(subPath);
-        subElements.forEach(pathJoiner::add);
-        return pathJoiner.toString();
     }
 
     private static List<String> splitPath(final String path) {

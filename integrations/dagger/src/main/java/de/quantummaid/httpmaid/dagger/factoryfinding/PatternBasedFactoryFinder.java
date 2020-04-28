@@ -69,9 +69,7 @@ public final class PatternBasedFactoryFinder implements DaggerFactoryFinder {
         try {
             return type.getMethod(name);
         } catch (final NoSuchMethodException e) {
-            throw daggerIntegrationException(format(
-                    "Cannot find method with name '%s' in class '%s'",
-                    name, type.getName()), e);
+            throw daggerIntegrationException(format("Cannot find method with name '%s' in class '%s'", name, type.getName()), e);
         }
     }
 }

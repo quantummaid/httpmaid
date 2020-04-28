@@ -74,10 +74,7 @@ public final class WebSocketModule implements ChainModule {
         extender.appendProcessor(WEBSOCKET_ESTABLISHMENT, createWebSocketProcessor(registry));
         extender.appendProcessor(DETERMINE_WEBSOCKET_TYPE, DetermineWebSocketTypeProcessor.determineWebSocketTypeProcessor(webSocketMappings));
         extender.appendProcessor(WEBSOCKET_OPEN, ActivateWebSocketProcessor.activateWebSocketProcessor(registry));
-        extender.appendProcessor(SEND_TO_WEBSOCKETS, SendToWebSocketsProcessor.sendToWebSocketsProcessor());
         extender.appendProcessor(WEBSOCKET_CLOSED, RemoveWebSocketFromRegistryProcessor.removeWebSocketFromRegistryProcessor(registry));
-        extender.appendProcessor(WEBSOCKET_CLOSE, CloseWebSocketProcessor.closeWebSocketProcessor(registry));
-        extender.appendProcessor(WEBSOCKET_MESSAGE, HandleNewWebSocketMessageProcessor.handleNewWebSocketMessageProcessor(registry));
     }
 
     private static void createSkeleton(final ChainExtender extender) {

@@ -36,7 +36,6 @@
     <name>HttpMaid - Examples - Parent</name>
 
     <modules>
-        <module>aws-lambda</module>
         <module>documentation</module>
     </modules>
 
