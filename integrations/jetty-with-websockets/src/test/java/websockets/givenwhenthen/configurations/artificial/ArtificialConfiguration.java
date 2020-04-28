@@ -22,11 +22,11 @@
 package websockets.givenwhenthen.configurations.artificial;
 
 import com.google.gson.Gson;
-import de.quantummaid.eventmaid.messageBus.MessageBus;
-import de.quantummaid.eventmaid.messageBus.MessageBusType;
-import de.quantummaid.eventmaid.useCases.building.ExceptionSerializationStep1Builder;
-import de.quantummaid.eventmaid.useCases.building.Step1Builder;
-import de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseAdapter;
+import de.quantummaid.eventmaid.messagebus.MessageBus;
+import de.quantummaid.eventmaid.messagebus.MessageBusType;
+import de.quantummaid.eventmaid.usecases.building.ExceptionSerializationStep1Builder;
+import de.quantummaid.eventmaid.usecases.building.Step1Builder;
+import de.quantummaid.eventmaid.usecases.usecaseadapter.UseCaseAdapter;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.path.Path;
 import de.quantummaid.httpmaid.security.SecurityConfigurators;
@@ -53,9 +53,9 @@ import websockets.givenwhenthen.configurations.artificial.usecases.queryfoo.Quer
 import java.util.Map;
 
 import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
-import static de.quantummaid.eventmaid.useCases.useCaseAdapter.UseCaseInvocationBuilder.anUseCaseAdapter;
+import static de.quantummaid.eventmaid.messagebus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.usecases.usecaseadapter.UseCaseInvocationBuilder.anUseCaseAdapter;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toUseTheMessageBus;

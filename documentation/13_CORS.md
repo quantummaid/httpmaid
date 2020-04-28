@@ -24,7 +24,7 @@ configuration:
 
 - `withAllowedMethods()` - configures the request methods cross-origin requests may
 use (default is `GET` and `POST`).
-This sets the `Access-Control-Allow-Methods` header - see [here](Access-Control-Allow-Methods) for more information.
+This sets the `Access-Control-Allow-Methods` header - see [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods) for more information.
 
 - `withAllowedHeaders()` and `allowingAllHeaders()` - configures the non-standard
 headers cross-origin requests may use (default is none).

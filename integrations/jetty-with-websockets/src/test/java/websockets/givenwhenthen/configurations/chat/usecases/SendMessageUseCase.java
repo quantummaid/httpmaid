@@ -28,7 +28,7 @@ import websockets.givenwhenthen.configurations.chat.domain.Username;
 
 import java.util.Map;
 
-import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
 import static websockets.givenwhenthen.configurations.chat.ChatConfiguration.messageBus;
 import static websockets.givenwhenthen.configurations.chat.domain.UserRepository.userRepository;
 import static websockets.givenwhenthen.configurations.chat.usecases.NewMessageEvent.newMessageEvent;

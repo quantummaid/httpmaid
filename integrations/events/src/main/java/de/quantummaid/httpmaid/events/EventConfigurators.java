@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.events;
 
-import de.quantummaid.eventmaid.messageBus.MessageBus;
-import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.messagebus.MessageBus;
+import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.PerRouteConfigurator;
 import de.quantummaid.httpmaid.chains.Configurator;
 import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;

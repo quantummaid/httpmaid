@@ -35,7 +35,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static de.quantummaid.eventmaid.internal.reflections.ForbiddenUseCaseMethods.NOT_ALLOWED_USECASE_PUBLIC_METHODS;
-import static de.quantummaid.eventmaid.useCases.useCaseAdapter.methodInvoking.MethodInvocationException.methodInvocationException;
+import static de.quantummaid.eventmaid.usecases.usecaseadapter.methodinvoking.MethodInvocationException.methodInvocationException;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.util.Optional.ofNullable;

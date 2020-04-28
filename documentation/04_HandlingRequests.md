@@ -41,7 +41,8 @@ paragraphs will walk you through each possible aspect and explain how to
 access it.
 
 ### Request Method
-The chapter [Routing](03_Routing.md#request-path) explained what the request method is.
+The chapter <!---[Link] ( 03_Routing.md Routing)-->
+[Routing](03_Routing.md) explained what the request method is.
 It can be queried from the current request object with the `method()` method:
 <!---[CodeSnippet] (requestPathMethod)-->
 ```java

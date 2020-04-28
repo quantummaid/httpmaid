@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.events.processors;
 
-import de.quantummaid.eventmaid.processingContext.EventType;
+import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.events.Event;
