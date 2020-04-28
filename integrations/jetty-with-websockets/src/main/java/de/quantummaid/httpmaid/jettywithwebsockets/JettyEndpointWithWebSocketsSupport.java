@@ -52,7 +52,7 @@ public final class JettyEndpointWithWebSocketsSupport implements AutoCloseable {
                     try {
                         server.stop();
                     } catch (final Exception e) {
-                        throw new RuntimeException(e);
+                        throw jettyEndpointException(e);
                     }
                 });
             } catch (final Exception e) {

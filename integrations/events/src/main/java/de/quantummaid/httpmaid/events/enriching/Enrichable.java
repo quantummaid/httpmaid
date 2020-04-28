@@ -26,9 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @ToString
 @EqualsAndHashCode
@@ -36,8 +34,6 @@ import java.util.List;
 public final class Enrichable {
     private final String key;
     private Object value = new HashMap<>();
-    private final List<InternalEnricher> enrichersWithoutOverwrite = new ArrayList<>();
-    private final List<InternalEnricher> enrichersWithOverwrite = new ArrayList<>();
 
     public static Enrichable enrichable(final String key) {
         return new Enrichable(key);
@@ -48,12 +44,6 @@ public final class Enrichable {
     }
 
     public Object compile() {
-        for (final InternalEnricher enricher : enrichersWithoutOverwrite) {
-            value = enricher.enrich(key, value);
-        }
-        for (final InternalEnricher enricher : enrichersWithOverwrite) {
-            value = enricher.enrich(key, value);
-        }
         return value;
     }
 }

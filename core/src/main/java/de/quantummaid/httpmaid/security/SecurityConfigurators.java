@@ -61,7 +61,7 @@ public final class SecurityConfigurators {
     public static AuthenticatorConfigurator toAuthenticateUsingCookie(final String cookieName,
                                                                       final Authenticator<String> authenticator) {
         validateNotNullNorEmpty(cookieName, "cookieName");
-        validateNotNull(authenticator, "authenticator");
+        validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.cookies()
                 .getOptionalCookie(cookieName)
                 .flatMap(authenticator::authenticate));
@@ -70,7 +70,7 @@ public final class SecurityConfigurators {
     public static AuthenticatorConfigurator toAuthenticateUsingHeader(final String headerName,
                                                                       final Authenticator<String> authenticator) {
         validateNotNullNorEmpty(headerName, "headerName");
-        validateNotNull(authenticator, "authenticator");
+        validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.headers()
                 .getOptionalHeader(headerName)
                 .flatMap(authenticator::authenticate));
@@ -79,7 +79,7 @@ public final class SecurityConfigurators {
     public static AuthenticatorConfigurator toAuthenticateUsingQueryParameter(final String parameterName,
                                                                               final Authenticator<String> authenticator) {
         validateNotNullNorEmpty(parameterName, "parameterName");
-        validateNotNull(authenticator, "authenticator");
+        validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.queryParameters()
                 .getOptionalQueryParameter(parameterName)
                 .flatMap(authenticator::authenticate));
@@ -88,7 +88,7 @@ public final class SecurityConfigurators {
     public static AuthenticatorConfigurator toAuthenticateUsingPathParameter(final String parameterName,
                                                                              final Authenticator<String> authenticator) {
         validateNotNullNorEmpty(parameterName, "parameterName");
-        validateNotNull(authenticator, "authenticator");
+        validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.pathParameters()
                 .getOptionalPathParameter(parameterName)
                 .flatMap(authenticator::authenticate)).afterBodyProcessing();

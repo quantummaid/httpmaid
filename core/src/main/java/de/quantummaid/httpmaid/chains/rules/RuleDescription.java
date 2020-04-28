@@ -41,10 +41,6 @@ public final class RuleDescription {
         return new RuleDescription(description);
     }
 
-    public static RuleDescription emptyRuleDescription() {
-        return new RuleDescription(null);
-    }
-
     public Optional<String> value() {
         return ofNullable(description);
     }

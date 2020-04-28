@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.multipart;
+package de.quantummaid.httpmaid.tests.specs.multipart.handler;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.multipart.MultipartIteratorBody;
@@ -35,8 +35,7 @@ import static de.quantummaid.httpmaid.multipart.MultipartChainKeys.MULTIPART_ITE
 import static de.quantummaid.httpmaid.multipart.MultipartConfigurators.toExposeMultipartBodiesUsingMultipartIteratorBody;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateRequestsUsing;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
-import static de.quantummaid.httpmaid.tests.Util.extractUsername;
-import static de.quantummaid.httpmaid.tests.multipart.DumpMultipartBodyHandler.dumpMultipartBodyHandler;
+import static de.quantummaid.httpmaid.tests.specs.multipart.handler.Util.extractUsername;
 import static java.util.Optional.empty;
 
 public final class MultipartHttpMaidConfiguration {
@@ -46,7 +45,7 @@ public final class MultipartHttpMaidConfiguration {
 
     public static HttpMaid theMultipartHttpMaidInstanceUsedForTesting() {
         return anHttpMaid()
-                .serving(dumpMultipartBodyHandler())
+                .serving(DumpMultipartBodyHandler.dumpMultipartBodyHandler())
                 .forRequestPath("/dump").andRequestMethods(GET, POST, PUT, DELETE)
                 .serving(AuthenticatedHandler.authenticatedHandler())
                 .forRequestPath("/authenticated").andRequestMethods(GET, POST, PUT, DELETE)

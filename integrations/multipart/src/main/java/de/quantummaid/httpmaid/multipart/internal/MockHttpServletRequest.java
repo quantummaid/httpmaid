@@ -39,7 +39,7 @@ public final class MockHttpServletRequest extends AbstractHttpServletRequestWith
     private final String contentType;
     private final Map<String, String> headers;
 
-    static HttpServletRequest mockHttpServletRequest(final InputStream body, final String contentType) {
+    public static HttpServletRequest mockHttpServletRequest(final InputStream body, final String contentType) {
         validateNotNull(body, "body");
         validateNotNull(contentType, "contentType");
         final Map<String, String> headers = new HashMap<>();
@@ -70,5 +70,10 @@ public final class MockHttpServletRequest extends AbstractHttpServletRequestWith
     @Override
     public ServletInputStream getInputStream() {
         return servletInputStreamBackedBy(body);
+    }
+
+    @Override
+    public String getCharacterEncoding() {
+        return "UTF-8";
     }
 }

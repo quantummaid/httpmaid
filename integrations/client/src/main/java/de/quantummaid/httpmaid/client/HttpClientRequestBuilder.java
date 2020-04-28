@@ -37,9 +37,9 @@ import static de.quantummaid.httpmaid.client.HttpClientRequest.httpClientRequest
 import static de.quantummaid.httpmaid.client.QueryParameter.queryParameter;
 import static de.quantummaid.httpmaid.client.body.Body.bodyWithoutContentType;
 import static de.quantummaid.httpmaid.client.body.multipart.MultipartBodyCreator.createMultipartBody;
-import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
+import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpClientRequestBuilder<T> {
@@ -107,6 +107,7 @@ public final class HttpClientRequestBuilder<T> {
     }
 
     HttpClientRequest<T> build(final BasePath basePath) {
+        validateNotNull(basePath, "basePath");
         return httpClientRequest(path, method, headers, Optional.ofNullable(body), targetType);
     }
 }

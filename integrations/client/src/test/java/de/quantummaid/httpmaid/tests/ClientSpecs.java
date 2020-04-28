@@ -89,7 +89,35 @@ public final class ClientSpecs {
     }
 
     @Test
-    public void clientResponseHasAUserfriedlyDescription() {
+    public void clientCanExplicitlyAddAnEmptyQueryParameter() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/test", (request, response) -> {
+                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            response.setBody(queryParameter);
+                        })
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/test").withQueryParameter("foo"))
+                .theResponseBodyWas("");
+    }
+
+    @Test
+    public void clientCanImplicitlyAddAnEmptyQueryParameter() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/test", (request, response) -> {
+                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            response.setBody(queryParameter);
+                        })
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/test?foo="))
+                .theResponseBodyWas("");
+    }
+
+    @Test
+    public void clientResponseHasAUserFriendlyDescription() {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> response.setBody("foobar"))

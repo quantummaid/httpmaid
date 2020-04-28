@@ -31,8 +31,7 @@ public final class UnsupportedTargetTypeException extends RuntimeException {
 
     public static UnsupportedTargetTypeException unsupportedTargetTypeException(final Class<?> expectedType,
                                                                                 final Class<?> actualType) {
-        final String message = format("Can only deserialize response objects to %s but found: %s",
-                expectedType.getName(), actualType.getName());
-        return new UnsupportedTargetTypeException(message);
+        return new UnsupportedTargetTypeException(format("Can only deserialize response objects to %s but found: %s",
+                expectedType.getName(), actualType.getName()));
     }
 }

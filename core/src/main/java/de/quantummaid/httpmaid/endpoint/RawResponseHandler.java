@@ -22,5 +22,5 @@
 package de.quantummaid.httpmaid.endpoint;
 
 public interface RawResponseHandler {
-    void handle(RawResponse response) throws Exception;
+    void handle(RawResponse response) throws Exception; // NOSONAR
 }

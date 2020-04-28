@@ -22,5 +22,5 @@
 package de.quantummaid.httpmaid.marshalling;
 
 public interface Unmarshaller {
-    Object unmarshall(String string) throws Exception;
+    Object unmarshall(String string) throws Exception; // NOSONAR
 }

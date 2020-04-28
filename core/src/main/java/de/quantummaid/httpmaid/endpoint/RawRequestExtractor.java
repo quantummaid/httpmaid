@@ -22,5 +22,5 @@
 package de.quantummaid.httpmaid.endpoint;
 
 public interface RawRequestExtractor {
-    RawRequest extract() throws Exception;
+    RawRequest extract() throws Exception; // NOSONAR
 }

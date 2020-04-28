@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.util.describing;
 
+import static java.lang.Integer.max;
 import static java.lang.String.format;
 
 final class DescriptionUtils {
@@ -47,9 +48,7 @@ final class DescriptionUtils {
     }
 
     static String times(final String sequence, final int times) {
-        if(times < 0) {
-            return "";
-        }
-        return sequence.repeat(times);
+        final int actualTimes = max(0, times);
+        return sequence.repeat(actualTimes);
     }
 }
