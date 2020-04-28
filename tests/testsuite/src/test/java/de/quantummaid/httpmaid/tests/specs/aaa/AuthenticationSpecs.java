@@ -191,6 +191,6 @@ public final class AuthenticationSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("user", "foo").isIssued()
-                .theResponseBodyWas("Unable to resolve type variables based on object 'GenericUser(name=foo)'");
+                .theResponseBodyWas("Type variables of 'de.quantummaid.httpmaid.tests.specs.aaa.domain.GenericUser' cannot be resolved");
     }
 }

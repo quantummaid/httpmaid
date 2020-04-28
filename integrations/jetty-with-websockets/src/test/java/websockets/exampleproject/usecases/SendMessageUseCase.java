@@ -25,7 +25,7 @@ import websockets.exampleproject.domain.*;
 
 import java.util.List;
 
-import static de.quantummaid.eventmaid.processingContext.EventType.eventTypeFromString;
+import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
 import static websockets.exampleproject.Application.MESSAGE_BUS;
 import static websockets.exampleproject.domain.MessageRepository.messageRepository;
 import static websockets.exampleproject.usecases.events.NewMessageEvent.newMessageEvent;

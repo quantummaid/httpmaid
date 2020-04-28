@@ -21,12 +21,12 @@
 
 package websockets.givenwhenthen.configurations.chat;
 
-import de.quantummaid.eventmaid.messageBus.MessageBus;
+import de.quantummaid.eventmaid.messagebus.MessageBus;
 import websockets.givenwhenthen.configurations.TestConfiguration;
 
 import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
-import static de.quantummaid.eventmaid.messageBus.MessageBusBuilder.aMessageBus;
-import static de.quantummaid.eventmaid.messageBus.MessageBusType.ASYNCHRONOUS;
+import static de.quantummaid.eventmaid.messagebus.MessageBusBuilder.aMessageBus;
+import static de.quantummaid.eventmaid.messagebus.MessageBusType.ASYNCHRONOUS;
 
 public final class ChatConfiguration {
     private static final int POOL_SIZE = 4;
