@@ -15,11 +15,6 @@ Another option is the Jetty endpoint:
 ```java
 jettyEndpointFor(httpMaid).listeningOnThePort(port);
 ```
-If you intend to use websockets, you can go with the Jetty-for-websockets variant:
-<!---[CodeSnippet] (jettyWebsocketsEndpoint)-->
-```java
-jettyEndpointWithWebSocketsSupportFor(httpMaid).listeningOnThePort(port);
-```
 ## Servlet
 If you intend to host your application using standard Java servlet technology, you can go with the servlet endpoint.
 Using it depends on how your servlet is loaded.
@@ -42,23 +37,3 @@ public final class MyServlet extends ServletEndpoint {
     }
 }
 ```
-
-There exists a version of it supporting websockets. It can be used in the same manner as the normal version:
-
-<!---[CodeSnippet] (websocketServletSample)-->
-```java
-final HttpServlet servletWithWebsockets = webSocketAwareHttpMaidServlet(httpMaid);
-```
-or
-```java
-public final class MyServlet extends WebSocketAwareHttpMaidServlet {
-    
-    private static final HttpMaid httpMaid = aLowLevelHttpMaid() ...
-    
-    public MyServlet() {
-        super(httpMaid);
-    }
-}
-```
-
-
