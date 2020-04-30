@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.endpoint.purejavaendpoint;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler; // NOSONAR
+import com.sun.net.httpserver.HttpServer; // NOSONAR
 import de.quantummaid.httpmaid.HttpMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

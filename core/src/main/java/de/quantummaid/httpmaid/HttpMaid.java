@@ -21,19 +21,21 @@
 
 package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.chains.*;
+import de.quantummaid.httpmaid.chains.ChainName;
+import de.quantummaid.httpmaid.chains.ChainRegistry;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.endpoint.*;
-import de.quantummaid.httpmaid.logger.Logger;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.LOGGER;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
@@ -43,6 +45,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
     public static final MetaDataKey<Duration> STARTUP_TIME = metaDataKey("STARTUP_TIME");
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpMaid.class);
 
     private final ChainRegistry chainRegistry;
 
@@ -73,7 +76,7 @@ public final class HttpMaid implements AutoCloseable {
         try {
             rawRequest = rawRequestExtractor.extract();
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception in endpoint request handling", e);
             return;
             // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
         }
@@ -84,21 +87,7 @@ public final class HttpMaid implements AutoCloseable {
             try {
                 rawResponseHandler.handle(rawResponse);
             } catch (final Exception e) {
-                final Logger logger = finalMetaData.get(LOGGER);
-                logger.error(e);
-                // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
-            }
-        });
-    }
-
-    public void handleRequest(final MetaData metaData,
-                              final FinalConsumer responseHandler) {
-        chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
-            try {
-                responseHandler.consume(metaData);
-            } catch (final IOException e) {
-                final Logger logger = finalMetaData.get(LOGGER);
-                logger.error(e);
+                LOGGER.error("Exception in endpoint reponse handling", e);
                 // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
             }
         });

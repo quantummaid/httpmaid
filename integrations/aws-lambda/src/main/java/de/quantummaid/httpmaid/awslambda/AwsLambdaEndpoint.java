@@ -27,14 +27,12 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
-import de.quantummaid.httpmaid.logger.LoggerImplementation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaLogger.awsLambdaLogger;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
@@ -46,10 +44,6 @@ public final class AwsLambdaEndpoint {
     public static final MetaDataKey<Context> CONTEXT = metaDataKey("awsLambdaContext");
 
     private final HttpMaid httpMaid;
-
-    public static LoggerImplementation awsLogger() {
-        return awsLambdaLogger();
-    }
 
     public static AwsLambdaEndpoint awsLambdaEndpointFor(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");

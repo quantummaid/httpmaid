@@ -80,9 +80,9 @@ public final class HttpMaidBuilder {
         return get(url, (Object) handler, perRouteConfigurators);
     }
 
-    public HttpMaidBuilder post(final String url, final Object handler) {
+    public HttpMaidBuilder post(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
-                .serving(handler)
+                .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.POST);
     }
@@ -91,9 +91,9 @@ public final class HttpMaidBuilder {
         return post(url, (Object) handler);
     }
 
-    public HttpMaidBuilder put(final String url, final Object handler) {
+    public HttpMaidBuilder put(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
-                .serving(handler)
+                .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.PUT);
     }
@@ -102,9 +102,9 @@ public final class HttpMaidBuilder {
         return put(url, (Object) handler);
     }
 
-    public HttpMaidBuilder delete(final String url, final Object handler) {
+    public HttpMaidBuilder delete(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
-                .serving(handler)
+                .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.DELETE);
     }

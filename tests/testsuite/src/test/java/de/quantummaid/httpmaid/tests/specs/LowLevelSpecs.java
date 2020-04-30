@@ -33,7 +33,6 @@ import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.debug.DebugConfigurator.toBeInDebugMode;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
-import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogUsing;
 
 public final class LowLevelSpecs {
 
@@ -106,6 +105,19 @@ public final class LowLevelSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testContentTypeCanContainParameters(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", (request, response) -> response.setBody(Map.of("a", "b")))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withContentType("application/json; charset=iso-8859-1").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void testRequestContentTypeIsCaseInsensitive(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -145,20 +157,6 @@ public final class LowLevelSpecs {
                 .when().aRequestToThePath("/headers_response").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theReponseContainsTheHeader("foo", "bar");
-    }
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void testLoggerCanBeSet(final TestEnvironment testEnvironment) {
-        testEnvironment.given(logger ->
-                anHttpMaid()
-                        .get("/log", (request, response) -> request.logger().info("foobar"))
-                        .configured(toLogUsing(logger))
-                        .build()
-        )
-                .when().aRequestToThePath("/log").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(200)
-                .theLogOutputStartedWith("INFO: foobar");
     }
 
     @ParameterizedTest

@@ -48,7 +48,7 @@ public final class AuthenticatorConfigurator implements SecurityConfigurator<Aut
     private final SimpleSecurityConfigurator simpleSecurityConfigurator;
     private final AuthenticatorId authenticatorId;
     private final List<Filter> optionalRequests;
-    private volatile HttpHandler rejectionHandler;
+    private HttpHandler rejectionHandler;
 
     public static AuthenticatorConfigurator authenticatorConfigurator(final Authenticator<MetaData> authenticator) {
         validateNotNull(authenticator, "authenticator");

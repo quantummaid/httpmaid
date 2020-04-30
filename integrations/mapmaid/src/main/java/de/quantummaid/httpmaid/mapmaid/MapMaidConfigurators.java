@@ -53,6 +53,7 @@ public final class MapMaidConfigurators {
 
             @Override
             public void configure(final DependencyRegistry dependencyRegistry) {
+                // do nothing
             }
         };
     }

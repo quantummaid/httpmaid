@@ -60,11 +60,11 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CorsConfigurator implements Configurator {
     private final AllowedOrigins allowedOrigins;
-    private volatile AllowedMethods allowedMethods;
-    private volatile AllowedHeaders allowedHeaders;
-    private volatile ExposedHeaders exposedHeaders;
-    private volatile boolean credentialsSupport = false;
-    private volatile MaxAge maxAge = undefinedMaxAge();
+    private AllowedMethods allowedMethods;
+    private AllowedHeaders allowedHeaders;
+    private ExposedHeaders exposedHeaders;
+    private boolean credentialsSupport = false;
+    private MaxAge maxAge = undefinedMaxAge();
 
     public static CorsConfigurator corsConfigurator(final AllowedOrigins allowedOrigins) {
         validateNotNull(allowedOrigins, "allowedOrigins");
@@ -78,7 +78,7 @@ public final class CorsConfigurator implements Configurator {
     public CorsConfigurator withAllowedMethods(final HttpRequestMethod... methods) {
         validateNotNull(methods, "methods");
         final List<HttpRequestMethod> methodList = asList(methods);
-        allowedMethods = requestedMethod -> methodList.parallelStream().anyMatch(requestedMethod::matches);
+        allowedMethods = requestedMethod -> methodList.stream().anyMatch(requestedMethod::matches);
         return this;
     }
 

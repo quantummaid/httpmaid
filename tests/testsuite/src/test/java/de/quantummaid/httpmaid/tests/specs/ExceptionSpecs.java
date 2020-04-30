@@ -21,14 +21,32 @@
 
 package de.quantummaid.httpmaid.tests.specs;
 
+import de.quantummaid.httpmaid.handler.PageNotFoundException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
+import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
 
 public final class ExceptionSpecs {
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testUseCaseNotFoundExceptionHandler(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> {
+                            response.setStatus(METHOD_NOT_ALLOWED);
+                            response.setBody("No use case found.");
+                        }))
+                        .build()
+        )
+                .when().aRequestToThePath("/this_has_no_usecase").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(405)
+                .theResponseBodyWas("No use case found.");
+    }
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)

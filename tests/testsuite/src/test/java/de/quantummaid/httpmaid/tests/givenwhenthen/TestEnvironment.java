@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.logger.LoggerImplementation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import lombok.AccessLevel;
@@ -31,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager.activeDeployers;
@@ -71,12 +69,8 @@ public final class TestEnvironment {
                 .collect(toList());
     }
 
-    public Given given(final Function<LoggerImplementation, HttpMaid> httpMaidSupplier) {
-        return Given.given(httpMaidSupplier, deployer, clientFactory);
-    }
-
     public Given given(final Supplier<HttpMaid> httpMaidSupplier) {
-        return Given.given(loggerImplementation -> httpMaidSupplier.get(), deployer, clientFactory);
+        return Given.given(httpMaidSupplier, deployer, clientFactory);
     }
 
     public Given given(final HttpMaid httpMaid) {

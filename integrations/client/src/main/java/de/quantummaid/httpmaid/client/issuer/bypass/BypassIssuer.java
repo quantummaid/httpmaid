@@ -75,5 +75,6 @@ public final class BypassIssuer implements Issuer {
 
     @Override
     public void close() {
+        // no resources to close
     }
 }

@@ -30,6 +30,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentTypeInResponses;
@@ -109,5 +111,31 @@ public final class MapMaidSpecs {
                         "   \"message\": \"customPrimitive2 is wrong\"," +
                         "   \"path\": \"myRequest.field2\"" +
                         "}]}");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testMapMaidOnlyWithInjectionAndWithoutBody(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/mapmaid/<value1>", MapMaidUseCase.class,
+                                mappingPathParameter("value1", "dataTransferObject.value1"),
+                                mappingHeader("value2", "dataTransferObject.value2"),
+                                mappingHeader("value3", "dataTransferObject.value3"),
+                                mappingHeader("value4", "dataTransferObject.value4"))
+                        .build()
+        )
+                .when().aRequestToThePath("/mapmaid/derp").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("value2", "merp").withTheHeader("value3", "herp").withTheHeader("value4", "qerp").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json")
+                .theJsonResponseEquals("" +
+                        "{" +
+                        "   value1: derp," +
+                        "   value2: merp," +
+                        "   value3: herp," +
+                        "   value4: qerp" +
+                        "}"
+                );
     }
 }

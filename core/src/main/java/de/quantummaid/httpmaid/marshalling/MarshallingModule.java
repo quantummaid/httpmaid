@@ -31,6 +31,8 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,10 +56,12 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MarshallingModule implements ChainModule {
-    private volatile DefaultContentTypeProvider defaultContentTypeProvider;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MarshallingModule.class);
+
+    private DefaultContentTypeProvider defaultContentTypeProvider;
     private final Map<ContentType, Unmarshaller> unmarshallers;
     private final Map<ContentType, Marshaller> marshallers;
-    private volatile boolean throwExceptionIfNoMarshallerFound;
+    private boolean throwExceptionIfNoMarshallerFound;
 
     public static MarshallingModule emptyMarshallingModule() {
         return new MarshallingModule(new HashMap<>(), new HashMap<>());
@@ -121,7 +125,7 @@ public final class MarshallingModule implements ChainModule {
                     final Object unmarshalled = unmarshaller.unmarshall(body);
                     metaData.set(UNMARSHALLED_REQUEST_BODY, unmarshalled);
                 } catch (final Exception e) {
-                    metaData.get(LOGGER).warn(e, "exception during marshalling");
+                    LOGGER.info("exception during marshalling", e);
                 }
             }
         });

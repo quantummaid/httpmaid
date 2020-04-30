@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
+import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
 
 public final class PathSpecs {
 
@@ -117,5 +118,22 @@ public final class PathSpecs {
         )
                 .when().httpMaidIsInitialized()
                 .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("and would therefore never trigger");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testWildcardRouteWithEmptyMiddleWildcard(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/wild/<x>/card", (request, response) -> response.setBody("foo"))
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> {
+                            response.setStatus(METHOD_NOT_ALLOWED);
+                            response.setBody("No use case found.");
+                        }))
+                        .build()
+        )
+                .when().aRequestToThePath("/wild/card").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(405)
+                .theResponseBodyWas("No use case found.");
     }
 }

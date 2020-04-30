@@ -26,6 +26,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
@@ -33,7 +34,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AuthenticatorId {
+public final class AuthenticatorId implements Serializable {
     private final String id;
 
     public static AuthenticatorId authenticatorId(final String id) {

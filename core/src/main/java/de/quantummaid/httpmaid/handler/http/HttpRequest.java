@@ -28,7 +28,6 @@ import de.quantummaid.httpmaid.http.PathParameters;
 import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.http.headers.cookies.Cookies;
-import de.quantummaid.httpmaid.logger.Logger;
 import de.quantummaid.httpmaid.path.Path;
 import lombok.*;
 
@@ -129,9 +128,5 @@ public final class HttpRequest {
                         return Optional.empty();
                     }
                 });
-    }
-
-    public Logger logger() {
-        return metaData.get(LOGGER);
     }
 }

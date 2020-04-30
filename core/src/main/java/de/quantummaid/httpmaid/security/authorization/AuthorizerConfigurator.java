@@ -42,7 +42,7 @@ import static java.util.Objects.nonNull;
 public class AuthorizerConfigurator implements SecurityConfigurator<AuthorizerConfigurator> {
     private final SimpleSecurityConfigurator simpleSecurityConfigurator;
     private final AuthorizerId authorizerId;
-    private volatile HttpHandler rejectionHandler;
+    private HttpHandler rejectionHandler;
 
     public static AuthorizerConfigurator authorizerConfigurator(final HttpAuthorizer authorizer) {
         validateNotNull(authorizer, "authorizer");

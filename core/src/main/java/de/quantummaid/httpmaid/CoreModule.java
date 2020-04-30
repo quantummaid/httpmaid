@@ -41,9 +41,6 @@ import de.quantummaid.httpmaid.handler.InvokeHandlerProcessor;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.http.Http;
-import de.quantummaid.httpmaid.logger.LoggerImplementation;
-import de.quantummaid.httpmaid.logger.Loggers;
-import de.quantummaid.httpmaid.logger.SetLoggerProcessor;
 import de.quantummaid.httpmaid.processors.MapExceptionProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ApplyResponseTemplateProcessor;
 import de.quantummaid.httpmaid.responsetemplate.InitResponseProcessor;
@@ -67,6 +64,7 @@ import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.h
 import static de.quantummaid.httpmaid.processors.StreamToStringProcessor.streamToStringProcessor;
 import static de.quantummaid.httpmaid.processors.StringBodyToStreamProcessor.stringBodyToStreamProcessor;
 import static de.quantummaid.httpmaid.processors.TranslateToValueObjectsProcessor.translateToValueObjectsProcessor;
+import static de.quantummaid.httpmaid.responsetemplate.ResponseTemplate.emptyResponseTemplate;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
@@ -78,9 +76,8 @@ import static java.util.Collections.emptyList;
 public final class CoreModule implements ChainModule {
     private final List<DistributableHandler> handlers = new ArrayList<>();
     private final List<Generator<Handler>> lowLevelHandlers = new LinkedList<>();
-    private ResponseTemplate responseTemplate = ResponseTemplate.EMPTY_RESPONSE_TEMPLATE;
+    private ResponseTemplate responseTemplate = emptyResponseTemplate();
     private final FilterMapBuilder<Throwable, ExceptionMapper<Throwable>> exceptionMappers = FilterMapBuilder.filterMapBuilder();
-    private LoggerImplementation logger = Loggers.stdoutAndStderrLogger();
     private final ClosingActions closingActions = ClosingActions.closingActions();
 
     public static CoreModule coreModule() {
@@ -96,11 +93,6 @@ public final class CoreModule implements ChainModule {
         validateNotNull(handler, "handler");
         validateNotNull(perRouteConfigurators, "perRouteConfigurators");
         handlers.add(distributableHandler(condition, handler, perRouteConfigurators));
-    }
-
-    public void setLogger(final LoggerImplementation logger) {
-        validateNotNull(logger, "logger");
-        this.logger = logger;
     }
 
     public void setResponseTemplate(final ResponseTemplate responseTemplate) {
@@ -143,7 +135,7 @@ public final class CoreModule implements ChainModule {
     public void register(final ChainExtender extender) {
         final ExceptionSerializer exceptionSerializer = ExceptionSerializer.exceptionSerializer(exceptionMappers.build());
         ChainBuilder.extendAChainWith(extender)
-                .append(INIT, SetLoggerProcessor.setLoggerProcessor(logger))
+                .append(INIT)
                 .append(PRE_PROCESS, translateToValueObjectsProcessor())
                 .append(PROCESS_HEADERS)
                 .append(PROCESS_BODY)

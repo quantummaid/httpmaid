@@ -26,15 +26,14 @@ import de.quantummaid.httpmaid.documentation.support.Deployer;
 import org.junit.jupiter.api.Test;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.logger.LoggerConfigurators.toLogToStdout;
 
 public final class LoggingExampleTests {
 
     @Test
     public void loggingExample() {
         //Showcase start logging
-        final HttpMaid httpMaid = anHttpMaid()
-                .configured(toLogToStdout())
+        final HttpMaid httpMaid = anHttpMaid() // TODO
+                //.configured(toLogToStdout())
                 .build();
         //Showcase end logging
         Deployer.test(httpMaid, client -> Deployer.assertGet("/foo", "", 500, client));
