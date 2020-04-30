@@ -30,6 +30,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MultipartIteratorBody implements Iterator<MultipartPart> {
@@ -51,7 +52,7 @@ public final class MultipartIteratorBody implements Iterator<MultipartPart> {
     public MultipartPart next(final String expectedControlName) {
         final MultipartPart next = next();
         final String nextControlName = next.getControlName();
-        if(!nextControlName.equals(expectedControlName)) {
+        if (!nextControlName.equals(expectedControlName)) {
             throw MultipartException.multipartException("Expected next multipart part to have the control " +
                     "name '" + expectedControlName + "' but it was '" + nextControlName + "'");
         }
@@ -70,7 +71,9 @@ public final class MultipartIteratorBody implements Iterator<MultipartPart> {
             } else {
                 return MultipartPart.multipartFormControl(controlName, inputStream);
             }
-        } catch (final FileUploadException | IOException e) {
+        } catch (final FileUploadException e) {
+            throw new NoSuchElementException();
+        } catch (final IOException e) {
             throw MultipartException.multipartException(e);
         }
     }

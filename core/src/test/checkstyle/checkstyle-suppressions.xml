@@ -37,5 +37,5 @@
     <suppress checks="VariableDeclarationUsageDistance|TrailingComment" files="HttpMaidBuilder"/>
     <suppress checks="IllegalCatch" files="MarshallingModule"/>
     <suppress checks="TrailingComment" files="Loggers|SecurityConfigurators|Unmarshaller|MarshallingConfigurators|MetaDataKey|ChainRegistry|RawResponseFactory"/>
-    <suppress checks="TrailingComment" files="RawResponseHandler|RawRequestExtractor"/>
+    <suppress checks="TrailingComment" files="RawResponseHandler|RawRequestExtractor|PureJavaEndpoint"/>
 </suppressions>

@@ -32,7 +32,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SynchronizationWrapper<T> {
-    private volatile T object;
+    private T object;
 
     public static <T> SynchronizationWrapper<T> synchronizationWrapper() {
         return new SynchronizationWrapper<>();

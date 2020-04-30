@@ -28,7 +28,6 @@ import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.http.PathParameters;
 import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.headers.ContentType;
-import de.quantummaid.httpmaid.logger.Logger;
 import de.quantummaid.httpmaid.path.Path;
 
 import java.io.InputStream;
@@ -43,7 +42,6 @@ public final class HttpMaidChainKeys {
     public static final MetaDataKey<Throwable> EXCEPTION = MetaDataKey.metaDataKey("EXCEPTION");
 
     public static final MetaDataKey<Object> AUTHENTICATION_INFORMATION = MetaDataKey.metaDataKey("AUTHENTICATION_INFORMATION");
-    public static final MetaDataKey<Logger> LOGGER = MetaDataKey.metaDataKey("LOGGER");
 
     public static final MetaDataKey<Handler> HANDLER = MetaDataKey.metaDataKey("HANDLER");
 

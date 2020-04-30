@@ -60,7 +60,7 @@ final class IndexedModules {
         modules.add(module);
     }
 
-    public Stream<? extends ChainModule> stream() {
+    public Stream<ChainModule> stream() {
         return modules.stream();
     }
 

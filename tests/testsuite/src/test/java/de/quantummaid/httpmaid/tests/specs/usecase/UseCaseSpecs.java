@@ -27,11 +27,95 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 
 public final class UseCaseSpecs {
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testGetRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/test", StringReturningUseCase.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json")
+                .theResponseBodyWas("\"the correct response\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testPostRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/test", StringReturningUseCase.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaThePostMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json")
+                .theResponseBodyWas("\"the correct response\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testPutRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .put("/test", StringReturningUseCase.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaThePutMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json")
+                .theResponseBodyWas("\"the correct response\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testDeleteRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .delete("/test", StringReturningUseCase.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaTheDeleteMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json")
+                .theResponseBodyWas("\"the correct response\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testTwoUseCaseParameters(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                () -> anHttpMaid()
+                        .get("/twoparameters", TwoStringsParameterUseCase.class, mappingHeader("parameter1"), mappingHeader("parameter2"))
+                        .build()
+        )
+                .when().aRequestToThePath("/twoparameters").viaTheGetMethod().withAnEmptyBody().withTheHeader("parameter1", "Hello").withTheHeader("parameter2", "World").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json")
+                .theResponseBodyWas("\"HelloWorld\"");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void testVoidUseCase(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/void", VoidUseCase.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/void").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseContentTypeWas("application/json");
+    }
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)

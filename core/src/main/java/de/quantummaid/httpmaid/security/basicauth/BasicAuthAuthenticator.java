@@ -21,41 +21,6 @@
 
 package de.quantummaid.httpmaid.security.basicauth;
 
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
-import de.quantummaid.httpmaid.security.authorization.AuthorizationHeader;
-import de.quantummaid.httpmaid.security.authentication.Authenticator;
-
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static de.quantummaid.httpmaid.http.Http.Headers.AUTHORIZATION;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.regex.Pattern.compile;
-
-public interface BasicAuthAuthenticator extends Authenticator<HttpRequest> {
-    Pattern PATTERN = compile("(?<username>[^:]+):(?<password>.*)");
-
-    @Override
-    default Optional<?> authenticate(final HttpRequest request) {
-        return request.headers().getOptionalHeader(AUTHORIZATION)
-                .flatMap(AuthorizationHeader::parse)
-                .filter(authorizationHeader -> authorizationHeader.type().equals("Basic"))
-                .map(AuthorizationHeader::credentials)
-                .map(Base64Decoder::decodeBase64)
-                .map(PATTERN::matcher)
-                .filter(Matcher::matches)
-                .flatMap(matcher -> {
-                    final String username = matcher.group("username");
-                    final String password = matcher.group("password");
-                    if (isAuthenticated(username, password)) {
-                        return of(username);
-                    } else {
-                        return empty();
-                    }
-                });
-    }
-
+public interface BasicAuthAuthenticator {
     boolean isAuthenticated(String username, String password);
 }

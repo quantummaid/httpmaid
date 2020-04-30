@@ -33,6 +33,7 @@ import lombok.ToString;
 import java.util.LinkedList;
 import java.util.List;
 
+import static de.quantummaid.httpmaid.chains.builder.ChainBuilderEntry.chainBuilderEntry;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Arrays.asList;
@@ -54,10 +55,10 @@ public final class ChainBuilder {
         return append(chainName, asList(processors));
     }
 
-    public ChainBuilder append(final ChainName chainName, final List<? extends Processor> processors) {
+    public ChainBuilder append(final ChainName chainName, final List<Processor> processors) {
         validateNotNull(chainName, "chainName");
         validateNotNull(processors, "processors");
-        final ChainBuilderEntry entry = ChainBuilderEntry.chainBuilderEntry(chainName, processors);
+        final ChainBuilderEntry entry = chainBuilderEntry(chainName, processors);
         chains.add(entry);
         return this;
     }

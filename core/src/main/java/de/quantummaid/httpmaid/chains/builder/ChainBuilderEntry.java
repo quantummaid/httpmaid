@@ -36,10 +36,10 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @RequiredArgsConstructor
 public final class ChainBuilderEntry {
     private final ChainName chainName;
-    private final List<? extends Processor> processors;
+    private final List<Processor> processors;
 
     public static ChainBuilderEntry chainBuilderEntry(final ChainName chainName,
-                                                      final List<? extends Processor> processors) {
+                                                      final List<Processor> processors) {
         validateNotNull(chainName, "chainName");
         validateNotNull(processors, "processors");
         return new ChainBuilderEntry(chainName, processors);
@@ -49,7 +49,7 @@ public final class ChainBuilderEntry {
         return chainName;
     }
 
-    public List<? extends Processor> processors() {
+    public List<Processor> processors() {
         return processors;
     }
 }

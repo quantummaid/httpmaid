@@ -28,7 +28,7 @@ import java.util.Optional;
 
 public interface TypeEnricher extends Enricher {
 
-    Optional<?> extractValue(HttpRequest request);
+    Optional<Object> extractValue(HttpRequest request);
 
     @Override
     default void enrich(final HttpRequest httpRequest, final Event event) {

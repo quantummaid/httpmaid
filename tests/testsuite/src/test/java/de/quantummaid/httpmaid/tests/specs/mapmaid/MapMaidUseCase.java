@@ -19,31 +19,13 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.security.authorization;
+package de.quantummaid.httpmaid.tests.specs.mapmaid;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import de.quantummaid.httpmaid.tests.specs.mapmaid.mapmaiddefinitions.DataTransferObject;
 
-import java.io.Serializable;
-import java.util.UUID;
+public class MapMaidUseCase {
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
-
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AuthorizerId implements Serializable {
-    private final String id;
-
-    public static AuthorizerId authorizerId(final String id) {
-        validateNotNullNorEmpty(id, "id");
-        return new AuthorizerId(id);
-    }
-
-    public static AuthorizerId uniqueAuthorizerId() {
-        final UUID uuid = UUID.randomUUID();
-        return authorizerId(uuid.toString());
+    public DataTransferObject echoDTO(final DataTransferObject dataTransferObject) {
+        return dataTransferObject;
     }
 }

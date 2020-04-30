@@ -40,6 +40,7 @@ public interface Configurator {
 
             @Override
             public void configure(final DependencyRegistry dependencyRegistry) {
+                // do nothing
             }
         };
     }

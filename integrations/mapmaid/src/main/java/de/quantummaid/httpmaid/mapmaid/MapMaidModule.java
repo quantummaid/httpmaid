@@ -142,5 +142,6 @@ public final class MapMaidModule implements ChainModule {
 
     @Override
     public void register(final ChainExtender extender) {
+        // do nothing
     }
 }

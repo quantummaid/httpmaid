@@ -36,6 +36,7 @@ import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 import static de.quantummaid.httpmaid.http.Http.Headers.WWW_AUTHENTICATE;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.UNAUTHORIZED;
 import static de.quantummaid.httpmaid.security.authentication.AuthenticatorConfigurator.authenticatorConfigurator;
+import static de.quantummaid.httpmaid.security.basicauth.BasicAuthAuthentication.basicAuthAuthentication;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -48,9 +49,10 @@ public final class BasicAuthConfigurator implements SecurityConfigurator<BasicAu
     private volatile String realm;
 
     public static BasicAuthConfigurator basicAuthenticationConfigurator(final BasicAuthAuthenticator authenticator) {
+        final BasicAuthAuthentication basicAuthAuthentication = basicAuthAuthentication(authenticator);
         final AuthenticatorConfigurator authenticatorConfigurator = authenticatorConfigurator(metaData -> {
             final HttpRequest request = httpRequest(metaData);
-            return authenticator.authenticate(request);
+            return basicAuthAuthentication.authenticate(request);
         });
         return new BasicAuthConfigurator(authenticatorConfigurator);
     }

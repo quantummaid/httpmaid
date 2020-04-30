@@ -41,7 +41,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SimpleSecurityConfigurator implements SecurityConfigurator<SimpleSecurityConfigurator> {
     private final Processor processor;
-    private volatile ChainName phase;
+    private ChainName phase;
     private final List<Filter> filters = new LinkedList<>();
 
     public static SimpleSecurityConfigurator simpleSecurityConfigurator(final Processor processor) {

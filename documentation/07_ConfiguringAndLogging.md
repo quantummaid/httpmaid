@@ -24,7 +24,7 @@ The default setting is to log to both `STDOUT` and `STDERR` - if you want to
 change that to log only to `STDOUT`, the configuration would look like this:
 <!---[CodeSnippet] (logging)-->
 ```java
-final HttpMaid httpMaid = anHttpMaid()
-        .configured(toLogToStdout())
+final HttpMaid httpMaid = anHttpMaid() // TODO
+        //.configured(toLogToStdout())
         .build();
 ```

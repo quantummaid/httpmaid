@@ -41,7 +41,7 @@ import static de.quantummaid.httpmaid.HttpMaidChains.*;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CorsModule implements ChainModule {
     private static final ChainName CORS_CHAIN = ChainName.chainName("CORS");
-    private volatile ResourceSharingPolicy resourceSharingPolicy;
+    private ResourceSharingPolicy resourceSharingPolicy;
 
     public static ChainModule corsModule() {
         return new CorsModule();

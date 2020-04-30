@@ -34,6 +34,7 @@ import static java.lang.reflect.Modifier.isAbstract;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S1452")
 public final class InstantiationInformation {
     private final Constructor<?> constructor;
 

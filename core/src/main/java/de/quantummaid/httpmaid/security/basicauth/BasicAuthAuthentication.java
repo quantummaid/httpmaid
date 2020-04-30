@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.security.oauth2;
+package de.quantummaid.httpmaid.security.basicauth;
 
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.security.authentication.Authenticator;
@@ -30,27 +30,45 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static de.quantummaid.httpmaid.http.Http.Headers.AUTHORIZATION;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.regex.Pattern.compile;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class OAuth2Authenticator implements Authenticator<HttpRequest> {
-    private final Authenticator<String> tokenAuthenticator;
+public final class BasicAuthAuthentication implements Authenticator<HttpRequest> {
+    private static final Pattern PATTERN = compile("(?<username>[^:]+):(?<password>.*)");
 
-    public static OAuth2Authenticator oAuth2Authenticator(final Authenticator<String> tokenAuthenticator) {
-        validateNotNull(tokenAuthenticator, "tokenAuthenticator");
-        return new OAuth2Authenticator(tokenAuthenticator);
+    private final BasicAuthAuthenticator authenticator;
+
+    public static BasicAuthAuthentication basicAuthAuthentication(final BasicAuthAuthenticator authenticator) {
+        validateNotNull(authenticator, "authenticator");
+        return new BasicAuthAuthentication(authenticator);
     }
 
     @Override
     public Optional<Object> authenticate(final HttpRequest request) {
         return request.headers().getOptionalHeader(AUTHORIZATION)
                 .flatMap(AuthorizationHeader::parse)
-                .filter(authorizationHeader -> authorizationHeader.type().equals("Bearer"))
+                .filter(authorizationHeader -> authorizationHeader.type().equals("Basic"))
                 .map(AuthorizationHeader::credentials)
-                .flatMap(tokenAuthenticator::authenticate);
+                .map(Base64Decoder::decodeBase64)
+                .map(PATTERN::matcher)
+                .filter(Matcher::matches)
+                .flatMap(matcher -> {
+                    final String username = matcher.group("username");
+                    final String password = matcher.group("password");
+                    if (authenticator.isAuthenticated(username, password)) {
+                        return of(username);
+                    } else {
+                        return empty();
+                    }
+                });
     }
 }

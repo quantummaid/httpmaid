@@ -54,6 +54,7 @@ import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
 import static de.quantummaid.httpmaid.events.Event.event;
 import static de.quantummaid.httpmaid.events.EventsChains.MAP_REQUEST_TO_EVENT;
+import static de.quantummaid.httpmaid.events.LoggingExceptionHandler.loggingExceptionHandler;
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEventEnrichers;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
@@ -77,8 +78,8 @@ public final class EventModule implements ChainModule {
 
     private static final int DEFAULT_POOL_SIZE = 4;
 
-    private volatile MessageBus messageBus;
-    private volatile boolean closeMessageBusOnClose = true;
+    private MessageBus messageBus;
+    private boolean closeMessageBusOnClose = true;
     private final List<Generator<EventType>> eventTypeGenerators = new LinkedList<>();
     private final Map<EventType, EventFactory> eventFactories = new HashMap<>();
     private final Map<EventType, PerEventEnrichers> enrichers = new HashMap<>();
@@ -89,6 +90,7 @@ public final class EventModule implements ChainModule {
         final EventModule eventModule = new EventModule();
         final MessageBus defaultMessageBus = aMessageBus().forType(ASYNCHRONOUS)
                 .withAsynchronousConfiguration(constantPoolSizeAsynchronousConfiguration(DEFAULT_POOL_SIZE))
+                .withExceptionHandler(loggingExceptionHandler())
                 .build();
         eventModule.setMessageBus(defaultMessageBus);
         return eventModule;

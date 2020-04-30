@@ -24,8 +24,9 @@ package de.quantummaid.httpmaid.exceptions;
 import de.quantummaid.httpmaid.chains.MetaData;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.LOGGER;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.INTERNAL_SERVER_ERROR;
 
@@ -35,6 +36,7 @@ import static de.quantummaid.httpmaid.http.Http.StatusCodes.INTERNAL_SERVER_ERRO
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DefaultExceptionMapper implements ExceptionMapper<Throwable> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
     public static ExceptionMapper<Throwable> theDefaultExceptionMapper() {
         return new DefaultExceptionMapper();
@@ -42,7 +44,9 @@ public final class DefaultExceptionMapper implements ExceptionMapper<Throwable> 
 
     @Override
     public void map(final Throwable exception, final MetaData metaData) {
-        metaData.get(LOGGER).error(exception);
         metaData.set(RESPONSE_STATUS, INTERNAL_SERVER_ERROR);
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("Exception during request processing\n{}", metaData.prettyPrint(), exception);
+        }
     }
 }
