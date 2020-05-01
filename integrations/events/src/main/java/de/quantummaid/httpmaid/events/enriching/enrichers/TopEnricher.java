@@ -29,11 +29,11 @@ import java.util.Optional;
 public interface TopEnricher extends Enricher {
     String mapKey();
 
-    Optional<?> extractValue(HttpRequest request);
+    Optional<String> extractValue(HttpRequest request);
 
     @Override
     default void enrich(final HttpRequest httpRequest, final Event event) {
         final String mapKey = mapKey();
-        extractValue(httpRequest).ifPresent(value -> event.addInjection(mapKey, (String) value));
+        extractValue(httpRequest).ifPresent(value -> event.addInjection(mapKey, value));
     }
 }

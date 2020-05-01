@@ -45,8 +45,8 @@ public final class RequiredAuthenticationInformationEnricher implements Authenti
     }
 
     @Override
-    public Optional<?> extractValue(final HttpRequest request) {
-        final Object authenticationInformation = request.authenticationInformation();
+    public Optional<String> extractValue(final HttpRequest request) {
+        final String authenticationInformation = request.authenticationInformationAs(String.class);
         return Optional.of(authenticationInformation);
     }
 }
