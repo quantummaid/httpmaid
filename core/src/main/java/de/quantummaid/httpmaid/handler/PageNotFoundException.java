@@ -36,10 +36,14 @@ public final class PageNotFoundException extends RuntimeException {
     }
 
     public static PageNotFoundException pageNotFoundException(final MetaData metaData) {
-        final Path path = metaData.get(PATH);
-        final HttpRequestMethod requestMethod = metaData.get(METHOD);
+        final String path = metaData.getOptional(PATH)
+                .map(Path::raw)
+                .orElse("?");
+        final String requestMethod = metaData.getOptional(METHOD)
+                .map(HttpRequestMethod::name)
+                .orElse("?");
         return new PageNotFoundException(format(
                 "No handler found for path '%s' and method '%s'%n%n%s",
-                path.raw(), requestMethod.name(), metaData.prettyPrint()));
+                path, requestMethod, metaData.prettyPrint()));
     }
 }

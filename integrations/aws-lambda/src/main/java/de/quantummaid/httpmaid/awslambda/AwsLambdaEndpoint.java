@@ -40,7 +40,6 @@ import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AwsLambdaEndpoint {
-
     public static final MetaDataKey<Context> CONTEXT = metaDataKey("awsLambdaContext");
 
     private final HttpMaid httpMaid;

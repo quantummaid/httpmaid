@@ -21,12 +21,13 @@
 
 package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.ChainRegistry;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.endpoint.*;
+import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
 import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
@@ -54,13 +56,7 @@ public final class HttpMaid implements AutoCloseable {
         return new HttpMaid(chainRegistry);
     }
 
-    public void handle(final ChainName chainName,
-                       final MetaData metaData) {
-        chainRegistry.putIntoChain(chainName, metaData, metaData1 -> {
-        });
-    }
-
-    public <T> T handleRequestSynchronously(final RawRequestExtractor rawRequestExtractor,
+    public <T> T handleRequestSynchronously(final RawRequestExtractor<RawRequest> rawRequestExtractor,
                                             final RawResponseFactory<T> rawResponseFactory) {
         final SynchronizationWrapper<T> synchronizationWrapper = synchronizationWrapper();
         handleRequest(rawRequestExtractor, response -> {
@@ -70,7 +66,7 @@ public final class HttpMaid implements AutoCloseable {
         return synchronizationWrapper.getObject();
     }
 
-    public void handleRequest(final RawRequestExtractor rawRequestExtractor,
+    public void handleRequest(final RawRequestExtractor<RawRequest> rawRequestExtractor,
                               final RawResponseHandler rawResponseHandler) {
         final RawRequest rawRequest;
         try {
@@ -91,6 +87,34 @@ public final class HttpMaid implements AutoCloseable {
                 // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
             }
         });
+    }
+
+    public void handleWebsocketConnect() {
+        System.out.println("Connect websocket!");
+    }
+
+    public void handleWebsocketMessage(final RawRequestExtractor<RawWebsocketMessage> rawRequestExtractor) {
+        final RawWebsocketMessage rawWebsocketMessage;
+        try {
+            rawWebsocketMessage = rawRequestExtractor.extract();
+        } catch (final Exception e) {
+            LOGGER.error("Exception in endpoint request handling", e);
+            return;
+            // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
+        }
+        final MetaData metaData = emptyMetaData();
+        rawWebsocketMessage.enter(metaData);
+        chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
+        });
+    }
+
+    public void handleWebsocketDisconnect() {
+        System.out.println("Disconnect websocket!");
+    }
+
+    public void setWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
+        validateNotNull(websocketRegistry, "websocketRegistry");
+        chainRegistry.addMetaDatum(WEBSOCKET_REGISTRY, websocketRegistry);
     }
 
     public <T> T getMetaDatum(final MetaDataKey<T> key) {

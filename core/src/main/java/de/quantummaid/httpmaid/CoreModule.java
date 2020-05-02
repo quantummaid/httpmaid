@@ -68,6 +68,7 @@ import static de.quantummaid.httpmaid.responsetemplate.ResponseTemplate.emptyRes
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_MESSAGE;
 import static java.util.Collections.emptyList;
 
 @ToString
@@ -140,6 +141,7 @@ public final class CoreModule implements ChainModule {
                 .append(PROCESS_HEADERS)
                 .append(PROCESS_BODY)
                 .append(PROCESS_BODY_STRING, streamToStringProcessor())
+                .append(PRE_DETERMINE_HANDLER)
                 .append(DETERMINE_HANDLER, DetermineHandlerProcessor.determineHandlerProcessor(Generators.generators(lowLevelHandlers)))
                 .append(PREPARE_RESPONSE, InitResponseProcessor.initResponseProcessor(), ApplyResponseTemplateProcessor.applyResponseTemplateProcessor(responseTemplate))
                 .append(INVOKE_HANDLER, InvokeHandlerProcessor.invokeHandlerProcessor())

@@ -21,11 +21,9 @@
 
 package de.quantummaid.httpmaid.processors;
 
-import de.quantummaid.httpmaid.HttpMaidChainKeys;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.Http;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.headers.ContentType;
@@ -35,8 +33,11 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
+import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
+import static java.util.Optional.empty;
 
 @ToString
 @EqualsAndHashCode
@@ -49,20 +50,22 @@ public final class TranslateToValueObjectsProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
-        final Map<String, List<String>> rawHeaders = metaData.get(HttpMaidChainKeys.RAW_REQUEST_HEADERS);
-        final Headers headers = Headers.headers(rawHeaders);
-        metaData.set(HttpMaidChainKeys.REQUEST_HEADERS, headers);
-        final ContentType contentType = ContentType.fromString(headers.getOptionalHeader(Http.Headers.CONTENT_TYPE));
-        metaData.set(HttpMaidChainKeys.REQUEST_CONTENT_TYPE, contentType);
+        metaData.getOptional(RAW_REQUEST_HEADERS).ifPresentOrElse(rawHeaders -> {
+                    final Headers headers = Headers.headers(rawHeaders);
+                    metaData.set(REQUEST_HEADERS, headers);
+                    final Optional<String> optionalContentType = headers.getOptionalHeader(CONTENT_TYPE);
+                    final ContentType contentType = ContentType.fromString(optionalContentType);
+                    metaData.set(REQUEST_CONTENT_TYPE, contentType);
+                },
+                () -> metaData.set(REQUEST_CONTENT_TYPE, ContentType.fromString(empty()))
+        );
 
-        final Map<String, String> rawQueryParameters = metaData.get(HttpMaidChainKeys.RAW_REQUEST_QUERY_PARAMETERS);
-        final QueryParameters queryParameters = QueryParameters.queryParameters(rawQueryParameters);
-        metaData.set(HttpMaidChainKeys.QUERY_PARAMETERS, queryParameters);
+        metaData.getOptional(RAW_REQUEST_QUERY_PARAMETERS).ifPresent(rawQueryParameters -> {
+            final QueryParameters queryParameters = QueryParameters.queryParameters(rawQueryParameters);
+            metaData.set(QUERY_PARAMETERS, queryParameters);
+        });
 
-        final String rawMethod = metaData.get(HttpMaidChainKeys.RAW_METHOD);
-        metaData.set(HttpMaidChainKeys.METHOD, HttpRequestMethod.parse(rawMethod));
-
-        final String rawPath = metaData.get(HttpMaidChainKeys.RAW_PATH);
-        metaData.set(HttpMaidChainKeys.PATH, Path.path(rawPath));
+        metaData.getOptional(RAW_METHOD).ifPresent(rawMethod -> metaData.set(METHOD, HttpRequestMethod.parse(rawMethod)));
+        metaData.getOptional(RAW_PATH).ifPresent(rawPath -> metaData.set(PATH, Path.path(rawPath)));
     }
 }

@@ -21,16 +21,16 @@
 
 package de.quantummaid.httpmaid.processors;
 
-import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.HttpMaidChainKeys;
-import de.quantummaid.httpmaid.util.streams.Streams;
+import de.quantummaid.httpmaid.chains.Processor;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.io.InputStream;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_BODY_STREAM;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_BODY_STRING;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 
 @ToString
 @EqualsAndHashCode
@@ -43,8 +43,9 @@ public final class StreamToStringProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
-        final InputStream inputStream = metaData.get(HttpMaidChainKeys.REQUEST_BODY_STREAM);
-        final String bodyString = Streams.inputStreamToString(inputStream);
-        metaData.set(HttpMaidChainKeys.REQUEST_BODY_STRING, bodyString);
+        metaData.getOptional(REQUEST_BODY_STREAM).ifPresent(inputStream -> {
+            final String bodyString = inputStreamToString(inputStream);
+            metaData.set(REQUEST_BODY_STRING, bodyString);
+        });
     }
 }

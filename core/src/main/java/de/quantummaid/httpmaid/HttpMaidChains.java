@@ -33,6 +33,7 @@ public final class HttpMaidChains {
     public static final ChainName PROCESS_HEADERS = ChainName.chainName("PROCESS_HEADERS");
     public static final ChainName PROCESS_BODY = ChainName.chainName("PROCESS_BODY");
     public static final ChainName PROCESS_BODY_STRING = ChainName.chainName("PROCESS_BODY_STRING");
+    public static final ChainName PRE_DETERMINE_HANDLER = ChainName.chainName("PRE_DETERMINE_HANDLER");
     public static final ChainName DETERMINE_HANDLER = ChainName.chainName("DETERMINE_HANDLER");
     public static final ChainName PREPARE_RESPONSE = ChainName.chainName("PREPARE_RESPONSE");
     public static final ChainName INVOKE_HANDLER = ChainName.chainName("INVOKE_HANDLER");

@@ -25,11 +25,14 @@ import de.quantummaid.httpmaid.chains.ChainRegistry;
 import de.quantummaid.httpmaid.chains.ChainRegistryBuilder;
 import de.quantummaid.httpmaid.chains.Configurator;
 import de.quantummaid.httpmaid.chains.ConfiguratorBuilder;
+import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.generator.builder.ConditionStage;
 import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
+import de.quantummaid.httpmaid.websockets.WebsocketHandler;
+import de.quantummaid.httpmaid.websockets.WebsocketBackchannelProvider;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +46,8 @@ import java.util.List;
 import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketCategory.webSocketCategory;
+import static de.quantummaid.httpmaid.websockets.WebsocketsModule.websocketsModule;
 import static java.time.Duration.between;
 import static java.util.Arrays.asList;
 
@@ -125,6 +130,21 @@ public final class HttpMaidBuilder {
         };
     }
 
+    public HttpMaidBuilder websocket(final String id, final WebsocketHandler handler) {
+        return websocket(id, (Object) handler);
+    }
+
+    public HttpMaidBuilder websocket(final String id, final Object handler) {
+        validateNotNull(id, "id");
+        validateNotNull(handler, "handler");
+        final GenerationCondition condition = webSocketCategory(id);
+        return serving(handler).when(condition);
+    }
+
+    public <T> void websocketDistributor(final Class<T> type, final WebsocketBackchannelProvider supplier) {
+        throw new UnsupportedOperationException();
+    }
+
     public HttpMaidBuilder configured(final ConfiguratorBuilder configuratorBuilder) {
         validateNotNull(configuratorBuilder, "configuratorBuilder");
         final Configurator configurator = configuratorBuilder.build();
@@ -141,6 +161,7 @@ public final class HttpMaidBuilder {
         final Instant begin = Instant.now();
         final ChainRegistryBuilder chainRegistryBuilder = ChainRegistryBuilder.chainRegistryBuilder();
         chainRegistryBuilder.addModule(coreModule);
+        chainRegistryBuilder.addModule(websocketsModule());
         if (autodetectionOfModules) {
             chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.events.EventModule");
             chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.usecases.UseCasesModule");
