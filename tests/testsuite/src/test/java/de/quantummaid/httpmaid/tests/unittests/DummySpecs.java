@@ -41,41 +41,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public final class DummySpecs {
     private static final List<String> IGNORED_METHODS = List.of("toString", "hashCode", "equals", "getClass", "wait", "notify", "notifyAll");
 
-    @Test
-    public void testMultipartDummyServlet() {
-        final HttpServletRequest object = mockHttpServletRequest(stringToInputStream(""), "");
-        ensureAllMethodsThrowUnsupportedOperationException(object,
-                "getContentLength",
-                "getContentType",
-                "getHeader",
-                "getMethod",
-                "getInputStream",
-                "getHttpServletMapping",
-                "newPushBuilder",
-                "getTrailerFields",
-                "isTrailerFieldsReady",
-                "getCharacterEncoding"
-        );
-    }
-
-    @Test
-    public void testSpecialServlet() {
-        final ServletInputStream object = servletInputStreamBackedBy(stringToInputStream(""));
-        ensureAllMethodsThrowUnsupportedOperationException(object,
-                "readLine",
-                "read",
-                "readAllBytes",
-                "readNBytes",
-                "close",
-                "mark",
-                "markSupported",
-                "transferTo",
-                "skip",
-                "available",
-                "reset"
-        );
-    }
-
     private static void ensureAllMethodsThrowUnsupportedOperationException(final Object object,
                                                                            final String... excludedMethods) {
         final List<String> excludedMethodsList = asList(excludedMethods);
@@ -110,6 +75,8 @@ public final class DummySpecs {
             exception = e.getCause();
         } catch (final IllegalAccessException e) {
             throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new RuntimeException("thrown in " + method.getName(), e);
         }
         assertThat(method.getName(), exception, instanceOf(UnsupportedOperationException.class));
     }
@@ -126,5 +93,41 @@ public final class DummySpecs {
             return Array.newInstance(componentType, 0);
         }
         return null;
+    }
+
+    @Test
+    public void testMultipartDummyServlet() {
+        final HttpServletRequest object = mockHttpServletRequest(stringToInputStream(""), "");
+        ensureAllMethodsThrowUnsupportedOperationException(object,
+                "getContentLength",
+                "getContentType",
+                "getHeader",
+                "getMethod",
+                "getInputStream",
+                "getHttpServletMapping",
+                "newPushBuilder",
+                "getTrailerFields",
+                "isTrailerFieldsReady",
+                "getCharacterEncoding"
+        );
+    }
+
+    @Test
+    public void testSpecialServlet() {
+        final ServletInputStream object = servletInputStreamBackedBy(stringToInputStream(""));
+        ensureAllMethodsThrowUnsupportedOperationException(object,
+                "readLine",
+                "read",
+                "readAllBytes",
+                "readNBytes",
+                "close",
+                "mark",
+                "markSupported",
+                "transferTo",
+                "skip",
+                "skipNBytes",
+                "available",
+                "reset"
+        );
     }
 }
