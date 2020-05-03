@@ -12,24 +12,31 @@ import lombok.ToString;
 
 import java.nio.ByteBuffer;
 
+import static java.lang.String.format;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AwsWebsocketSender implements WebsocketSender<AwsWebsocketConnectionInformation> {
+public final class AwsWebsocketSender implements WebsocketSender<Object> {
 
     public static AwsWebsocketSender awsWebsocketSender() {
         return new AwsWebsocketSender();
     }
 
     @Override
-    public void send(final AwsWebsocketConnectionInformation connectionInformation, final String message) {
-        final String endpoint = connectionInformation.toEndpointUrl();
+    public void send(final Object connectionInformation, final String message) {
+        if (!(connectionInformation instanceof AwsWebsocketConnectionInformation)) {
+            throw new UnsupportedOperationException(format("Unsupported websocket connection information: %s", connectionInformation));
+        }
+        final AwsWebsocketConnectionInformation awsWebsocketConnectionInformation = (AwsWebsocketConnectionInformation) connectionInformation;
+
+        final String endpoint = awsWebsocketConnectionInformation.toEndpointUrl();
         System.out.println("endpoint = " + endpoint);
 
-        final String region = connectionInformation.region();
+        final String region = awsWebsocketConnectionInformation.region();
         System.out.println("region = " + region);
 
-        final String connectionId = connectionInformation.connectionId();
+        final String connectionId = awsWebsocketConnectionInformation.connectionId();
         System.out.println("connectionId = " + connectionId);
 
         final AwsClientBuilder.EndpointConfiguration config = new AwsClientBuilder.EndpointConfiguration(endpoint, region);

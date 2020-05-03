@@ -6,6 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import static de.quantummaid.httpmaid.client.websocket.Websocket.websocket;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
@@ -21,6 +25,15 @@ public final class WebsocketClient {
     }
 
     public Websocket openWebsocket() {
-        return websocket(httpMaid);
+        return openWebsocket(s -> {});
+    }
+
+    public Websocket openWebsocket(final Consumer<String> consumer) {
+        return openWebsocket(consumer, Map.of());
+    }
+
+    public Websocket openWebsocket(final Consumer<String> consumer, final Map<String, List<String>> headers) {
+        httpMaid.handleWebsocketConnect(consumer, headers);
+        return websocket(httpMaid, consumer);
     }
 }

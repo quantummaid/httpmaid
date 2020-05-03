@@ -1,4 +1,4 @@
-package de.quantummaid.httpmaid.websockets.processor;
+package de.quantummaid.httpmaid.websockets.processors;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;

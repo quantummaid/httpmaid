@@ -34,15 +34,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RAW_REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
 import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
@@ -89,8 +92,15 @@ public final class HttpMaid implements AutoCloseable {
         });
     }
 
-    public void handleWebsocketConnect() {
+    public void handleWebsocketConnect(final Object connectionInformation,
+                                       final Map<String, List<String>> headers) {
+        final MetaData metaData = emptyMetaData();
+        metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
+        metaData.set(REQUEST_TYPE, WEBSOCKET_CONNECT);
+        metaData.set(RAW_REQUEST_HEADERS, headers);
         System.out.println("Connect websocket!");
+        chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
+        });
     }
 
     public void handleWebsocketMessage(final RawRequestExtractor<RawWebsocketMessage> rawRequestExtractor) {

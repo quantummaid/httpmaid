@@ -68,7 +68,6 @@ import static de.quantummaid.httpmaid.responsetemplate.ResponseTemplate.emptyRes
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_MESSAGE;
 import static java.util.Collections.emptyList;
 
 @ToString

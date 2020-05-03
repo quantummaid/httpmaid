@@ -9,9 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.awsWebsocketSender;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
@@ -37,7 +39,6 @@ public final class AwsLambdaEndpoint2 {
         System.out.println("requestContext = " + requestContext);
 
         if (isWebSocketRequest(event)) {
-
             final String eventType = (String) requestContext.get("eventType");
             System.out.println("eventType = " + eventType);
 
@@ -58,20 +59,27 @@ public final class AwsLambdaEndpoint2 {
             final Object connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
 
             if (CONNECT_EVENT_TYPE.equals(eventType)) {
-                httpMaid.handleWebsocketConnect();
+                handleConnect(event, connectionInformation);
             } else if (DISCONNECT_EVENT_TYPE.equals(eventType)) {
                 httpMaid.handleWebsocketDisconnect();
             } else if (MESSAGE_EVENT_TYPE.equals(eventType)) {
                 httpMaid.handleWebsocketMessage(() -> {
-
                     final String body = (String) event.get("body");
                     System.out.println("body = " + body);
-                    return RawWebsocketMessage.rawWebsocketMessage(connectionId, body);
+                    final AwsWebsocketSender sender = awsWebsocketSender();
+                    return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body, sender);
                 });
             }
         }
 
         return new APIGatewayProxyResponseEvent().withBody("foobar");
+    }
+
+    private void handleConnect(final Map<String, Object> event,
+                               final Object connectionInformation) {
+        final Map<String, List<String>> multiValueHeaders = (Map<String, List<String>>) event.get("multiValueHeaders");
+        System.out.println("multiValueHeaders = " + multiValueHeaders);
+        httpMaid.handleWebsocketConnect(connectionInformation, multiValueHeaders);
     }
 
     private static boolean isWebSocketRequest(final Map<String, Object> event) {

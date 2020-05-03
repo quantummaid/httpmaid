@@ -8,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_CATEGORY;
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_MESSAGE;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 
 @ToString
 @EqualsAndHashCode
@@ -24,7 +23,9 @@ public final class WebsocketCategory implements GenerationCondition {
 
     @Override
     public boolean generate(final MetaData metaData) {
-        final Boolean websocket = metaData.getOptional(WEBSOCKET_MESSAGE).orElse(false);
+        final Boolean websocket = metaData.getOptional(REQUEST_TYPE)
+                .map(WEBSOCKET_MESSAGE::equals)
+                .orElse(false);
         if (!websocket) {
             return false;
         }
