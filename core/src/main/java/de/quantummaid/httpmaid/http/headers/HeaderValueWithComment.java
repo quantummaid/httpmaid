@@ -26,29 +26,21 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HeaderValueWithComment {
-    private static final Pattern PATTERN = Pattern.compile("(?<value>[^;]*)(;(?<comment>.*))?");
-
     private final String value;
     @EqualsAndHashCode.Exclude
     private final String comment;
 
     public static HeaderValueWithComment fromString(final String rawValue) {
-        final Matcher matcher = PATTERN.matcher(rawValue);
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException(format("Header with comment '%s' must match '%s'", rawValue, PATTERN.pattern()));
+        if (!rawValue.contains(";")) {
+            return new HeaderValueWithComment(rawValue, "");
         }
-        final String value = matcher.group("value").toLowerCase();
-        final String comment = ofNullable(matcher.group("comment")).orElse("");
+        final int semicolon = rawValue.indexOf(';');
+        final String value = rawValue.substring(0, semicolon);
+        final String comment = rawValue.substring(semicolon + 1);
         return new HeaderValueWithComment(value, comment);
     }
 
@@ -61,7 +53,7 @@ public final class HeaderValueWithComment {
     }
 
     public String valueWithComment() {
-        if(comment == null || comment.isEmpty()) {
+        if (comment == null || comment.isEmpty()) {
             return value();
         }
         return String.format("%s;%s", value, comment);

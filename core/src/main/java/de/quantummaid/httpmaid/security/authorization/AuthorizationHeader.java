@@ -39,7 +39,7 @@ import static java.util.regex.Pattern.compile;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorizationHeader {
-    private static final Pattern PATTERN = compile("(?<type>\\S*) (?<credentials>\\S*)");
+    private static final Pattern PATTERN = compile("(?<type>\\S*+) (?<credentials>\\S*+)");
 
     private final String type;
     private final String credentials;
