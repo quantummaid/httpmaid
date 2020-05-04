@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.security.authentication;
 
 import java.util.Optional;
 
+@SuppressWarnings("java:S1452")
 public interface Authenticator<T> {
 
     Optional<?> authenticate(T challenge);
