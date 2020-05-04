@@ -43,7 +43,7 @@ import static java.util.regex.Pattern.compile;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BasicAuthAuthentication implements Authenticator<HttpRequest> {
-    private static final Pattern PATTERN = compile("(?<username>[^:]+):(?<password>.*)");
+    private static final Pattern PATTERN = compile("(?<username>[^:]++):(?<password>.*+)");
 
     private final BasicAuthAuthenticator authenticator;
 
