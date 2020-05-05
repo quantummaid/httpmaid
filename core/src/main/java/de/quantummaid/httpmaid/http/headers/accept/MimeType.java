@@ -28,19 +28,12 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static de.quantummaid.httpmaid.http.headers.HeaderValueWithComment.fromString;
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MimeType {
-    private static final Pattern PATTERN = Pattern.compile("(?<type>[^/]*)(/(?<subtype>.*))?");
-
     private final String type;
     private final String subtype;
 
@@ -49,13 +42,12 @@ public final class MimeType {
         final HeaderValueWithComment value = fromString(string);
 
         final String typeAndSubtype = value.value();
-        final Matcher matcher = PATTERN.matcher(typeAndSubtype);
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException(format("Mimetype '%s' must match '%s'", typeAndSubtype, PATTERN.pattern()));
+        if (!typeAndSubtype.contains("/")) {
+            return new MimeType(typeAndSubtype, "");
         }
-        final String type = matcher.group("type").toLowerCase();
-        final String subtype = ofNullable(matcher.group("subtype")).orElse("");
-
+        final int slash = typeAndSubtype.indexOf('/');
+        final String type = typeAndSubtype.substring(0, slash).toLowerCase();
+        final String subtype = typeAndSubtype.substring(slash + 1);
         return new MimeType(type, subtype);
     }
 
