@@ -141,10 +141,6 @@ public final class HttpMaidBuilder {
         return serving(handler).when(condition);
     }
 
-    public <T> void websocketDistributor(final Class<T> type, final WebsocketBackchannelProvider supplier) {
-        throw new UnsupportedOperationException();
-    }
-
     public HttpMaidBuilder configured(final ConfiguratorBuilder configuratorBuilder) {
         validateNotNull(configuratorBuilder, "configuratorBuilder");
         final Configurator configurator = configuratorBuilder.build();
