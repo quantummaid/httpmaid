@@ -21,44 +21,60 @@
 
 package de.quantummaid.httpmaid.client;
 
-import de.quantummaid.httpmaid.client.issuer.Issuer;
-import de.quantummaid.httpmaid.client.issuer.real.RealIssuer;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.clientbuilder.PortStage;
+import de.quantummaid.httpmaid.client.issuer.Issuer;
+import de.quantummaid.httpmaid.client.issuer.real.Protocol;
+import de.quantummaid.httpmaid.client.issuer.real.RealIssuer;
+import de.quantummaid.httpmaid.client.websocket.Websocket;
+import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
+import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
+import de.quantummaid.httpmaid.client.websocket.bypass.BypassingWebsocketClient;
 import de.quantummaid.httpmaid.filtermap.FilterMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
+import static de.quantummaid.httpmaid.client.HttpMaidClientBuilder.clientBuilder;
 import static de.quantummaid.httpmaid.client.issuer.bypass.BypassIssuer.bypassIssuer;
+import static de.quantummaid.httpmaid.client.issuer.real.RealIssuer.realIssuer;
+import static de.quantummaid.httpmaid.client.websocket.bypass.BypassingWebsocketClient.bypassingWebsocketClient;
+import static de.quantummaid.httpmaid.client.websocket.real.RealWebsocketClient.realWebsocketClient;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClient implements AutoCloseable {
     private final Issuer issuer;
+    private final WebsocketClient websocketClient;
     private final BasePath basePath;
     private final FilterMap<Class<?>, ClientResponseMapper<?>> responseMappers;
 
     static HttpMaidClient httpMaidClient(final Issuer issuer,
                                          final BasePath basePath,
-                                         final FilterMap<Class<?>, ClientResponseMapper<?>> responseMappers) {
+                                         final FilterMap<Class<?>, ClientResponseMapper<?>> responseMappers,
+                                         final WebsocketClient websocketClient) {
         validateNotNull(issuer, "issuer");
         validateNotNull(basePath, "basePath");
         validateNotNull(responseMappers, "responseMappers");
-        return new HttpMaidClient(issuer, basePath, responseMappers);
+        return new HttpMaidClient(issuer, websocketClient, basePath, responseMappers);
     }
 
     public static HttpMaidClientBuilder aHttpMaidClientBypassingRequestsDirectlyTo(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");
         final Issuer issuer = bypassIssuer(httpMaid);
-        return HttpMaidClientBuilder.clientBuilder(basePath -> issuer);
+        final BypassingWebsocketClient websocketClient = bypassingWebsocketClient(httpMaid);
+        return clientBuilder(basePath -> issuer, websocketClient);
     }
 
     public static PortStage aHttpMaidClientForTheHost(final String host) {
         validateNotNullNorEmpty(host, "host");
         return port -> protocol -> {
             validateNotNull(protocol, "protocol");
-            return HttpMaidClientBuilder.clientBuilder(basePath -> RealIssuer.realIssuer(protocol, host, port, basePath));
+            final WebsocketClient websocketClient = websocketClient(protocol, host, port);
+            return clientBuilder(basePath -> realIssuer(protocol, host, port, basePath), websocketClient);
         };
     }
 
@@ -66,8 +82,22 @@ public final class HttpMaidClient implements AutoCloseable {
         validateNotNullNorEmpty(host, "host");
         return port -> protocol -> {
             validateNotNull(protocol, "protocol");
-            return HttpMaidClientBuilder.clientBuilder(basePath -> RealIssuer.realIssuerWithConnectionReuse(protocol, host, port, basePath));
+            final WebsocketClient websocketClient = websocketClient(protocol, host, port);
+            return clientBuilder(basePath -> RealIssuer.realIssuerWithConnectionReuse(protocol, host, port, basePath), websocketClient);
         };
+    }
+
+    private static WebsocketClient websocketClient(final Protocol protocol,
+                                                   final String host,
+                                                   final int port) {
+        final String websocketProtocol;
+        if (protocol.equals(Protocol.HTTP)) {
+            websocketProtocol = "ws";
+        } else {
+            websocketProtocol = "wss";
+        }
+        final String websocketUri = String.format("%s://%s:%d/", websocketProtocol, host, port);
+        return realWebsocketClient(websocketUri);
     }
 
     public <T> T issue(final HttpClientRequestBuilder<T> requestBuilder) {
@@ -82,6 +112,21 @@ public final class HttpMaidClient implements AutoCloseable {
             final ClientResponseMapper<T> responseMapper = (ClientResponseMapper<T>) responseMappers.get(targetType);
             return responseMapper.map(response, targetType);
         });
+    }
+
+    public Websocket openWebsocket() {
+        return openWebsocket(s -> {
+        });
+    }
+
+    public Websocket openWebsocket(final WebsocketMessageHandler messageHandler) {
+        return openWebsocket(messageHandler, Map.of(), Map.of());
+    }
+
+    public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
+                                   final Map<String, String> queryParameters,
+                                   final Map<String, List<String>> headers) {
+        return websocketClient.openWebsocket(messageHandler, queryParameters, headers);
     }
 
     @Override

@@ -38,7 +38,7 @@ public final class RealHttpMaidClientWithConnectionReuseFactory implements Clien
 
     @Override
     public HttpClientWrapper createClient(final Deployment deployment) {
-        return HttpMaidClientWrapper.realHttpMaidClientWithConnectionReueWrapper(deployment);
+        return HttpMaidClientWrapper.realHttpMaidClientWithConnectionReuseWrapper(deployment);
     }
 
     @Override

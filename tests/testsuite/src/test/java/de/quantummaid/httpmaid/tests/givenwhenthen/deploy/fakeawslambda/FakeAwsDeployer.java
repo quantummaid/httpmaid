@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
@@ -50,7 +49,7 @@ public final class FakeAwsDeployer implements Deployer {
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
-        final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
+        final AwsLambdaEndpoint awsLambdaEndpoint = AwsLambdaEndpoint.awsLambdaEndpointFor(httpMaid);
         return retryUntilFreePortFound(port -> {
             current = FakeLambda.fakeLambda(awsLambdaEndpoint, port);
             return httpDeployment("localhost", port);

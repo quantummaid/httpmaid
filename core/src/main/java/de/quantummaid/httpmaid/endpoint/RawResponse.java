@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
@@ -85,9 +86,13 @@ public final class RawResponse {
                 .orElseGet(() -> Streams.stringToInputStream(""));
     }
 
-    public String stringBody() {
+    public Optional<String> optionalStringBody() {
         return metaData.getOptional(RESPONSE_STREAM)
-                .map(Streams::inputStreamToString)
+                .map(Streams::inputStreamToString);
+    }
+
+    public String stringBody() {
+        return optionalStringBody()
                 .orElse("");
     }
 }

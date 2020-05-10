@@ -23,8 +23,17 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.builders;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.Then;
 
+import java.util.List;
+import java.util.Map;
+
 public interface FirstWhenStage {
     MethodBuilder aRequestToThePath(String path);
 
     Then httpMaidIsInitialized();
+
+    default Then aWebsocketIsConnectedAndMessageSent(final String message) {
+        return aWebsocketIsConnectedAndMessageSent(message, Map.of(), Map.of());
+    }
+
+    Then aWebsocketIsConnectedAndMessageSent(String message, Map<String, String> queryParameters, Map<String, List<String>> headers);
 }

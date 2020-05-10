@@ -27,7 +27,7 @@ import de.quantummaid.httpmaid.client.RawClientResponse;
 import de.quantummaid.httpmaid.client.RequestPath;
 import de.quantummaid.httpmaid.client.UriString;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
-import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
+import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.client.RawClientResponse.rawClientResponse;
-import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
+import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toMap;
 
@@ -61,7 +61,7 @@ public final class BypassIssuer implements Issuer {
                         queryParameter -> queryParameter.value().map(UriString::encoded).orElse(""))
                 );
         final RawClientResponse rawClientResponse = httpMaid.handleRequestSynchronously(() -> {
-            final RawRequestBuilder builder = rawRequestBuilder();
+            final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
             builder.withPath(requestPath.path());
             builder.withMethod(request.method());
             builder.withUniqueHeaders(request.headers());

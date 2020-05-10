@@ -34,13 +34,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequest;
+import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
 import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RawRequestBuilder {
+public final class RawHttpRequestBuilder {
     private String path;
     private String requestMethod;
     private Map<String, List<String>> headers = new HashMap<>();
@@ -48,66 +48,66 @@ public final class RawRequestBuilder {
     private InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData = new HashMap<>();
 
-    public static RawRequestBuilder rawRequestBuilder() {
-        return new RawRequestBuilder();
+    public static RawHttpRequestBuilder rawHttpRequestBuilder() {
+        return new RawHttpRequestBuilder();
     }
 
-    public RawRequestBuilder withUri(final URI uri) {
+    public RawHttpRequestBuilder withUri(final URI uri) {
         withPath(uri.getPath());
         withEncodedQueryParameters(uri.getQuery());
         return this;
     }
 
-    public RawRequestBuilder withPath(final String path) {
+    public RawHttpRequestBuilder withPath(final String path) {
         this.path = path;
         return this;
     }
 
-    public RawRequestBuilder withMethod(final String method) {
+    public RawHttpRequestBuilder withMethod(final String method) {
         this.requestMethod = method;
         return this;
     }
 
-    public RawRequestBuilder withUniqueHeaders(final Map<String, String> headers) {
+    public RawHttpRequestBuilder withUniqueHeaders(final Map<String, String> headers) {
         final Map<String, List<String>> multiMap = Maps.mapToMultiMap(headers);
         return withHeaders(multiMap);
     }
 
-    public RawRequestBuilder withHeaders(final Map<String, List<String>> headers) {
+    public RawHttpRequestBuilder withHeaders(final Map<String, List<String>> headers) {
         this.headers = headers;
         return this;
     }
 
-    public RawRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
+    public RawHttpRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
         final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
         return withQueryParameters(queryParametersMap);
     }
 
-    public RawRequestBuilder withQueryParameters(final Map<String, String> queryParameters) {
+    public RawHttpRequestBuilder withQueryParameters(final Map<String, String> queryParameters) {
         this.queryParameters = queryParameters;
         return this;
     }
 
-    public RawRequestBuilder withBody(final String body) {
+    public RawHttpRequestBuilder withBody(final String body) {
         final InputStream stream = stringToInputStream(body);
         return withBody(stream);
     }
 
-    public RawRequestBuilder withBody(final InputStream body) {
+    public RawHttpRequestBuilder withBody(final InputStream body) {
         this.body = body;
         return this;
     }
 
-    public <T> RawRequestBuilder withAdditionalMetaData(final MetaDataKey<T> key, final T value) {
+    public <T> RawHttpRequestBuilder withAdditionalMetaData(final MetaDataKey<T> key, final T value) {
         additionalMetaData.put(key, value);
         return this;
     }
 
-    public RawRequest build() {
+    public RawHttpRequest build() {
         if (body == null) {
             withBody("");
         }
-        return rawRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
+        return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
     }
 
     private static Map<String, String> queryToMap(final String query) {

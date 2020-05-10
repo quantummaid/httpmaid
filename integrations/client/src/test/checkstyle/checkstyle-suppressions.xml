@@ -27,7 +27,7 @@
     <suppress checks="FinalParameters" files="SynchronizationWrapper" />
     <suppress checks=".*" files="ClientSpecs" />
     <suppress checks="ClassFanOutComplexity" files="RealIssuer" />
-    <suppress checks="IllegalCatch" files="Given" />
+    <suppress checks="IllegalCatch" files="Given|RealWebsocketClient|RealWebsocket" />
     <suppress checks="Regex" files="FreePortPool" />
     <suppress checks="TrailingComment" files="HttpMaidClientBuilder"/>
 </suppressions>

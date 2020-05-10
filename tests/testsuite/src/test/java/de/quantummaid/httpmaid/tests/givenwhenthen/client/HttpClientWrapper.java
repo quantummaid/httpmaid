@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface HttpClientWrapper extends AutoCloseable {
     HttpClientResponse issueRequestWithoutBody(
@@ -35,6 +36,11 @@ public interface HttpClientWrapper extends AutoCloseable {
 
     HttpClientResponse issueRequestWithMultipartBody(
             String path, String method, Map<String, String> headers, List<MultipartElement> parts);
+
+    void openWebsocketAndSendMessage(Consumer<String> responseHandler,
+                                     String message,
+                                     Map<String, String> queryParameters,
+                                     Map<String, List<String>> headers);
 
     @Override
     default void close() {

@@ -71,6 +71,14 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     }
 
     @Override
+    public void openWebsocketAndSendMessage(final Consumer<String> responseHandler,
+                                            final String message,
+                                            final Map<String, String> queryParameters,
+                                            final Map<String, List<String>> headers) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public HttpClientResponse issueRequestWithoutBody(final String path,
                                                       final String method,
                                                       final Map<String, String> headers) {

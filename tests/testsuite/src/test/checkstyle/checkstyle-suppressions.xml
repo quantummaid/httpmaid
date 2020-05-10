@@ -47,4 +47,5 @@
     <suppress checks="IllegalCatch" files="Given" />
     <suppress checks="FileLength|MethodCount" files="SpecialUseCaseSpecs" />
     <suppress checks="TrailingComment" files="Poller" />
+    <suppress checks="VisibilityModifier" files="AnnotatedApplicationConfig|ProgrammaticApplicationConfig" />
 </suppressions>

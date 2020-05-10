@@ -31,8 +31,6 @@ import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
-import de.quantummaid.httpmaid.websockets.WebsocketHandler;
-import de.quantummaid.httpmaid.websockets.WebsocketBackchannelProvider;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +44,7 @@ import java.util.List;
 import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.WebsocketCategory.webSocketCategory;
+import static de.quantummaid.httpmaid.websockets.WebsocketRoute.webSocketCategory;
 import static de.quantummaid.httpmaid.websockets.WebsocketsModule.websocketsModule;
 import static java.time.Duration.between;
 import static java.util.Arrays.asList;
@@ -130,7 +128,7 @@ public final class HttpMaidBuilder {
         };
     }
 
-    public HttpMaidBuilder websocket(final String id, final WebsocketHandler handler) {
+    public HttpMaidBuilder websocket(final String id, final HttpHandler handler) {
         return websocket(id, (Object) handler);
     }
 

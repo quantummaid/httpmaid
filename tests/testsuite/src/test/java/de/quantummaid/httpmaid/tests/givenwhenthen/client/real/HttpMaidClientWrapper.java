@@ -21,15 +21,16 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.client.real;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.client.HttpClientRequestBuilder;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.client.body.multipart.Part;
 import de.quantummaid.httpmaid.client.issuer.real.Protocol;
+import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -45,10 +46,9 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRespo
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClientWrapper implements HttpClientWrapper {
-
     private final HttpMaidClient client;
 
-    static HttpClientWrapper realHttpMaidClientWithConnectionReueWrapper(final Deployment deployment) {
+    static HttpClientWrapper realHttpMaidClientWithConnectionReuseWrapper(final Deployment deployment) {
         final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
         final HttpMaidClient client = HttpMaidClient.aHttpMaidClientThatReusesConnectionsForTheHost(deployment.hostname())
                 .withThePort(deployment.port())
@@ -114,6 +114,15 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
         headers.forEach(requestBuilder::withHeader);
         final SimpleHttpResponseObject response = this.client.issue(requestBuilder);
         return httpClientResponse(response.getStatusCode(), response.getHeaders(), response.getBody());
+    }
+
+    @Override
+    public void openWebsocketAndSendMessage(final Consumer<String> responseHandler,
+                                            final String message,
+                                            final Map<String, String> queryParameters,
+                                            final Map<String, List<String>> headers) {
+        final Websocket websocket = client.openWebsocket(responseHandler::accept, queryParameters, headers);
+        websocket.send(message);
     }
 
     @Override

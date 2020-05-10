@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -40,10 +41,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public final class Then {
     private final HttpClientResponse response;
     private final Throwable initializationException;
+    private final Checkpoints checkpoints;
 
     static Then then(final HttpClientResponse response,
-                     final Throwable initializationException) {
-        return new Then(response, initializationException);
+                     final Throwable initializationException,
+                     final Checkpoints checkpoints) {
+        return new Then(response, initializationException, checkpoints);
     }
 
     public Then anExceptionHasBeenThrownDuringInitializationWithAMessageContaining(final String expectedMessage) {
@@ -91,5 +94,14 @@ public final class Then {
         final Map<String, Object> normalizedActual = normalizeJsonToMap(actualResponseBody);
         assertThat(normalizedActual, is(normalizedExpected));
         return this;
+    }
+
+    public Then theCheckpointHasBeenVisited(final String checkpoint) {
+        assertThat(checkpoints.checkpointHasBeenVisited(checkpoint), is(true));
+        return this;
+    }
+
+    public Then aWebsocketMessageHasBeenReceivedWithContent(final String content) {
+        return theCheckpointHasBeenVisited(content);
     }
 }

@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus.AnnotatedJsr356OnTyrusDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,9 @@ import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager.activeDeployers;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager.activeDeployersWithOnlyShittyClient;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.bypassed.BypassedDeployer.bypassedDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.websocket.WebsocketDeployer.websocketDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus.ProgrammaticJsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toList;
 
@@ -43,6 +47,7 @@ import static java.util.stream.Collectors.toList;
 public final class TestEnvironment {
     private static final String PACKAGE = "de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment#";
     public static final String ALL_ENVIRONMENTS = PACKAGE + "allEnvironments";
+    public static final String WEBSOCKET_ENVIRONMENTS = PACKAGE + "websocketEnvironments";
     public static final String ONLY_SHITTY_CLIENT = PACKAGE + "onlyShittyClient";
 
     private final Deployer deployer;
@@ -53,6 +58,19 @@ public final class TestEnvironment {
         validateNotNull(deployer, "deployer");
         validateNotNull(clientFactory, "clientFactory");
         return new TestEnvironment(deployer, clientFactory);
+    }
+
+    public static List<TestEnvironment> websocketEnvironments() {
+        final List<Deployer> deployers = List.of(
+                bypassedDeployer(),
+                websocketDeployer(),
+                programmaticJsr356OnTyrusDeployer(),
+                AnnotatedJsr356OnTyrusDeployer.annotatedJsr356OnTyrusDeployer()
+        );
+        return deployers.stream()
+                .flatMap(deployer -> deployer.supportedClients().stream()
+                        .map(client -> testEnvironment(deployer, client)))
+                .collect(toList());
     }
 
     public static List<TestEnvironment> allEnvironments() {
@@ -69,8 +87,12 @@ public final class TestEnvironment {
                 .collect(toList());
     }
 
-    public Given given(final Supplier<HttpMaid> httpMaidSupplier) {
+    public Given given(final HttpMaidSupplier httpMaidSupplier) {
         return Given.given(httpMaidSupplier, deployer, clientFactory);
+    }
+
+    public Given given(final Supplier<HttpMaid> httpMaidSupplier) {
+        return given(checkpoints -> httpMaidSupplier.get());
     }
 
     public Given given(final HttpMaid httpMaid) {

@@ -47,6 +47,7 @@
         <module>usecases</module>
         <module>guice</module>
         <module>dagger</module>
+        <module>jsr356</module>
     </modules>
 
     <properties>

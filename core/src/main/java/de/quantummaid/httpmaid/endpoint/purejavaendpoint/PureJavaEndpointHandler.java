@@ -25,7 +25,7 @@ import com.sun.net.httpserver.Headers; // NOSONAR
 import com.sun.net.httpserver.HttpExchange; // NOSONAR
 import com.sun.net.httpserver.HttpHandler; // NOSONAR
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
+import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 
-import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
+import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class PureJavaEndpointHandler implements HttpHandler {
@@ -46,7 +46,7 @@ final class PureJavaEndpointHandler implements HttpHandler {
     @Override
     public void handle(final HttpExchange httpExchange) {
         httpMaid.handleRequest(() -> {
-                    final RawRequestBuilder builder = rawRequestBuilder();
+                    final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
                     final URI requestURI = httpExchange.getRequestURI();
                     builder.withUri(requestURI);
                     final String requestMethod = httpExchange.getRequestMethod();

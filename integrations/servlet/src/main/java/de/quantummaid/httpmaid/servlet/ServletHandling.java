@@ -22,8 +22,8 @@
 package de.quantummaid.httpmaid.servlet;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.endpoint.RawRequest;
-import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
+import de.quantummaid.httpmaid.endpoint.RawHttpRequest;
+import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +45,7 @@ public final class ServletHandling {
                               final HttpServletRequest request,
                               final HttpServletResponse response) {
         httpMaid.handleRequest(() -> {
-            final RawRequestBuilder builder = extractMetaDataFromHttpServletRequest(request);
+            final RawHttpRequestBuilder builder = extractMetaDataFromHttpServletRequest(request);
             final InputStream body = request.getInputStream();
             builder.withBody(body);
             return builder.build();
@@ -58,8 +58,8 @@ public final class ServletHandling {
         });
     }
 
-    public static RawRequestBuilder extractMetaDataFromHttpServletRequest(final HttpServletRequest request) {
-        final RawRequestBuilder builder = RawRequest.rawRequestBuilder();
+    public static RawHttpRequestBuilder extractMetaDataFromHttpServletRequest(final HttpServletRequest request) {
+        final RawHttpRequestBuilder builder = RawHttpRequest.rawHttpRequestBuilder();
         final String path = request.getPathInfo();
         builder.withPath(path);
         final String method = request.getMethod();

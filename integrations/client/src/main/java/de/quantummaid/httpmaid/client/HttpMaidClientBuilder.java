@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.client;
 
 import de.quantummaid.httpmaid.client.issuer.Issuer;
+import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
 import de.quantummaid.httpmaid.filtermap.FilterMapBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -46,12 +47,14 @@ import static java.lang.String.format;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClientBuilder {
     private final Function<BasePath, Issuer> issuerFactory;
+    private final WebsocketClient websocketClient;
     private final FilterMapBuilder<Class<?>, ClientResponseMapper<?>> responseMappers;
     private BasePath basePath = basePath("");
 
-    static HttpMaidClientBuilder clientBuilder(final Function<BasePath, Issuer> issuer) {
+    static HttpMaidClientBuilder clientBuilder(final Function<BasePath, Issuer> issuer,
+                                               final WebsocketClient websocketClient) {
         validateNotNull(issuer, "issuer");
-        final HttpMaidClientBuilder builder = new HttpMaidClientBuilder(issuer, filterMapBuilder());
+        final HttpMaidClientBuilder builder = new HttpMaidClientBuilder(issuer, websocketClient, filterMapBuilder());
         builder.withResponseMapping(String.class, (response, targetType) -> {
             if (targetType.equals(String.class)) {
                 return inputStreamToString(response.content());
@@ -101,7 +104,7 @@ public final class HttpMaidClientBuilder {
 
     public HttpMaidClient build() {
         final Issuer issuer = this.issuerFactory.apply(basePath);
-        return httpMaidClient(issuer, basePath, responseMappers.build());
+        return httpMaidClient(issuer, basePath, responseMappers.build(), websocketClient);
     }
 
     private static <T> Predicate<Class<T>> subtype(final Class<T> type) {

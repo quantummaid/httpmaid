@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.*;
+import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import lombok.AccessLevel;
@@ -39,18 +40,27 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     private final Map<String, String> headers = new HashMap<>();
     private Object body;
     private final Throwable initializationException;
+    private final Checkpoints checkpoints;
 
-    static When successWhen(final HttpClientWrapper clientWrapper) {
-        return new When(clientWrapper, null);
+    static When successWhen(final HttpClientWrapper clientWrapper, final Checkpoints checkpoints) {
+        return new When(clientWrapper, null, checkpoints);
     }
 
     static When failureWhen(final Throwable initializationException) {
-        return new When(null, initializationException);
+        return new When(null, initializationException, null);
     }
 
     @Override
     public Then httpMaidIsInitialized() {
-        return Then.then(null, initializationException);
+        return Then.then(null, initializationException, checkpoints);
+    }
+
+    @Override
+    public Then aWebsocketIsConnectedAndMessageSent(final String message,
+                                                    final Map<String, String> queryParameters,
+                                                    final Map<String, List<String>> headers) {
+        clientWrapper.openWebsocketAndSendMessage(checkpoints::visitCheckpoint, message, queryParameters, headers);
+        return Then.then(null, initializationException, checkpoints);
     }
 
     @Override
@@ -130,7 +140,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
             } else {
                 response = clientWrapper.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
             }
-            return Then.then(response, initializationException);
+            return Then.then(response, initializationException, checkpoints);
         }
     }
 }

@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -39,6 +38,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.FakeAwsContext.fakeAwsContext;
@@ -57,7 +57,7 @@ public final class FakeLambda implements AutoCloseable {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             final HttpHandler httpHandler = exchange -> {
-                final APIGatewayProxyRequestEvent requestEvent = mapRequestToEvent(exchange);
+                final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
                 final APIGatewayProxyResponseEvent responseEvent = endpoint.delegate(requestEvent, fakeAwsContext());
                 mapEventToResponse(responseEvent, exchange);
             };
@@ -75,20 +75,20 @@ public final class FakeLambda implements AutoCloseable {
         server.stop(0);
     }
 
-    private static APIGatewayProxyRequestEvent mapRequestToEvent(final HttpExchange exchange) {
-        final APIGatewayProxyRequestEvent event = new APIGatewayProxyRequestEvent();
+    private static Map<String, Object> mapRequestToEvent(final HttpExchange exchange) {
+        final Map<String, Object> event = new HashMap<>();
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
-        event.setPathParameters(Map.of("path", path));
+        event.put("path", path);
         final Map<String, String> queryParameters = queryToMap(requestURI.getQuery());
-        event.setQueryStringParameters(queryParameters);
+        event.put("queryStringParameters", queryParameters);
         final String method = exchange.getRequestMethod();
-        event.setHttpMethod(method);
+        event.put("httpMethod", method);
         final String body = inputStreamToString(exchange.getRequestBody());
-        event.setBody(body);
-        final Map<String, String> headers = new HashMap<>();
-        exchange.getRequestHeaders().forEach((key, value) -> headers.put(key, value.get(0)));
-        event.setHeaders(headers);
+        event.put("body", body);
+        final Map<String, List<String>> headers = new HashMap<>();
+        exchange.getRequestHeaders().forEach(headers::put);
+        event.put("multiValueHeaders", headers);
         return event;
     }
 

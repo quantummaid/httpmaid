@@ -26,7 +26,6 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.endpoint.*;
-import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +33,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RAW_REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
 import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
@@ -71,16 +67,16 @@ public final class HttpMaid implements AutoCloseable {
 
     public void handleRequest(final RawRequestExtractor<RawRequest> rawRequestExtractor,
                               final RawResponseHandler rawResponseHandler) {
-        final RawRequest rawRequest;
+        final RawRequest rawHttpRequest;
         try {
-            rawRequest = rawRequestExtractor.extract();
+            rawHttpRequest = rawRequestExtractor.extract();
         } catch (final Exception e) {
             LOGGER.error("Exception in endpoint request handling", e);
             return;
             // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
         }
         final MetaData metaData = emptyMetaData();
-        rawRequest.enter(metaData);
+        rawHttpRequest.enter(metaData);
         chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
             final RawResponse rawResponse = rawResponse(finalMetaData);
             try {
@@ -92,34 +88,7 @@ public final class HttpMaid implements AutoCloseable {
         });
     }
 
-    public void handleWebsocketConnect(final Object connectionInformation,
-                                       final Map<String, List<String>> headers) {
-        final MetaData metaData = emptyMetaData();
-        metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
-        metaData.set(REQUEST_TYPE, WEBSOCKET_CONNECT);
-        metaData.set(RAW_REQUEST_HEADERS, headers);
-        System.out.println("Connect websocket!");
-        chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
-        });
-    }
-
-    public void handleWebsocketMessage(final RawRequestExtractor<RawWebsocketMessage> rawRequestExtractor) {
-        final RawWebsocketMessage rawWebsocketMessage;
-        try {
-            rawWebsocketMessage = rawRequestExtractor.extract();
-        } catch (final Exception e) {
-            LOGGER.error("Exception in endpoint request handling", e);
-            return;
-            // throwing an exception here might pose a security risk (http://cwe.mitre.org/data/definitions/600.html)
-        }
-        final MetaData metaData = emptyMetaData();
-        rawWebsocketMessage.enter(metaData);
-        chainRegistry.putIntoChain(HttpMaidChains.INIT, metaData, finalMetaData -> {
-        });
-    }
-
     public void handleWebsocketDisconnect() {
-        System.out.println("Disconnect websocket!");
     }
 
     public void setWebsocketRegistry(final WebsocketRegistry websocketRegistry) {

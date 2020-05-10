@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package de.quantummaid.httpmaid.awslambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -24,16 +45,16 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.ra
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AwsLambdaEndpoint2 {
+public final class AwsLambdaEndpoint {
     private static final String CONNECT_EVENT_TYPE = "CONNECT";
     private static final String DISCONNECT_EVENT_TYPE = "DISCONNECT";
     private static final String MESSAGE_EVENT_TYPE = "MESSAGE";
 
     private final HttpMaid httpMaid;
 
-    public static AwsLambdaEndpoint2 awsLambdaEndpointFor(final HttpMaid httpMaid) {
+    public static AwsLambdaEndpoint awsLambdaEndpointFor(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");
-        return new AwsLambdaEndpoint2(httpMaid);
+        return new AwsLambdaEndpoint(httpMaid);
     }
 
     public APIGatewayProxyResponseEvent delegate(final Map<String, Object> event,
@@ -73,41 +94,20 @@ public final class AwsLambdaEndpoint2 {
 
     private APIGatewayProxyResponseEvent handleWebsocketRequest(final AwsLambdaEvent event) {
         final String eventType = event.getFromContext("eventType");
-        System.out.println("eventType = " + eventType);
-
         final String connectionId = event.getFromContext("connectionId");
-        System.out.println("connectionId = " + connectionId);
-
         final String stage = event.getFromContext("stage");
-        System.out.println("stage = " + stage);
-
         final String apiId = event.getFromContext("apiId");
-        System.out.println("apiId = " + apiId);
-
         final String domainName = event.getFromContext("domainName");
-        System.out.println("domainName = " + domainName);
         final String region = extractRegionFromDomain(domainName);
-        System.out.println("region = " + region);
-
         final Object connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
-
-        final APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
         if (CONNECT_EVENT_TYPE.equals(eventType)) {
             handleConnect(event, connectionInformation);
-            return responseEvent;
+            return new APIGatewayProxyResponseEvent();
         } else if (DISCONNECT_EVENT_TYPE.equals(eventType)) {
             httpMaid.handleWebsocketDisconnect();
-            return responseEvent;
+            return new APIGatewayProxyResponseEvent();
         } else if (MESSAGE_EVENT_TYPE.equals(eventType)) {
-            return httpMaid.handleRequestSynchronously(() -> {
-                final String body = event.getAsString("body");
-                System.out.println("body = " + body);
-                return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body);
-            }, response -> {
-                response.optionalStringBody()
-                        .ifPresent(responseEvent::setBody);
-                return responseEvent;
-            });
+            return handleMessage(event, connectionInformation);
         } else {
             throw new UnsupportedOperationException(String.format("Unsupported lambda event type '%s' with event '%s'", eventType, event));
         }
@@ -120,6 +120,19 @@ public final class AwsLambdaEndpoint2 {
             final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
             return rawWebsocketConnect(connectionInformation, queryParameters, headers);
         }, response -> {
+        });
+    }
+
+    private APIGatewayProxyResponseEvent handleMessage(final AwsLambdaEvent event,
+                                                       final Object connectionInformation) {
+        return httpMaid.handleRequestSynchronously(() -> {
+            final String body = event.getAsString("body");
+            return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body);
+        }, response -> {
+            final APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
+            response.optionalStringBody()
+                    .ifPresent(responseEvent::setBody);
+            return responseEvent;
         });
     }
 

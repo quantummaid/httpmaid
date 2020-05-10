@@ -38,7 +38,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RawRequest {
+public final class RawHttpRequest implements RawRequest {
     private final String path;
     private final String requestMethod;
     private final Map<String, List<String>> headers;
@@ -46,24 +46,25 @@ public final class RawRequest {
     private final InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData;
 
-    public static RawRequestBuilder rawRequestBuilder() {
-        return RawRequestBuilder.rawRequestBuilder();
+    public static RawHttpRequestBuilder rawHttpRequestBuilder() {
+        return RawHttpRequestBuilder.rawHttpRequestBuilder();
     }
 
-    public static RawRequest rawRequest(final String path,
-                                        final String requestMethod,
-                                        final Map<String, List<String>> headers,
-                                        final Map<String, String> queryParameters,
-                                        final InputStream body,
-                                        final Map<MetaDataKey<?>, Object> additionalMetaData) {
+    public static RawHttpRequest rawHttpRequest(final String path,
+                                                final String requestMethod,
+                                                final Map<String, List<String>> headers,
+                                                final Map<String, String> queryParameters,
+                                                final InputStream body,
+                                                final Map<MetaDataKey<?>, Object> additionalMetaData) {
         validateNotNull(path, "path");
         validateNotNull(requestMethod, "requestMethod");
         validateNotNull(headers, "headers");
         validateNotNull(queryParameters, "queryParameters");
         validateNotNull(body, "body");
-        return new RawRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
+        return new RawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
     }
 
+    @Override
     public void enter(final MetaData metaData) {
         metaData.set(RAW_PATH, path);
         metaData.set(RAW_METHOD, requestMethod);

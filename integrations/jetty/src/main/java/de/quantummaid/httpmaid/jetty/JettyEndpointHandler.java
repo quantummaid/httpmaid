@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.jetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.endpoint.RawRequestBuilder;
+import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.server.Request;
@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.endpoint.RawRequest.rawRequestBuilder;
+import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Collections.singletonList;
 
@@ -56,7 +56,7 @@ final class JettyEndpointHandler extends AbstractHandler {
                        final HttpServletRequest httpServletRequest,
                        final HttpServletResponse httpServletResponse) {
         httpMaid.handleRequest(() -> {
-                    final RawRequestBuilder builder = rawRequestBuilder();
+                    final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
                     final String path = request.getPathInfo();
                     builder.withPath(path);
                     final String method = request.getMethod();
