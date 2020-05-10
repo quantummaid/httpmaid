@@ -19,16 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.endpoint;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ApplicationConfig;
 
-public final class ProgrammaticApplicationConfig implements Jsr356ApplicationConfig {
-    public static HttpMaid httpMaid;
-
-    @Override
-    public HttpMaid provideHttpMaid() {
-        return httpMaid;
-    }
+public interface HttpMaidProvider {
+    HttpMaid provideHttpMaid();
 }

@@ -19,16 +19,20 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.testwar;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ApplicationConfig;
+import de.quantummaid.httpmaid.servlet.ServletEndpoint;
 
-public final class ProgrammaticApplicationConfig implements Jsr356ApplicationConfig {
-    public static HttpMaid httpMaid;
+import javax.servlet.annotation.WebServlet;
 
-    @Override
-    public HttpMaid provideHttpMaid() {
-        return httpMaid;
+import static de.quantummaid.httpmaid.testwar.HttpMaidFactory.httpMaid;
+
+@WebServlet("/*")
+public class SimpleServlet extends ServletEndpoint implements Jsr356ApplicationConfig {
+    private static final long serialVersionUID = 1L;
+
+    public SimpleServlet() {
+        super(httpMaid());
     }
 }

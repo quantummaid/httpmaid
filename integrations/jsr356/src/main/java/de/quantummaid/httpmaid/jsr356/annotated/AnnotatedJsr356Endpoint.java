@@ -28,10 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import javax.websocket.EndpointConfig;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +40,7 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.ra
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-@ServerEndpoint("/")
+//@ServerEndpoint("/")
 public class AnnotatedJsr356Endpoint {
     private final HttpMaid httpMaid;
     private final Map<String, List<String>> headers;
@@ -53,7 +50,7 @@ public class AnnotatedJsr356Endpoint {
         return new AnnotatedJsr356Endpoint(httpMaid, headers);
     }
 
-    @OnOpen
+    //@OnOpen
     public void onOpen(final Session session,
                        final EndpointConfig endpointConfig) throws IOException {
         httpMaid.handleRequest(() -> {
@@ -63,7 +60,7 @@ public class AnnotatedJsr356Endpoint {
         });
     }
 
-    @OnMessage
+    //@OnMessage
     public void onMessage(final String message, final Session session) {
         httpMaid.handleRequest(
                 () -> rawWebsocketMessage(session, message),

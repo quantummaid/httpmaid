@@ -19,16 +19,14 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.tests.givenwhenthen.remote;
 
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ApplicationConfig;
+public final class BaseDirectoryFinder {
 
-public final class ProgrammaticApplicationConfig implements Jsr356ApplicationConfig {
-    public static HttpMaid httpMaid;
+    private BaseDirectoryFinder() {
+    }
 
-    @Override
-    public HttpMaid provideHttpMaid() {
-        return httpMaid;
+    public static String findProjectBaseDirectory() {
+        return "/home/marco/repositories/quantummaid/httpmaid";
     }
 }

@@ -19,16 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.testwar;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ApplicationConfig;
 
-public final class ProgrammaticApplicationConfig implements Jsr356ApplicationConfig {
-    public static HttpMaid httpMaid;
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 
-    @Override
-    public HttpMaid provideHttpMaid() {
-        return httpMaid;
+public final class HttpMaidFactory {
+
+    private HttpMaidFactory() {
+    }
+
+    public static HttpMaid httpMaid() {
+        return anHttpMaid()
+                .get("/", (request, response) -> response.setBody("fooooo"))
+                .websocket("handler1", (request, response) -> response.setBody("handler 1"))
+                .websocket("handler2", (request, response) -> response.setBody("handler 2"))
+                .build();
     }
 }

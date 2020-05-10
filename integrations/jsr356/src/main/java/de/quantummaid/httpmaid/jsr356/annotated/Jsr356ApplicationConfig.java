@@ -38,7 +38,7 @@ import static de.quantummaid.httpmaid.jsr356.annotated.Jsr356ServerEndpointConfi
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public class Jsr356ApplicationConfig implements ServerApplicationConfig {
+public abstract class Jsr356ApplicationConfig implements ServerApplicationConfig {
     private final HttpMaid httpMaid;
 
     @Override

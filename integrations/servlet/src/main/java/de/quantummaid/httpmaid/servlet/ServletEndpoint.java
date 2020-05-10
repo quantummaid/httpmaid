@@ -22,15 +22,15 @@
 package de.quantummaid.httpmaid.servlet;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.endpoint.HttpMaidProvider;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
-public class ServletEndpoint extends HttpServlet {
+public class ServletEndpoint extends HttpServlet implements HttpMaidProvider {
     private static final long serialVersionUID = 0L;
 
     private final transient HttpMaid httpMaid;
@@ -45,32 +45,37 @@ public class ServletEndpoint extends HttpServlet {
     }
 
     @Override
+    public HttpMaid provideHttpMaid() {
+        return httpMaid;
+    }
+
+    @Override
     protected void doGet(final HttpServletRequest request,
-                         final HttpServletResponse response) throws IOException {
+                         final HttpServletResponse response) {
         ServletHandling.handle(httpMaid, request, response);
     }
 
     @Override
     protected void doPost(final HttpServletRequest request,
-                          final HttpServletResponse response) throws IOException {
+                          final HttpServletResponse response) {
         ServletHandling.handle(httpMaid, request, response);
     }
 
     @Override
     protected void doPut(final HttpServletRequest request,
-                         final HttpServletResponse response) throws IOException {
+                         final HttpServletResponse response) {
         ServletHandling.handle(httpMaid, request, response);
     }
 
     @Override
     protected void doDelete(final HttpServletRequest request,
-                            final HttpServletResponse response) throws IOException {
+                            final HttpServletResponse response) {
         ServletHandling.handle(httpMaid, request, response);
     }
 
     @Override
     protected void doOptions(final HttpServletRequest request,
-                             final HttpServletResponse response) throws IOException {
+                             final HttpServletResponse response) {
         ServletHandling.handle(httpMaid, request, response);
     }
 }

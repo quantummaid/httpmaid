@@ -37,6 +37,7 @@
 
     <modules>
         <module>testsuite</module>
+        <module>war</module>
     </modules>
 
     <properties>

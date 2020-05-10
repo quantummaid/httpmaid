@@ -22,10 +22,7 @@
 package de.quantummaid.httpmaid.jsr356.programmatic;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import de.quantummaid.httpmaid.endpoint.HttpMaidProvider;
 
 import javax.websocket.Endpoint;
 import javax.websocket.server.ServerApplicationConfig;
@@ -35,19 +32,17 @@ import java.util.Set;
 
 import static de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ServerEndpointConfig.jsr356ServerEndpointConfig;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public class Jsr356ApplicationConfig implements ServerApplicationConfig {
-    private final HttpMaid httpMaid;
+public interface Jsr356ApplicationConfig extends ServerApplicationConfig, HttpMaidProvider {
 
     @Override
-    public Set<ServerEndpointConfig> getEndpointConfigs(final Set<Class<? extends Endpoint>> endpointClasses) {
-        return Set.of(jsr356ServerEndpointConfig(httpMaid));
+    default Set<ServerEndpointConfig> getEndpointConfigs(final Set<Class<? extends Endpoint>> endpointClasses) {
+        final HttpMaid httpMaid = provideHttpMaid();
+        final ServerEndpointConfig serverEndpointConfig = jsr356ServerEndpointConfig(httpMaid);
+        return Set.of(serverEndpointConfig);
     }
 
     @Override
-    public Set<Class<?>> getAnnotatedEndpointClasses(final Set<Class<?>> scanned) {
+    default Set<Class<?>> getAnnotatedEndpointClasses(final Set<Class<?>> scanned) {
         return Collections.emptySet();
     }
 }
