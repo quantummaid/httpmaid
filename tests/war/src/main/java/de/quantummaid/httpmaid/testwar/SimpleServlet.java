@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.testwar;
 
-import de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ApplicationConfig;
+import de.quantummaid.httpmaid.jsr356.Jsr356ApplicationConfig;
 import de.quantummaid.httpmaid.servlet.ServletEndpoint;
 
 import javax.servlet.annotation.WebServlet;

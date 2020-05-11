@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.jsr356.programmatic;
+package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.HttpMaidProvider;
@@ -30,7 +30,7 @@ import javax.websocket.server.ServerEndpointConfig;
 import java.util.Collections;
 import java.util.Set;
 
-import static de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ServerEndpointConfig.jsr356ServerEndpointConfig;
+import static de.quantummaid.httpmaid.jsr356.Jsr356ServerEndpointConfig.jsr356ServerEndpointConfig;
 
 public interface Jsr356ApplicationConfig extends ServerApplicationConfig, HttpMaidProvider {
 

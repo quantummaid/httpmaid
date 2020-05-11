@@ -19,71 +19,62 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.remote.warontomcat;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.startup.ContextConfig;
-import org.apache.catalina.startup.Tomcat;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import org.glassfish.tyrus.server.Server;
 
 import java.util.List;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.remote.BaseDirectoryFinder.findProjectBaseDirectory;
 import static java.util.Arrays.asList;
 
-public final class WarOnTomcatDeployer implements Deployer {
-    private static final String RELATIVE_PATH_TO_WAR = "/tests/war/target/testwar-0.9.57.war";
-    private Tomcat tomcat;
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Jsr356OnTyrusDeployer implements Deployer {
+    private Server current;
 
-    public static WarOnTomcatDeployer warOnTomcatDeployer() {
-        return new WarOnTomcatDeployer();
+    public static Jsr356OnTyrusDeployer programmaticJsr356OnTyrusDeployer() {
+        return new Jsr356OnTyrusDeployer();
     }
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
-        final String basePath = findProjectBaseDirectory();
-        final String pathToWar = basePath + RELATIVE_PATH_TO_WAR;
-
+        TestApplicationConfig.HTTP_MAID_HOLDER.update(httpMaid);
         return retryUntilFreePortFound(port -> {
-            tomcat = new Tomcat();
-            tomcat.setPort(port);
-            final String basedir = "/home/marco/repositories/quantummaid/jacocotutorial/test";
-            tomcat.setBaseDir(basedir);
-            tomcat.getHost().setAppBase(basedir);
-            tomcat.getHost().setAutoDeploy(true);
-            tomcat.getHost().setDeployOnStartup(true);
-
+            current = new Server("localhost", port, "/", null, TestApplicationConfig.class);
             try {
-                tomcat.start();
-            } catch (final LifecycleException e) {
+                current.start();
+            } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
 
-            tomcat.addWebapp(tomcat.getHost(), "/app", pathToWar);
-            tomcat.getServer().await();
             return httpDeployment("localhost", port);
         });
     }
 
     @Override
     public void cleanUp() {
-        if (tomcat != null) {
-            try {
-                tomcat.stop();
-            } catch (final LifecycleException e) {
-                throw new RuntimeException(e);
-            }
+        if (current != null) {
+            current.stop();
         }
     }
 
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(theRealHttpMaidClient(), theRealHttpMaidClientWithConnectionReuse());
+    }
+
+    @Override
+    public String toString() {
+        return "jsr356OnTyrus";
     }
 }

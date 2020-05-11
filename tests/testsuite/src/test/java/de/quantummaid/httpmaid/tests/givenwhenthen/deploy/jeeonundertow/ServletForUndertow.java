@@ -19,14 +19,17 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.remote;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jeeonundertow;
 
-public final class BaseDirectoryFinder {
+import de.quantummaid.httpmaid.servlet.ServletEndpoint;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.HttpMaidHolder;
 
-    private BaseDirectoryFinder() {
-    }
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.HttpMaidHolder.emptyHttpMaidHolder;
 
-    public static String findProjectBaseDirectory() {
-        return "/home/marco/repositories/quantummaid/httpmaid";
+public final class ServletForUndertow extends ServletEndpoint {
+    public static final HttpMaidHolder HTTP_MAID_HOLDER = emptyHttpMaidHolder();
+
+    public ServletForUndertow() {
+        super(HTTP_MAID_HOLDER.get());
     }
 }

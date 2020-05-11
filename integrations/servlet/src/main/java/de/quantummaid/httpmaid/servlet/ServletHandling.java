@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
+import static java.util.Optional.ofNullable;
 
 public final class ServletHandling {
 
@@ -66,8 +67,8 @@ public final class ServletHandling {
         builder.withMethod(method);
         final Map<String, List<String>> headers = extractHeaders(request);
         builder.withHeaders(headers);
-        final Map<String, String> queryParameters = extractQueryParameters(request);
-        builder.withQueryParameters(queryParameters);
+        final String queryString = ofNullable(request.getQueryString()).orElse("");
+        builder.withEncodedQueryParameters(queryString);
         return builder;
     }
 
@@ -80,16 +81,5 @@ public final class ServletHandling {
             headers.put(headerName, singletonList(value));
         }
         return headers;
-    }
-
-    private static Map<String, String> extractQueryParameters(final HttpServletRequest request) {
-        final Map<String, String> queryParameters = new HashMap<>();
-        final Enumeration<String> parameterNames = request.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            final String parameterName = parameterNames.nextElement();
-            final String value = request.getParameter(parameterName);
-            queryParameters.put(parameterName, value);
-        }
-        return queryParameters;
     }
 }

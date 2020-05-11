@@ -91,7 +91,8 @@ public final class WebsocketDeployer implements Deployer {
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(
-                // theShittyTestClient(), TODO
+                // TODO
+                // theShittyTestClient(),
                 theRealHttpMaidClient(),
                 theRealHttpMaidClientWithConnectionReuse()
         );

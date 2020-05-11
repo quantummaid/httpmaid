@@ -38,6 +38,7 @@
     <modules>
         <module>testsuite</module>
         <module>war</module>
+        <module>remotespecs-tomcat</module>
     </modules>
 
     <properties>

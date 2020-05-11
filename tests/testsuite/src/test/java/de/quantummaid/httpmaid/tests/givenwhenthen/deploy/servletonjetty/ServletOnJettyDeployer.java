@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.servletonjetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
@@ -28,35 +28,41 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import org.glassfish.tyrus.server.Server;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.List;
 
+import static de.quantummaid.httpmaid.servlet.ServletEndpoint.servletEndpointFor;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
 import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ProgrammaticJsr356OnTyrusDeployer implements Deployer {
+public final class ServletOnJettyDeployer implements Deployer {
     private Server current;
 
-    public static ProgrammaticJsr356OnTyrusDeployer programmaticJsr356OnTyrusDeployer() {
-        return new ProgrammaticJsr356OnTyrusDeployer();
+    public static Deployer servletOnJettyDeployer() {
+        return new ServletOnJettyDeployer();
     }
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
-        ProgrammaticApplicationConfig.httpMaid = httpMaid;
         return retryUntilFreePortFound(port -> {
-            current = new Server("localhost", port, "/", null, ProgrammaticApplicationConfig.class);
+            current = new Server(port);
+            final ServletHandler servletHandler = new ServletHandler();
+            current.setHandler(servletHandler);
+            final ServletHolder servletHolder = new ServletHolder(servletEndpointFor(httpMaid));
+            servletHandler.addServletWithMapping(servletHolder, "/*");
             try {
                 current.start();
             } catch (final Exception e) {
                 throw new RuntimeException(e);
             }
-
             return httpDeployment("localhost", port);
         });
     }
@@ -64,17 +70,22 @@ public final class ProgrammaticJsr356OnTyrusDeployer implements Deployer {
     @Override
     public void cleanUp() {
         if (current != null) {
-            current.stop();
+            try {
+                current.stop();
+                current.destroy();
+            } catch (final Exception e) {
+                throw new UnsupportedOperationException("Could not stop jetty", e);
+            }
         }
     }
 
     @Override
-    public List<ClientFactory> supportedClients() {
-        return asList(theRealHttpMaidClient(), theRealHttpMaidClientWithConnectionReuse());
+    public String toString() {
+        return "servletOnJetty";
     }
 
     @Override
-    public String toString() {
-        return "jsr356OnTyrus";
+    public List<ClientFactory> supportedClients() {
+        return asList(theShittyTestClient(), theRealHttpMaidClient(), theRealHttpMaidClientWithConnectionReuse());
     }
 }

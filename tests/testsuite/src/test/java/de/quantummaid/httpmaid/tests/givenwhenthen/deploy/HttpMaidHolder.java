@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.jsr356.annotated;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import lombok.AccessLevel;
@@ -27,27 +27,21 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import javax.websocket.Endpoint;
-import javax.websocket.server.ServerApplicationConfig;
-import javax.websocket.server.ServerEndpointConfig;
-import java.util.Collections;
-import java.util.Set;
-
-import static de.quantummaid.httpmaid.jsr356.annotated.Jsr356ServerEndpointConfig.jsr356ServerEndpointConfig;
-
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public abstract class Jsr356ApplicationConfig implements ServerApplicationConfig {
-    private final HttpMaid httpMaid;
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class HttpMaidHolder {
+    private HttpMaid httpMaid;
 
-    @Override
-    public Set<ServerEndpointConfig> getEndpointConfigs(final Set<Class<? extends Endpoint>> endpointClasses) {
-        return Set.of(jsr356ServerEndpointConfig(httpMaid));
+    public static HttpMaidHolder emptyHttpMaidHolder() {
+        return new HttpMaidHolder();
     }
 
-    @Override
-    public Set<Class<?>> getAnnotatedEndpointClasses(final Set<Class<?>> scanned) {
-        return Collections.emptySet();
+    public void update(final HttpMaid httpMaid) {
+        this.httpMaid = httpMaid;
+    }
+
+    public HttpMaid get() {
+        return httpMaid;
     }
 }

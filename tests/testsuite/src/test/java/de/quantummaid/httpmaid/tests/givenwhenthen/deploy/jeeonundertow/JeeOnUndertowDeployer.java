@@ -19,19 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jeeonundertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.ServletInfo;
+import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import org.glassfish.tyrus.server.Server;
 
+import javax.servlet.ServletException;
+import javax.websocket.server.ServerEndpointConfig;
 import java.util.List;
 
+import static de.quantummaid.httpmaid.jsr356.Jsr356ServerEndpointConfig.jsr356ServerEndpointConfig;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
@@ -39,25 +48,41 @@ import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AnnotatedJsr356OnTyrusDeployer implements Deployer {
-    private Server current;
+public final class JeeOnUndertowDeployer implements Deployer {
+    private Undertow current;
 
-    public static AnnotatedJsr356OnTyrusDeployer annotatedJsr356OnTyrusDeployer() {
-        return new AnnotatedJsr356OnTyrusDeployer();
+    public static JeeOnUndertowDeployer jeeOnUndertowDeployer() {
+        return new JeeOnUndertowDeployer();
     }
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
-        AnnotatedApplicationConfig.httpMaid = httpMaid;
+        ServletForUndertow.HTTP_MAID_HOLDER.update(httpMaid);
         return retryUntilFreePortFound(port -> {
-            current = new Server("localhost", port, "/", null, AnnotatedApplicationConfig.class);
+            final ServerEndpointConfig serverEndpointConfig = jsr356ServerEndpointConfig(httpMaid);
+            final WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo().addEndpoint(serverEndpointConfig);
+
+            final ServletInfo servletInfo = Servlets.servlet("Servlet", ServletForUndertow.class)
+                    .addMapping("/*");
+
+            final DeploymentInfo deploymentInfo = Servlets.deployment()
+                    .setDeploymentName("test")
+                    .setContextPath("/")
+                    .setClassLoader(JeeOnUndertowDeployer.class.getClassLoader())
+                    .addServlet(servletInfo)
+                    .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, webSocketDeploymentInfo);
+            final DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
+            manager.deploy();
             try {
+                current = Undertow.builder()
+                        .setHandler(Handlers.path().addPrefixPath(deploymentInfo.getContextPath(), manager.start()))
+                        .addHttpListener(port, "localhost")
+                        .build();
                 current.start();
-            } catch (final Exception e) {
+                return httpDeployment("localhost", port);
+            } catch (final ServletException e) {
                 throw new RuntimeException(e);
             }
-
-            return httpDeployment("localhost", port);
         });
     }
 
@@ -75,6 +100,6 @@ public final class AnnotatedJsr356OnTyrusDeployer implements Deployer {
 
     @Override
     public String toString() {
-        return "jsr356OnTyrus";
+        return "JeeOnUndertow";
     }
 }

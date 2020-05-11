@@ -112,7 +112,7 @@ public final class RawHttpRequestBuilder {
 
     private static Map<String, String> queryToMap(final String query) {
         final Map<String, String> result = new HashMap<>();
-        if (query == null) {
+        if (query == null || query.isEmpty()) {
             return result;
         }
         for (final String param : query.split("&")) {

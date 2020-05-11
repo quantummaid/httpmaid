@@ -19,11 +19,9 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.jsr356.annotated;
+package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.jsr356.HandshakeMetaData;
-import de.quantummaid.httpmaid.jsr356.programmatic.ProgrammaticJsr356Endpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.jsr356.HandshakeMetaData.handshakeMetaData;
-import static de.quantummaid.httpmaid.jsr356.programmatic.Jsr356EndpointConfigurator.jsr356EndpointConfigurator;
+import static de.quantummaid.httpmaid.jsr356.Jsr356EndpointConfigurator.jsr356EndpointConfigurator;
 import static java.util.Collections.emptyList;
 
 @ToString
@@ -54,7 +52,7 @@ public final class Jsr356ServerEndpointConfig implements ServerEndpointConfig {
 
     @Override
     public Class<?> getEndpointClass() {
-        return ProgrammaticJsr356Endpoint.class;
+        return Jsr356Endpoint.class;
     }
 
     @Override

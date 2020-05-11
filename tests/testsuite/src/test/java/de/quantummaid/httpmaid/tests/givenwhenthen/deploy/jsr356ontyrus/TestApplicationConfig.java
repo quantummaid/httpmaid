@@ -22,13 +22,16 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.jsr356.programmatic.Jsr356ApplicationConfig;
+import de.quantummaid.httpmaid.jsr356.Jsr356ApplicationConfig;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.HttpMaidHolder;
 
-public final class ProgrammaticApplicationConfig implements Jsr356ApplicationConfig {
-    public static HttpMaid httpMaid;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.HttpMaidHolder.emptyHttpMaidHolder;
+
+public final class TestApplicationConfig implements Jsr356ApplicationConfig {
+    public static final HttpMaidHolder HTTP_MAID_HOLDER = emptyHttpMaidHolder();
 
     @Override
     public HttpMaid provideHttpMaid() {
-        return httpMaid;
+        return HTTP_MAID_HOLDER.get();
     }
 }

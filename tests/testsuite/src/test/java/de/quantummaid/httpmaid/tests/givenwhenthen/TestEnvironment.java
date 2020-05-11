@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.remote.warontomcat.WarOnTomcatDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,8 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeployerManager.activeDeployersWithOnlyShittyClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.bypassed.BypassedDeployer.bypassedDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.websocket.WebsocketDeployer.websocketDeployer;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus.ProgrammaticJsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus.Jsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toList;
 
@@ -48,7 +48,6 @@ public final class TestEnvironment {
     private static final String PACKAGE = "de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment#";
     public static final String ALL_ENVIRONMENTS = PACKAGE + "allEnvironments";
     public static final String WEBSOCKET_ENVIRONMENTS = PACKAGE + "websocketEnvironments";
-    public static final String REMOTE_ENVIRONMENTS = PACKAGE + "remoteEnvironments";
     public static final String ONLY_SHITTY_CLIENT = PACKAGE + "onlyShittyClient";
 
     private final Deployer deployer;
@@ -61,21 +60,12 @@ public final class TestEnvironment {
         return new TestEnvironment(deployer, clientFactory);
     }
 
-    public static List<TestEnvironment> remoteEnvironments() {
-        final List<Deployer> deployers = List.of(
-                WarOnTomcatDeployer.warOnTomcatDeployer()
-        );
-        return deployers.stream()
-                .flatMap(deployer -> deployer.supportedClients().stream()
-                        .map(client -> testEnvironment(deployer, client)))
-                .collect(toList());
-    }
-
     public static List<TestEnvironment> websocketEnvironments() {
         final List<Deployer> deployers = List.of(
                 bypassedDeployer(),
                 websocketDeployer(),
-                programmaticJsr356OnTyrusDeployer()
+                programmaticJsr356OnTyrusDeployer(),
+                jeeOnUndertowDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()
