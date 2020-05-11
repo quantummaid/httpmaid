@@ -26,6 +26,10 @@ import de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -36,23 +40,19 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyCl
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
 import static java.util.Arrays.asList;
 
-public final class PureJavaDeployer implements Deployer {
-
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PureJavaDeployer implements PortDeployer {
     private PureJavaEndpoint current;
-
-    private PureJavaDeployer() {
-    }
 
     public static Deployer pureJavaDeployer() {
         return new PureJavaDeployer();
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
-        return retryUntilFreePortFound(port -> {
-            current = pureJavaEndpointFor(httpMaid).listeningOnThePort(port);
-            return httpDeployment("localhost", port);
-        });
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        current = pureJavaEndpointFor(httpMaid).listeningOnThePort(port);
+        return httpDeployment("localhost", port);
     }
 
     @Override

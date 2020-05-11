@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ServletOnJettyDeployer implements Deployer {
+public final class ServletOnJettyDeployer implements PortDeployer {
     private Server current;
 
     public static Deployer servletOnJettyDeployer() {
@@ -51,20 +52,18 @@ public final class ServletOnJettyDeployer implements Deployer {
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
-        return retryUntilFreePortFound(port -> {
-            current = new Server(port);
-            final ServletHandler servletHandler = new ServletHandler();
-            current.setHandler(servletHandler);
-            final ServletHolder servletHolder = new ServletHolder(servletEndpointFor(httpMaid));
-            servletHandler.addServletWithMapping(servletHolder, "/*");
-            try {
-                current.start();
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-            return httpDeployment("localhost", port);
-        });
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        current = new Server(port);
+        final ServletHandler servletHandler = new ServletHandler();
+        current.setHandler(servletHandler);
+        final ServletHolder servletHolder = new ServletHolder(servletEndpointFor(httpMaid));
+        servletHandler.addServletWithMapping(servletHolder, "/*");
+        try {
+            current.start();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+        return httpDeployment("localhost", port);
     }
 
     @Override

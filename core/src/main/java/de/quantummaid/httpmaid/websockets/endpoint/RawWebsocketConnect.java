@@ -43,6 +43,10 @@ public final class RawWebsocketConnect implements RawRequest {
     private final Map<String, String> queryParameters;
     private final Map<String, List<String>> headers;
 
+    public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
+        return RawWebsocketConnectBuilder.rawWebsocketConnectBuilder();
+    }
+
     public static RawWebsocketConnect rawWebsocketConnect(final Object connectionInformation,
                                                           final Map<String, String> queryParameters,
                                                           final Map<String, List<String>> headers) {

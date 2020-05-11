@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.undertow.UndertowDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +66,8 @@ public final class TestEnvironment {
                 bypassedDeployer(),
                 websocketDeployer(),
                 programmaticJsr356OnTyrusDeployer(),
-                jeeOnUndertowDeployer()
+                jeeOnUndertowDeployer(),
+                UndertowDeployer.undertowDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()

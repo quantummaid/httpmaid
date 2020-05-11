@@ -77,7 +77,7 @@ public final class AwsLambdaEndpoint {
             final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
             builder.withHeaders(headers);
             final Map<String, String> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
-            builder.withQueryParameters(queryParameters);
+            builder.withUniqueQueryParameters(queryParameters);
             final String body = event.getOrDefault(BODY, "");
             builder.withBody(body);
             return builder.build();

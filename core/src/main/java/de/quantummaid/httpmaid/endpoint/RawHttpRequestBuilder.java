@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,12 +79,21 @@ public final class RawHttpRequestBuilder {
         return this;
     }
 
-    public RawHttpRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
-        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
-        return withQueryParameters(queryParametersMap);
+    public RawHttpRequestBuilder withQueryParameters(final Map<String, ? extends Collection<String>> queryParameters) {
+        final Map<String, String> uniqueQueryParameters = new HashMap<>(queryParameters.size());
+        queryParameters.forEach((key, values) -> {
+            final String firstValue = values.iterator().next();
+            uniqueQueryParameters.put(key, firstValue);
+        });
+        return withUniqueQueryParameters(uniqueQueryParameters);
     }
 
-    public RawHttpRequestBuilder withQueryParameters(final Map<String, String> queryParameters) {
+    public RawHttpRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
+        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
+        return withUniqueQueryParameters(queryParametersMap);
+    }
+
+    public RawHttpRequestBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
         this.queryParameters = queryParameters;
         return this;
     }

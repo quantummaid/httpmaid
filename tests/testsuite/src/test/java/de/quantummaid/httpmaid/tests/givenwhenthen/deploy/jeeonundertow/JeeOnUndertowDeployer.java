@@ -23,8 +23,8 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jeeonundertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.servlet.Servlets;
@@ -48,7 +48,7 @@ import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JeeOnUndertowDeployer implements Deployer {
+public final class JeeOnUndertowDeployer implements PortDeployer {
     private Undertow current;
 
     public static JeeOnUndertowDeployer jeeOnUndertowDeployer() {
@@ -56,34 +56,32 @@ public final class JeeOnUndertowDeployer implements Deployer {
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
         ServletForUndertow.HTTP_MAID_HOLDER.update(httpMaid);
-        return retryUntilFreePortFound(port -> {
-            final ServerEndpointConfig serverEndpointConfig = jsr356ServerEndpointConfig(httpMaid);
-            final WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo().addEndpoint(serverEndpointConfig);
+        final ServerEndpointConfig serverEndpointConfig = jsr356ServerEndpointConfig(httpMaid);
+        final WebSocketDeploymentInfo webSocketDeploymentInfo = new WebSocketDeploymentInfo().addEndpoint(serverEndpointConfig);
 
-            final ServletInfo servletInfo = Servlets.servlet("Servlet", ServletForUndertow.class)
-                    .addMapping("/*");
+        final ServletInfo servletInfo = Servlets.servlet("Servlet", ServletForUndertow.class)
+                .addMapping("/*");
 
-            final DeploymentInfo deploymentInfo = Servlets.deployment()
-                    .setDeploymentName("test")
-                    .setContextPath("/")
-                    .setClassLoader(JeeOnUndertowDeployer.class.getClassLoader())
-                    .addServlet(servletInfo)
-                    .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, webSocketDeploymentInfo);
-            final DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
-            manager.deploy();
-            try {
-                current = Undertow.builder()
-                        .setHandler(Handlers.path().addPrefixPath(deploymentInfo.getContextPath(), manager.start()))
-                        .addHttpListener(port, "localhost")
-                        .build();
-                current.start();
-                return httpDeployment("localhost", port);
-            } catch (final ServletException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        final DeploymentInfo deploymentInfo = Servlets.deployment()
+                .setDeploymentName("test")
+                .setContextPath("/")
+                .setClassLoader(JeeOnUndertowDeployer.class.getClassLoader())
+                .addServlet(servletInfo)
+                .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, webSocketDeploymentInfo);
+        final DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
+        manager.deploy();
+        try {
+            current = Undertow.builder()
+                    .setHandler(Handlers.path().addPrefixPath(deploymentInfo.getContextPath(), manager.start()))
+                    .addHttpListener(port, "localhost")
+                    .build();
+            current.start();
+            return httpDeployment("localhost", port);
+        } catch (final ServletException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -65,7 +65,7 @@ public final class BypassIssuer implements Issuer {
             builder.withPath(requestPath.path());
             builder.withMethod(request.method());
             builder.withUniqueHeaders(request.headers());
-            builder.withQueryParameters(queryParameters);
+            builder.withUniqueQueryParameters(queryParameters);
             final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
             builder.withBody(body);
             return builder.build();

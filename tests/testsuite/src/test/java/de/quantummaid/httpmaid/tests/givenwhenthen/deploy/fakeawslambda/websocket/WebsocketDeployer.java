@@ -24,8 +24,8 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.websock
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class WebsocketDeployer implements Deployer {
+public final class WebsocketDeployer implements PortDeployer {
     private Server current;
 
     public static WebsocketDeployer websocketDeployer() {
@@ -55,25 +55,23 @@ public final class WebsocketDeployer implements Deployer {
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
-        return retryUntilFreePortFound(port -> {
-            current = new Server(port);
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        current = new Server(port);
 
-            final HttpConnectionFactory connectionFactory = extractConnectionFactory(current);
-            connectionFactory.getHttpConfiguration().setFormEncodedMethods();
+        final HttpConnectionFactory connectionFactory = extractConnectionFactory(current);
+        connectionFactory.getHttpConfiguration().setFormEncodedMethods();
 
-            final ServletHandler servletHandler = new ServletHandler();
-            current.setHandler(servletHandler);
-            final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
-            final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(awsLambdaEndpoint));
-            servletHandler.addServletWithMapping(servletHolder, "/*");
-            try {
-                current.start();
-            } catch (final Exception e) {
-                throw new RuntimeException(e);
-            }
-            return httpDeployment("localhost", port);
-        });
+        final ServletHandler servletHandler = new ServletHandler();
+        current.setHandler(servletHandler);
+        final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
+        final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(awsLambdaEndpoint));
+        servletHandler.addServletWithMapping(servletHolder, "/*");
+        try {
+            current.start();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+        return httpDeployment("localhost", port);
     }
 
     @Override

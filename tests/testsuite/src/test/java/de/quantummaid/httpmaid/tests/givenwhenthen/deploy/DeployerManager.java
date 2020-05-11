@@ -23,29 +23,31 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.deploy;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.DeployerAndClient;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.bypassed.BypassedDeployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.FakeAwsDeployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jeeonundertow.JeeOnUndertowDeployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jetty.JettyDeployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.purejava.PureJavaDeployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.servletonjetty.ServletOnJettyDeployer;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.DeployerAndClient.deployerAndClient;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.bypassed.BypassedDeployer.bypassedDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.FakeAwsDeployer.fakeAwsDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jetty.JettyDeployer.jettyDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.purejava.PureJavaDeployer.pureJavaDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.servletonjetty.ServletOnJettyDeployer.servletOnJettyDeployer;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.undertow.UndertowDeployer.undertowDeployer;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 public final class DeployerManager {
     private static final Collection<Deployer> ACTIVE_DEPLOYERS = asList(
-            JettyDeployer.jettyDeployer(),
-            PureJavaDeployer.pureJavaDeployer(),
-            ServletOnJettyDeployer.servletOnJettyDeployer(),
-            FakeAwsDeployer.fakeAwsDeployer(),
-            BypassedDeployer.bypassedDeployer(),
-            JeeOnUndertowDeployer.jeeOnUndertowDeployer()
+            jettyDeployer(),
+            pureJavaDeployer(),
+            servletOnJettyDeployer(),
+            fakeAwsDeployer(),
+            bypassedDeployer(),
+            jeeOnUndertowDeployer(),
+            undertowDeployer()
     );
 
     private DeployerManager() {

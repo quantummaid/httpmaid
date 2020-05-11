@@ -21,11 +21,12 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jetty;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.jetty.JettyEndpoint;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyCl
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
 import static java.util.Arrays.asList;
 
-public final class JettyDeployer implements Deployer {
+public final class JettyDeployer implements PortDeployer {
 
     private JettyEndpoint current;
 
@@ -48,11 +49,9 @@ public final class JettyDeployer implements Deployer {
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
-        return retryUntilFreePortFound(port -> {
-            current = jettyEndpointFor(httpMaid).listeningOnThePort(port);
-            return httpDeployment("localhost", port);
-        });
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        current = jettyEndpointFor(httpMaid).listeningOnThePort(port);
+        return httpDeployment("localhost", port);
     }
 
     @Override

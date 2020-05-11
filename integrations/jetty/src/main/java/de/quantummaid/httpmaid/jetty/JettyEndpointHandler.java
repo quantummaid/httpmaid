@@ -64,7 +64,7 @@ final class JettyEndpointHandler extends AbstractHandler {
                     final Map<String, List<String>> headers = extractHeaders(request);
                     builder.withHeaders(headers);
                     final Map<String, String> queryParameters = extractQueryParameters(request);
-                    builder.withQueryParameters(queryParameters);
+                    builder.withUniqueQueryParameters(queryParameters);
                     final InputStream body = request.getInputStream();
                     builder.withBody(body);
                     return builder.build();

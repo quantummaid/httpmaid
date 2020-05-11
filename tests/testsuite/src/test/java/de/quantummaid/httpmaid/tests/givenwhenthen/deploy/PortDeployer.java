@@ -22,15 +22,32 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen.deploy;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public interface Deployer {
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool.freePort;
 
-    Deployment deploy(HttpMaid httpMaid);
+public interface PortDeployer extends Deployer {
 
-    void cleanUp();
+    Deployment deploy(int port, HttpMaid httpMaid);
 
-    List<ClientFactory> supportedClients();
+    @Override
+    default Deployment deploy(HttpMaid httpMaid) {
+        cleanUp();
+        final List<Exception> exceptions = new LinkedList<>();
+        for (int i = 0; i < 3; ++i) {
+            final int port = freePort();
+            try {
+                return deploy(port, httpMaid);
+            } catch (final Exception e) {
+                exceptions.add(e);
+            }
+        }
+        final String message = "Failed three times to use supposedly free port.";
+        System.err.println(message);
+        exceptions.forEach(Throwable::printStackTrace);
+        final Exception lastException = exceptions.get(exceptions.size() - 1);
+        throw new IllegalStateException(message, lastException);
+    }
 }

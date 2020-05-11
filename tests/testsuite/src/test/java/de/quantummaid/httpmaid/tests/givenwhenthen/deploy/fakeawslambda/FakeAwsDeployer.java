@@ -26,21 +26,24 @@ import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.fakeawslambda.FakeLambda.fakeLambda;
 import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeAwsDeployer implements Deployer {
+public final class FakeAwsDeployer implements PortDeployer {
     private FakeLambda current;
 
     public static Deployer fakeAwsDeployer() {
@@ -48,12 +51,10 @@ public final class FakeAwsDeployer implements Deployer {
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
-        final AwsLambdaEndpoint awsLambdaEndpoint = AwsLambdaEndpoint.awsLambdaEndpointFor(httpMaid);
-        return retryUntilFreePortFound(port -> {
-            current = FakeLambda.fakeLambda(awsLambdaEndpoint, port);
-            return httpDeployment("localhost", port);
-        });
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
+        current = fakeLambda(awsLambdaEndpoint, port);
+        return httpDeployment("localhost", port);
     }
 
     @Override

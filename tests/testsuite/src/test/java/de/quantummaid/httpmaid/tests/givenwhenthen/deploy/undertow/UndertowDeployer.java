@@ -19,16 +19,16 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.jsr356ontyrus;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy.undertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
+import de.quantummaid.httpmaid.undertow.UndertowEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import org.glassfish.tyrus.server.Server;
 
 import java.util.List;
 
@@ -39,39 +39,37 @@ import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Jsr356OnTyrusDeployer implements PortDeployer {
-    private Server current;
+public final class UndertowDeployer implements PortDeployer {
+    private UndertowEndpoint current;
 
-    public static Jsr356OnTyrusDeployer programmaticJsr356OnTyrusDeployer() {
-        return new Jsr356OnTyrusDeployer();
+    public static UndertowDeployer undertowDeployer() {
+        return new UndertowDeployer();
     }
 
     @Override
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
-        TestApplicationConfig.HTTP_MAID_HOLDER.update(httpMaid);
-        current = new Server("localhost", port, "/", null, TestApplicationConfig.class);
-        try {
-            current.start();
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+        current = UndertowEndpoint.startUndertowEndpoint(httpMaid, port);
         return httpDeployment("localhost", port);
     }
 
     @Override
     public void cleanUp() {
         if (current != null) {
-            current.stop();
+            current.close();
         }
     }
 
     @Override
     public List<ClientFactory> supportedClients() {
-        return asList(theRealHttpMaidClient(), theRealHttpMaidClientWithConnectionReuse());
+        return asList(
+                //theShittyTestClient(), // TODO
+                theRealHttpMaidClient(),
+                theRealHttpMaidClientWithConnectionReuse()
+        );
     }
 
     @Override
     public String toString() {
-        return "jsr356OnTyrus";
+        return "undertow";
     }
 }
