@@ -49,4 +49,8 @@ public final class BasePath {
                 .filter(element -> !element.isEmpty())
                 .collect(toList());
     }
+
+    public String render() {
+        return String.join("/", elements);
+    }
 }

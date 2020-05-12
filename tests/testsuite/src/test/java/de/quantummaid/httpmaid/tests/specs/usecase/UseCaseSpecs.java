@@ -31,11 +31,12 @@ import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class UseCaseSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testGetRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -49,7 +50,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testPostRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -63,7 +64,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testPutRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -77,7 +78,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testDeleteRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -91,7 +92,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testTwoUseCaseParameters(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -105,7 +106,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testVoidUseCase(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -118,7 +119,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void aUseCaseWithNoParametersAndVoidReturnTypeCanBeInvokedWithoutConfiguringAnySerializers(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid().get("/", VoidUseCase.class).build())
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -127,7 +128,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void checkedExceptionInUseCaseCanBeCaughtInSpecializedHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -148,7 +149,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCasesCanReturnStrings(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -161,7 +162,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCasesCanReturnInts(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -174,7 +175,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseCanHaveASingleStringAsParameterWithInlinedRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -187,7 +188,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseCanHaveASingleStringAsParameterViaPathParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -200,7 +201,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseCanHaveASingleDtoAsParameterWithInlinedRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -213,7 +214,7 @@ public final class UseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseCanHaveTwoStringsAsParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

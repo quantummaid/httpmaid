@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 

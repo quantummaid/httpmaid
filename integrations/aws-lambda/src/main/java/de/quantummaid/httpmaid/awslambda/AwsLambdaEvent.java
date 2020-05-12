@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.HTTP_METHOD;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.REQUEST_CONTEXT;
+import static de.quantummaid.httpmaid.awslambda.EmptyLambdaEventException.emptyLambdaEventException;
 import static java.util.Objects.requireNonNullElse;
 import static java.util.Objects.requireNonNullElseGet;
 
@@ -43,6 +44,9 @@ public final class AwsLambdaEvent {
 
     @SuppressWarnings("unchecked")
     public static AwsLambdaEvent awsLambdaEvent(final Map<String, Object> event) {
+        if (event.isEmpty()) {
+            throw emptyLambdaEventException();
+        }
         final Map<String, Object> requestContext = (Map<String, Object>) event.get(REQUEST_CONTEXT);
         return new AwsLambdaEvent(event, requestContext);
     }

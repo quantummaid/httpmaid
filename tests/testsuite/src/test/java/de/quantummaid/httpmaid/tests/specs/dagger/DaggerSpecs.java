@@ -28,11 +28,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.dagger.DaggerConfigurators.toCreateUseCaseInstancesUsingDagger;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class DaggerSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void daggerIntegrationWorks(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

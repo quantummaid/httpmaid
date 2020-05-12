@@ -33,7 +33,7 @@
     <artifactId>integrations-parent</artifactId>
     <packaging>pom</packaging>
 
-    <name>HttpMaid - integrations</name>
+    <name>HttpMaid - Integrations</name>
 
     <modules>
         <module>all</module>

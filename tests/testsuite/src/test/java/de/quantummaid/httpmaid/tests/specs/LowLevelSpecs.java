@@ -33,11 +33,12 @@ import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.debug.DebugConfigurator.toBeInDebugMode;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class LowLevelSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void pageNotFoundExceptionContainsContext(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -49,7 +50,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testBodyOfAPostRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -62,7 +63,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testBodyOfAPutRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -75,7 +76,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testBodyOfADeleteRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -88,7 +89,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testContentTypeInRequest(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -104,7 +105,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testContentTypeCanContainParameters(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -117,7 +118,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testRequestContentTypeIsCaseInsensitive(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -134,7 +135,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testContentTypeInResponse(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -147,7 +148,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testHeadersInResponse(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -160,7 +161,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testFileDownload(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -178,7 +179,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testDebugModule(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -191,7 +192,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testEmptyTemplate(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -206,7 +207,7 @@ public final class LowLevelSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestHeadersCanBeAMap(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

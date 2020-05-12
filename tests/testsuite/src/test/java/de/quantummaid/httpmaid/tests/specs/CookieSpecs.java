@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.http.headers.cookies.CookieBuilder.cookie;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.concurrent.TimeUnit.HOURS;
 

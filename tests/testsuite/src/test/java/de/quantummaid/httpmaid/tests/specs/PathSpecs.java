@@ -29,11 +29,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class PathSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void wildcardPathMatchesSingleElement(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -45,7 +46,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void wildcardPathMatchesZeroElements(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -57,7 +58,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void wildcardPathMatchesMultipleElements(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -69,7 +70,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void multipleWildcardsMatchIfThePathHasTheIntermediateElements(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -81,7 +82,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void multipleWildcardsMatchNotIfThePathDoesNotHaveTheIntermediateElements(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -94,7 +95,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void wrongRegexInPath(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -108,7 +109,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void overlappingPaths(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -121,7 +122,7 @@ public final class PathSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testWildcardRouteWithEmptyMiddleWildcard(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

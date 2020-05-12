@@ -34,7 +34,6 @@ import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.Then.then;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 
@@ -69,7 +68,7 @@ public final class When {
                 })
                 .build();
         clientConsumer.accept(client);
-        return then(requestLog, null);
+        return Then.then(requestLog, null);
     }
 
     public Then aRequestIsMade(final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder) {
@@ -78,6 +77,6 @@ public final class When {
                 .viaHttp()
                 .build();
         final SimpleHttpResponseObject response = client.issue(requestBuilder);
-        return then(null, response);
+        return Then.then(null, response);
     }
 }

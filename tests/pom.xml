@@ -37,7 +37,11 @@
 
     <modules>
         <module>testsuite</module>
+        <module>remotespecs-instance</module>
+        <module>jar</module>
         <module>war</module>
+        <module>lambda</module>
+        <module>remotespecs</module>
         <module>remotespecs-tomcat</module>
     </modules>
 

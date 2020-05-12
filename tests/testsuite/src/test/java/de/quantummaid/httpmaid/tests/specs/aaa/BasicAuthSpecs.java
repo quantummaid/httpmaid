@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toDoBasicAuthWith;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Base64.getEncoder;
@@ -34,7 +35,7 @@ import static java.util.Base64.getEncoder;
 public final class BasicAuthSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void unauthenticatedRequestsAreRejected(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -48,7 +49,7 @@ public final class BasicAuthSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestWithWrongCredentialsGetsRejected(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -63,7 +64,7 @@ public final class BasicAuthSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestWithCorrectCredentialsDoNotGetRejected(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -78,7 +79,7 @@ public final class BasicAuthSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void messageCanBeSet(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

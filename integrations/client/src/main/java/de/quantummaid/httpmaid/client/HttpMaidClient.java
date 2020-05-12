@@ -36,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.client.HttpMaidClientBuilder.clientBuilder;
 import static de.quantummaid.httpmaid.client.issuer.bypass.BypassIssuer.bypassIssuer;
@@ -66,15 +67,16 @@ public final class HttpMaidClient implements AutoCloseable {
         validateNotNull(httpMaid, "httpMaid");
         final Issuer issuer = bypassIssuer(httpMaid);
         final BypassingWebsocketClient websocketClient = bypassingWebsocketClient(httpMaid);
-        return clientBuilder(basePath -> issuer, websocketClient);
+        return clientBuilder(basePath -> issuer, basePath -> websocketClient);
     }
 
     public static PortStage aHttpMaidClientForTheHost(final String host) {
         validateNotNullNorEmpty(host, "host");
         return port -> protocol -> {
             validateNotNull(protocol, "protocol");
-            final WebsocketClient websocketClient = websocketClient(protocol, host, port);
-            return clientBuilder(basePath -> realIssuer(protocol, host, port, basePath), websocketClient);
+            final Function<BasePath, WebsocketClient> websocketClient = basePath -> websocketClient(protocol, host, port, basePath);
+            final Function<BasePath, Issuer> issuer = basePath -> realIssuer(protocol, host, port, basePath);
+            return clientBuilder(issuer, websocketClient);
         };
     }
 
@@ -82,21 +84,23 @@ public final class HttpMaidClient implements AutoCloseable {
         validateNotNullNorEmpty(host, "host");
         return port -> protocol -> {
             validateNotNull(protocol, "protocol");
-            final WebsocketClient websocketClient = websocketClient(protocol, host, port);
-            return clientBuilder(basePath -> RealIssuer.realIssuerWithConnectionReuse(protocol, host, port, basePath), websocketClient);
+            final Function<BasePath, Issuer> issuer = basePath -> RealIssuer.realIssuerWithConnectionReuse(protocol, host, port, basePath);
+            final Function<BasePath, WebsocketClient> websocketClient = basePath -> websocketClient(protocol, host, port, basePath);
+            return clientBuilder(issuer, websocketClient);
         };
     }
 
     private static WebsocketClient websocketClient(final Protocol protocol,
                                                    final String host,
-                                                   final int port) {
+                                                   final int port,
+                                                   final BasePath basePath) {
         final String websocketProtocol;
         if (protocol.equals(Protocol.HTTP)) {
             websocketProtocol = "ws";
         } else {
             websocketProtocol = "wss";
         }
-        final String websocketUri = String.format("%s://%s:%d/", websocketProtocol, host, port);
+        final String websocketUri = String.format("%s://%s:%d/%s", websocketProtocol, host, port, basePath.render());
         return realWebsocketClient(websocketUri);
     }
 

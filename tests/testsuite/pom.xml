@@ -49,8 +49,33 @@
             <groupId>de.quantummaid.httpmaid</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>de.quantummaid.httpmaid.integrations</groupId>
+            <artifactId>httpmaid-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.12</version>
+        </dependency>
+
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-multipart</artifactId>
@@ -67,18 +92,6 @@
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-jackson</artifactId>
             <version>0.9.52</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-client</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -162,17 +175,6 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>9.4.28.v20200408</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.5.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -210,10 +212,12 @@
             <scope>test</scope>
         </dependency>
         -->
+        <!-- TODO -->
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
             <version>9.4.28.v20200408</version>
+            <scope>test</scope>
         </dependency>
 
 

@@ -28,11 +28,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.UNAUTHORIZED;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class AuthorizationSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void unauthorizedRequestsCanBeRejected(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -46,7 +47,7 @@ public final class AuthorizationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void rejectionCanBeConfigured(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -64,7 +65,7 @@ public final class AuthorizationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void routesCanBeExcludedFromAuthorization(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -78,7 +79,7 @@ public final class AuthorizationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void authorizationCanBeLimitedToCertainRoutes(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

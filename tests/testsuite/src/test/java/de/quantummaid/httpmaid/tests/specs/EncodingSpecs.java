@@ -26,11 +26,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ONLY_SHITTY_CLIENT;
 
 public final class EncodingSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ONLY_SHITTY_CLIENT)
+    @MethodSource(ONLY_SHITTY_CLIENT)
     public void pathEncoding(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

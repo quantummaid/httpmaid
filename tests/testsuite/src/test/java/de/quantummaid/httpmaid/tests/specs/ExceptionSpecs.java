@@ -29,11 +29,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.METHOD_NOT_ALLOWED;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class ExceptionSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testUseCaseNotFoundExceptionHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -49,7 +50,7 @@ public final class ExceptionSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void unmappedExceptionHasStatusCode500AsDefault(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -64,7 +65,7 @@ public final class ExceptionSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void mappedExceptionsHaveStatusCode500AsDefault(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -80,7 +81,7 @@ public final class ExceptionSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void checkedExceptionsCanBeMapped(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -95,7 +96,7 @@ public final class ExceptionSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void subtypesOfMappedExceptionsGetMapped(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

@@ -35,11 +35,12 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.*;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingPathParameter;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingQueryParameter;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public class EnrichingSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void pathParameterEnrichmentIsAddedAutomatically(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -51,7 +52,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void pathParameterEnrichmentIsAddedAutomaticallyForRegexPaths(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -63,7 +64,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void pathParameterEnrichmentCanBeIgnored(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -76,7 +77,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void pathParameterEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -88,7 +89,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void queryParameterEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -100,7 +101,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void queryParameterFromEnrichmentCanBeEmpty(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -112,7 +113,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void twoQueryParametersCanBeEnriched(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -124,7 +125,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void twoQueryParametersCanEnrichedATopLevelDto(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -139,7 +140,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void headerEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -151,7 +152,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void multipleEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -166,7 +167,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void cookieEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -178,7 +179,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void authenticationInformationEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -191,7 +192,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void whenAuthenticationInformationIsMissingTheRequestIsAborted(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -206,7 +207,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void optionalAuthenticationInformationEnrichmentCanBeConfiguredPerRoute(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -219,7 +220,7 @@ public class EnrichingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void whenAuthenticationInformationIsMissingTheRequestIsNotAbortedForOptionalAuthenticationInformation(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

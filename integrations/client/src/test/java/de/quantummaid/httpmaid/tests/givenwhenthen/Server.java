@@ -41,7 +41,7 @@ final class Server {
             httpServer = HttpServer.create(new InetSocketAddress(port), 0);
             httpServer.createContext("/", exchange -> {
                 final URI requestURI = exchange.getRequestURI();
-                final Request request = request(requestURI.getRawPath());
+                final Request request = Request.request(requestURI.getRawPath());
                 requestLog.log(request);
                 exchange.sendResponseHeaders(OK, 0);
                 exchange.close();

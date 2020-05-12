@@ -32,6 +32,7 @@ import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
 import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
 import static de.quantummaid.reflectmaid.GenericType.genericType;
@@ -39,7 +40,7 @@ import static de.quantummaid.reflectmaid.GenericType.genericType;
 public final class SpecialUseCaseSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithTwoMethods(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -51,7 +52,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithoutPublicMethods(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -63,7 +64,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithAdditionalPackagePrivateMethods(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -75,7 +76,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void packagePrivateUseCaseWithPublicMethod(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -87,7 +88,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void packagePrivateUseCaseWithPackagePrivateMethod(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -99,7 +100,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsDirectReturnType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -113,7 +114,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsDirectReturnTypeWithGenericType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -125,7 +126,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsIndirectReturnType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -139,7 +140,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsIndirectReturnTypeWithGenericType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -151,7 +152,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsDirectParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -164,7 +165,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsDirectParameterRegisteredAsGenericType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -177,7 +178,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsIndirectParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -191,7 +192,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithClassScopeTypeVariableAsIndirectParameterWithGenericType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -204,7 +205,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithMethodScopeTypeVariableAsDirectReturnType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -218,7 +219,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithMethodScopeTypeVariableAsIndirectReturnType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -233,7 +234,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithMethodScopeTypeVariableAsDirectParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -247,7 +248,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithMethodScopeTypeVariableAsIndirectParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -262,7 +263,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithWildcardInReturnType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -287,7 +288,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithGenericsInReturnType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -299,7 +300,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithGenericsInParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -312,7 +313,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithWildcardInParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -337,7 +338,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnInterface(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -358,7 +359,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnAbstractClass(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -379,7 +380,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnEnum(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -391,7 +392,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnAnonymousClass(final TestEnvironment testEnvironment) {
         final Class<?> useCaseClass = new UseCaseThatIsAnInterface() {
         }.getClass();
@@ -405,7 +406,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnInnerClass(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -417,7 +418,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAStaticInnerClass(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -429,7 +430,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsALocalClass(final TestEnvironment testEnvironment) {
         class UseCase {
             public String method() {
@@ -448,7 +449,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAPrimitive(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -460,7 +461,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnAnnotation(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -472,7 +473,7 @@ public final class SpecialUseCaseSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseThatIsAnArray(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()

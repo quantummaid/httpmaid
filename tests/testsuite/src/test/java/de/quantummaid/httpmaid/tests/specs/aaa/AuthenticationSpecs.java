@@ -35,12 +35,13 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingAuthenticationInformation;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.*;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static java.util.Optional.of;
 
 public final class AuthenticationSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithHeader(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -56,7 +57,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithCookie(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -72,7 +73,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithQueryParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -88,7 +89,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithPathParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -104,7 +105,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithBody(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -120,7 +121,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithOAuth2BearerToken(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -136,7 +137,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void routesCanBeExcludedFromAuthentication(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -152,7 +153,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void authenticationCanBeLimitedToCertainRoutes(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -168,7 +169,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void authenticationInformationCanBeADomainObject(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -181,7 +182,7 @@ public final class AuthenticationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void authenticationInformationCanBeADomainObjectWithGenerics(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

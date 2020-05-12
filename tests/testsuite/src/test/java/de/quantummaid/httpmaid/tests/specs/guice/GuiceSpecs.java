@@ -34,12 +34,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.guice.GuiceConfigurators.toCreateUseCaseInstancesUsingGuice;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.tests.specs.guice.domain.HardToInstantiateComponent.HARD_TO_INSTANTIATE_COMPONENT;
 
 public final class GuiceSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void guiceIntegrationCanWorkWithoutSpecifyingAnInjector(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -52,7 +53,7 @@ public final class GuiceSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void guiceIntegrationFailsPerDefaultForMoreThanOneConstructor(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -66,7 +67,7 @@ public final class GuiceSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void guiceIntegrationCanGetACustomInjector(final TestEnvironment testEnvironment) {
         final Injector injector = Guice.createInjector();
         testEnvironment.given(
@@ -80,7 +81,7 @@ public final class GuiceSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void guiceIntegrationCanSpecifyModules(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

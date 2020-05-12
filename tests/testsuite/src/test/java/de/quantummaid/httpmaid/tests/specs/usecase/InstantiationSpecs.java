@@ -35,12 +35,13 @@ import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
 
 public final class InstantiationSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void exceptionInInitializerIsThrownOnStartup(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -54,7 +55,7 @@ public final class InstantiationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void exceptionInInitializerCanBeCaughtInSpecializedHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -78,7 +79,7 @@ public final class InstantiationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void exceptionInInitializerCanBeCaughtInDefaultHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -92,7 +93,7 @@ public final class InstantiationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void defaultInstantiatorFailsForInterfacesOnRuntime(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -110,7 +111,7 @@ public final class InstantiationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void defaultInstantiatorFailsForInterfacesOnStartup(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
@@ -127,7 +128,7 @@ public final class InstantiationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void defaultInstantiatorFailsForAbstractClassOnRuntime(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -145,7 +146,7 @@ public final class InstantiationSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void defaultInstantiatorFailsForAbstractClassOnStartup(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()

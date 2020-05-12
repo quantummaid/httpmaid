@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.tests;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -31,11 +31,12 @@ import java.time.Instant;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class ResourceDeallocationSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void createTestAndDestroyALotOfTimes(final TestEnvironment testEnvironment) {
         final Boolean runThisTest = Optional.ofNullable(System.getProperty("testMode")).map(s -> s.equals("RELEASE")).orElse(false);
         if (runThisTest) {

@@ -35,11 +35,12 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.*;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class MarshallingSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void unmarshallerCanBeSet(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -57,7 +58,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void marshallerCanBeSet(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -73,7 +74,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestUsesContentTypeHeaderForUnmarshalling(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -92,7 +93,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void defaultContentTypeIsUsedForUnmarshallingIfNoContentTypeIsSpecified(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -113,7 +114,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void responseUsesContentTypeOfAcceptHeader(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -132,7 +133,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void responseIsMarshalledUsingContentTypeIfNoAcceptHeaderIsSet(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -151,7 +152,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void wildcardsInAcceptHeaderCanBeUsedToSpecifyResponseContentType(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -172,7 +173,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void responseIsMarshalledUsingContentTypeIfAcceptHeaderAllowsMultipleMarshallers(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -192,7 +193,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void responseIsMarshalledUsingDefaultContentTypeIfAcceptAndContentTypeHeaderCannotBeUsed(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -211,7 +212,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void unknownUnmarshallerCanThrowException(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
@@ -233,7 +234,7 @@ public final class MarshallingSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void unknownMarshallerCanThrowException(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

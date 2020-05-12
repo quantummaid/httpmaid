@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.hamcrest.MatcherAssert;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -45,7 +46,7 @@ public final class Then {
 
     public Then theServerReceivedARequestToThePath(final String expectedPath) {
         final Request request = requestLog.lastRequest();
-        assertThat(request.path(), is(expectedPath));
+        MatcherAssert.assertThat(request.path(), is(expectedPath));
         return this;
     }
 

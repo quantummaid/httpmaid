@@ -28,11 +28,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.BAD_REQUEST;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toFilterRequestsThat;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class FilterSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void requestsCanBeFiltered(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

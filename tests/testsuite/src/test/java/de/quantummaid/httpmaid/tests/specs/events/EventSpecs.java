@@ -25,10 +25,12 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
+
 public final class EventSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testEventsCanBeTriggered(final TestEnvironment testEnvironment) {
         testEnvironment.given(EventsHttpMaidConfiguration.theEventsHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/trigger").viaTheGetMethod().withAnEmptyBody().isIssued()

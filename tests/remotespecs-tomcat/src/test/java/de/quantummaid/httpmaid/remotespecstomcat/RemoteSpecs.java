@@ -37,7 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public final class RemoteSpecs {
-    private static final String RELATIVE_PATH_TO_WAR = "/tests/war/target/testwar-0.9.57.war";
+    private static final String RELATIVE_PATH_TO_WAR = "/tests/war/target/remotespecs.war";
     private static final int PORT = 8080;
     private Tomcat tomcat;
 

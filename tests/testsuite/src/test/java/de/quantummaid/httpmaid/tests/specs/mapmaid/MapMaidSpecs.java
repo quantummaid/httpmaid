@@ -36,7 +36,7 @@ import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentTypeInResponses;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallContentTypeInRequests;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class MapMaidSpecs {
 
@@ -114,7 +114,7 @@ public final class MapMaidSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMapMaidOnlyWithInjectionAndWithoutBody(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

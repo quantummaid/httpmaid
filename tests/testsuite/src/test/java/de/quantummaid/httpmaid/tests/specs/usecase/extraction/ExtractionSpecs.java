@@ -27,11 +27,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toExtractFromTheResponseMapTheHeader;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class ExtractionSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void extractionToHeader(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

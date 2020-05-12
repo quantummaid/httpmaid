@@ -26,6 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.MultipartBuilder.startingWith;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement.aFile;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement.aFormControl;
 import static de.quantummaid.httpmaid.tests.specs.multipart.handler.MultipartHttpMaidConfiguration.theMultipartHttpMaidInstanceUsedForTesting;
@@ -33,7 +34,7 @@ import static de.quantummaid.httpmaid.tests.specs.multipart.handler.MultipartHtt
 public final class MultipartSpecs {
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartFileUploadWithGet(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaTheGetMethod()
@@ -43,7 +44,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartFileUploadWithPost(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaThePostMethod()
@@ -53,7 +54,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartFileUploadWithPut(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaThePutMethod()
@@ -63,7 +64,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartFileUploadWithDelete(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaTheDeleteMethod()
@@ -73,7 +74,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartWithoutFile(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaThePostMethod()
@@ -83,7 +84,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartWithFieldsBeforeTheFileUpload(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaThePostMethod()
@@ -95,7 +96,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartFieldsAfterTheFileUpload(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaThePostMethod()
@@ -108,7 +109,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testMultipartWithMultipleFiles(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/dump").viaThePostMethod()
@@ -120,7 +121,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testAuthenticationByFirstMultipartPart(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/authenticated").viaThePostMethod()
@@ -131,7 +132,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testWrongAuthorizationGetsRejectedBeforeProcessingFile(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/authorized").viaThePostMethod().withTheMultipartBody(startingWith(aFormControl("authentication", "username=normaluser"))
@@ -141,7 +142,7 @@ public final class MultipartSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    @MethodSource(ALL_ENVIRONMENTS)
     public void testAuthorizationBeforeProcessingFile(final TestEnvironment testEnvironment) {
         testEnvironment.given(theMultipartHttpMaidInstanceUsedForTesting())
                 .when().aRequestToThePath("/authorized").viaThePostMethod().withTheMultipartBody(startingWith(aFormControl("authentication", "username=admin"))
