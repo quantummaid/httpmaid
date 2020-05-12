@@ -29,15 +29,12 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Thread.currentThread;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Checkpoints {
-    private static final int WAIT_TIME = 120;
-    private static final int SLEEP_TIME = 250;
-
     private final List<String> checkpoints = new ArrayList<>(0);
 
     public static Checkpoints checkpoints() {
@@ -53,16 +50,6 @@ public final class Checkpoints {
     }
 
     public boolean checkpointHasBeenVisited(final String checkpoint) {
-        for (int i = 0; i < WAIT_TIME; ++i) {
-            if (hasCheckpointBeenVisited(checkpoint)) {
-                return true;
-            }
-            try {
-                Thread.sleep(SLEEP_TIME);
-            } catch (final InterruptedException e) {
-                currentThread().interrupt();
-            }
-        }
-        return false;
+        return pollWithTimeout(() -> hasCheckpointBeenVisited(checkpoint));
     }
 }

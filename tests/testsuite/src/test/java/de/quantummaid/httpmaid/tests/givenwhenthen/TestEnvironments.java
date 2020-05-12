@@ -35,6 +35,7 @@ import static de.quantummaid.httpmaid.tests.deployers.undertow.UndertowDeployer.
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.testEnvironment;
 import static java.util.stream.Collectors.toList;
 
+// TODO move
 public final class TestEnvironments {
     private static final String PACKAGE = "de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments#";
     public static final String ALL_ENVIRONMENTS = PACKAGE + "allEnvironments";

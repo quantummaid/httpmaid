@@ -58,4 +58,8 @@ public final class TestEnvironment {
     public Given given(final HttpMaid httpMaid) {
         return given(() -> httpMaid);
     }
+
+    public Given givenTheStaticallyDeployedTestInstance() {
+        return given((HttpMaid) null);
+    }
 }

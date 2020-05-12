@@ -40,6 +40,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>de.quantummaid.httpmaid.tests</groupId>
+            <artifactId>remotespecs</artifactId>
+            <version>0.9.57</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>8.5.23</version>

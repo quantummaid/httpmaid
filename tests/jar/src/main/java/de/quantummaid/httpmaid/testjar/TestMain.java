@@ -38,5 +38,6 @@ public final class TestMain {
         final int port = Integer.parseInt(args[0]);
         final HttpMaid httpMaid = HttpMaidFactory.httpMaid();
         startUndertowEndpoint(httpMaid, port);
+        System.out.println("\nTestJar ready to be tested.");
     }
 }
