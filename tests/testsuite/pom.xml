@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.57</version>
+        <version>0.9.58</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-jackson</artifactId>
-            <version>0.9.52</version>
+            <version>0.9.53</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
