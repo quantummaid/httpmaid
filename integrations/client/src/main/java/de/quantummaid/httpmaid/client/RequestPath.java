@@ -73,6 +73,15 @@ public final class RequestPath {
         queryParameters.add(queryParameter);
     }
 
+    public RequestPath rebase(final BasePath basePath) {
+        final List<UriString> newPathElements = new ArrayList<>();
+        basePath.elements().stream()
+                .map(UriString::uriString)
+                .forEach(newPathElements::add);
+        newPathElements.addAll(pathElements);
+        return new RequestPath(newPathElements, queryParameters, trailingSlash);
+    }
+
     public String render() {
         final String path = path();
 

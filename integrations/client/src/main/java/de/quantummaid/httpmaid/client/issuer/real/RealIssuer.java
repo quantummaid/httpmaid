@@ -54,22 +54,21 @@ public final class RealIssuer implements Issuer {
 
     public static Issuer realIssuer(final Protocol protocol,
                                     final String host,
-                                    final int port,
-                                    final BasePath basePath) {
-        return new RealIssuer(endpoint(protocol, host, port, basePath), normalConnectionFactory());
+                                    final int port) {
+        return new RealIssuer(endpoint(protocol, host, port), normalConnectionFactory());
     }
 
     public static Issuer realIssuerWithConnectionReuse(final Protocol protocol,
                                                        final String host,
-                                                       final int port,
-                                                       final BasePath basePath) {
-        return new RealIssuer(endpoint(protocol, host, port, basePath), pooledConnectionFactory());
+                                                       final int port) {
+        return new RealIssuer(endpoint(protocol, host, port), pooledConnectionFactory());
     }
 
     @Override
     public <T> T issue(final HttpClientRequest<T> request,
-                       final Function<RawClientResponse, T> responseMapper) {
-        final RequestPath path = request.path();
+                       final Function<RawClientResponse, T> responseMapper,
+                       final BasePath basePath) {
+        final RequestPath path = request.path(basePath);
         final String url = this.endpoint.toUrl(path);
         final String method = request.method();
         final HttpEntityEnclosingRequest lowLevelRequest = new BasicHttpEntityEnclosingRequest(method, url);

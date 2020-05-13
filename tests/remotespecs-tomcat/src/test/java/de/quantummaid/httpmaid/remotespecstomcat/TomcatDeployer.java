@@ -21,59 +21,36 @@
 
 package de.quantummaid.httpmaid.remotespecstomcat;
 
-import de.quantummaid.httpmaid.client.HttpMaidClient;
-import de.quantummaid.httpmaid.client.websocket.Websocket;
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
-import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
-import static de.quantummaid.httpmaid.remotespecstomcat.BaseDirectoryFinder.findProjectBaseDirectory;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import java.util.List;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public final class RemoteSpecs {
+import static de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder.findProjectBaseDirectory;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TomcatDeployer implements PortDeployer {
     private static final String RELATIVE_PATH_TO_WAR = "/tests/war/target/remotespecs.war";
-    private static final int PORT = 8080;
     private Tomcat tomcat;
 
-    // TODO trailing slash
-
-    @Test
-    public void test() {
-        final HttpMaidClient client = HttpMaidClient.aHttpMaidClientForTheHost("localhost").withThePort(PORT)
-                .viaHttp().build();
-
-        final String response = client.issue(aGetRequestToThePath("/").mappedToString());
-
-        assertThat(response, is("fooooo"));
+    public static TomcatDeployer tomcatDeployer() {
+        return new TomcatDeployer();
     }
 
-    @Test
-    public void test2() {
-        final HttpMaidClient client = HttpMaidClient.aHttpMaidClientForTheHost("localhost").withThePort(PORT)
-                .viaHttp().build();
-
-        final Websocket websocket = client.openWebsocket(System.out::println);
-        websocket.send("{ \"message\": \"handler2\" }");
-
-        /*
-        try {
-            Thread.sleep(10000);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-         */
-    }
-
-    @BeforeAll
-    public void deploy() {
+    @Override
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
         tomcat = new Tomcat();
-        tomcat.setPort(PORT);
+        tomcat.setPort(port);
+        // TODO
         final String basedir = "/home/marco/repositories/quantummaid/jacocotutorial/test";
         tomcat.setBaseDir(basedir);
         tomcat.getHost().setAppBase(basedir);
@@ -88,9 +65,10 @@ public final class RemoteSpecs {
         final String basePath = findProjectBaseDirectory();
         final String pathToWar = basePath + RELATIVE_PATH_TO_WAR;
         tomcat.addWebapp(tomcat.getHost(), "/", pathToWar);
+        return httpDeployment("localhost", port);
     }
 
-    @AfterAll
+    @Override
     public void cleanUp() {
         if (tomcat != null) {
             try {
@@ -99,5 +77,15 @@ public final class RemoteSpecs {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Override
+    public List<ClientFactory> supportedClients() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return "tomcat";
     }
 }

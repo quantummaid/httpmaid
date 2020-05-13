@@ -29,7 +29,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.client.BasePath.basePath;
@@ -46,13 +45,13 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClientBuilder {
-    private final Function<BasePath, Issuer> issuerFactory;
-    private final Function<BasePath, WebsocketClient> websocketClient;
+    private final Issuer issuer;
+    private final WebsocketClient websocketClient;
     private final FilterMapBuilder<Class<?>, ClientResponseMapper<?>> responseMappers;
     private BasePath basePath = basePath("");
 
-    static HttpMaidClientBuilder clientBuilder(final Function<BasePath, Issuer> issuer,
-                                               final Function<BasePath, WebsocketClient> websocketClient) {
+    static HttpMaidClientBuilder clientBuilder(final Issuer issuer,
+                                               final WebsocketClient websocketClient) {
         validateNotNull(issuer, "issuer");
         validateNotNull(websocketClient, "websocketClient");
         final HttpMaidClientBuilder builder = new HttpMaidClientBuilder(issuer, websocketClient, filterMapBuilder());
@@ -104,8 +103,6 @@ public final class HttpMaidClientBuilder {
     }
 
     public HttpMaidClient build() {
-        final Issuer issuer = this.issuerFactory.apply(basePath);
-        final WebsocketClient websocketClient = this.websocketClient.apply(basePath);
         return httpMaidClient(issuer, basePath, responseMappers.build(), websocketClient);
     }
 

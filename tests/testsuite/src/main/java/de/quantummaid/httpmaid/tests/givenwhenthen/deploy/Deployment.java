@@ -33,9 +33,11 @@ import lombok.ToString;
 public final class Deployment {
     private final HttpMaid httpMaid;
     private final String protocol;
-    private final String hostname;
+    private final String httpHostname;
+    private final String websocketHostname;
     private final int port;
-    private final String basePath;
+    private final String httpBasePath;
+    private final String websocketBasePath;
 
     public static Deployment httpsDeploymentWithBasePath(final String hostname,
                                                          final int port,
@@ -43,15 +45,26 @@ public final class Deployment {
         if (!basePath.startsWith("/")) {
             throw new IllegalArgumentException("basePath has to start with a '/'");
         }
-        return new Deployment(null, "https", hostname, port, basePath);
+        return new Deployment(null, "https", hostname, hostname, port, basePath, basePath);
+    }
+
+    public static Deployment httpsDeploymentWithBasePath(final String httpHostname,
+                                                         final String websocketHostname,
+                                                         final int port,
+                                                         final String httpBasePath,
+                                                         final String websocketBasePath) {
+        if (!httpBasePath.startsWith("/") || !websocketBasePath.startsWith("/")) {
+            throw new IllegalArgumentException("basePath has to start with a '/'");
+        }
+        return new Deployment(null, "https", httpHostname, websocketHostname, port, httpBasePath, websocketBasePath);
     }
 
     public static Deployment httpDeployment(final String hostname, final int port) {
-        return new Deployment(null, "http", hostname, port, "/");
+        return new Deployment(null, "http", hostname, hostname, port, "/", "/");
     }
 
     public static Deployment bypassedDeployment(final HttpMaid httpMaid) {
-        return new Deployment(httpMaid, null, null, -1, null);
+        return new Deployment(httpMaid, null, null, null, -1, null, null);
     }
 
     public HttpMaid httpMaid() {
@@ -66,15 +79,23 @@ public final class Deployment {
         return port;
     }
 
-    public String hostname() {
-        return hostname;
+    public String httpHostname() {
+        return httpHostname;
     }
 
-    public String basePath() {
-        return basePath;
+    public String websocketHostname() {
+        return websocketHostname;
+    }
+
+    public String httpBasePath() {
+        return httpBasePath;
+    }
+
+    public String websocketBasePath() {
+        return websocketBasePath;
     }
 
     public String baseUrl() {
-        return protocol + "://" + hostname + ":" + port + basePath;
+        return protocol + "://" + httpHostname + ":" + port + httpBasePath;
     }
 }

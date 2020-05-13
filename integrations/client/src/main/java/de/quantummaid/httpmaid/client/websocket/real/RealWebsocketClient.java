@@ -56,11 +56,13 @@ public final class RealWebsocketClient implements WebsocketClient {
     @Override
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
                                    final Map<String, String> queryParameters,
-                                   final Map<String, List<String>> headers) {
+                                   final Map<String, List<String>> headers,
+                                   final String path) {
+        final String fullUri = uri + path;
         final WebSocketClient client = new WebSocketClient();
         try {
             client.start();
-            final URI uriObject = createUri(uri, queryParameters);
+            final URI uriObject = createUri(fullUri, queryParameters);
             final ClientUpgradeRequest request = new ClientUpgradeRequest();
             headers.forEach(request::setHeader);
             final RealWebsocket realWebsocket = realWebsocket(messageHandler, client);

@@ -36,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.client.HttpMaidClientBuilder.clientBuilder;
 import static de.quantummaid.httpmaid.client.issuer.bypass.BypassIssuer.bypassIssuer;
@@ -67,15 +66,15 @@ public final class HttpMaidClient implements AutoCloseable {
         validateNotNull(httpMaid, "httpMaid");
         final Issuer issuer = bypassIssuer(httpMaid);
         final BypassingWebsocketClient websocketClient = bypassingWebsocketClient(httpMaid);
-        return clientBuilder(basePath -> issuer, basePath -> websocketClient);
+        return clientBuilder(issuer, websocketClient);
     }
 
     public static PortStage aHttpMaidClientForTheHost(final String host) {
         validateNotNullNorEmpty(host, "host");
         return port -> protocol -> {
             validateNotNull(protocol, "protocol");
-            final Function<BasePath, WebsocketClient> websocketClient = basePath -> websocketClient(protocol, host, port, basePath);
-            final Function<BasePath, Issuer> issuer = basePath -> realIssuer(protocol, host, port, basePath);
+            final Issuer issuer = realIssuer(protocol, host, port);
+            final WebsocketClient websocketClient = websocketClient(protocol, host, port);
             return clientBuilder(issuer, websocketClient);
         };
     }
@@ -84,23 +83,22 @@ public final class HttpMaidClient implements AutoCloseable {
         validateNotNullNorEmpty(host, "host");
         return port -> protocol -> {
             validateNotNull(protocol, "protocol");
-            final Function<BasePath, Issuer> issuer = basePath -> RealIssuer.realIssuerWithConnectionReuse(protocol, host, port, basePath);
-            final Function<BasePath, WebsocketClient> websocketClient = basePath -> websocketClient(protocol, host, port, basePath);
+            final Issuer issuer = RealIssuer.realIssuerWithConnectionReuse(protocol, host, port);
+            final WebsocketClient websocketClient = websocketClient(protocol, host, port);
             return clientBuilder(issuer, websocketClient);
         };
     }
 
     private static WebsocketClient websocketClient(final Protocol protocol,
                                                    final String host,
-                                                   final int port,
-                                                   final BasePath basePath) {
+                                                   final int port) {
         final String websocketProtocol;
         if (protocol.equals(Protocol.HTTP)) {
             websocketProtocol = "ws";
         } else {
             websocketProtocol = "wss";
         }
-        final String websocketUri = String.format("%s://%s:%d/%s", websocketProtocol, host, port, basePath.render());
+        final String websocketUri = String.format("%s://%s:%d/", websocketProtocol, host, port);
         return realWebsocketClient(websocketUri);
     }
 
@@ -115,7 +113,7 @@ public final class HttpMaidClient implements AutoCloseable {
             final Class<T> targetType = request.targetType();
             final ClientResponseMapper<T> responseMapper = (ClientResponseMapper<T>) responseMappers.get(targetType);
             return responseMapper.map(response, targetType);
-        });
+        }, basePath);
     }
 
     public Websocket openWebsocket() {
@@ -130,7 +128,7 @@ public final class HttpMaidClient implements AutoCloseable {
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
                                    final Map<String, String> queryParameters,
                                    final Map<String, List<String>> headers) {
-        return websocketClient.openWebsocket(messageHandler, queryParameters, headers);
+        return websocketClient.openWebsocket(messageHandler, queryParameters, headers, basePath.render());
     }
 
     @Override

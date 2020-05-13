@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.client.issuer.real;
 
-import de.quantummaid.httpmaid.client.BasePath;
 import de.quantummaid.httpmaid.client.RequestPath;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -37,17 +36,14 @@ final class Endpoint {
     private final Protocol protocol;
     private final String host;
     private final int port;
-    private final BasePath basePath;
 
     static Endpoint endpoint(final Protocol protocol,
                              final String host,
-                             final int port,
-                             final BasePath basePath) {
+                             final int port) {
         validateNotNull(protocol, "protocol");
         validateNotNull(host, "host");
         validateNotNull(port, "port");
-        validateNotNull(basePath, "basePath");
-        return new Endpoint(protocol, host, port, basePath);
+        return new Endpoint(protocol, host, port);
     }
 
     String host() {

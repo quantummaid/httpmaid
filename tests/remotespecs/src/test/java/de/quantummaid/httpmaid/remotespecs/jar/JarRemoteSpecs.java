@@ -19,14 +19,20 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecstomcat;
+package de.quantummaid.httpmaid.remotespecs.jar;
 
-public final class BaseDirectoryFinder {
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-    private BaseDirectoryFinder() {
-    }
+import static de.quantummaid.httpmaid.remotespecs.jar.JarDeployer.jarDeployer;
 
-    public static String findProjectBaseDirectory() {
-        return "/home/marco/repositories/quantummaid/httpmaid";
+@ExtendWith(RemoteSpecsExtension.class)
+public final class JarRemoteSpecs implements RemoteSpecs {
+
+    @Override
+    public Deployer provideDeployer() {
+        return jarDeployer();
     }
 }

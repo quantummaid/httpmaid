@@ -19,8 +19,13 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client;
+package de.quantummaid.httpmaid.remotespecs.jvm;
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
+import de.quantummaid.httpmaid.undertow.UndertowEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -28,33 +33,34 @@ import lombok.ToString;
 
 import java.util.List;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
+import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BasePath {
-    private final List<String> elements;
+public final class JvmDeployer implements PortDeployer {
+    private UndertowEndpoint endpoint;
 
-    static BasePath basePath(final String basePath) {
-        validateNotNull(basePath, "basePath");
-        final List<String> basePathElements = splitPath(basePath);
-        return new BasePath(basePathElements);
+    public static JvmDeployer jvmDeployer() {
+        return new JvmDeployer();
     }
 
-    private static List<String> splitPath(final String path) {
-        return stream(path.split("/"))
-                .filter(element -> !element.isEmpty())
-                .collect(toList());
+    @Override
+    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        final HttpMaid realHttpMaid = httpMaid();
+        endpoint = UndertowEndpoint.startUndertowEndpoint(realHttpMaid, port);
+        return Deployment.httpDeployment("localhost", port);
     }
 
-    public List<String> elements() {
-        return elements;
+    @Override
+    public void cleanUp() {
+        if (endpoint != null) {
+            endpoint.close();
+        }
     }
 
-    public String render() {
-        return String.join("/", elements);
+    @Override
+    public List<ClientFactory> supportedClients() {
+        throw new UnsupportedOperationException();
     }
 }

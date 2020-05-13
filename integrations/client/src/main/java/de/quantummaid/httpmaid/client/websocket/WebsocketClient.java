@@ -28,5 +28,6 @@ public interface WebsocketClient {
 
     Websocket openWebsocket(WebsocketMessageHandler messageHandler,
                             Map<String, String> queryParameters,
-                            Map<String, List<String>> headers);
+                            Map<String, List<String>> headers,
+                            String path);
 }

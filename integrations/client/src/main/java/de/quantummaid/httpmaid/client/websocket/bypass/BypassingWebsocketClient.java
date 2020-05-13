@@ -50,7 +50,8 @@ public final class BypassingWebsocketClient implements WebsocketClient {
     @Override
     public BypassedWebsocket openWebsocket(final WebsocketMessageHandler messageHandler,
                                            final Map<String, String> queryParameters,
-                                           final Map<String, List<String>> headers) {
+                                           final Map<String, List<String>> headers,
+                                           final String path) {
         httpMaid.handleRequest(
                 () -> rawWebsocketConnect(messageHandler, queryParameters, headers),
                 response -> {

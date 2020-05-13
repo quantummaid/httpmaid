@@ -22,10 +22,7 @@
 package de.quantummaid.httpmaid.client.issuer.bypass;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.client.HttpClientRequest;
-import de.quantummaid.httpmaid.client.RawClientResponse;
-import de.quantummaid.httpmaid.client.RequestPath;
-import de.quantummaid.httpmaid.client.UriString;
+import de.quantummaid.httpmaid.client.*;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.util.streams.Streams;
@@ -52,8 +49,9 @@ public final class BypassIssuer implements Issuer {
 
     @Override
     public <T> T issue(final HttpClientRequest<T> request,
-                       final Function<RawClientResponse, T> responseMapper) {
-        final RequestPath requestPath = request.path();
+                       final Function<RawClientResponse, T> responseMapper,
+                       final BasePath basePath) {
+        final RequestPath requestPath = request.path(basePath);
         final Map<String, String> queryParameters = requestPath.queryParameters()
                 .stream()
                 .collect(toMap(

@@ -49,7 +49,6 @@ public final class UndertowEndpoint implements AutoCloseable {
                         undertowWebsocketsCallback(httpMaid),
                         undertowHandler(httpMaid))
                 )
-                //.setHandler(undertowHandler(httpMaid))
                 .build();
         undertow.start();
         httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(undertow::stop);

@@ -19,20 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.issuer;
+package de.quantummaid.httpmaid.tests;
 
-import de.quantummaid.httpmaid.client.BasePath;
-import de.quantummaid.httpmaid.client.HttpClientRequest;
-import de.quantummaid.httpmaid.client.RawClientResponse;
+import org.junit.jupiter.api.Test;
 
-import java.util.function.Function;
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Given.givenTheHttpMaidServer;
 
-public interface Issuer extends AutoCloseable {
-    <T> T issue(HttpClientRequest<T> request,
-                Function<RawClientResponse, T> responseMapper,
-                BasePath basePath);
+public final class BasePathSpecs {
 
-    @Override
-    default void close() {
+    @Test
+    public void clientCanHaveABasePath() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/foo/test", (request, response) -> response.setBody("foo"))
+                        .build()
+        )
+                .when().aRequestIsMadeOnClientWithBasePath("/foo", aGetRequestToThePath("/test"))
+                .theResponseBodyWas("foo");
     }
 }

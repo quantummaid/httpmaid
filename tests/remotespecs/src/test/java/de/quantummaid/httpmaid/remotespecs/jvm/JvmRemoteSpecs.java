@@ -19,20 +19,20 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.issuer;
+package de.quantummaid.httpmaid.remotespecs.jvm;
 
-import de.quantummaid.httpmaid.client.BasePath;
-import de.quantummaid.httpmaid.client.HttpClientRequest;
-import de.quantummaid.httpmaid.client.RawClientResponse;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.function.Function;
+import static de.quantummaid.httpmaid.remotespecs.jvm.JvmDeployer.jvmDeployer;
 
-public interface Issuer extends AutoCloseable {
-    <T> T issue(HttpClientRequest<T> request,
-                Function<RawClientResponse, T> responseMapper,
-                BasePath basePath);
+@ExtendWith(RemoteSpecsExtension.class)
+public final class JvmRemoteSpecs implements RemoteSpecs {
 
     @Override
-    default void close() {
+    public Deployer provideDeployer() {
+        return jvmDeployer();
     }
 }

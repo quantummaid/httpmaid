@@ -87,8 +87,8 @@ public final class HttpClientRequest<T> {
         return new HttpClientRequest<>(requestPath, method, fixedHeaders, bodyStream, targetType);
     }
 
-    public RequestPath path() {
-        return this.path;
+    public RequestPath path(final BasePath basePath) {
+        return path.rebase(basePath);
     }
 
     public String method() {

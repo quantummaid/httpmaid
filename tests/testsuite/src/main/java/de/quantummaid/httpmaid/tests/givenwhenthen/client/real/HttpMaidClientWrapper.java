@@ -39,39 +39,50 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aRequest;
-import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientBypassingRequestsDirectlyTo;
+import static de.quantummaid.httpmaid.client.HttpMaidClient.*;
 import static de.quantummaid.httpmaid.client.body.multipart.Part.aPartWithTheControlName;
 import static de.quantummaid.httpmaid.client.issuer.real.Protocol.valueOf;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse.httpClientResponse;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClientWrapper implements HttpClientWrapper {
-    private final HttpMaidClient client;
+    private final HttpMaidClient httpClient;
+    private final HttpMaidClient websocketClient;
 
     static HttpClientWrapper realHttpMaidClientWithConnectionReuseWrapper(final Deployment deployment) {
         final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
-        final HttpMaidClient client = HttpMaidClient.aHttpMaidClientThatReusesConnectionsForTheHost(deployment.hostname())
+        final HttpMaidClient httpClient = aHttpMaidClientThatReusesConnectionsForTheHost(deployment.httpHostname())
                 .withThePort(deployment.port())
                 .viaTheProtocol(protocol)
-                .withBasePath(deployment.basePath())
+                .withBasePath(deployment.httpBasePath())
                 .build();
-        return new HttpMaidClientWrapper(client);
+        final HttpMaidClient websocketClient = aHttpMaidClientThatReusesConnectionsForTheHost(deployment.websocketHostname())
+                .withThePort(deployment.port())
+                .viaTheProtocol(protocol)
+                .withBasePath(deployment.websocketBasePath())
+                .build();
+        return new HttpMaidClientWrapper(httpClient, websocketClient);
     }
 
     static HttpClientWrapper realHttpMaidClientWrapper(final Deployment deployment) {
         final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
-        final HttpMaidClient client = HttpMaidClient.aHttpMaidClientForTheHost(deployment.hostname())
+        final HttpMaidClient httpClient = aHttpMaidClientForTheHost(deployment.httpHostname())
                 .withThePort(deployment.port())
                 .viaTheProtocol(protocol)
-                .withBasePath(deployment.basePath())
+                .withBasePath(deployment.httpBasePath())
                 .build();
-        return new HttpMaidClientWrapper(client);
+        final HttpMaidClient websocketClient = aHttpMaidClientForTheHost(deployment.websocketHostname())
+                .withThePort(deployment.port())
+                .viaTheProtocol(protocol)
+                .withBasePath(deployment.websocketBasePath())
+                .build();
+        return new HttpMaidClientWrapper(httpClient, websocketClient);
     }
 
     static HttpClientWrapper bypassingHttpMaidClientWrapper(final Deployment deployment) {
         final HttpMaidClient client = aHttpMaidClientBypassingRequestsDirectlyTo(deployment.httpMaid())
                 .build();
-        return new HttpMaidClientWrapper(client);
+        return new HttpMaidClientWrapper(client, client);
     }
 
     @Override
@@ -112,7 +123,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
         final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder = aRequest(method, path);
         bodyAppender.accept(requestBuilder);
         headers.forEach(requestBuilder::withHeader);
-        final SimpleHttpResponseObject response = this.client.issue(requestBuilder);
+        final SimpleHttpResponseObject response = this.httpClient.issue(requestBuilder);
         return httpClientResponse(response.getStatusCode(), response.getHeaders(), response.getBody());
     }
 
@@ -121,12 +132,13 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
                                             final String message,
                                             final Map<String, String> queryParameters,
                                             final Map<String, List<String>> headers) {
-        final Websocket websocket = client.openWebsocket(responseHandler::accept, queryParameters, headers);
+        final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, queryParameters, headers);
         websocket.send(message);
     }
 
     @Override
     public void close() {
-        client.close();
+        httpClient.close();
+        websocketClient.close();
     }
 }

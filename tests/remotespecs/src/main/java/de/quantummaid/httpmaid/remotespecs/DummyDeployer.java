@@ -19,8 +19,12 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client;
+package de.quantummaid.httpmaid.remotespecs;
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -28,33 +32,27 @@ import lombok.ToString;
 
 import java.util.List;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
-
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BasePath {
-    private final List<String> elements;
+public final class DummyDeployer implements Deployer {
+    private final Deployment deployment;
 
-    static BasePath basePath(final String basePath) {
-        validateNotNull(basePath, "basePath");
-        final List<String> basePathElements = splitPath(basePath);
-        return new BasePath(basePathElements);
+    public static DummyDeployer dummyDeployer(final Deployment deployment) {
+        return new DummyDeployer(deployment);
     }
 
-    private static List<String> splitPath(final String path) {
-        return stream(path.split("/"))
-                .filter(element -> !element.isEmpty())
-                .collect(toList());
+    @Override
+    public Deployment deploy(final HttpMaid httpMaid) {
+        return deployment;
     }
 
-    public List<String> elements() {
-        return elements;
+    @Override
+    public void cleanUp() {
     }
 
-    public String render() {
-        return String.join("/", elements);
+    @Override
+    public List<ClientFactory> supportedClients() {
+        throw new UnsupportedOperationException();
     }
 }

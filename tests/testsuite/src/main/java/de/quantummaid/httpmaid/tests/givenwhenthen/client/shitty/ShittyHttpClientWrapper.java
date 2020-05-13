@@ -143,7 +143,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                     .add(new RequestTargetHost())
                     .build();
             final HttpCoreContext context = HttpCoreContext.create();
-            context.setTargetHost(new HttpHost(deployment.hostname()));
+            context.setTargetHost(new HttpHost(deployment.httpHostname()));
             httpProcessor.process(request, context);
             final HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
             final HttpResponse response = httpexecutor.execute(request, connection, context);
@@ -178,12 +178,12 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     private static Socket createSocket(final Deployment deployment) {
         try {
             if (deployment.protocol().equals("http")) {
-                return new Socket(deployment.hostname(), deployment.port());
+                return new Socket(deployment.httpHostname(), deployment.port());
             }
             final SSLContext sslcontext = SSLContexts.createSystemDefault();
             final SocketFactory socketFactory = sslcontext.getSocketFactory();
 
-            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(deployment.hostname(), deployment.port());
+            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(deployment.httpHostname(), deployment.port());
             // Enforce TLS and disable SSL
             socket.setEnabledProtocols(new String[]{
                     "TLSv1",

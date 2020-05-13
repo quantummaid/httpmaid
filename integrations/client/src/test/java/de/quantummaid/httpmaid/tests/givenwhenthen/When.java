@@ -79,4 +79,15 @@ public final class When {
         final SimpleHttpResponseObject response = client.issue(requestBuilder);
         return Then.then(null, response);
     }
+
+    public Then aRequestIsMadeOnClientWithBasePath(final String basePath,
+                                                   final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder) {
+        final HttpMaidClient client = aHttpMaidClientForTheHost("localhost")
+                .withThePort(port)
+                .viaHttp()
+                .withBasePath(basePath)
+                .build();
+        final SimpleHttpResponseObject response = client.issue(requestBuilder);
+        return Then.then(null, response);
+    }
 }

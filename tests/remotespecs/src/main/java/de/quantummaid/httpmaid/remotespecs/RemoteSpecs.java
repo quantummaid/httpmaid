@@ -22,28 +22,24 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import org.junit.jupiter.api.Test;
 
-import static de.quantummaid.httpmaid.remotespecs.deployers.TestEnvironments.ALL_ENVIRONMENTS;
+public interface RemoteSpecs {
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public final class RemoteSpecs2 {
+    Deployer provideDeployer();
 
     // TODO trailing slash
 
-    @ParameterizedTest
-    @MethodSource(ALL_ENVIRONMENTS)
-    public void httpTest(final TestEnvironment testEnvironment) {
+    @Test
+    default void httpTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theResponseBodyWas("fooooo");
     }
 
-    @ParameterizedTest
-    @MethodSource(ALL_ENVIRONMENTS)
-    public void websocketTest(final TestEnvironment testEnvironment) {
+    @Test
+    default void websocketTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler2\" }")
                 .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
