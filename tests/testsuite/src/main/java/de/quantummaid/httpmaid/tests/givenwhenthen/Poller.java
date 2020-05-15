@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 import static java.lang.Thread.currentThread;
 
 public final class Poller {
-    private static final int WAIT_TIME = 120;
+    private static final int WAIT_TIME = 90 * 4;
     private static final int SLEEP_TIME = 250;
 
     private Poller() {

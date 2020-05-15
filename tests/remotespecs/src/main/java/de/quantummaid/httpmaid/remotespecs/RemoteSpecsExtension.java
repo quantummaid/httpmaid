@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.*;
 
 import static de.quantummaid.httpmaid.remotespecs.DummyDeployer.dummyDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.testEnvironment;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
 
 public final class RemoteSpecsExtension implements ParameterResolver,
         BeforeEachCallback,
@@ -46,7 +46,8 @@ public final class RemoteSpecsExtension implements ParameterResolver,
     public Object resolveParameter(final ParameterContext parameterContext,
                                    final ExtensionContext extensionContext) throws ParameterResolutionException {
         final Deployer deployer = dummyDeployer(deployment);
-        final ClientFactory clientFactory = theRealHttpMaidClient();
+        //final ClientFactory clientFactory = theRealHttpMaidClient();
+        final ClientFactory clientFactory = theShittyTestClient();
         return testEnvironment(deployer, clientFactory);
     }
 

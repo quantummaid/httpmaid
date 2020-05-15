@@ -1,0 +1,230 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "HttpMaid AWS Lambda integration."
+
+Parameters:
+  StackIdentifier:
+    Type: String
+    Description: "Unique string to identify the stack"
+
+Resources:
+  ############
+  ## Lambda ##
+  ############
+
+  FunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${StackIdentifier}-FunctionRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: !Sub "${StackIdentifier}-FunctionRolePolicy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - sts:AssumeRole
+                Resource: '*'
+                Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+
+  FunctionResourcePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref Function
+
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${StackIdentifier}-Deployment"
+      Code:
+        S3Bucket: "remotespecs"
+        S3Key: "jar"
+      Tags:
+        - Key: StackIdentifier
+          Value: !Ref StackIdentifier
+      MemorySize: 192
+      Handler: de.quantummaid.httpmaid.testlambda.TestLambda::handleRequest
+      Role: !GetAtt FunctionRole.Arn
+      Timeout: 20
+      Runtime: java11
+
+  #####################
+  ## HTTP ApiGateway ##
+  #####################
+
+  #HttpApi:
+  #  Type: 'AWS::ApiGatewayV2::Api'
+  #  Properties:
+  #    Name: RemoteSpecs HTTP Lambda Proxy
+  #    ProtocolType: HTTP
+  #    Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "RemoteSpecs HTTP Lambda Proxy"
+      FailOnWarnings: true
+
+  ApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref HttpMaidApi
+      ParentId: !GetAtt HttpMaidApi.RootResourceId
+      PathPart: "{path+}"
+
+  AnyMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RestApiId: !Ref HttpMaidApi
+      ResourceId: !Ref ApiResource
+      ApiKeyRequired: false
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+
+  SecondAnyMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RestApiId: !Ref HttpMaidApi
+      ResourceId: !GetAtt
+        - HttpMaidApi
+        - RootResourceId
+      ApiKeyRequired: false
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        PassthroughBehavior: WHEN_NO_MATCH
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  ApiStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref ApiDeployment
+      RestApiId: !Ref HttpMaidApi
+      StageName: !Ref StackIdentifier
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: AnyMethod
+    Properties:
+      RestApiId: !Ref HttpMaidApi
+
+  ###########################
+  ## WebSockets ApiGateway ##
+  ###########################
+
+  HttpMaidWebsocketsApi:
+    Type: 'AWS::ApiGatewayV2::Api'
+    Properties:
+      Name: RemoteSpecs WebSockets Lambda Proxy
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+      Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidWebsocketsApiConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpMaidWebsocketsApi
+      RouteKey: $connect
+      AuthorizationType: NONE
+      # A Lambda proxy response is used for $connect messages to return
+      # success/failure info to the caller.
+      # See the matching response section following the integration definition.
+      RouteResponseSelectionExpression: $default
+      Target: !Join ['/', [integrations, !Ref HttpMaidWebsocketsApiConnectIntegration]] # See below
+
+  # The Lambda proxy for $connect.
+  HttpMaidWebsocketsApiConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpMaidWebsocketsApi
+      Description: Integration for builtin $connect route
+      IntegrationType: AWS_PROXY
+      # All routes lead to the same Lambda function; it uses the route
+      # provided by API Gateway to determine the right behavior.
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidWebsocketsApiDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpMaidWebsocketsApi
+      RouteKey: $default
+      AuthorizationType: NONE
+      # A Lambda proxy response is used for $default messages to immediately inform
+      # the caller that the request was malformed.
+      # See the matching response section following the integration definition.
+      RouteResponseSelectionExpression: $default
+      Target: !Join ['/', [integrations, !Ref HttpMaidWebsocketsApiDefaultIntegration]]
+
+  # Lambda proxy integratino for $default route
+  HttpMaidWebsocketsApiDefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpMaidWebsocketsApi
+      IntegrationType: AWS_PROXY
+      # All routes lead to the same Lambda function; it uses the route
+      # provided by API Gateway to determine the right behavior.
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidWebsocketsApiDefaultResponse:
+    Type: 'AWS::ApiGatewayV2::RouteResponse'
+    Properties:
+      RouteId: !Ref HttpMaidWebsocketsApiDefaultRoute
+      ApiId: !Ref HttpMaidWebsocketsApi
+      RouteResponseKey: $default
+
+  # NATPunch websocket deployment descriptor; see 'stage' below.
+  HttpMaidWebsocketsApiDeployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-deployment.html for
+    # an explanation on why the routes below are listed as explicit dependencies for
+    # the API's deployment in CloudFormation. This feels like a bug/hack; hopefully AWS
+    # fixes it over time.
+    DependsOn:
+      - HttpMaidWebsocketsApiDefaultRoute
+      - HttpMaidWebsocketsApiConnectRoute
+    Properties:
+      ApiId: !Ref HttpMaidWebsocketsApi
+
+  # NATPunch websocket deployment stage descriptor; see 'deployment' above.
+  HttpMaidWebsocketsApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: 'stage'
+      DeploymentId: !Ref HttpMaidWebsocketsApiDeployment
+      ApiId: !Ref HttpMaidWebsocketsApi
+      #DefaultRouteSettings:
+      #  DetailedMetricsEnabled: true
+      #  LoggingLevel: INFO
+      #  DataTraceEnabled: true
+      #  #ThrottlingBurstLimit: 10 ... TODO, revisit later!
+      #  #ThrottlingRateLimit: 10  ... TODO, revisit later!
+      #AccessLogSettings:
+      #  DestinationArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ProjectId}-wss-access-logs'
+      #  Format: >-2
+      #    '{"requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
+      #    "caller":"$context.identity.caller",
+      #    "user":"$context.identity.user","requestTime":"$context.requestTime",
+      #    "eventType":"$context.eventType","routeKey":"$context.routeKey",
+      #    "status":"$context.status","connectionId":"$context.connectionId"}'

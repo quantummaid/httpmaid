@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse.httpClientResponse;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyWebsocketClient.openWebsocket;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static java.util.Arrays.stream;
 import static org.apache.http.protocol.HttpProcessorBuilder.create;
@@ -75,7 +76,9 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                                             final String message,
                                             final Map<String, String> queryParameters,
                                             final Map<String, List<String>> headers) {
-        throw new UnsupportedOperationException();
+        final ShittyWebsocketClient shittyWebsocketClient = openWebsocket(
+                deployment.websocketUri(), responseHandler, headers, queryParameters);
+        shittyWebsocketClient.send(message);
     }
 
     @Override
