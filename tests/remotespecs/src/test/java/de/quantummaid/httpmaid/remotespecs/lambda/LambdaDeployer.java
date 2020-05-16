@@ -54,7 +54,7 @@ public final class LambdaDeployer implements Deployer {
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";
     private static final String REST_API_NAME = "RemoteSpecs HTTP Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = "RemoteSpecs WebSockets Lambda Proxy";
-    private static final int WAIT_TIME = 60_000;
+    private static final int WAIT_TIME = 10_000;
 
     private static final int PORT = 443;
 
