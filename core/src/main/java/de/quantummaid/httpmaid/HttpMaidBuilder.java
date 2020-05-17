@@ -31,6 +31,8 @@ import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
+import de.quantummaid.httpmaid.websockets.broadcast.BroadcasterFactory;
+import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,8 @@ import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketRoute.webSocketCategory;
 import static de.quantummaid.httpmaid.websockets.WebsocketsModule.websocketsModule;
+import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
+import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.broadcasters;
 import static java.time.Duration.between;
 import static java.util.Arrays.asList;
 
@@ -57,6 +61,7 @@ public final class HttpMaidBuilder {
     private boolean performStartupChecks = true;
     private final CoreModule coreModule;
     private final List<Configurator> configurators;
+    private final Broadcasters broadcasters = broadcasters();
 
     static HttpMaidBuilder httpMaidBuilder() {
         return new HttpMaidBuilder(CoreModule.coreModule(), new ArrayList<>());
@@ -139,6 +144,13 @@ public final class HttpMaidBuilder {
         return serving(handler).when(condition);
     }
 
+    public <T, U> HttpMaidBuilder broadcast(final Class<T> broadcaster,
+                                            final Class<U> messageType,
+                                            final BroadcasterFactory<T, U> factory) {
+        this.broadcasters.addBroadcaster(broadcaster, messageType, factory);
+        return this;
+    }
+
     public HttpMaidBuilder configured(final ConfiguratorBuilder configuratorBuilder) {
         validateNotNull(configuratorBuilder, "configuratorBuilder");
         final Configurator configurator = configuratorBuilder.build();
@@ -154,6 +166,7 @@ public final class HttpMaidBuilder {
     public HttpMaid build() {
         final Instant begin = Instant.now();
         final ChainRegistryBuilder chainRegistryBuilder = ChainRegistryBuilder.chainRegistryBuilder();
+        chainRegistryBuilder.addMetaDatum(BROADCASTERS, broadcasters);
         chainRegistryBuilder.addModule(coreModule);
         chainRegistryBuilder.addModule(websocketsModule());
         if (autodetectionOfModules) {

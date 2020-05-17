@@ -31,9 +31,11 @@ public interface FirstWhenStage {
 
     Then httpMaidIsInitialized();
 
-    default Then aWebsocketIsConnectedAndMessageSent(final String message) {
-        return aWebsocketIsConnectedAndMessageSent(message, Map.of(), Map.of());
+    default Then aWebsocketIsConnected() {
+        return aWebsocketIsConnected(Map.of(), Map.of());
     }
 
-    Then aWebsocketIsConnectedAndMessageSent(String message, Map<String, String> queryParameters, Map<String, List<String>> headers);
+    Then aWebsocketMessageIsSent(final String message);
+
+    Then aWebsocketIsConnected(Map<String, String> queryParameters, Map<String, List<String>> headers);
 }

@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +34,16 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RAW_REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RAW_REQUEST_QUERY_PARAMETERS;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketConnect implements RawRequest {
     private final Object connectionInformation;
+    private final WebsocketSenderId websocketSenderId;
     private final Map<String, String> queryParameters;
     private final Map<String, List<String>> headers;
 
@@ -48,14 +52,20 @@ public final class RawWebsocketConnect implements RawRequest {
     }
 
     public static RawWebsocketConnect rawWebsocketConnect(final Object connectionInformation,
+                                                          final WebsocketSenderId websocketSenderId,
                                                           final Map<String, String> queryParameters,
                                                           final Map<String, List<String>> headers) {
-        return new RawWebsocketConnect(connectionInformation, queryParameters, headers);
+        validateNotNull(connectionInformation, "connectionInformation");
+        validateNotNull(websocketSenderId, "websocketSenderId");
+        validateNotNull(queryParameters, "queryParameters");
+        validateNotNull(headers, "headers");
+        return new RawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
     }
 
     @Override
     public void enter(final MetaData metaData) {
         metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
+        metaData.set(WEBSOCKET_SENDER_ID, websocketSenderId);
         metaData.set(REQUEST_TYPE, WEBSOCKET_CONNECT);
         metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
         metaData.set(RAW_REQUEST_HEADERS, headers);

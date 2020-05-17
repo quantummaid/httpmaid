@@ -44,6 +44,7 @@ import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization;
+import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
 import de.quantummaid.reflectmaid.GenericType;
 import de.quantummaid.reflectmaid.ResolvedType;
 import lombok.AccessLevel;
@@ -69,6 +70,7 @@ import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEve
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
 import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static de.quantummaid.reflectmaid.GenericType.genericType;
 import static java.util.Collections.singletonList;
@@ -147,8 +149,10 @@ public final class UseCasesModule implements ChainModule {
 
     @Override
     public void register(final ChainExtender extender) {
+        final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
+        final Collection<Class<?>> injectionTypes = broadcasters.injectionTypes();
         final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
-        final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods);
+        final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes);
 
         final List<Class<?>> useCaseClasses = useCaseMethods.stream()
                 .map(UseCaseMethod::useCaseClass)

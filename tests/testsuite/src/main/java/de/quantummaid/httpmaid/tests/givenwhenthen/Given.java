@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.RequiredArgsConstructor;
 
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestData.testData;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints.checkpoints;
 
 @RequiredArgsConstructor
@@ -45,15 +46,19 @@ public final class Given {
     }
 
     public FirstWhenStage when() {
+        final TestData testData = testData();
         final HttpMaid httpMaid;
         final Checkpoints checkpoints = checkpoints();
+        testData.setCheckpoints(checkpoints);
         try {
             httpMaid = httpMaidSupplier.provide(checkpoints);
         } catch (final Throwable e) {
-            return When.failureWhen(e);
+            testData.setInitializationException(e);
+            return When.when(testData);
         }
         final Deployment deployment = deployer.deploy(httpMaid);
         final HttpClientWrapper clientWrapper = clientFactory.createClient(deployment);
-        return When.successWhen(clientWrapper, checkpoints);
+        testData.setClientWrapper(clientWrapper);
+        return When.when(testData);
     }
 }

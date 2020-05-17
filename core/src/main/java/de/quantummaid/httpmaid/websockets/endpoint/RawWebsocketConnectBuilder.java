@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.websockets.endpoint;
 
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +33,14 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnect;
+import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocketSender.NON_SERIALIZABLE_WEBSOCKET_SENDER;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketConnectBuilder {
     private Object connectionInformation;
+    private WebsocketSenderId websocketSenderId;
     private Map<String, List<String>> headers = new HashMap<>();
     private Map<String, String> queryParameters = new HashMap<>();
 
@@ -44,7 +48,13 @@ public final class RawWebsocketConnectBuilder {
         return new RawWebsocketConnectBuilder();
     }
 
-    public RawWebsocketConnectBuilder withConnectionInformation(final Object connectionInformation) {
+    public RawWebsocketConnectBuilder withNonSerializableConnectionInformation(final NonSerializableConnectionInformation connectionInformation) {
+        return withConnectionInformation(NON_SERIALIZABLE_WEBSOCKET_SENDER, connectionInformation);
+    }
+
+    public RawWebsocketConnectBuilder withConnectionInformation(final WebsocketSenderId websocketSenderId,
+                                                                final Object connectionInformation) {
+        this.websocketSenderId = websocketSenderId;
         this.connectionInformation = connectionInformation;
         return this;
     }
@@ -65,7 +75,7 @@ public final class RawWebsocketConnectBuilder {
     }
 
     public RawWebsocketConnect build() {
-        return rawWebsocketConnect(connectionInformation, queryParameters, headers);
+        return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
     }
 
     // TODO

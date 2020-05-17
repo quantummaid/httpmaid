@@ -94,8 +94,9 @@ public final class MapMaidModule implements ChainModule {
     public void configure(final DependencyRegistry dependencyRegistry) {
         final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
 
-        final SerializationAndDeserializationProvider serializationAndDeserializationProvider = useCaseMethods -> {
+        final SerializationAndDeserializationProvider serializationAndDeserializationProvider = (useCaseMethods, injectionTypes) -> {
             final MapMaidBuilder mapMaidBuilder = aMapMaid();
+            injectionTypes.forEach(mapMaidBuilder::injecting);
             final Map<ResolvedType, MethodParameterDeserializationWrapper> deserializationWrappers =
                     addAllReferencedClassesIn(useCaseMethods, mapMaidBuilder);
 

@@ -44,7 +44,8 @@ public final class WebsocketSpecs {
                         .websocket("test", (request, response) -> checkpoints.visitCheckpoint("test"))
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"test\" }")
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"test\" }")
                 .theCheckpointHasBeenVisited("test");
     }
 
@@ -57,7 +58,8 @@ public final class WebsocketSpecs {
                         .websocket("handler2", (request, response) -> checkpoints.visitCheckpoint("handler 2"))
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler2\" }")
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
                 .theCheckpointHasBeenVisited("handler 2");
     }
 
@@ -72,7 +74,8 @@ public final class WebsocketSpecs {
                         })
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler\" }", Map.of(), Map.of("myHeader", List.of("foo")))
+                .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
                 .theCheckpointHasBeenVisited("foo");
     }
 
@@ -87,7 +90,8 @@ public final class WebsocketSpecs {
                         })
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler\" }", Map.of(), Map.of("Content-Type", List.of("application/json")))
+                .when().aWebsocketIsConnected(Map.of(), Map.of("Content-Type", List.of("application/json")))
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
                 .theCheckpointHasBeenVisited("application/json");
     }
 
@@ -102,7 +106,8 @@ public final class WebsocketSpecs {
                         })
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler\" }", Map.of("foo", "bar"), Map.of())
+                .when().aWebsocketIsConnected(Map.of("foo", "bar"), Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
                 .theCheckpointHasBeenVisited("bar");
     }
 
@@ -114,7 +119,8 @@ public final class WebsocketSpecs {
                         .websocket("handler", (request, response) -> response.setBody("foo"))
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler\" }")
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
                 .aWebsocketMessageHasBeenReceivedWithContent("foo");
     }
 
@@ -126,7 +132,8 @@ public final class WebsocketSpecs {
                         .websocket("handler", TestUseCase.class)
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("" +
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("" +
                 "{\n" +
                 "   \"message\": \"handler\",\n" +
                 "   \"parameter1\": \"foo\",\n" +
@@ -145,7 +152,8 @@ public final class WebsocketSpecs {
                         .configured(toSelectWebsocketRoutesBasedOn("action"))
                         .build()
         )
-                .when().aWebsocketIsConnectedAndMessageSent("" +
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("" +
                 "{\n" +
                 "   \"message\": \"handler1\",\n" +
                 "   \"action\": \"handler2\"\n" +

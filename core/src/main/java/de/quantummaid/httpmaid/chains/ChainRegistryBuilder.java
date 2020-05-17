@@ -40,11 +40,16 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChainRegistryBuilder {
+    final MetaData metaData = emptyMetaData();
     private final List<ChainModule> modules;
     private final List<Configurator> configurators;
 
     public static ChainRegistryBuilder chainRegistryBuilder() {
         return new ChainRegistryBuilder(new LinkedList<>(), new LinkedList<>());
+    }
+
+    public <T> void addMetaDatum(final MetaDataKey<T> key, final T value) {
+        metaData.set(key, value);
     }
 
     public void addModule(final ChainModule module) {
@@ -63,7 +68,6 @@ public final class ChainRegistryBuilder {
     }
 
     public ChainRegistry build() {
-        final MetaData metaData = emptyMetaData();
         final DependencyRegistry dependencyRegistry = load(modules, metaData);
         enterDefaultDependencies(modules, dependencyRegistry);
         enterDefaultDependencies(configurators, dependencyRegistry);

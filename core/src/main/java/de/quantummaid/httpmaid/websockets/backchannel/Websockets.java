@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.websockets.backchannel;
 
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.websockets.WebsocketSender;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;

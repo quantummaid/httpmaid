@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +31,12 @@ import lombok.ToString;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.jsr356.Jsr356MessageHandler.jsr356MessageHandler;
-import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnect;
+import static de.quantummaid.httpmaid.jsr356.SenderHelper.sendMessage;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -53,30 +54,16 @@ public class Jsr356Endpoint extends Endpoint {
     public void onOpen(final Session session, final EndpointConfig config) {
         httpMaid.handleRequest(
                 () -> {
+                    final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
+                    builder.withNonSerializableConnectionInformation(message -> sendMessage(session, message));
+                    builder.withHeaders(headers);
                     final String queryString = session.getQueryString();
-                    final Map<String, String> queryParameters = queryToMap(queryString);
-                    return rawWebsocketConnect(session, queryParameters, headers);
+                    builder.withEncodedQueryParameters(queryString);
+                    return builder.build();
                 },
                 response -> {
                 }
         );
         session.addMessageHandler(jsr356MessageHandler(session, httpMaid));
-    }
-
-    // TODO move
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
-        if (query == null || query.isEmpty()) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
-        }
-        return result;
     }
 }

@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
@@ -55,7 +56,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse.httpClientResponse;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyWebsocketClient.openWebsocket;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket.wrappedWebsocket;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static java.util.Arrays.stream;
 import static org.apache.http.protocol.HttpProcessorBuilder.create;
@@ -76,9 +77,17 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                                             final String message,
                                             final Map<String, String> queryParameters,
                                             final Map<String, List<String>> headers) {
-        final ShittyWebsocketClient shittyWebsocketClient = openWebsocket(
+        final ShittyWebsocketClient shittyWebsocketClient = ShittyWebsocketClient.openWebsocket(
                 deployment.websocketUri(), responseHandler, headers, queryParameters);
         shittyWebsocketClient.send(message);
+    }
+
+    @Override
+    public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
+                                          final Map<String, String> queryParameters,
+                                          final Map<String, List<String>> headers) {
+        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(deployment.websocketUri(), responseHandler, headers, queryParameters);
+        return wrappedWebsocket(client::send);
     }
 
     @Override

@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.builders.*;
 import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -34,33 +35,35 @@ import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, HeaderBuilder {
-    private final HttpClientWrapper clientWrapper;
     private String path;
     private String method;
     private final Map<String, String> headers = new HashMap<>();
     private Object body;
-    private final Throwable initializationException;
-    private final Checkpoints checkpoints;
+    private final TestData testData;
 
-    static When successWhen(final HttpClientWrapper clientWrapper, final Checkpoints checkpoints) {
-        return new When(clientWrapper, null, checkpoints);
-    }
-
-    static When failureWhen(final Throwable initializationException) {
-        return new When(null, initializationException, null);
+    static When when(final TestData testData) {
+        return new When(testData);
     }
 
     @Override
     public Then httpMaidIsInitialized() {
-        return Then.then(null, initializationException, checkpoints);
+        return Then.then(testData);
     }
 
     @Override
-    public Then aWebsocketIsConnectedAndMessageSent(final String message,
-                                                    final Map<String, String> queryParameters,
-                                                    final Map<String, List<String>> headers) {
-        clientWrapper.openWebsocketAndSendMessage(checkpoints::visitCheckpoint, message, queryParameters, headers);
-        return Then.then(null, initializationException, checkpoints);
+    public Then aWebsocketIsConnected(final Map<String, String> queryParameters,
+                                      final Map<String, List<String>> headers) {
+        final Checkpoints checkpoints = testData.getCheckpoints();
+        final WrappedWebsocket websocket = testData.getClientWrapper().openWebsocket(checkpoints::visitCheckpoint, queryParameters, headers);
+        testData.setWebsocket(websocket);
+        return Then.then(testData);
+    }
+
+    @Override
+    public Then aWebsocketMessageIsSent(final String message) {
+        final WrappedWebsocket websocket = testData.getWebsocket();
+        websocket.send(message);
+        return Then.then(testData);
     }
 
     @Override
@@ -131,7 +134,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     @SuppressWarnings("unchecked")
     @Override
     public Then isIssued() {
-        try (clientWrapper) {
+        try (HttpClientWrapper clientWrapper = testData.getClientWrapper()) {
             final HttpClientResponse response;
             if (body == null) {
                 response = clientWrapper.issueRequestWithoutBody(path, method, headers);
@@ -140,7 +143,8 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
             } else {
                 response = clientWrapper.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
             }
-            return Then.then(response, initializationException, checkpoints);
+            testData.setResponse(response);
+            return Then.then(testData);
         }
     }
 }

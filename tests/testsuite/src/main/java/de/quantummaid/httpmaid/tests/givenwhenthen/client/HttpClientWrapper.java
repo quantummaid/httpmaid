@@ -37,6 +37,10 @@ public interface HttpClientWrapper extends AutoCloseable {
     HttpClientResponse issueRequestWithMultipartBody(
             String path, String method, Map<String, String> headers, List<MultipartElement> parts);
 
+    WrappedWebsocket openWebsocket(Consumer<String> responseHandler,
+                                   Map<String, String> queryParameters,
+                                   Map<String, List<String>> headers);
+
     void openWebsocketAndSendMessage(Consumer<String> responseHandler,
                                      String message,
                                      Map<String, String> queryParameters,

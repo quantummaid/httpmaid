@@ -46,6 +46,7 @@ import de.quantummaid.httpmaid.responsetemplate.ApplyResponseTemplateProcessor;
 import de.quantummaid.httpmaid.responsetemplate.InitResponseProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ResponseTemplate;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
+import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
+import static de.quantummaid.httpmaid.closing.ClosingActions.closingActions;
 import static de.quantummaid.httpmaid.exceptions.DefaultExceptionMapper.theDefaultExceptionMapper;
 import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
@@ -68,6 +70,7 @@ import static de.quantummaid.httpmaid.responsetemplate.ResponseTemplate.emptyRes
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.broadcasters;
 import static java.util.Collections.emptyList;
 
 @ToString
@@ -78,7 +81,7 @@ public final class CoreModule implements ChainModule {
     private final List<Generator<Handler>> lowLevelHandlers = new LinkedList<>();
     private ResponseTemplate responseTemplate = emptyResponseTemplate();
     private final FilterMapBuilder<Throwable, ExceptionMapper<Throwable>> exceptionMappers = FilterMapBuilder.filterMapBuilder();
-    private final ClosingActions closingActions = ClosingActions.closingActions();
+    private final ClosingActions closingActions = closingActions();
 
     public static CoreModule coreModule() {
         final CoreModule coreModule = new CoreModule();

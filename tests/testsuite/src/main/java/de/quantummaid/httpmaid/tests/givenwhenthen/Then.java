@@ -21,8 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
+import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,24 +38,24 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normali
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Then {
-    private final HttpClientResponse response;
-    private final Throwable initializationException;
-    private final Checkpoints checkpoints;
+    private final TestData testData;
 
-    static Then then(final HttpClientResponse response,
-                     final Throwable initializationException,
-                     final Checkpoints checkpoints) {
-        return new Then(response, initializationException, checkpoints);
+    static Then then(final TestData testData) {
+        return new Then(testData);
+    }
+
+    public FirstWhenStage andWhen() {
+        return When.when(testData);
     }
 
     public Then anExceptionHasBeenThrownDuringInitializationWithAMessageContaining(final String expectedMessage) {
-        final String actualMessage = initializationException.getMessage();
+        final String actualMessage = testData.getInitializationException().getMessage();
         MatcherAssert.assertThat(actualMessage, CoreMatchers.containsString(expectedMessage));
         return this;
     }
 
     public Then theStatusCodeWas(final int expectedStatusCode) {
-        final int actualStatusCode = response.getStatusCode();
+        final int actualStatusCode = testData.getResponse().getStatusCode();
         MatcherAssert.assertThat(actualStatusCode, CoreMatchers.is(expectedStatusCode));
         return this;
     }
@@ -66,7 +65,7 @@ public final class Then {
     }
 
     public Then theReponseContainsTheHeader(final String key, final String value) {
-        final Map<String, String> headers = response.getHeaders();
+        final Map<String, String> headers = testData.getResponse().getHeaders();
         final Map<String, String> normalizedHeaders = new HashMap<>();
         headers.forEach((k, v) -> normalizedHeaders.put(k.toLowerCase(), v));
         final String normalizedKey = key.toLowerCase();
@@ -77,27 +76,27 @@ public final class Then {
     }
 
     public Then theResponseBodyWas(final String expectedResponseBody) {
-        final String actualResponseBody = response.getBody();
+        final String actualResponseBody = testData.getResponse().getBody();
         MatcherAssert.assertThat(actualResponseBody, CoreMatchers.is(expectedResponseBody));
         return this;
     }
 
     public Then theResponseBodyContains(final String expectedResponseBody) {
-        final String actualResponseBody = response.getBody();
+        final String actualResponseBody = testData.getResponse().getBody();
         MatcherAssert.assertThat(actualResponseBody, CoreMatchers.containsString(expectedResponseBody));
         return this;
     }
 
     public Then theJsonResponseEquals(final String expectedJson) {
         final Map<String, Object> normalizedExpected = normalizeJsonToMap(expectedJson);
-        final String actualResponseBody = response.getBody();
+        final String actualResponseBody = testData.getResponse().getBody();
         final Map<String, Object> normalizedActual = normalizeJsonToMap(actualResponseBody);
         MatcherAssert.assertThat(normalizedActual, CoreMatchers.is(normalizedExpected));
         return this;
     }
 
     public Then theCheckpointHasBeenVisited(final String checkpoint) {
-        MatcherAssert.assertThat(checkpoints.checkpointHasBeenVisited(checkpoint), CoreMatchers.is(true));
+        MatcherAssert.assertThat(testData.getCheckpoints().checkpointHasBeenVisited(checkpoint), CoreMatchers.is(true));
         return this;
     }
 

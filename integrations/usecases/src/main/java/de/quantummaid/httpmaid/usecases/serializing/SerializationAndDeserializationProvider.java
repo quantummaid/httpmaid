@@ -23,8 +23,10 @@ package de.quantummaid.httpmaid.usecases.serializing;
 
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface SerializationAndDeserializationProvider {
-    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods);
+    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
+                                                   Collection<Class<?>> injectionTypes);
 }

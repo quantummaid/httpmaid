@@ -46,9 +46,11 @@ public final class ReceiveListener extends AbstractReceiveListener {
     @Override
     protected void onFullTextMessage(final WebSocketChannel channel,
                                      final BufferedTextMessage message) {
-        final String messageData = message.getData();
         httpMaid.handleRequest(
-                () -> RawWebsocketMessage.rawWebsocketMessage(channel, messageData),
+                () -> {
+                    final String messageData = message.getData();
+                    return RawWebsocketMessage.rawWebsocketMessage(channel, messageData);
+                },
                 response -> response.optionalStringBody()
                         .ifPresent(responseMessage -> sendText(responseMessage, channel, null))
         );

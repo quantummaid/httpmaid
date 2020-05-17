@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -134,6 +135,14 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
                                             final Map<String, List<String>> headers) {
         final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, queryParameters, headers);
         websocket.send(message);
+    }
+
+    @Override
+    public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
+                                          final Map<String, String> queryParameters,
+                                          final Map<String, List<String>> headers) {
+        final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, queryParameters, headers);
+        return WrappedWebsocket.wrappedWebsocket(websocket::send);
     }
 
     @Override

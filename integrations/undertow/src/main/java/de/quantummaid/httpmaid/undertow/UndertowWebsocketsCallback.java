@@ -33,6 +33,7 @@ import lombok.ToString;
 
 import static de.quantummaid.httpmaid.undertow.ReceiveListener.receiveListener;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
+import static io.undertow.websockets.core.WebSockets.sendText;
 
 @ToString
 @EqualsAndHashCode
@@ -48,7 +49,7 @@ public final class UndertowWebsocketsCallback implements WebSocketConnectionCall
     public void onConnect(final WebSocketHttpExchange exchange, final WebSocketChannel channel) {
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
-            builder.withConnectionInformation(channel);
+            builder.withNonSerializableConnectionInformation(message -> sendText(message, channel, null));
             builder.withEncodedQueryParameters(exchange.getQueryString());
             builder.withHeaders(exchange.getRequestHeaders());
             return builder.build();
