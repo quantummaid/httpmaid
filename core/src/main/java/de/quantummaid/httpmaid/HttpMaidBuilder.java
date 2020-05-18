@@ -50,6 +50,8 @@ import static de.quantummaid.httpmaid.websockets.WebsocketRoute.webSocketCategor
 import static de.quantummaid.httpmaid.websockets.WebsocketsModule.websocketsModule;
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.broadcasters;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.websocketSenders;
 import static java.time.Duration.between;
 import static java.util.Arrays.asList;
 
@@ -167,6 +169,7 @@ public final class HttpMaidBuilder {
         final Instant begin = Instant.now();
         final ChainRegistryBuilder chainRegistryBuilder = ChainRegistryBuilder.chainRegistryBuilder();
         chainRegistryBuilder.addMetaDatum(BROADCASTERS, broadcasters);
+        chainRegistryBuilder.addMetaDatum(WEBSOCKET_SENDERS, websocketSenders());
         chainRegistryBuilder.addModule(coreModule);
         chainRegistryBuilder.addModule(websocketsModule());
         if (autodetectionOfModules) {

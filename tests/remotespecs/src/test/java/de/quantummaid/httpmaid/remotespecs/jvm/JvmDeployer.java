@@ -34,6 +34,8 @@ import lombok.ToString;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static de.quantummaid.httpmaid.undertow.UndertowEndpoint.startUndertowEndpoint;
 
 @ToString
 @EqualsAndHashCode
@@ -48,8 +50,11 @@ public final class JvmDeployer implements PortDeployer {
     @Override
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
         final HttpMaid realHttpMaid = httpMaid();
-        endpoint = UndertowEndpoint.startUndertowEndpoint(realHttpMaid, port);
-        return Deployment.httpDeployment("localhost", port);
+        endpoint = startUndertowEndpoint(realHttpMaid, port);
+        return deploymentBuilder()
+                .withHttpPort(port)
+                .withWebsocketPort(port)
+                .build();
     }
 
     @Override

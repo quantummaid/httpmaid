@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.undertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
@@ -37,10 +38,12 @@ import static io.undertow.websockets.core.WebSockets.sendText;
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReceiveListener extends AbstractReceiveListener {
+    private final NonSerializableConnectionInformation connectionInformation;
     private final HttpMaid httpMaid;
 
-    public static ReceiveListener receiveListener(final HttpMaid httpMaid) {
-        return new ReceiveListener(httpMaid);
+    public static ReceiveListener receiveListener(final NonSerializableConnectionInformation connectionInformation,
+                                                  final HttpMaid httpMaid) {
+        return new ReceiveListener(connectionInformation, httpMaid);
     }
 
     @Override
@@ -49,7 +52,7 @@ public final class ReceiveListener extends AbstractReceiveListener {
         httpMaid.handleRequest(
                 () -> {
                     final String messageData = message.getData();
-                    return RawWebsocketMessage.rawWebsocketMessage(channel, messageData);
+                    return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, messageData);
                 },
                 response -> response.optionalStringBody()
                         .ifPresent(responseMessage -> sendText(responseMessage, channel, null))

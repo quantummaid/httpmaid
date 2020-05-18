@@ -38,36 +38,40 @@ public final class Deployment {
     private final String httpHostname;
     private final String websocketProtocol;
     private final String websocketHostname;
-    private final int port;
+    private final int httpPort;
+    private final int websocketPort;
     private final String httpBasePath;
     private final String websocketBasePath;
 
-    public static Deployment httpsDeploymentWithBasePath(final String hostname,
-                                                         final int port,
-                                                         final String basePath) {
-        if (!basePath.startsWith("/")) {
-            throw new IllegalArgumentException("basePath has to start with a '/'");
+    public static Deployment httpDeployment(final String httpProtocol,
+                                            final String httpHostname,
+                                            final String websocketProtocol,
+                                            final String websocketHostname,
+                                            final int httpPort,
+                                            final int websocketPort,
+                                            final String httpBasePath,
+                                            final String websocketBasePath) {
+        if (httpBasePath != null && !httpBasePath.startsWith("/")) {
+            throw new IllegalArgumentException("httpBasePath has to start with a '/'");
         }
-        return new Deployment(null, "https", hostname, "wss", hostname, port, basePath, basePath);
-    }
-
-    public static Deployment httpsDeploymentWithBasePath(final String httpHostname,
-                                                         final String websocketHostname,
-                                                         final int port,
-                                                         final String httpBasePath,
-                                                         final String websocketBasePath) {
-        if (!httpBasePath.startsWith("/") || !websocketBasePath.startsWith("/")) {
-            throw new IllegalArgumentException("basePath has to start with a '/'");
+        if (websocketBasePath != null && !websocketBasePath.startsWith("/")) {
+            throw new IllegalArgumentException("websocketBasePath has to start with a '/'");
         }
-        return new Deployment(null, "https", httpHostname, "wss", websocketHostname, port, httpBasePath, websocketBasePath);
-    }
-
-    public static Deployment httpDeployment(final String hostname, final int port) {
-        return new Deployment(null, "http", hostname, "ws", hostname, port, "/", "/");
+        return new Deployment(
+                null,
+                httpProtocol,
+                httpHostname,
+                websocketProtocol,
+                websocketHostname,
+                httpPort,
+                websocketPort,
+                httpBasePath,
+                websocketBasePath
+        );
     }
 
     public static Deployment bypassedDeployment(final HttpMaid httpMaid) {
-        return new Deployment(httpMaid, null, null, null, null, -1, null, null);
+        return new Deployment(httpMaid, null, null, null, null, -1, -1, null, null);
     }
 
     public HttpMaid httpMaid() {
@@ -78,8 +82,12 @@ public final class Deployment {
         return httpProtocol;
     }
 
-    public int port() {
-        return port;
+    public int httpPort() {
+        return httpPort;
+    }
+
+    public int websocketPort() {
+        return websocketPort;
     }
 
     public String httpHostname() {
@@ -99,10 +107,13 @@ public final class Deployment {
     }
 
     public String baseUrl() {
-        return httpProtocol + "://" + httpHostname + ":" + port + httpBasePath;
+        return httpProtocol + "://" + httpHostname + ":" + httpPort + httpBasePath;
     }
 
     public String websocketUri() {
-        return format("%s://%s:%d%s", websocketProtocol, websocketHostname, port, websocketBasePath);
+        System.out.println("websocketPort = " + websocketPort);
+        final String format = format("%s://%s:%d%s", websocketProtocol, websocketHostname, websocketPort, websocketBasePath);
+        System.out.println("format = " + format);
+        return format;
     }
 }

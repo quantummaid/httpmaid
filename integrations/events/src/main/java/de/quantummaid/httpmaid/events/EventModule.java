@@ -34,6 +34,7 @@ import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.generator.Generator;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,7 @@ import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 import static java.util.Collections.emptyList;
 
 @ToString
@@ -168,13 +170,15 @@ public final class EventModule implements ChainModule {
             final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(null);
             final EventType eventType = metaData.get(EVENT_TYPE);
             final EventFactory eventFactory = eventFactories.get(eventType);
+            System.out.println("unmarshalled = " + unmarshalled);
             final EnrichableMap map = eventFactory.createEvent(unmarshalled);
             final Event event = event(map);
             metaData.set(EVENT, event);
         });
         extender.appendProcessor(MAP_REQUEST_TO_EVENT, enrichersProcessor(enrichers));
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
-        extender.appendProcessor(MAP_REQUEST_TO_EVENT, broadcastingProcessor(broadcasters));
+        final WebsocketSenders websocketSenders = extender.getMetaDatum(WEBSOCKET_SENDERS);
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, broadcastingProcessor(broadcasters, websocketSenders));
 
         extender.createChain(EventsChains.SUBMIT_EVENT, jumpTo(EventsChains.MAP_EVENT_TO_RESPONSE), jumpTo(EXCEPTION_OCCURRED));
         extender.appendProcessor(EventsChains.SUBMIT_EVENT, DispatchEventProcessor.dispatchEventProcessor(messageBus));

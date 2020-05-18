@@ -67,6 +67,7 @@ public class Chain {
     }
 
     Action accept(final ProcessingContext processingContext) {
+        System.out.println("name = " + name);
         final MetaData metaData = processingContext.metaData();
         try {
             processors.stream()

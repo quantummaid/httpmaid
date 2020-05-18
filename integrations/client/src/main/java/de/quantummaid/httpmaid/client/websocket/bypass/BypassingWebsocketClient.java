@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -53,10 +54,11 @@ public final class BypassingWebsocketClient implements WebsocketClient {
                                            final Map<String, String> queryParameters,
                                            final Map<String, List<String>> headers,
                                            final String path) {
+        final NonSerializableConnectionInformation connectionInformation = messageHandler::handle;
         httpMaid.handleRequest(
                 () -> {
                     final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
-                    builder.withNonSerializableConnectionInformation(messageHandler::handle);
+                    builder.withNonSerializableConnectionInformation(connectionInformation);
                     builder.withUniqueQueryParameters(queryParameters);
                     builder.withHeaders(headers);
                     return builder.build();
@@ -64,6 +66,6 @@ public final class BypassingWebsocketClient implements WebsocketClient {
                 response -> {
                 }
         );
-        return bypassedWebsocket(httpMaid, messageHandler);
+        return bypassedWebsocket(httpMaid, messageHandler, connectionInformation);
     }
 }

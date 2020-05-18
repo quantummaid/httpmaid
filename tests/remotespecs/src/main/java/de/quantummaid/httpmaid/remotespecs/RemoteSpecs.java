@@ -41,7 +41,8 @@ public interface RemoteSpecs {
     @Test
     default void websocketTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnectedAndMessageSent("{ \"message\": \"handler2\" }")
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
                 .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
     }
 }

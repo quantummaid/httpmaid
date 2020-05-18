@@ -1,0 +1,65 @@
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
+
+import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeLambdaServlet.fakeLambdaServlet;
+
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class FakeWebsocketLambda implements AutoCloseable {
+    private final Server server;
+
+    public static FakeWebsocketLambda fakeWebsocketLambda(final AwsLambdaEndpoint endpoint,
+                                                          final int port) {
+        final Server server = new Server(port);
+
+        final HttpConnectionFactory connectionFactory = extractConnectionFactory(server);
+        connectionFactory.getHttpConfiguration().setFormEncodedMethods();
+
+        final ServletHandler servletHandler = new ServletHandler();
+        server.setHandler(servletHandler);
+        final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(endpoint));
+        servletHandler.addServletWithMapping(servletHolder, "/*");
+        try {
+            server.start();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+        return new FakeWebsocketLambda(server);
+    }
+
+    @Override
+    public void close() {
+        try {
+            server.stop();
+            server.destroy();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Could not stop jetty", e);
+        }
+    }
+
+    // TODO
+    private static HttpConnectionFactory extractConnectionFactory(final Server server) {
+        final Connector[] connectors = server.getConnectors();
+        if (connectors.length != 1) {
+            throw new UnsupportedOperationException("Jetty does not behave as expected");
+        }
+        final Connector connector = connectors[0];
+        final ConnectionFactory connectionFactory = connector.getDefaultConnectionFactory();
+        if (!(connectionFactory instanceof HttpConnectionFactory)) {
+            throw new UnsupportedOperationException("Jetty does not behave as expected");
+        }
+        return (HttpConnectionFactory) connectionFactory;
+    }
+}

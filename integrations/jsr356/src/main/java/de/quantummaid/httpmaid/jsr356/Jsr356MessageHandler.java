@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,18 +38,20 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.ra
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Jsr356MessageHandler implements MessageHandler.Whole<String> {
+    private final NonSerializableConnectionInformation connectionInformation;
     private final Session session;
     private final HttpMaid httpMaid;
 
-    public static MessageHandler.Whole<String> jsr356MessageHandler(final Session session,
+    public static MessageHandler.Whole<String> jsr356MessageHandler(final NonSerializableConnectionInformation connectionInformation,
+                                                                    final Session session,
                                                                     final HttpMaid httpMaid) {
-        return new Jsr356MessageHandler(session, httpMaid);
+        return new Jsr356MessageHandler(connectionInformation, session, httpMaid);
     }
 
     @Override
     public void onMessage(final String message) {
         httpMaid.handleRequest(
-                () -> rawWebsocketMessage(session, message),
+                () -> rawWebsocketMessage(connectionInformation, message),
                 response -> response.optionalStringBody()
                         .ifPresent(responseMessage -> sendMessage(session, responseMessage))
         );

@@ -40,7 +40,9 @@ public final class SerializingSender<T> {
         connections.forEach(connection -> {
             final WebsocketSenderId websocketSenderId = connection.senderId();
             final WebsocketSender<Object> sender = websocketSenders.senderById(websocketSenderId);
+            System.out.println("sender = " + sender);
             final Object connectionInformation = connection.connectionInformation();
+            System.out.println("connectionInformation = " + connectionInformation);
             sender.send(connectionInformation, (String) message);
         });
     }

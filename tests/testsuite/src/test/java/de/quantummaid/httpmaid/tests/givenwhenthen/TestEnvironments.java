@@ -28,7 +28,7 @@ import java.util.List;
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployers;
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployersWithOnlyShittyClient;
 import static de.quantummaid.httpmaid.tests.deployers.bypassed.BypassedDeployer.bypassedDeployer;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.WebsocketDeployer.websocketDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeAwsDeployer.fakeAwsDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jsr356ontyrus.Jsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.undertow.UndertowDeployer.undertowDeployer;
@@ -40,6 +40,7 @@ public final class TestEnvironments {
     private static final String PACKAGE = "de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments#";
     public static final String ALL_ENVIRONMENTS = PACKAGE + "allEnvironments";
     public static final String WEBSOCKET_ENVIRONMENTS = PACKAGE + "websocketEnvironments";
+    public static final String ENVIRONMENTS_WITH_ALL_CAPABILITIES = PACKAGE + "environmentsWithAllCapabilities";
     public static final String ONLY_SHITTY_CLIENT = PACKAGE + "onlyShittyClient";
 
     private TestEnvironments() {
@@ -48,8 +49,21 @@ public final class TestEnvironments {
     public static List<TestEnvironment> websocketEnvironments() {
         final List<Deployer> deployers = List.of(
                 bypassedDeployer(),
-                websocketDeployer(),
+                fakeAwsDeployer(),
                 programmaticJsr356OnTyrusDeployer(),
+                jeeOnUndertowDeployer(),
+                undertowDeployer()
+        );
+        return deployers.stream()
+                .flatMap(deployer -> deployer.supportedClients().stream()
+                        .map(client -> testEnvironment(deployer, client)))
+                .collect(toList());
+    }
+
+    public static List<TestEnvironment> environmentsWithAllCapabilities() {
+        final List<Deployer> deployers = List.of(
+                bypassedDeployer(),
+                //fakeAwsDeployer(), TODO
                 jeeOnUndertowDeployer(),
                 undertowDeployer()
         );

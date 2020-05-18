@@ -53,12 +53,12 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     static HttpClientWrapper realHttpMaidClientWithConnectionReuseWrapper(final Deployment deployment) {
         final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
         final HttpMaidClient httpClient = aHttpMaidClientThatReusesConnectionsForTheHost(deployment.httpHostname())
-                .withThePort(deployment.port())
+                .withThePort(deployment.httpPort())
                 .viaTheProtocol(protocol)
                 .withBasePath(deployment.httpBasePath())
                 .build();
         final HttpMaidClient websocketClient = aHttpMaidClientThatReusesConnectionsForTheHost(deployment.websocketHostname())
-                .withThePort(deployment.port())
+                .withThePort(deployment.websocketPort())
                 .viaTheProtocol(protocol)
                 .withBasePath(deployment.websocketBasePath())
                 .build();
@@ -68,12 +68,12 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     static HttpClientWrapper realHttpMaidClientWrapper(final Deployment deployment) {
         final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
         final HttpMaidClient httpClient = aHttpMaidClientForTheHost(deployment.httpHostname())
-                .withThePort(deployment.port())
+                .withThePort(deployment.httpPort())
                 .viaTheProtocol(protocol)
                 .withBasePath(deployment.httpBasePath())
                 .build();
         final HttpMaidClient websocketClient = aHttpMaidClientForTheHost(deployment.websocketHostname())
-                .withThePort(deployment.port())
+                .withThePort(deployment.websocketPort())
                 .viaTheProtocol(protocol)
                 .withBasePath(deployment.websocketBasePath())
                 .build();

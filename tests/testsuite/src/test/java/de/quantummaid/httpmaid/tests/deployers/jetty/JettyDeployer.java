@@ -34,7 +34,7 @@ import static de.quantummaid.httpmaid.jetty.JettyEndpoint.jettyEndpointFor;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 import static java.util.Arrays.asList;
 
 public final class JettyDeployer implements PortDeployer {
@@ -51,7 +51,9 @@ public final class JettyDeployer implements PortDeployer {
     @Override
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
         current = jettyEndpointFor(httpMaid).listeningOnThePort(port);
-        return httpDeployment("localhost", port);
+        return deploymentBuilder()
+                .withHttpPort(port)
+                .build();
     }
 
     @Override

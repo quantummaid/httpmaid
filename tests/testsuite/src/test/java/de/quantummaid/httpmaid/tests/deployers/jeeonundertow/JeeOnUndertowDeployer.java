@@ -44,7 +44,7 @@ import static de.quantummaid.httpmaid.jsr356.Jsr356ServerEndpointConfig.jsr356Se
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
@@ -79,7 +79,10 @@ public final class JeeOnUndertowDeployer implements PortDeployer {
                     .addHttpListener(port, "localhost")
                     .build();
             current.start();
-            return httpDeployment("localhost", port);
+            return deploymentBuilder()
+                    .withHttpPort(port)
+                    .withWebsocketPort(port)
+                    .build();
         } catch (final ServletException e) {
             throw new RuntimeException(e);
         }

@@ -35,7 +35,7 @@ import java.util.List;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
@@ -56,7 +56,9 @@ public final class Jsr356OnTyrusDeployer implements PortDeployer {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-        return httpDeployment("localhost", port);
+        return deploymentBuilder()
+                .withWebsocketPort(port)
+                .build();
     }
 
     @Override

@@ -44,8 +44,12 @@ public final class PutWebsocketInRegistryProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
+        System.out.println("foo1");
         final WebsocketRegistryEntry entry = loadFromMetaData(metaData);
+        System.out.println("foo2");
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+        System.out.println("foo3");
         websocketRegistry.addConnection(entry);
+        System.out.println("foo4");
     }
 }

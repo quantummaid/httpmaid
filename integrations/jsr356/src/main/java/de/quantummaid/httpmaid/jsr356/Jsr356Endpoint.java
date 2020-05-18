@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +53,11 @@ public class Jsr356Endpoint extends Endpoint {
 
     @Override
     public void onOpen(final Session session, final EndpointConfig config) {
+        final NonSerializableConnectionInformation connectionInformation = message -> sendMessage(session, message);
         httpMaid.handleRequest(
                 () -> {
                     final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
-                    builder.withNonSerializableConnectionInformation(message -> sendMessage(session, message));
+                    builder.withNonSerializableConnectionInformation(connectionInformation);
                     builder.withHeaders(headers);
                     final String queryString = session.getQueryString();
                     builder.withEncodedQueryParameters(queryString);
@@ -64,6 +66,6 @@ public class Jsr356Endpoint extends Endpoint {
                 response -> {
                 }
         );
-        session.addMessageHandler(jsr356MessageHandler(session, httpMaid));
+        session.addMessageHandler(jsr356MessageHandler(connectionInformation, session, httpMaid));
     }
 }

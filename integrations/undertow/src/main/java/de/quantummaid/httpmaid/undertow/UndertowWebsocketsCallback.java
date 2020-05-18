@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.undertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
@@ -47,15 +48,16 @@ public final class UndertowWebsocketsCallback implements WebSocketConnectionCall
 
     @Override
     public void onConnect(final WebSocketHttpExchange exchange, final WebSocketChannel channel) {
+        final NonSerializableConnectionInformation connectionInformation = message -> sendText(message, channel, null);
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
-            builder.withNonSerializableConnectionInformation(message -> sendText(message, channel, null));
+            builder.withNonSerializableConnectionInformation(connectionInformation);
             builder.withEncodedQueryParameters(exchange.getQueryString());
             builder.withHeaders(exchange.getRequestHeaders());
             return builder.build();
         }, response -> {
         });
-        channel.getReceiveSetter().set(receiveListener(httpMaid));
+        channel.getReceiveSetter().set(receiveListener(connectionInformation, httpMaid));
         channel.resumeReceives();
     }
 }

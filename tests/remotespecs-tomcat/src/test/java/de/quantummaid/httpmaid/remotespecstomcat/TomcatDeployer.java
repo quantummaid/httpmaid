@@ -34,7 +34,7 @@ import org.apache.catalina.startup.Tomcat;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder.findProjectBaseDirectory;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -65,7 +65,10 @@ public final class TomcatDeployer implements PortDeployer {
         final String basePath = findProjectBaseDirectory();
         final String pathToWar = basePath + RELATIVE_PATH_TO_WAR;
         tomcat.addWebapp(tomcat.getHost(), "/", pathToWar);
-        return httpDeployment("localhost", port);
+        return deploymentBuilder()
+                .withHttpPort(port)
+                .withWebsocketPort(port)
+                .build();
     }
 
     @Override

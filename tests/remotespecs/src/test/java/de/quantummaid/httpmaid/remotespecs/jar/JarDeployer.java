@@ -38,7 +38,7 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -64,7 +64,10 @@ public final class JarDeployer implements PortDeployer {
         try {
             process = Runtime.getRuntime().exec(command);
             waitForEndpointToBecomeAvailable();
-            return httpDeployment("localhost", port);
+            return deploymentBuilder()
+                    .withHttpPort(port)
+                    .withWebsocketPort(port)
+                    .build();
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

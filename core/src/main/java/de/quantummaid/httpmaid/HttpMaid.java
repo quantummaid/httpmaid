@@ -45,7 +45,7 @@ import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
 import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.websocketSenders;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
@@ -53,7 +53,6 @@ public final class HttpMaid implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpMaid.class);
 
     private final ChainRegistry chainRegistry;
-    private final WebsocketSenders websocketSenders = websocketSenders();
 
     public static HttpMaid httpMaid(final ChainRegistry chainRegistry) {
         validateNotNull(chainRegistry, "chainRegistry");
@@ -98,6 +97,7 @@ public final class HttpMaid implements AutoCloseable {
 
     public void addWebsocketSender(final WebsocketSenderId websocketSenderId,
                                    final WebsocketSender<?> websocketSender) {
+        final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         websocketSenders.addWebsocketSender(websocketSenderId, websocketSender);
     }
 

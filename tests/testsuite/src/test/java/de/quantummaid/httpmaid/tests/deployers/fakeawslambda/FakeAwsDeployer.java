@@ -23,6 +23,8 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest.FakeRestLambda;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
@@ -34,17 +36,20 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest.FakeRestLambda.fakeRestLambda;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeLambda.fakeLambda;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool.freePort;
 import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeAwsDeployer implements PortDeployer {
-    private FakeLambda current;
+    private FakeRestLambda currentRestLambda;
+    private FakeWebsocketLambda currentWebsocketLambda;
 
     public static Deployer fakeAwsDeployer() {
         return new FakeAwsDeployer();
@@ -53,15 +58,28 @@ public final class FakeAwsDeployer implements PortDeployer {
     @Override
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
         final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
-        current = fakeLambda(awsLambdaEndpoint, port);
-        return httpDeployment("localhost", port);
+        currentRestLambda = fakeRestLambda(awsLambdaEndpoint, port);
+        final int websocketsPort = freePort();
+        currentWebsocketLambda = fakeWebsocketLambda(awsLambdaEndpoint, websocketsPort);
+
+        return deploymentBuilder()
+                .withHttpPort(port)
+                .withWebsocketPort(websocketsPort)
+                .build();
     }
 
     @Override
     public void cleanUp() {
-        if (current != null) {
+        if (currentRestLambda != null) {
             try {
-                current.close();
+                currentRestLambda.close();
+            } catch (Exception e) {
+                throw new UnsupportedOperationException("Could not stop server", e);
+            }
+        }
+        if (currentWebsocketLambda != null) {
+            try {
+                currentWebsocketLambda.close();
             } catch (Exception e) {
                 throw new UnsupportedOperationException("Could not stop server", e);
             }
@@ -75,6 +93,10 @@ public final class FakeAwsDeployer implements PortDeployer {
 
     @Override
     public List<ClientFactory> supportedClients() {
-        return asList(theShittyTestClient(), theRealHttpMaidClient(), theRealHttpMaidClientWithConnectionReuse());
+        return asList(
+                theShittyTestClient(),
+                theRealHttpMaidClient(),
+                theRealHttpMaidClientWithConnectionReuse()
+        );
     }
 }

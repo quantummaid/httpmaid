@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.sun.net.httpserver.Headers;
@@ -49,11 +49,11 @@ import static java.util.Collections.singletonList;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeLambda implements AutoCloseable {
+public final class FakeRestLambda implements AutoCloseable {
     private final HttpServer server;
 
-    public static FakeLambda fakeLambda(final AwsLambdaEndpoint endpoint,
-                                        final int port) {
+    public static FakeRestLambda fakeRestLambda(final AwsLambdaEndpoint endpoint,
+                                                final int port) {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             final HttpHandler httpHandler = exchange -> {
@@ -64,7 +64,7 @@ public final class FakeLambda implements AutoCloseable {
             server.createContext("/", httpHandler);
             server.setExecutor(null);
             server.start();
-            return new FakeLambda(server);
+            return new FakeRestLambda(server);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

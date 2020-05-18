@@ -47,8 +47,10 @@ import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
 import static de.quantummaid.httpmaid.http.headers.accept.Accept.fromMetaData;
+import static de.quantummaid.httpmaid.marshalling.UnsupportedContentTypeException.unsupportedContentTypeException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.*;
 import static java.util.stream.Collectors.toList;
 
@@ -109,18 +111,23 @@ public final class MarshallingModule implements ChainModule {
         metaData.getOptional(REQUEST_BODY_STRING).ifPresent(body -> {
             final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
 
+            System.out.println("contentType = " + contentType);
             final Unmarshaller unmarshaller;
             if (contentType.isEmpty()) {
                 final HttpRequest request = httpRequest(metaData);
                 final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
                 unmarshaller = unmarshallers.get(defaultContentType);
-            } else {
+            } else if (unmarshallers.containsKey(contentType)) {
                 unmarshaller = unmarshallers.get(contentType);
-            }
-
-            if (isNull(unmarshaller)) {
-                failIfConfiguredToDoSo(() -> UnsupportedContentTypeException.unsupportedContentTypeException(contentType, unmarshallers.keySet()));
+            } else if (!throwExceptionIfNoMarshallerFound) {
+                final HttpRequest request = httpRequest(metaData);
+                final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
+                unmarshaller = unmarshallers.get(defaultContentType);
             } else {
+                throw unsupportedContentTypeException(contentType, unmarshallers.keySet());
+            }
+            System.out.println("unmarshaller = " + unmarshaller);
+            if (nonNull(unmarshaller)) {
                 try {
                     final Object unmarshalled = unmarshaller.unmarshall(body);
                     metaData.set(UNMARSHALLED_REQUEST_BODY, unmarshalled);
@@ -151,7 +158,7 @@ public final class MarshallingModule implements ChainModule {
     private Marshaller marshallerFor(final ContentType responseContentType) {
         final Marshaller marshaller = marshallers.get(responseContentType);
         if (isNull(marshaller)) {
-            throw UnsupportedContentTypeException.unsupportedContentTypeException(responseContentType, marshallers.keySet());
+            throw unsupportedContentTypeException(responseContentType, marshallers.keySet());
         }
         return marshaller;
     }
@@ -176,7 +183,7 @@ public final class MarshallingModule implements ChainModule {
         }
         final HttpRequest request = httpRequest(metaData);
         final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
-        if(candidates.contains(defaultContentType)) {
+        if (candidates.contains(defaultContentType)) {
             return defaultContentType;
         }
         return candidates.get(0);

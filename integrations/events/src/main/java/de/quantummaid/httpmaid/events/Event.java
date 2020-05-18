@@ -59,6 +59,7 @@ public final class Event {
     }
 
     public Map<String, Object> asMap() {
+        System.out.println("map = " + map);
         return map.asMap();
     }
 

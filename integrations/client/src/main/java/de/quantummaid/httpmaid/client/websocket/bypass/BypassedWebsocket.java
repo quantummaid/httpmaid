@@ -24,13 +24,13 @@ package de.quantummaid.httpmaid.client.websocket.bypass;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.rawWebsocketMessage;
-import static java.util.UUID.randomUUID;
 
 @ToString
 @EqualsAndHashCode
@@ -38,17 +38,17 @@ import static java.util.UUID.randomUUID;
 public final class BypassedWebsocket implements Websocket {
     private final HttpMaid httpMaid;
     private final WebsocketMessageHandler messageHandler;
-    private final String connectionId;
+    private final NonSerializableConnectionInformation connectionInformation;
 
     public static BypassedWebsocket bypassedWebsocket(final HttpMaid httpMaid,
-                                                      final WebsocketMessageHandler messageHandler) {
-        final String connectionId = randomUUID().toString();
-        return new BypassedWebsocket(httpMaid, messageHandler, connectionId);
+                                                      final WebsocketMessageHandler messageHandler,
+                                                      final NonSerializableConnectionInformation connectionInformation) {
+        return new BypassedWebsocket(httpMaid, messageHandler, connectionInformation);
     }
 
     public void send(final String message) {
         httpMaid.handleRequest(
-                () -> rawWebsocketMessage(messageHandler, message),
+                () -> rawWebsocketMessage(connectionInformation, message),
                 response -> response.optionalStringBody()
                         .ifPresent(messageHandler::handle)
         );

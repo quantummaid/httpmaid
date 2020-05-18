@@ -42,6 +42,7 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.Clou
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiHandler.loadRestApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 
 @ToString
 @EqualsAndHashCode
@@ -54,7 +55,7 @@ public final class LambdaDeployer implements Deployer {
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";
     private static final String REST_API_NAME = "RemoteSpecs HTTP Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = "RemoteSpecs WebSockets Lambda Proxy";
-    private static final int WAIT_TIME = 10_000;
+    private static final int WAIT_TIME = 60_000;
 
     private static final int PORT = 443;
 
@@ -65,6 +66,13 @@ public final class LambdaDeployer implements Deployer {
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
         deleteStack(STACK_IDENTIFIER);
+
+        try {
+            Thread.sleep(WAIT_TIME);
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         create();
         final RestApiInformation restApiInformation = loadRestApiInformation(REST_API_NAME);
         final WebsocketApiInformation websocketApiInformation = loadWebsocketApiInformation(WEBSOCKET_API_NAME);
@@ -74,13 +82,15 @@ public final class LambdaDeployer implements Deployer {
         final String websocketHost = websocketApiInformation.host();
         final String websocketBasePath = websocketApiInformation.basePath();
 
-        try {
-            Thread.sleep(WAIT_TIME);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        return Deployment.httpsDeploymentWithBasePath(httpHost, websocketHost, PORT, httpBasePath, websocketBasePath);
+        return deploymentBuilder()
+                .usingHttpsAndWss()
+                .withHttpHostname(httpHost)
+                .withWebsocketHostname(websocketHost)
+                .withHttpPort(PORT)
+                .withWebsocketPort(PORT)
+                .withHttpBasePath(httpBasePath)
+                .withWebsocketBasePath(websocketBasePath)
+                .build();
     }
 
     @Override

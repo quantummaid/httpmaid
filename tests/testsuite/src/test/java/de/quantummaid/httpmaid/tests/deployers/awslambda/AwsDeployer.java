@@ -25,33 +25,34 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpsDeploymentWithBasePath;
 import static de.quantummaid.httpmaid.tests.deployers.awslambda.Poller.sleep;
 import static de.quantummaid.httpmaid.tests.deployers.awslambda.Poller.waitFor;
 import static de.quantummaid.httpmaid.tests.deployers.awslambda.S3Handler.deleteFromS3Bucket;
 import static de.quantummaid.httpmaid.tests.deployers.awslambda.S3Handler.uploadToS3Bucket;
 import static de.quantummaid.httpmaid.tests.deployers.awslambda.lambdastatus.LambdaStatus.isReady;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AwsDeployer implements Deployer {
-
     private static final String BUCKET = "de.quantummaid.httpmaid.lambda.artifacts";
     private static final String KEY_TEMPLATE = "%s/aws-lambda-testfunction.jar";
     private static final String GATEWAY_ID = "5o3n1virag";
 
     private String uuid;
-
-    private AwsDeployer() {
-    }
 
     public static Deployer awsDeployer() {
         return new AwsDeployer();
@@ -72,7 +73,11 @@ public final class AwsDeployer implements Deployer {
         } else {
             System.out.println("skipping, ensureTheTestHttpMaidInstanceIsDeployed already initialized...");
         }
-        return httpsDeploymentWithBasePath(GATEWAY_ID + ".execute-api.eu-central-1.amazonaws.com", 443, "/" + uuid);
+        return deploymentBuilder()
+                .withHttpHostname(GATEWAY_ID + ".execute-api.eu-central-1.amazonaws.com")
+                .withHttpPort(443)
+                .withHttpBasePath("/" + uuid)
+                .build();
     }
 
     @Override
