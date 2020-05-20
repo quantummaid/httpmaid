@@ -28,6 +28,7 @@ import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
 import de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher;
+import de.quantummaid.httpmaid.events.extraction.PerEventExtractors;
 import de.quantummaid.httpmaid.events.processors.DetermineEventProcessor;
 import de.quantummaid.httpmaid.events.processors.DispatchEventProcessor;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
@@ -58,7 +59,9 @@ import static de.quantummaid.httpmaid.events.LoggingExceptionHandler.loggingExce
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEventEnrichers;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
+import static de.quantummaid.httpmaid.events.extraction.PerEventExtractors.perEventExtractors;
 import static de.quantummaid.httpmaid.events.processors.PerRequestEnrichersProcessor.enrichersProcessor;
+import static de.quantummaid.httpmaid.events.processors.PerRequestExtractorsProcessor.extractorsProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.generator.Generator.generator;
 import static de.quantummaid.httpmaid.generator.Generators.generators;
@@ -83,6 +86,7 @@ public final class EventModule implements ChainModule {
     private final List<Generator<EventType>> eventTypeGenerators = new LinkedList<>();
     private final Map<EventType, EventFactory> eventFactories = new HashMap<>();
     private final Map<EventType, PerEventEnrichers> enrichers = new HashMap<>();
+    private final Map<EventType, PerEventExtractors> extractors = new HashMap<>();
 
     private final List<ResponseMapExtractor> responseMapExtractors = new LinkedList<>();
 
@@ -102,6 +106,14 @@ public final class EventModule implements ChainModule {
         }
         final PerEventEnrichers perEventEnrichers = enrichers.get(eventType);
         enricher.accept(perEventEnrichers);
+    }
+
+    public void addExtractor(final EventType eventType, final Consumer<PerEventExtractors> extractor) {
+        if(!extractors.containsKey(eventType)) {
+            extractors.put(eventType, perEventExtractors());
+        }
+        final PerEventExtractors perEventExtractors = extractors.get(eventType);
+        extractor.accept(perEventExtractors);
     }
 
     public void setMessageBus(final MessageBus messageBus) {
@@ -176,6 +188,8 @@ public final class EventModule implements ChainModule {
 
         extender.createChain(EventsChains.MAP_EVENT_TO_RESPONSE, jumpTo(POST_INVOKE), jumpTo(EXCEPTION_OCCURRED));
         responseMapExtractors.forEach(extractor -> extender.appendProcessor(EventsChains.MAP_EVENT_TO_RESPONSE, extractor));
+        extender.appendProcessor(EventsChains.MAP_EVENT_TO_RESPONSE, extractorsProcessor(extractors));
+
         extender.appendProcessor(EventsChains.MAP_EVENT_TO_RESPONSE, metaData -> {
             final Object map = metaData.get(RECEIVED_EVENT).orElseGet(HashMap::new);
             metaData.set(RESPONSE_BODY_OBJECT, map);
