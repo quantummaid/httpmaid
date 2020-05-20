@@ -43,7 +43,12 @@ public final class WebsocketApiHandler {
             System.out.println("routes:");
             routes.getItems().forEach(route -> {
                 final String routeId = route.getRouteId();
-                route.getRouteKey()
+                final String routeKey = route.getRouteKey();
+                System.out.println("routeKey = " + routeKey);
+                final String operationName = route.getOperationName();
+                System.out.println("operationName = " + operationName);
+                final String target = route.getTarget();
+                System.out.println("target = " + target);
                 final GetRouteResponsesRequest getRouteResponsesRequest = new GetRouteResponsesRequest()
                         .withApiId(apiId)
                         .withRouteId(routeId);
