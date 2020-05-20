@@ -38,34 +38,42 @@ import java.io.File;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.createStack;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.deleteStack;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiHandler.loadRestApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static java.util.UUID.randomUUID;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LambdaDeployer implements Deployer {
-    private static final String STACK_IDENTIFIER = "foo";
+    //private static final String STACK_IDENTIFIER = "foo"; TODO
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
     private static final String BUCKET_NAME = "remotespecs";
     private static final String S3_JAR_NAME = "jar";
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";
-    private static final String REST_API_NAME = "RemoteSpecs HTTP Lambda Proxy";
-    private static final String WEBSOCKET_API_NAME = "RemoteSpecs WebSockets Lambda Proxy";
-    private static final int WAIT_TIME = 60_000;
+    private static final String REST_API_NAME = " RemoteSpecs HTTP Lambda Proxy";
+    private static final String WEBSOCKET_API_NAME = " RemoteSpecs WebSockets Lambda Proxy";
+    private static final int WAIT_TIME = 60_000; // TODO
 
     private static final int PORT = 443;
+    private final String stackIdentifier;
 
     public static LambdaDeployer lambdaDeployer() {
-        return new LambdaDeployer();
+        final String stackIdentifier = "remotespecs" + randomUUID().toString();
+        return new LambdaDeployer(stackIdentifier);
     }
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
-        deleteStack(STACK_IDENTIFIER);
+        //deleteStack(STACK_IDENTIFIER); TODO
+
+        /*
+        TODO
+         */
+
+        create(stackIdentifier);
 
         try {
             Thread.sleep(WAIT_TIME);
@@ -73,9 +81,8 @@ public final class LambdaDeployer implements Deployer {
             Thread.currentThread().interrupt();
         }
 
-        create();
-        final RestApiInformation restApiInformation = loadRestApiInformation(REST_API_NAME);
-        final WebsocketApiInformation websocketApiInformation = loadWebsocketApiInformation(WEBSOCKET_API_NAME);
+        final RestApiInformation restApiInformation = loadRestApiInformation(stackIdentifier + REST_API_NAME);
+        final WebsocketApiInformation websocketApiInformation = loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
         final String region = websocketApiInformation.region();
         final String httpHost = restApiInformation.host(region);
         final String httpBasePath = restApiInformation.basePath();
@@ -95,7 +102,7 @@ public final class LambdaDeployer implements Deployer {
 
     @Override
     public void cleanUp() {
-        CloudFormationHandler.deleteStack(STACK_IDENTIFIER);
+        CloudFormationHandler.deleteStack(stackIdentifier);
     }
 
     @Override
@@ -103,12 +110,12 @@ public final class LambdaDeployer implements Deployer {
         throw new UnsupportedOperationException();
     }
 
-    private static void create() {
+    private static void create(final String stackIdentifier) {
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
         final File file = new File(lambdaPath);
         uploadToS3Bucket(BUCKET_NAME, S3_JAR_NAME, file);
         final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE;
-        createStack(STACK_IDENTIFIER, templatePath);
+        createStack(stackIdentifier, templatePath);
     }
 }

@@ -23,9 +23,8 @@ package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation;
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
-import com.amazonaws.services.cloudformation.model.CreateStackRequest;
-import com.amazonaws.services.cloudformation.model.DeleteStackRequest;
-import com.amazonaws.services.cloudformation.model.Parameter;
+import com.amazonaws.services.cloudformation.model.*;
+import de.quantummaid.httpmaid.remotespecs.lambda.ResourcesLog;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,10 +33,12 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.ResourcesLog.resourcesLog;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackCreation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackDeletion;
 
 public final class CloudFormationHandler {
+    private static final ResourcesLog RESOURCES_LOG = resourcesLog();
 
     private CloudFormationHandler() {
     }
@@ -59,6 +60,11 @@ public final class CloudFormationHandler {
 
             amazonCloudFormation.createStack(createStackRequest);
             waitForStackCreation(stackIdentifier, amazonCloudFormation);
+
+            final DescribeStackResourcesRequest describeStackResourcesRequest = new DescribeStackResourcesRequest().withStackName(stackIdentifier);
+            final DescribeStackResourcesResult stackResources = amazonCloudFormation.describeStackResources(describeStackResourcesRequest);
+            RESOURCES_LOG.log(stackResources.getStackResources());
+            RESOURCES_LOG.dump();
         } finally {
             amazonCloudFormation.shutdown();
         }

@@ -74,7 +74,7 @@ Resources:
   HttpMaidApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: "RemoteSpecs HTTP Lambda Proxy"
+      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Lambda Proxy"
       FailOnWarnings: true
 
   ApiResource:
@@ -135,7 +135,7 @@ Resources:
   HttpMaidWebsocketsApi:
     Type: 'AWS::ApiGatewayV2::Api'
     Properties:
-      Name: RemoteSpecs WebSockets Lambda Proxy
+      Name: !Sub "${StackIdentifier} RemoteSpecs WebSockets Lambda Proxy"
       ProtocolType: WEBSOCKET
       RouteSelectionExpression: "$request.body.action"
       Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
@@ -211,7 +211,7 @@ Resources:
   HttpMaidWebsocketsApiStage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:
-      StageName: 'stage'
+      StageName: !Ref StackIdentifier
       DeploymentId: !Ref HttpMaidWebsocketsApiDeployment
       ApiId: !Ref HttpMaidWebsocketsApi
       #DefaultRouteSettings:
