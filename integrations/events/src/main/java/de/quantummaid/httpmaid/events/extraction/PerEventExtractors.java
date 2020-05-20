@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.events.extraction;
 
-import de.quantummaid.httpmaid.events.Event;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -42,9 +40,7 @@ public final class PerEventExtractors {
         this.statusCode = statusCode;
     }
 
-    public void extract(final HttpRequest httpRequest,
-                        final HttpResponse httpResponse,
-                        final Event event) {
+    public void extract(final HttpResponse httpResponse) {
         if (statusCode != null) {
             httpResponse.setStatus(statusCode);
         }

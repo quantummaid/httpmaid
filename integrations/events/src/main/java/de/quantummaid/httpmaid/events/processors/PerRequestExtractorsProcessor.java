@@ -24,9 +24,7 @@ package de.quantummaid.httpmaid.events.processors;
 import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.events.extraction.PerEventExtractors;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,9 +33,7 @@ import lombok.ToString;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT;
 import static de.quantummaid.httpmaid.events.EventModule.EVENT_TYPE;
-import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 import static de.quantummaid.httpmaid.handler.http.HttpResponse.httpResponse;
 
 @ToString
@@ -56,10 +52,8 @@ public final class PerRequestExtractorsProcessor implements Processor {
             if (!extractors.containsKey(eventType)) {
                 return;
             }
-            final Event event = metaData.get(EVENT);
-            final HttpRequest httpRequest = httpRequest(metaData);
             final HttpResponse httpResponse = httpResponse(metaData);
-            extractors.get(eventType).extract(httpRequest, httpResponse, event);
+            extractors.get(eventType).extract(httpResponse);
         });
     }
 }
