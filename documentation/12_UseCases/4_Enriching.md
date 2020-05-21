@@ -98,6 +98,9 @@ the same as the header key. If the response map contains a value under the provi
 the value will be removed from the map and added as a response header value with the
 provided header key.
 
+### statusCode()
+Sets the response status code on a per-route basis.
+
 ## Example
 As stated above, we can now change the multiplication example to use take its
 input from the query parameters instead of the request body:
@@ -106,7 +109,8 @@ input from the query parameters instead of the request body:
 final HttpMaid httpMaid = anHttpMaid()
         .get("/multiply", MultiplicationUseCase.class,
                 mappingQueryParameter("factor1", "multiplicationRequest.factor1"),
-                mappingQueryParameter("factor2", "multiplicationRequest.factor2")
+                mappingQueryParameter("factor2", "multiplicationRequest.factor2"),
+                statusCode(200)
         )
         .get("/divide", DivisionUseCase.class,
                 mappingQueryParameter("dividend", "divisionRequest.dividend"),
