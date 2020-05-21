@@ -204,6 +204,7 @@ Resources:
     DependsOn:
       - HttpMaidWebsocketsApiDefaultRoute
       - HttpMaidWebsocketsApiConnectRoute
+      - HttpMaidWebsocketsApiDefaultResponse
     Properties:
       ApiId: !Ref HttpMaidWebsocketsApi
 

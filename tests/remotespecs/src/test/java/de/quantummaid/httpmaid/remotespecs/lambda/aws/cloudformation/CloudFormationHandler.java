@@ -25,6 +25,7 @@ import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
 import com.amazonaws.services.cloudformation.model.*;
 import de.quantummaid.httpmaid.remotespecs.lambda.ResourcesLog;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +38,7 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.ResourcesLog.resourcesL
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackCreation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackDeletion;
 
+@Slf4j
 public final class CloudFormationHandler {
     private static final ResourcesLog RESOURCES_LOG = resourcesLog();
 
@@ -45,6 +47,7 @@ public final class CloudFormationHandler {
 
     public static void createStack(final String stackIdentifier,
                                    final String pathToTemplate) {
+        log.info("Creating stack {}...", stackIdentifier);
         final String templateBody = fileToString(pathToTemplate);
         final AmazonCloudFormation amazonCloudFormation = AmazonCloudFormationClientBuilder.defaultClient();
         try {
@@ -68,18 +71,38 @@ public final class CloudFormationHandler {
         } finally {
             amazonCloudFormation.shutdown();
         }
+        log.info("Created stack {}.", stackIdentifier);
     }
 
-    public static void deleteStack(final String stackIdentifier) {
+    public static void main(String[] args) {
+        deleteStacksStartingWith("remotespecs");
+    }
+
+    public static void deleteStacksStartingWith(final String stackPrefix) {
         final AmazonCloudFormation amazonCloudFormation = AmazonCloudFormationClientBuilder.defaultClient();
         try {
-            final DeleteStackRequest deleteStackRequest = new DeleteStackRequest();
-            deleteStackRequest.setStackName(stackIdentifier);
-            amazonCloudFormation.deleteStack(deleteStackRequest);
-            waitForStackDeletion(stackIdentifier, amazonCloudFormation);
+
+            final ListStacksResult listStacksResult = amazonCloudFormation.listStacks();
+            listStacksResult.getStackSummaries().stream()
+                    .filter(stack -> stack.getStackStatus().equals("CREATE_COMPLETE"))
+                    .filter(stack -> stack.getStackName().startsWith(stackPrefix))
+                    .forEach(stack -> {
+                        final String stackName = stack.getStackName();
+                        deleteStack(stackName, amazonCloudFormation);
+                    });
         } finally {
             amazonCloudFormation.shutdown();
         }
+    }
+
+    private static void deleteStack(final String stackIdentifier,
+                                    final AmazonCloudFormation amazonCloudFormation) {
+        log.info("Deleting stack {}...", stackIdentifier);
+        final DeleteStackRequest deleteStackRequest = new DeleteStackRequest();
+        deleteStackRequest.setStackName(stackIdentifier);
+        amazonCloudFormation.deleteStack(deleteStackRequest);
+        waitForStackDeletion(stackIdentifier, amazonCloudFormation);
+        log.info("Deleted stack {}.", stackIdentifier);
     }
 
     private static String fileToString(final String filePath) {

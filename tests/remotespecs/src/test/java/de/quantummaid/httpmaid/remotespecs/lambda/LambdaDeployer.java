@@ -23,7 +23,6 @@ package de.quantummaid.httpmaid.remotespecs.lambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
@@ -38,6 +37,7 @@ import java.io.File;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.createStack;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.deleteStacksStartingWith;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiHandler.loadRestApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
@@ -48,38 +48,26 @@ import static java.util.UUID.randomUUID;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LambdaDeployer implements Deployer {
-    //private static final String STACK_IDENTIFIER = "foo"; TODO
+    private static final String PREFIX = "remotespecs";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
     private static final String BUCKET_NAME = "remotespecs";
     private static final String S3_JAR_NAME = "jar";
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";
     private static final String REST_API_NAME = " RemoteSpecs HTTP Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = " RemoteSpecs WebSockets Lambda Proxy";
-    private static final int WAIT_TIME = 60_000; // TODO
 
     private static final int PORT = 443;
     private final String stackIdentifier;
 
     public static LambdaDeployer lambdaDeployer() {
-        final String stackIdentifier = "remotespecs" + randomUUID().toString();
+        final String stackIdentifier = PREFIX + randomUUID().toString();
         return new LambdaDeployer(stackIdentifier);
     }
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
-        //deleteStack(STACK_IDENTIFIER); TODO
-
-        /*
-        TODO
-         */
-
+        cleanUp();
         create(stackIdentifier);
-
-        try {
-            Thread.sleep(WAIT_TIME);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
 
         final RestApiInformation restApiInformation = loadRestApiInformation(stackIdentifier + REST_API_NAME);
         final WebsocketApiInformation websocketApiInformation = loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
@@ -102,7 +90,7 @@ public final class LambdaDeployer implements Deployer {
 
     @Override
     public void cleanUp() {
-        CloudFormationHandler.deleteStack(stackIdentifier);
+        deleteStacksStartingWith(PREFIX);
     }
 
     @Override
