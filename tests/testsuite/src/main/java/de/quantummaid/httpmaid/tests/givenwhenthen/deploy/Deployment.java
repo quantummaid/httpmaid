@@ -111,9 +111,6 @@ public final class Deployment {
     }
 
     public String websocketUri() {
-        System.out.println("websocketPort = " + websocketPort);
-        final String format = format("%s://%s:%d%s", websocketProtocol, websocketHostname, websocketPort, websocketBasePath);
-        System.out.println("format = " + format);
-        return format;
+        return format("%s://%s:%d%s", websocketProtocol, websocketHostname, websocketPort, websocketBasePath);
     }
 }

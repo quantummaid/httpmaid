@@ -142,7 +142,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
                                           final Map<String, String> queryParameters,
                                           final Map<String, List<String>> headers) {
         final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, queryParameters, headers);
-        return WrappedWebsocket.wrappedWebsocket(websocket::send);
+        return WrappedWebsocket.wrappedWebsocket(websocket::send, websocket);
     }
 
     @Override

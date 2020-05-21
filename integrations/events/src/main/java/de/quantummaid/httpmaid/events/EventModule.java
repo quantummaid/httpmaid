@@ -170,7 +170,6 @@ public final class EventModule implements ChainModule {
             final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(null);
             final EventType eventType = metaData.get(EVENT_TYPE);
             final EventFactory eventFactory = eventFactories.get(eventType);
-            System.out.println("unmarshalled = " + unmarshalled);
             final EnrichableMap map = eventFactory.createEvent(unmarshalled);
             final Event event = event(map);
             metaData.set(EVENT, event);

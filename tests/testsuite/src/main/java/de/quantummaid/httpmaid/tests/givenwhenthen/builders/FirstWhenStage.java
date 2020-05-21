@@ -35,7 +35,7 @@ public interface FirstWhenStage {
         return aWebsocketIsConnected(Map.of(), Map.of());
     }
 
-    Then aWebsocketMessageIsSent(final String message);
-
     Then aWebsocketIsConnected(Map<String, String> queryParameters, Map<String, List<String>> headers);
+
+    Then aWebsocketMessageIsSent(String message);
 }

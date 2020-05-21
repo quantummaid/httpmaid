@@ -87,7 +87,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                                           final Map<String, String> queryParameters,
                                           final Map<String, List<String>> headers) {
         final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(deployment.websocketUri(), responseHandler, headers, queryParameters);
-        return wrappedWebsocket(client::send);
+        return wrappedWebsocket(client::send, client);
     }
 
     @Override

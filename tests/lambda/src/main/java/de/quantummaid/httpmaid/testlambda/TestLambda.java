@@ -41,9 +41,6 @@ public final class TestLambda implements RequestHandler<Map<String, Object>, API
     @Override
     public APIGatewayProxyResponseEvent handleRequest(final Map<String, Object> event,
                                                       final Context context) {
-        System.out.println("event = " + event);
-        final APIGatewayProxyResponseEvent response = ENDPOINT.delegate(event, context);
-        System.out.println("response = " + response);
-        return response;
+        return ENDPOINT.delegate(event, context);
     }
 }

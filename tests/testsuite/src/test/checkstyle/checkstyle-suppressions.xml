@@ -48,4 +48,6 @@
     <suppress checks="FileLength|MethodCount" files="SpecialUseCaseSpecs" />
     <suppress checks="TrailingComment" files="Poller" />
     <suppress checks="VisibilityModifier" files="AnnotatedApplicationConfig|ProgrammaticApplicationConfig" />
+    <suppress checks="IllegalCatch" files="FakeWebsocketLambda|ResourcesTracker" />
+    <suppress checks="ParameterNumber" files="Deployment" />
 </suppressions>

@@ -28,6 +28,7 @@ import lombok.ToString;
 import org.glassfish.tyrus.client.ClientManager;
 
 import javax.websocket.*;
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,7 +45,7 @@ import static java.lang.Thread.currentThread;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ShittyWebsocketClient extends Endpoint implements MessageHandler.Whole<String> {
+public final class ShittyWebsocketClient extends Endpoint implements MessageHandler.Whole<String>, Closeable {
     private final Consumer<String> responseHandler;
     private final CountDownLatch connectLatch = new CountDownLatch(1);
     private Session session;
@@ -106,5 +107,10 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        session.close();
     }
 }

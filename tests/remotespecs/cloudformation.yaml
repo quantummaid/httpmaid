@@ -50,7 +50,7 @@ Resources:
       FunctionName: !Sub "${StackIdentifier}-Deployment"
       Code:
         S3Bucket: "remotespecs"
-        S3Key: "jar"
+        S3Key: !Sub "${StackIdentifier}"
       Tags:
         - Key: StackIdentifier
           Value: !Ref StackIdentifier

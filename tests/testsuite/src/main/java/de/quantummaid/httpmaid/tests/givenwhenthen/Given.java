@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.RequiredArgsConstructor;
 
+import static de.quantummaid.httpmaid.tests.givenwhenthen.ResourcesTracker.closeAll;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestData.testData;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints.checkpoints;
 
@@ -46,6 +47,7 @@ public final class Given {
     }
 
     public FirstWhenStage when() {
+        closeAll();
         final TestData testData = testData();
         final HttpMaid httpMaid;
         final Checkpoints checkpoints = checkpoints();

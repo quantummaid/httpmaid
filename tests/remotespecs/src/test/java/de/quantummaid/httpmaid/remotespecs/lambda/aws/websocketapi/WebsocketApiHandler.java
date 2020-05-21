@@ -38,31 +38,6 @@ public final class WebsocketApiHandler {
         try {
             final Api api = apiByName(apiName, amazonApiGatewayV2);
             final String apiId = api.getApiId();
-
-            final GetRoutesResult routes = amazonApiGatewayV2.getRoutes(new GetRoutesRequest().withApiId(apiId));
-            System.out.println("routes:");
-            routes.getItems().forEach(route -> {
-                final String routeId = route.getRouteId();
-                final String routeKey = route.getRouteKey();
-                System.out.println("routeKey = " + routeKey);
-                final String operationName = route.getOperationName();
-                System.out.println("operationName = " + operationName);
-                final String target = route.getTarget();
-                System.out.println("target = " + target);
-                final GetRouteResponsesRequest getRouteResponsesRequest = new GetRouteResponsesRequest()
-                        .withApiId(apiId)
-                        .withRouteId(routeId);
-                final GetRouteResponsesResult routeResponses = amazonApiGatewayV2.getRouteResponses(getRouteResponsesRequest);
-                System.out.println("routeResponses.getItems() = " + routeResponses.getItems());
-            });
-
-            /*
-            final GetIntegrationResponsesRequest getIntegrationResponsesRequest = new GetIntegrationResponsesRequest().withApiId(apiId);
-            final GetIntegrationResponsesResult integrationResponses = amazonApiGatewayV2.getIntegrationResponses(getIntegrationResponsesRequest);
-            System.out.println("integrationResponses.getItems() = " + integrationResponses.getItems());
-             */
-
-
             final String endpoint = api.getApiEndpoint();
             final String region = endpoint.split("\\.")[2];
             final String stageName = stageNameByApi(api, amazonApiGatewayV2);

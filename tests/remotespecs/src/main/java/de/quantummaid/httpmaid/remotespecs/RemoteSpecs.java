@@ -40,18 +40,9 @@ public interface RemoteSpecs {
 
     @Test
     default void websocketTest(final TestEnvironment testEnvironment) {
-        for (int i = 0; i < 3; ++i) {
-            System.out.println("i = " + i);
-            try {
-                testEnvironment.givenTheStaticallyDeployedTestInstance()
-                        .when().aWebsocketIsConnected()
-                        .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
-                        .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
-            } catch (Throwable e) {
-                if (i > 1) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
     }
 }

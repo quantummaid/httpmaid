@@ -62,6 +62,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     @Override
     public Then aWebsocketMessageIsSent(final String message) {
         final WrappedWebsocket websocket = testData.getWebsocket();
+        ResourcesTracker.addResource(websocket);
         websocket.send(message);
         return Then.then(testData);
     }

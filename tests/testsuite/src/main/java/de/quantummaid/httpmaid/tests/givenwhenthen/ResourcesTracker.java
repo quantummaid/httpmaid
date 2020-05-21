@@ -19,27 +19,32 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.tests.givenwhenthen;
 
-import de.quantummaid.httpmaid.chains.MetaDataKey;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
-import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class WebsocketSenderId {
-    public static final MetaDataKey<WebsocketSenderId> WEBSOCKET_SENDER_ID = metaDataKey("WEBSOCKET_SENDER_ID");
+@Slf4j
+public final class ResourcesTracker {
+    private static final List<AutoCloseable> RESOURCES = new ArrayList<>();
 
-    private final String id;
+    private ResourcesTracker() {
+    }
 
-    public static WebsocketSenderId websocketSenderId(final String id) {
-        validateNotNull(id, "id");
-        return new WebsocketSenderId(id);
+    public static void addResource(final AutoCloseable autoCloseable) {
+        RESOURCES.add(autoCloseable);
+    }
+
+    public static void closeAll() {
+        RESOURCES.forEach(autoCloseable -> {
+            try {
+                autoCloseable.close();
+            } catch (final Exception e) {
+                log.warn("Error closing resource", e);
+            }
+        });
+        RESOURCES.clear();
     }
 }

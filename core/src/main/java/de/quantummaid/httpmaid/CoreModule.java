@@ -46,7 +46,6 @@ import de.quantummaid.httpmaid.responsetemplate.ApplyResponseTemplateProcessor;
 import de.quantummaid.httpmaid.responsetemplate.InitResponseProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ResponseTemplate;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
-import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +69,6 @@ import static de.quantummaid.httpmaid.responsetemplate.ResponseTemplate.emptyRes
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.broadcasters;
 import static java.util.Collections.emptyList;
 
 @ToString

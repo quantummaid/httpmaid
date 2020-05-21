@@ -21,7 +21,9 @@
 
 package de.quantummaid.httpmaid.client.websocket;
 
-public interface Websocket extends AutoCloseable {
+import java.io.Closeable;
+
+public interface Websocket extends Closeable {
     void send(String message);
 
     @Override

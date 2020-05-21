@@ -47,7 +47,6 @@ public final class MultipleParametersDeserializationWrapper implements MethodPar
                                                      final List<Injection> injections,
                                                      final List<Object> typeInjections,
                                                      final MapMaid mapMaid) {
-        System.out.println("input = " + input);
         return mapMaid.deserializer().deserializeFromUniversalObject(
                 input,
                 this.typeIdentifier,

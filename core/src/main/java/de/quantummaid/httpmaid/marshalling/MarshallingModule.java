@@ -110,8 +110,6 @@ public final class MarshallingModule implements ChainModule {
     private void processUnmarshalling(final MetaData metaData) {
         metaData.getOptional(REQUEST_BODY_STRING).ifPresent(body -> {
             final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
-
-            System.out.println("contentType = " + contentType);
             final Unmarshaller unmarshaller;
             if (contentType.isEmpty()) {
                 final HttpRequest request = httpRequest(metaData);
@@ -126,7 +124,6 @@ public final class MarshallingModule implements ChainModule {
             } else {
                 throw unsupportedContentTypeException(contentType, unmarshallers.keySet());
             }
-            System.out.println("unmarshaller = " + unmarshaller);
             if (nonNull(unmarshaller)) {
                 try {
                     final Object unmarshalled = unmarshaller.unmarshall(body);

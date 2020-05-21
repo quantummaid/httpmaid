@@ -23,7 +23,6 @@ package de.quantummaid.httpmaid.websockets;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
-import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 
