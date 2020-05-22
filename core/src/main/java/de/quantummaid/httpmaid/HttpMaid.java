@@ -116,6 +116,10 @@ public final class HttpMaid implements AutoCloseable {
         return chainRegistry.getOptionalMetaDatum(key);
     }
 
+    public <T> void setMetaDatum(final MetaDataKey<T> key, final T value) {
+        chainRegistry.addMetaDatum(key, value);
+    }
+
     public String dumpChains() {
         return chainRegistry.dump();
     }

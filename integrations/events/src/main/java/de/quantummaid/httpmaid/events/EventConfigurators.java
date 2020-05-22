@@ -134,6 +134,16 @@ public final class EventConfigurators {
         return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
     }
 
+    public static PerRouteConfigurator statusCode(final int statusCode) {
+        return (generationCondition, handler, dependencyRegistry) -> {
+            if (!(handler instanceof EventType)) {
+                return;
+            }
+            final EventModule eventModule = dependencyRegistry.getDependency(EventModule.class);
+            eventModule.addExtractor((EventType) handler, perEventExtractors -> perEventExtractors.setStatusCode(statusCode));
+        };
+    }
+
     private static PerRouteConfigurator mapping(final Consumer<PerEventEnrichers> enricher) {
         return (generationCondition, handler, dependencyRegistry) -> {
             if (!(handler instanceof EventType)) {

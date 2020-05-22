@@ -20,15 +20,13 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.57</version>
+        <version>0.9.61</version>
     </parent>
 
     <artifactId>testwar</artifactId>
@@ -36,31 +34,25 @@
 
     <name>HttpMaid - Tests - Test WAR</name>
 
-    <build>
-        <finalName>remotespecs</finalName>
-        <plugins>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-        </plugins>
-    </build>
+    <properties>
+        <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
             <artifactId>remotespecs-instance</artifactId>
-            <version>0.9.57</version>
+            <version>0.9.61</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-servlet</artifactId>
-            <version>0.9.57</version>
+            <version>0.9.61</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jsr356</artifactId>
-            <version>0.9.57</version>
+            <version>0.9.61</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -68,4 +60,14 @@
             <version>1.3.0-alpha5</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>remotespecs</finalName>
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

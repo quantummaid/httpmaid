@@ -22,10 +22,12 @@
 package de.quantummaid.httpmaid.tests.specs.usecase.extraction;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.specs.usecase.usecases.StringReturningUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.events.EventConfigurators.statusCode;
 import static de.quantummaid.httpmaid.events.EventConfigurators.toExtractFromTheResponseMapTheHeader;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
@@ -42,5 +44,18 @@ public final class ExtractionSpecs {
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theReponseContainsTheHeader("foo", "b");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void customStatusCodeCanBeSetPerRoute(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/", StringReturningUseCase.class, statusCode(201))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theResponseBodyWas("\"the correct response\"")
+                .theStatusCodeWas(201);
     }
 }

@@ -36,6 +36,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.documentation.support.curl.Curl.parseFromCurlFile;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingQueryParameter;
+import static de.quantummaid.httpmaid.events.EventConfigurators.statusCode;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
@@ -116,7 +117,8 @@ public final class MultiplicationUseCaseExampleTests {
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/multiply", MultiplicationUseCase.class,
                         mappingQueryParameter("factor1", "multiplicationRequest.factor1"),
-                        mappingQueryParameter("factor2", "multiplicationRequest.factor2")
+                        mappingQueryParameter("factor2", "multiplicationRequest.factor2"),
+                        statusCode(200)
                 )
                 .get("/divide", DivisionUseCase.class,
                         mappingQueryParameter("dividend", "divisionRequest.dividend"),

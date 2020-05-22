@@ -3,6 +3,11 @@
          xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0 http://mojo.codehaus.org/versions-maven-plugin/xsd/rule-2.0.0.xsd">
 
     <rules>
+        <rule groupId="org.glassfish.tyrus" comparisonMethod="maven">
+            <ignoreVersions>
+                <ignoreVersion>2.0.0-M1</ignoreVersion>
+            </ignoreVersions>
+        </rule>
         <rule groupId="org.eclipse.jetty" comparisonMethod="maven">
             <ignoreVersions>
                 <ignoreVersion>10.0.0-alpha0</ignoreVersion>

@@ -138,4 +138,18 @@ public final class MapMaidSpecs {
                         "}"
                 );
     }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void mapMaidCanUnmarshallEmptyStringToFormEncoded(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", (request, response) -> response.setBody(request.bodyMap()))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("")
+                .withContentType("application/x-www-form-urlencoded").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("{}");
+    }
 }
