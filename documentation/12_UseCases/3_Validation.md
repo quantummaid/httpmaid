@@ -267,7 +267,32 @@ It can easily be used in a frontend to present the according form validation to
 the user.
 
 ## Advanced settings
-When HttpMaid handles a validation error as seen above, it will set the status code to 400. You can tell
-HttpMaid to use an other status code like this:
+When HttpMaid handles a validation error as seen above, it will set the status code to `400` (Client Error). You can tell
+HttpMaid to use another status code like this:
 
- 
+<!---[CodeSnippet] (setValidationErrorStatusCode)-->
+```java
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/", SomeUseCase.class)
+        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
+        .configured(MapMaidConfigurators.toSetStatusCodeOnMapMaidValidationErrorsTo(401))
+        .build();
+```
+
+If you do not want HttpMaid to create detailed responses for validation errors, you can disable that
+feature. HttpMaid will instead throw an exception that can be handled accordingly.
+Example:
+
+<!---[CodeSnippet] (disableAggregation)-->
+```java
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/", SomeUseCase.class)
+        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
+        .configured(MapMaidConfigurators.toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
+        .configured(ExceptionConfigurators.toMapExceptionsOfType(AggregatedValidationException.class, (exception, response) -> {
+            // handle validation errors here
+        }))
+        .build();
+```

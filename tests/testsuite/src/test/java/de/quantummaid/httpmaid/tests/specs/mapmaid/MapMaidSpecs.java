@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.specs.mapmaid;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyFailingWithEmptyMessageUseCase;
 import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -104,12 +105,32 @@ public final class MapMaidSpecs {
                         "{" +
                         "\"errors\": [" +
                         "{" +
-                        "   \"message\": \"customPrimitive1 is wrong\"," +
-                        "   \"path\": \"myRequest.field1\"" +
+                        "   \"path\": \"myRequest.field1\"," +
+                        "   \"message\": \"customPrimitive1 is wrong\"" +
                         "}," +
                         "{" +
-                        "   \"message\": \"customPrimitive2 is wrong\"," +
-                        "   \"path\": \"myRequest.field2\"" +
+                        "   \"path\": \"myRequest.field2\"," +
+                        "   \"message\": \"customPrimitive2 is wrong\"" +
+                        "}]}");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void automatedValidationResponseWorksWhenExceptionMessageIsNull(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", MyFailingWithEmptyMessageUseCase.class)
+                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                                .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
+                .theStatusCodeWas(400)
+                .theJsonResponseEquals("" +
+                        "{" +
+                        "\"errors\": [" +
+                        "{" +
+                        "   \"path\": \"parameter\"" +
                         "}]}");
     }
 

@@ -29,6 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,9 +60,14 @@ public final class MapMaidValidationExceptionMapper implements HttpExceptionMapp
         final AggregatedValidationException aggregatedException = (AggregatedValidationException) exception;
         final List<Object> errorsList = aggregatedException.getValidationErrors()
                 .stream()
-                .map(validationError -> Map.of(
-                        "message", validationError.message,
-                        "path", validationError.propertyPath))
+                .map(validationError -> {
+                    final Map<String, String> map = new HashMap<>();
+                    map.put("path", validationError.propertyPath);
+                    if (validationError.message != null) {
+                        map.put("message", validationError.message);
+                    }
+                    return map;
+                })
                 .collect(toList());
         response.setBody(Map.of("errors", errorsList));
         response.setStatus(statusCode);
