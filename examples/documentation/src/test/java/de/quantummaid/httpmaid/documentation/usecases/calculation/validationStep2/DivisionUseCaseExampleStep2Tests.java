@@ -77,7 +77,7 @@ public final class DivisionUseCaseExampleStep2Tests {
         final HttpClientRequestBuilder<SimpleHttpResponseObject> request = parseFromCurlFile("division2.curl");
         final SimpleHttpResponseObject response = client.issue(request);
         final int statusCode = response.getStatusCode();
-        assertThat(statusCode, is(500));
+        assertThat(statusCode, is(400));
         final String body = response.getBody();
         assertThat(body, isJson("{\"errors\":[{\"message\":\"the divisor must not be 0\",\"path\":\"divisionRequest\"}]}"));
     }

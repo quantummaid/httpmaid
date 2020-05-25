@@ -82,7 +82,7 @@ what exactly was wrong about the provided input. Otherwise, the user would not k
 
 ## Validating input
 One way to tell the user what went wrong would be normal HttpMaid exception mapping.
-It has aleady been explained in previous chapters how this can be achieved.
+It has already been explained in previous chapters how this can be achieved.
 An obvious downside to this approach is that we need to execute the actual division to trigger the `ArithmeticException`
 and know that the input was wrong.
 By the time we execute the divsion, our input should already have been validated.
@@ -266,3 +266,33 @@ This time, the path correctly points to the affected field: `divisor`.
 It can easily be used in a frontend to present the according form validation to
 the user.
 
+## Advanced settings
+When HttpMaid handles a validation error as seen above, it will set the status code to `400` (Client Error). You can tell
+HttpMaid to use another status code like this:
+
+<!---[CodeSnippet] (setValidationErrorStatusCode)-->
+```java
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/", SomeUseCase.class)
+        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
+        .configured(MapMaidConfigurators.toSetStatusCodeOnMapMaidValidationErrorsTo(401))
+        .build();
+```
+
+If you do not want HttpMaid to create detailed responses for validation errors, you can disable that
+feature. HttpMaid will instead throw an exception that can be handled accordingly.
+Example:
+
+<!---[CodeSnippet] (disableAggregation)-->
+```java
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/", SomeUseCase.class)
+        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
+        .configured(MapMaidConfigurators.toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
+        .configured(ExceptionConfigurators.toMapExceptionsOfType(AggregatedValidationException.class, (exception, response) -> {
+            // handle validation errors here
+        }))
+        .build();
+```

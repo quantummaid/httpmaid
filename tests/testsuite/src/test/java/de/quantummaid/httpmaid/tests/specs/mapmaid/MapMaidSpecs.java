@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.specs.mapmaid;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyFailingWithEmptyMessageUseCase;
 import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,7 +34,7 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
 import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.*;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentTypeInResponses;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallContentTypeInRequests;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
@@ -99,7 +100,53 @@ public final class MapMaidSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"wrong\", \"field2\": \"wrong\"}").withContentType("application/json").isIssued()
-                .theStatusCodeWas(500)
+                .theStatusCodeWas(400)
+                .theJsonResponseEquals("" +
+                        "{" +
+                        "\"errors\": [" +
+                        "{" +
+                        "   \"path\": \"myRequest.field1\"," +
+                        "   \"message\": \"customPrimitive1 is wrong\"" +
+                        "}," +
+                        "{" +
+                        "   \"path\": \"myRequest.field2\"," +
+                        "   \"message\": \"customPrimitive2 is wrong\"" +
+                        "}]}");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void automatedValidationResponseWorksWhenExceptionMessageIsNull(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", MyFailingWithEmptyMessageUseCase.class)
+                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                                .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
+                .theStatusCodeWas(400)
+                .theJsonResponseEquals("" +
+                        "{" +
+                        "\"errors\": [" +
+                        "{" +
+                        "   \"path\": \"parameter\"" +
+                        "}]}");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void statusCodeForAutomatedValidationResponseCanBeConfigured(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", MyUseCase.class)
+                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                                .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
+                        .configured(toSetStatusCodeOnMapMaidValidationErrorsTo(401))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"wrong\", \"field2\": \"wrong\"}").withContentType("application/json").isIssued()
+                .theStatusCodeWas(401)
                 .theJsonResponseEquals("" +
                         "{" +
                         "\"errors\": [" +
@@ -111,6 +158,22 @@ public final class MapMaidSpecs {
                         "   \"message\": \"customPrimitive2 is wrong\"," +
                         "   \"path\": \"myRequest.field2\"" +
                         "}]}");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void automatedValidationResponseCanBeDisabled(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", MyUseCase.class)
+                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                                .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
+                        .configured(toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"wrong\", \"field2\": \"wrong\"}").withContentType("application/json").isIssued()
+                .theStatusCodeWas(500)
+                .theResponseBodyWas("");
     }
 
     @ParameterizedTest
