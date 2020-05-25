@@ -47,9 +47,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.RECIPES;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidMarshallingMapper.mapMaidMarshallingMapper;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidValidationExceptionMapper.mapMaidValidationExceptionMapper;
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.UseCaseClassScanner.addAllReferencedClassesIn;
 import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
 import static de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization.useCaseSerializationAndDeserialization;
@@ -57,14 +57,16 @@ import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdentifierFor;
 import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MapMaidModule implements ChainModule {
+    private static final int DEFAULT_VALIDATION_ERROR_STATUS_CODE = 400;
+
     private final MapMaidMarshallingMapper mapMaidMarshallingMapper = mapMaidMarshallingMapper();
     private volatile boolean addAggregatedExceptionHandler = true;
+    private volatile int validationErrorStatusCode = DEFAULT_VALIDATION_ERROR_STATUS_CODE;
 
     public static MapMaidModule mapMaidModule() {
         return new MapMaidModule();
@@ -83,6 +85,10 @@ public final class MapMaidModule implements ChainModule {
     public void addMarshallingTypeToResponseContentTypeMapping(final ContentType contentType,
                                                                final MarshallingType marshallingType) {
         mapMaidMarshallingMapper.addMarshallingTypeToResponseContentTypeMapping(contentType, marshallingType);
+    }
+
+    public void setValidationErrorStatusCode(final int validationErrorStatusCode) {
+        this.validationErrorStatusCode = validationErrorStatusCode;
     }
 
     @Override
@@ -125,19 +131,10 @@ public final class MapMaidModule implements ChainModule {
         }
     }
 
-    private static void addExceptionHandler(final DependencyRegistry dependencyRegistry) {
+    private void addExceptionHandler(final DependencyRegistry dependencyRegistry) {
         final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
         coreModule.addExceptionMapper(throwable -> throwable instanceof AggregatedValidationException,
-                (exception, metaData) -> {
-                    final AggregatedValidationException aggregatedException = (AggregatedValidationException) exception;
-                    final List<Object> errorsList = aggregatedException.getValidationErrors()
-                            .stream()
-                            .map(validationError -> Map.of(
-                                    "message", validationError.message,
-                                    "path", validationError.propertyPath))
-                            .collect(toList());
-                    metaData.set(RESPONSE_BODY_OBJECT, Map.of("errors", errorsList));
-                });
+                mapMaidValidationExceptionMapper(validationErrorStatusCode));
     }
 
     @Override

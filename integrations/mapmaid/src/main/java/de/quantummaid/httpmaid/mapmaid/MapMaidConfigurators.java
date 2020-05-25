@@ -27,6 +27,7 @@ import de.quantummaid.mapmaid.builder.recipes.Recipe;
 import java.util.LinkedList;
 import java.util.List;
 
+import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
@@ -36,6 +37,14 @@ public final class MapMaidConfigurators {
     public static final MetaDataKey<List<Recipe>> RECIPES = metaDataKey("RECIPES");
 
     private MapMaidConfigurators() {
+    }
+
+    public static Configurator toSetStatusCodeOnMapMaidValidationErrorsTo(final int statusCode) {
+        return configuratorForType(MapMaidModule.class, mapMaidModule -> mapMaidModule.setValidationErrorStatusCode(statusCode));
+    }
+
+    public static Configurator toNotCreateAnAutomaticResponseForMapMaidValidationErrors() {
+        return configuratorForType(MapMaidModule.class, MapMaidModule::doNotAddAggregatedExceptionHandler);
     }
 
     public static Configurator toConfigureMapMaidUsingRecipe(final Recipe recipe) {
