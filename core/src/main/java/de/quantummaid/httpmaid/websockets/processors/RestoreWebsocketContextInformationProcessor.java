@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.processors;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
@@ -48,7 +49,7 @@ public final class RestoreWebsocketContextInformationProcessor implements Proces
                 .orElse(false);
         if (isWebsocketMessage) {
             final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
-            final Object connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
+            final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
             final WebsocketRegistryEntry entry = websocketRegistry.byConnectionInformation(connectionInformation);
             entry.restoreToMetaData(metaData);
         }

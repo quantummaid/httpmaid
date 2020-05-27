@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +38,10 @@ import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketMessage implements RawRequest {
-    private final Object connectionInformation;
+    private final ConnectionInformation connectionInformation;
     private final String body;
 
-    public static RawWebsocketMessage rawWebsocketMessage(final Object connectionInformation,
+    public static RawWebsocketMessage rawWebsocketMessage(final ConnectionInformation connectionInformation,
                                                           final String body) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(body, "body");

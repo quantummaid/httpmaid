@@ -35,7 +35,6 @@ import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.generator.Generator;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
-import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -61,8 +60,8 @@ import static de.quantummaid.httpmaid.events.LoggingExceptionHandler.loggingExce
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
 import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEventEnrichers;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
-import static de.quantummaid.httpmaid.events.processors.BroadcastingProcessor.broadcastingProcessor;
 import static de.quantummaid.httpmaid.events.extraction.PerEventExtractors.perEventExtractors;
+import static de.quantummaid.httpmaid.events.processors.BroadcastingProcessor.broadcastingProcessor;
 import static de.quantummaid.httpmaid.events.processors.PerRequestEnrichersProcessor.enrichersProcessor;
 import static de.quantummaid.httpmaid.events.processors.PerRequestExtractorsProcessor.extractorsProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
@@ -71,7 +70,6 @@ import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 import static java.util.Collections.emptyList;
 
 @ToString
@@ -188,8 +186,7 @@ public final class EventModule implements ChainModule {
         });
         extender.appendProcessor(MAP_REQUEST_TO_EVENT, enrichersProcessor(enrichers));
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
-        final WebsocketSenders websocketSenders = extender.getMetaDatum(WEBSOCKET_SENDERS);
-        extender.appendProcessor(MAP_REQUEST_TO_EVENT, broadcastingProcessor(broadcasters, websocketSenders));
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, broadcastingProcessor(broadcasters));
 
         extender.createChain(EventsChains.SUBMIT_EVENT, jumpTo(EventsChains.MAP_EVENT_TO_RESPONSE), jumpTo(EXCEPTION_OCCURRED));
         extender.appendProcessor(EventsChains.SUBMIT_EVENT, DispatchEventProcessor.dispatchEventProcessor(messageBus));

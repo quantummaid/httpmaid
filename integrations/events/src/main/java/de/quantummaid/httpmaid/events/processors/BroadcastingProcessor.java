@@ -25,7 +25,6 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
-import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -40,17 +39,15 @@ import static de.quantummaid.httpmaid.events.EventModule.EVENT;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BroadcastingProcessor implements Processor {
     private final Broadcasters broadcasters;
-    private final WebsocketSenders websocketSenders;
 
-    public static BroadcastingProcessor broadcastingProcessor(final Broadcasters broadcasters,
-                                                              final WebsocketSenders websocketSenders) {
-        return new BroadcastingProcessor(broadcasters, websocketSenders);
+    public static BroadcastingProcessor broadcastingProcessor(final Broadcasters broadcasters) {
+        return new BroadcastingProcessor(broadcasters);
     }
 
     @Override
     public void apply(final MetaData metaData) {
         final Event event = metaData.get(EVENT);
-        final List<Object> broadcasterInstances = broadcasters.instantiateAll(metaData, websocketSenders);
+        final List<Object> broadcasterInstances = broadcasters.instantiateAll(metaData);
         broadcasterInstances.forEach(event::addTypeInjection);
     }
 }

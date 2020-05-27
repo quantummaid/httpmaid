@@ -31,22 +31,28 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_CONNECTION_INFORMATION;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WebsocketRegistryEntry {
-    private final Object connectionInformation;
+    private final ConnectionInformation connectionInformation;
     private final WebsocketSenderId senderId;
     private final Headers headers;
     private final ContentType contentType;
     private final QueryParameters queryParameters;
 
-    private static WebsocketRegistryEntry websocketRegistryEntry(final Object connectionInformation,
+    private static WebsocketRegistryEntry websocketRegistryEntry(final ConnectionInformation connectionInformation,
                                                                  final WebsocketSenderId senderId,
                                                                  final Headers headers,
                                                                  final ContentType contentType,
@@ -60,7 +66,7 @@ public final class WebsocketRegistryEntry {
     }
 
     public static WebsocketRegistryEntry loadFromMetaData(final MetaData metaData) {
-        final Object connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
+        final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
         final WebsocketSenderId senderId = metaData.get(WEBSOCKET_SENDER_ID);
         final Headers headers = metaData.get(REQUEST_HEADERS);
         final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
@@ -68,12 +74,30 @@ public final class WebsocketRegistryEntry {
         return websocketRegistryEntry(connectionInformation, senderId, headers, contentType, queryParameters);
     }
 
+    public static WebsocketRegistryEntry restoreFromStrings(final ConnectionInformation connectionInformation,
+                                                            final String senderId,
+                                                            final Map<String, String> headers,
+                                                            final String contentType,
+                                                            final Map<String, String> queryParameters) {
+        final WebsocketSenderId websocketSenderId = websocketSenderId(senderId);
+        final Map<String, List<String>> headersMultiMap = new HashMap<>();
+        headers.forEach((key, value) -> headersMultiMap.put(key, List.of(value)));
+        final Headers headersObject = Headers.headers(headersMultiMap);
+        final ContentType contentTypeObject = ContentType.fromString(Optional.ofNullable(contentType));
+        final QueryParameters queryParametersObject = QueryParameters.queryParameters(queryParameters);
+        return websocketRegistryEntry(connectionInformation, websocketSenderId, headersObject, contentTypeObject, queryParametersObject);
+    }
+
     public WebsocketSenderId senderId() {
         return senderId;
     }
 
-    public Object connectionInformation() {
+    public ConnectionInformation connectionInformation() {
         return connectionInformation;
+    }
+
+    public WebsocketSenderId getSenderId() {
+        return senderId;
     }
 
     public Headers headers() {
@@ -82,6 +106,10 @@ public final class WebsocketRegistryEntry {
 
     public ContentType contentType() {
         return contentType;
+    }
+
+    public QueryParameters queryParameters() {
+        return queryParameters;
     }
 
     public void restoreToMetaData(final MetaData metaData) {

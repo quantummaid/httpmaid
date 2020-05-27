@@ -27,6 +27,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -133,7 +134,7 @@ public final class AwsLambdaEndpoint {
     }
 
     private APIGatewayProxyResponseEvent handleMessage(final AwsLambdaEvent event,
-                                                       final Object connectionInformation) {
+                                                       final ConnectionInformation connectionInformation) {
         return httpMaid.handleRequestSynchronously(() -> {
             final String body = event.getAsString("body");
             return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body);

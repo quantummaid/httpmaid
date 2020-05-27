@@ -21,6 +21,13 @@
 
 package de.quantummaid.httpmaid.websockets.sender;
 
-public interface NonSerializableConnectionInformation {
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
+
+public interface NonSerializableConnectionInformation extends ConnectionInformation {
     void send(String message);
+
+    @Override
+    default String uniqueIdentifier() {
+        throw new UnsupportedOperationException("Cannot provide identifier because this connection is not serializable");
+    }
 }

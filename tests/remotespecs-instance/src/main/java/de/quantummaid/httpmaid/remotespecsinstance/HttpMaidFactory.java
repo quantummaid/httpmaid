@@ -22,6 +22,9 @@
 package de.quantummaid.httpmaid.remotespecsinstance;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.HttpMaidBuilder;
+
+import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 
@@ -31,10 +34,16 @@ public final class HttpMaidFactory {
     }
 
     public static HttpMaid httpMaid() {
-        return anHttpMaid()
+        return httpMaid(httpMaidBuilder -> {
+        });
+    }
+
+    public static HttpMaid httpMaid(final Consumer<HttpMaidBuilder> configurator) {
+        final HttpMaidBuilder builder = anHttpMaid()
                 .get("/", (request, response) -> response.setBody("fooooo"))
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
-                .websocket("handler2", (request, response) -> response.setBody("handler 2"))
-                .build();
+                .websocket("handler2", (request, response) -> response.setBody("handler 2"));
+        configurator.accept(builder);
+        return builder.build();
     }
 }

@@ -27,19 +27,6 @@ Resources:
                   - sts:AssumeRole
                 Resource: '*'
                 Effect: Allow
-        - PolicyName: !Sub "${StackIdentifier}-UseDBPolicy"
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                  - 'dynamodb:DeleteItem'
-                  - 'dynamodb:GetItem'
-                  - 'dynamodb:PutItem'
-                  - 'dynamodb:Query'
-                  - 'dynamodb:Scan'
-                  - 'dynamodb:UpdateItem'
-                Resource: 'arn:aws:dynamodb:eu-central-1:712767472906:table/WebsocketsTest'
-                Effect: Allow
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -67,7 +54,7 @@ Resources:
       Tags:
         - Key: StackIdentifier
           Value: !Ref StackIdentifier
-      MemorySize: 512
+      MemorySize: 192
       Handler: de.quantummaid.httpmaid.testlambda.TestLambda::handleRequest
       Role: !GetAtt FunctionRole.Arn
       Timeout: 20

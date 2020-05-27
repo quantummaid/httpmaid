@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -42,7 +43,7 @@ import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOC
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketConnect implements RawRequest {
-    private final Object connectionInformation;
+    private final ConnectionInformation connectionInformation;
     private final WebsocketSenderId websocketSenderId;
     private final Map<String, String> queryParameters;
     private final Map<String, List<String>> headers;
@@ -51,7 +52,7 @@ public final class RawWebsocketConnect implements RawRequest {
         return RawWebsocketConnectBuilder.rawWebsocketConnectBuilder();
     }
 
-    public static RawWebsocketConnect rawWebsocketConnect(final Object connectionInformation,
+    public static RawWebsocketConnect rawWebsocketConnect(final ConnectionInformation connectionInformation,
                                                           final WebsocketSenderId websocketSenderId,
                                                           final Map<String, String> queryParameters,
                                                           final Map<String, List<String>> headers) {

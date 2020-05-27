@@ -25,18 +25,26 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.websockets.WebsocketsModule;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
+import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
+import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
 
 @ToString
 @EqualsAndHashCode
 public final class TestLambda implements RequestHandler<Map<String, Object>, APIGatewayProxyResponseEvent> {
-    private static final AwsLambdaEndpoint ENDPOINT = awsLambdaEndpointFor(httpMaid());
+    private static final AwsLambdaEndpoint ENDPOINT = awsLambdaEndpointFor(
+            httpMaid(httpMaidBuilder ->
+                    httpMaidBuilder.configured(configuratorForType(
+                            WebsocketsModule.class,
+                            websocketsModule -> websocketsModule.setWebsocketRegistry(dynamoDbWebsocketRegistry()))))
+    );
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(final Map<String, Object> event,

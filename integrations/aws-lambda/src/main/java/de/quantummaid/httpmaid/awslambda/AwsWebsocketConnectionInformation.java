@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.awslambda;
 
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +32,11 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AwsWebsocketConnectionInformation {
-    private final String connectionId;
-    private final String stage;
-    private final String apiId;
-    private final String region;
+public final class AwsWebsocketConnectionInformation implements ConnectionInformation {
+    public final String connectionId;
+    public final String stage;
+    public final String apiId;
+    public final String region;
 
     public static AwsWebsocketConnectionInformation awsWebsocketConnectionInformation(final String connectionId,
                                                                                       final String stage,
@@ -53,11 +54,8 @@ public final class AwsWebsocketConnectionInformation {
         return String.format("https://%s/%s", domainName, stage);
     }
 
-    public String region() {
-        return region;
-    }
-
-    public String connectionId() {
-        return connectionId;
+    @Override
+    public String uniqueIdentifier() {
+        return toEndpointUrl();
     }
 }

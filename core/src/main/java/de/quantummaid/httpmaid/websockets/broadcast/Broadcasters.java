@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
 import static de.quantummaid.httpmaid.websockets.broadcast.SerializingSender.serializingSender;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 
 @ToString
 @EqualsAndHashCode
@@ -62,7 +63,8 @@ public final class Broadcasters {
         return factories.keySet();
     }
 
-    public List<Object> instantiateAll(final MetaData metaData, final WebsocketSenders websocketSenders) {
+    public List<Object> instantiateAll(final MetaData metaData) {
+        final WebsocketSenders websocketSenders = metaData.get(WEBSOCKET_SENDERS);
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
         final SerializingSender<Object> serializingSender = serializingSender(websocketRegistry, websocketSenders);
         return factories.values().stream()

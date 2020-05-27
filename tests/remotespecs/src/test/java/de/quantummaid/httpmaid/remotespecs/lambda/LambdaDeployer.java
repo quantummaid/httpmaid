@@ -49,7 +49,7 @@ import static java.util.UUID.randomUUID;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LambdaDeployer implements Deployer {
-    private static final String PREFIX = "remotespecs";
+    private static final String PREFIX = "remotespecsX";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
     private static final String BUCKET_NAME = "remotespecs";
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";

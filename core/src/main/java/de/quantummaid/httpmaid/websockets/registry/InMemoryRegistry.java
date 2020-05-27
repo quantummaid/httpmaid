@@ -37,7 +37,7 @@ import static java.lang.String.format;
 public final class InMemoryRegistry implements WebsocketRegistry {
     private final List<WebsocketRegistryEntry> entries;
 
-    public static WebsocketRegistry inMemoryRegistry() {
+    public static InMemoryRegistry inMemoryRegistry() {
         return new InMemoryRegistry(new ArrayList<>());
     }
 
@@ -47,7 +47,7 @@ public final class InMemoryRegistry implements WebsocketRegistry {
     }
 
     @Override
-    public WebsocketRegistryEntry byConnectionInformation(final Object connectionInformation) {
+    public WebsocketRegistryEntry byConnectionInformation(final ConnectionInformation connectionInformation) {
         return entries.stream()
                 .filter(entry -> entry.connectionInformation().equals(connectionInformation))
                 .findFirst()
@@ -56,6 +56,6 @@ public final class InMemoryRegistry implements WebsocketRegistry {
 
     @Override
     public void addConnection(final WebsocketRegistryEntry entry) {
-        this.entries.add(entry);
+        entries.add(entry);
     }
 }

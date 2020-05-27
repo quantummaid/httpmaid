@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +37,12 @@ import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.REQUEST_TYPE;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_CONNECT;
-import static de.quantummaid.httpmaid.websockets.processors.AddWebsocketRegistryProcessor.addWebsocketRegistryProcessor;
+import static de.quantummaid.httpmaid.websockets.processors.AddWebsocketsMetaDataProcessor.addWebsocketRegistryProcessor;
 import static de.quantummaid.httpmaid.websockets.processors.DetermineWebsocketRouteProcessor.determineWebsocketRouteProcessor;
 import static de.quantummaid.httpmaid.websockets.processors.PutWebsocketInRegistryProcessor.putWebsocketInRegistryProcessor;
 import static de.quantummaid.httpmaid.websockets.processors.RestoreWebsocketContextInformationProcessor.restoreWebsocketContextInformationProcessor;
 import static de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry.inMemoryRegistry;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 
 @ToString
 @EqualsAndHashCode
@@ -59,9 +61,14 @@ public final class WebsocketsModule implements ChainModule {
         this.routeSelectionExpression = routeSelectionExpression;
     }
 
+    public void setWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
+        this.websocketRegistry = websocketRegistry;
+    }
+
     @Override
     public void register(final ChainExtender extender) {
-        extender.appendProcessor(INIT, addWebsocketRegistryProcessor(websocketRegistry));
+        final WebsocketSenders websocketSenders = extender.getMetaDatum(WEBSOCKET_SENDERS);
+        extender.appendProcessor(INIT, addWebsocketRegistryProcessor(websocketSenders, websocketRegistry));
         extender.appendProcessor(PRE_PROCESS, restoreWebsocketContextInformationProcessor());
         extender.routeIfEquals(PRE_PROCESS, jumpTo(CONNECT_WEBSOCKET), REQUEST_TYPE, WEBSOCKET_CONNECT);
         extender.createChain(CONNECT_WEBSOCKET, drop(), jumpTo(EXCEPTION_OCCURRED));

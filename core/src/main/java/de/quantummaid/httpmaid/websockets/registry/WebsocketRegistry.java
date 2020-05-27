@@ -26,7 +26,7 @@ import java.util.List;
 public interface WebsocketRegistry {
     List<WebsocketRegistryEntry> connections();
 
-    WebsocketRegistryEntry byConnectionInformation(Object connectionInformation);
+    WebsocketRegistryEntry byConnectionInformation(ConnectionInformation connectionInformation);
 
     void addConnection(WebsocketRegistryEntry entry);
 }

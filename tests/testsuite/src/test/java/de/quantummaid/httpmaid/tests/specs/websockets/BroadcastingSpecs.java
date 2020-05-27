@@ -34,7 +34,24 @@ public final class BroadcastingSpecs {
 
     @ParameterizedTest
     @MethodSource(ENVIRONMENTS_WITH_ALL_CAPABILITIES)
-    public void broadcastingTest(final TestEnvironment testEnvironment) {
+    public void handlersCanBroadcast(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
+                        .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                        .build()
+        )
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
+                .theStatusCodeWas(200)
+                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ENVIRONMENTS_WITH_ALL_CAPABILITIES)
+    public void useCasesCanBroadcast(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/broadcast", BroadcastingUseCase.class)
