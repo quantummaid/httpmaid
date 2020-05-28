@@ -25,8 +25,8 @@ import de.quantummaid.httpmaid.CoreModule;
 import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
 import de.quantummaid.httpmaid.chains.MetaData;
-import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.security.Filter;
+import de.quantummaid.httpmaid.security.RejectionHandler;
 import de.quantummaid.httpmaid.security.SimpleSecurityConfigurator;
 import de.quantummaid.httpmaid.security.config.SecurityConfigurator;
 import lombok.AccessLevel;
@@ -48,7 +48,8 @@ public final class AuthenticatorConfigurator implements SecurityConfigurator<Aut
     private final SimpleSecurityConfigurator simpleSecurityConfigurator;
     private final AuthenticatorId authenticatorId;
     private final List<Filter> optionalRequests;
-    private HttpHandler rejectionHandler;
+    private RejectionHandler rejectionHandler = (request, response) -> {
+    };
 
     public static AuthenticatorConfigurator authenticatorConfigurator(final Authenticator<MetaData> authenticator) {
         validateNotNull(authenticator, "authenticator");
@@ -92,7 +93,7 @@ public final class AuthenticatorConfigurator implements SecurityConfigurator<Aut
         return notFailingOnMissingAuthenticationForRequestsThat(Filter.pathsFilter(paths));
     }
 
-    public AuthenticatorConfigurator rejectingUnauthenticatedRequestsUsing(final HttpHandler rejectionHandler) {
+    public AuthenticatorConfigurator rejectingUnauthenticatedRequestsUsing(final RejectionHandler rejectionHandler) {
         validateNotNull(rejectionHandler, "rejectionHandler");
         this.rejectionHandler = rejectionHandler;
         return this;
