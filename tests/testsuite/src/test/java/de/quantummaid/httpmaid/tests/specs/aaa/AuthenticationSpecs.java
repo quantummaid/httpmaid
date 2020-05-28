@@ -41,6 +41,29 @@ public final class AuthenticationSpecs {
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
+    public void unauthenticatedRequestsAreRejectedWith401(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/username", (request, response) -> {
+                            final String username = request.optionalAuthenticationInformationAs(String.class).orElseThrow();
+                            response.setBody(username);
+                        })
+                        .configured(toAuthenticateUsingHeader("username", challenge -> {
+                            if (challenge.equals("correct")) {
+                                return Optional.of(challenge);
+                            } else {
+                                return Optional.empty();
+                            }
+                        }))
+                        .build()
+        )
+                .when().aRequestToThePath("/username").viaTheGetMethod().withAnEmptyBody().withTheHeader("username", "incorrect").isIssued()
+                .theStatusCodeWas(401)
+                .theResponseBodyWas("");
+    }
+
+    @ParameterizedTest
+    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
     public void requestsCanBeAuthenticatedWithHeader(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()

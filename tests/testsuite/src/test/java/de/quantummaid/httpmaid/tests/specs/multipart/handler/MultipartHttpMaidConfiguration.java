@@ -25,10 +25,8 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.multipart.MultipartIteratorBody;
 import de.quantummaid.httpmaid.multipart.MultipartPart;
 import de.quantummaid.httpmaid.path.Path;
-import de.quantummaid.httpmaid.security.authorization.NotAuthorizedException;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.FORBIDDEN;
 import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
 import static de.quantummaid.httpmaid.multipart.MultipartChainKeys.MULTIPART_ITERATOR_BODY;
@@ -70,11 +68,12 @@ public final class MultipartHttpMaidConfiguration {
                     } else {
                         return true;
                     }
-                }).afterBodyProcessing())
-                .configured(toMapExceptionsOfType(NotAuthorizedException.class, (exception, response) -> {
-                    response.setStatus(FORBIDDEN);
-                    response.setBody("Access denied!");
-                }))
+                }).afterBodyProcessing()
+                        .rejectingUnauthorizedRequestsUsing((request, response) -> {
+                            response.setStatus(FORBIDDEN);
+                            response.setBody("Access denied!");
+                        })
+                )
                 .configured(toExposeMultipartBodiesUsingMultipartIteratorBody())
                 .build();
     }
