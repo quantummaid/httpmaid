@@ -110,19 +110,10 @@ The configurator is then customized with the `.onlyRequestsTo("/admin")` line - 
 on the requests that actually need administrator privileges.
 
 You can now once again start the example app, browse to http://localhost:1337/admin and enter the `joe` / `qrpk4L?>L(DB\[mN` credentials,
-only this time you will be rejected with an empty page and status code `500`.
-When you look into the console log, you will see that an exception of type `NotAuthorizedException` has been logged.
-When any http request fails authorization, normal processing is stopped immediately by throwing the observed `NotAuthorizedException`.
-If you recall the chapter about exception handling, you will remember that an empty response body and a status code of `500`
-is HttpMaid's default behaviour for caught exceptions.
+only this time you will be rejected with an empty page and status code `401`.
 
-If you don't like this behaviour and would like to customize how HttpMaid responds to unauthorized requests, you have two options.
-First, you could add a normal handler for the `NotAuthorizedException` exception. This will handle all unauthorized requests,
-no matter which authorizer failed (if you provided more than one of them).
-Secondly, you could customize the authorizer configurator with the `.rejectingUnauthorizedRequestsUsing()` method. This would
-only apply to requests that fail this particular authorizer.
-
-In our example, we will opt for option two:
+If you don't like this behaviour and would like to customize how HttpMaid responds to unauthorized requests, you can change it.
+This is done by customizing the authorizer configurator with the `.rejectingUnauthorizedRequestsUsing()` method like in our example:
 <!---[CodeSnippet] (basicAuthFull)-->
 ```java
 final UserDatabase userDatabase = new InMemoryUserDatabase();

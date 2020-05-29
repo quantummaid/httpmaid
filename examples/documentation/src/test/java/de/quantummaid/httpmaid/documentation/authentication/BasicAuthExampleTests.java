@@ -171,7 +171,7 @@ public final class BasicAuthExampleTests {
                                            final String response,
                                            final HttpMaidClient client) {
         final SimpleHttpResponseObject responseObject = authenticatedRequest(path, username, password, client);
-        assertThat(responseObject.getStatusCode(), is(500));
+        assertThat(responseObject.getStatusCode(), is(401));
         assertThat(responseObject.getBody(), is(response));
         assertThat(responseObject.getHeaders(), not((hasKey("www-authenticate"))));
     }

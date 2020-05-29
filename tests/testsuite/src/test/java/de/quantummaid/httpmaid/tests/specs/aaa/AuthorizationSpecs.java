@@ -42,7 +42,7 @@ public final class AuthorizationSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/secret").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(500)
+                .theStatusCodeWas(401)
                 .theResponseBodyWas("");
     }
 

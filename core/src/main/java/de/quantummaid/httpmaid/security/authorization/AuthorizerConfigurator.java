@@ -24,8 +24,8 @@ package de.quantummaid.httpmaid.security.authorization;
 import de.quantummaid.httpmaid.CoreModule;
 import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
-import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.security.Filter;
+import de.quantummaid.httpmaid.security.RejectionHandler;
 import de.quantummaid.httpmaid.security.SimpleSecurityConfigurator;
 import de.quantummaid.httpmaid.security.config.SecurityConfigurator;
 import lombok.AccessLevel;
@@ -42,7 +42,8 @@ import static java.util.Objects.nonNull;
 public class AuthorizerConfigurator implements SecurityConfigurator<AuthorizerConfigurator> {
     private final SimpleSecurityConfigurator simpleSecurityConfigurator;
     private final AuthorizerId authorizerId;
-    private HttpHandler rejectionHandler;
+    private RejectionHandler rejectionHandler = (request, response) -> {
+    };
 
     public static AuthorizerConfigurator authorizerConfigurator(final HttpAuthorizer authorizer) {
         validateNotNull(authorizer, "authorizer");
@@ -62,7 +63,7 @@ public class AuthorizerConfigurator implements SecurityConfigurator<AuthorizerCo
         return this;
     }
 
-    public AuthorizerConfigurator rejectingUnauthorizedRequestsUsing(final HttpHandler rejectionHandler) {
+    public AuthorizerConfigurator rejectingUnauthorizedRequestsUsing(final RejectionHandler rejectionHandler) {
         validateNotNull(rejectionHandler, "rejectionHandler");
         this.rejectionHandler = rejectionHandler;
         return this;

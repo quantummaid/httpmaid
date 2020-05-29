@@ -23,8 +23,8 @@ package de.quantummaid.httpmaid.security.filtering;
 
 import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.DependencyRegistry;
-import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.security.Filter;
+import de.quantummaid.httpmaid.security.RejectionHandler;
 import de.quantummaid.httpmaid.security.authorization.AuthorizerConfigurator;
 import de.quantummaid.httpmaid.security.config.SecurityConfigurator;
 import de.quantummaid.httpmaid.util.Validators;
@@ -58,7 +58,7 @@ public final class FilterConfigurator implements SecurityConfigurator<FilterConf
         return this;
     }
 
-    public FilterConfigurator rejectingFilteredRequestsUsing(final HttpHandler rejectionHandler) {
+    public FilterConfigurator rejectingFilteredRequestsUsing(final RejectionHandler rejectionHandler) {
         authorizerConfigurator.rejectingUnauthorizedRequestsUsing(rejectionHandler);
         return this;
     }
