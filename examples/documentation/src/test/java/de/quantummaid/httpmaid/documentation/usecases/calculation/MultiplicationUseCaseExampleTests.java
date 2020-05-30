@@ -80,11 +80,11 @@ public final class MultiplicationUseCaseExampleTests {
             final int statusCode = response.getStatusCode();
             assertThat(statusCode, is(200));
             final String body = response.getBody();
-            assertThat(body, is("{\"result\":\"12\"}"));
+            assertThat(body, is("{\"result\":12}"));
 
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"4\"}", "{\"result\":\"12\"}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"5\"}", "{\"result\":\"15\"}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"20\", \"factor2\": \"7\"}", "{\"result\":\"140\"}", client);
+            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"4\"}", "{\"result\":12}", client);
+            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"5\"}", "{\"result\":15}", client);
+            Deployer.assertPost("/multiply", "{\"factor1\": \"20\", \"factor2\": \"7\"}", "{\"result\":140}", client);
         });
     }
 
@@ -100,13 +100,13 @@ public final class MultiplicationUseCaseExampleTests {
         //Showcase end multAndDivUseCaseExample
 
         Deployer.test(httpMaid, client -> {
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"4\"}", "{\"result\":\"12\"}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"5\"}", "{\"result\":\"15\"}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"20\", \"factor2\": \"7\"}", "{\"result\":\"140\"}", client);
+            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"4\"}", "{\"result\":12}", client);
+            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"5\"}", "{\"result\":15}", client);
+            Deployer.assertPost("/multiply", "{\"factor1\": \"20\", \"factor2\": \"7\"}", "{\"result\":140}", client);
 
-            Deployer.assertPost("/divide", "{\"dividend\": \"12\", \"divisor\": \"4\"}", "{\"result\":\"3\"}", client);
-            Deployer.assertPost("/divide", "{\"dividend\": \"15\", \"divisor\": \"5\"}", "{\"result\":\"3\"}", client);
-            Deployer.assertPost("/divide", "{\"dividend\": \"140\", \"divisor\": \"7\"}", "{\"result\":\"20\"}", client);
+            Deployer.assertPost("/divide", "{\"dividend\": \"12\", \"divisor\": \"4\"}", "{\"result\":3}", client);
+            Deployer.assertPost("/divide", "{\"dividend\": \"15\", \"divisor\": \"5\"}", "{\"result\":3}", client);
+            Deployer.assertPost("/divide", "{\"dividend\": \"140\", \"divisor\": \"7\"}", "{\"result\":20}", client);
         });
     }
 
@@ -139,13 +139,13 @@ public final class MultiplicationUseCaseExampleTests {
             final int statusCode = response.getStatusCode();
             assertThat(statusCode, is(200));
 
-            Deployer.assertGet("/multiply?factor1=3&factor2=4", "{\"result\":\"12\"}", client);
-            Deployer.assertGet("/multiply?factor1=3&factor2=5", "{\"result\":\"15\"}", client);
-            Deployer.assertGet("/multiply?factor1=20&factor2=7", "{\"result\":\"140\"}", client);
+            Deployer.assertGet("/multiply?factor1=3&factor2=4", "{\"result\":12}", client);
+            Deployer.assertGet("/multiply?factor1=3&factor2=5", "{\"result\":15}", client);
+            Deployer.assertGet("/multiply?factor1=20&factor2=7", "{\"result\":140}", client);
 
-            Deployer.assertGet("/divide?dividend=12&divisor=4", "{\"result\":\"3\"}", client);
-            Deployer.assertGet("/divide?dividend=15&divisor=5", "{\"result\":\"3\"}", client);
-            Deployer.assertGet("/divide?dividend=140&divisor=7", "{\"result\":\"20\"}", client);
+            Deployer.assertGet("/divide?dividend=12&divisor=4", "{\"result\":3}", client);
+            Deployer.assertGet("/divide?dividend=15&divisor=5", "{\"result\":3}", client);
+            Deployer.assertGet("/divide?dividend=140&divisor=7", "{\"result\":20}", client);
         });
     }
 }

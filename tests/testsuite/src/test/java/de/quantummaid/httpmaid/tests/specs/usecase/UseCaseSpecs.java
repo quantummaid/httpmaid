@@ -170,7 +170,7 @@ public final class UseCaseSpecs {
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("\"42\"");
+                .theResponseBodyWas("42");
     }
 
     @ParameterizedTest
