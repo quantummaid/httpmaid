@@ -77,13 +77,13 @@ public final class WebsocketRegistryEntry {
     public static WebsocketRegistryEntry restoreFromStrings(final ConnectionInformation connectionInformation,
                                                             final String senderId,
                                                             final Map<String, String> headers,
-                                                            final String contentType,
+                                                            final Optional<String> contentType,
                                                             final Map<String, String> queryParameters) {
         final WebsocketSenderId websocketSenderId = websocketSenderId(senderId);
         final Map<String, List<String>> headersMultiMap = new HashMap<>();
         headers.forEach((key, value) -> headersMultiMap.put(key, List.of(value)));
         final Headers headersObject = Headers.headers(headersMultiMap);
-        final ContentType contentTypeObject = ContentType.fromString(Optional.ofNullable(contentType));
+        final ContentType contentTypeObject = ContentType.fromString(contentType);
         final QueryParameters queryParametersObject = QueryParameters.queryParameters(queryParameters);
         return websocketRegistryEntry(connectionInformation, websocketSenderId, headersObject, contentTypeObject, queryParametersObject);
     }

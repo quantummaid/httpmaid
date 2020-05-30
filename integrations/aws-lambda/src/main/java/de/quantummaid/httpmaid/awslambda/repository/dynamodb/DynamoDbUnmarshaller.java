@@ -46,6 +46,13 @@ public final class DynamoDbUnmarshaller {
             final Map<String, AttributeValue> map = attributeValue.m();
             return unmarshallMap(map);
         }
-        return attributeValue.s();
+        final Boolean nul = attributeValue.nul();
+        if (nul != null && nul) {
+            return null;
+        }
+        if (attributeValue.s() != null) {
+            return attributeValue.s();
+        }
+        throw new UnsupportedOperationException();
     }
 }

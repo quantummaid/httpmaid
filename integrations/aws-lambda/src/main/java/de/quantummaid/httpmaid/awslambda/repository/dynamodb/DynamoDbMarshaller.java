@@ -42,6 +42,9 @@ public final class DynamoDbMarshaller {
 
     @SuppressWarnings("unchecked")
     private static AttributeValue marshal(final Object object) {
+        if (object == null) {
+            return marshalNull();
+        }
         if (object instanceof String) {
             return marshalString((String) object);
         }
@@ -61,6 +64,12 @@ public final class DynamoDbMarshaller {
         final Map<String, AttributeValue> attributeValueMap = marshalTopLevelMap(map);
         return AttributeValue.builder()
                 .m(attributeValueMap)
+                .build();
+    }
+
+    private static AttributeValue marshalNull() {
+        return AttributeValue.builder()
+                .nul(true)
                 .build();
     }
 }

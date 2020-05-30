@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.awslambda.registry;
 
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
 import de.quantummaid.httpmaid.awslambda.repository.Repository;
+import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -35,6 +36,7 @@ import lombok.ToString;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
@@ -90,7 +92,7 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
 
         final String senderId = (String) map.get("senderId");
         final Map<String, String> headers = (Map<String, String>) map.get("headers");
-        final String contentType = (String) map.get("contentType");
+        final Optional<String> contentType = Optional.ofNullable((String) map.get("contentType"));
         final Map<String, String> queryParameters = (Map<String, String>) map.get("queryParameters");
 
         return restoreFromStrings(connectionInformation, senderId, headers, contentType, queryParameters);
@@ -108,8 +110,17 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
         map.put("connectionInformation", connectionInformationMap);
         map.put("senderId", entry.senderId().asString());
         map.put("headers", entry.headers().asStringMap());
-        map.put("contentType", entry.contentType().internalValueForMapping());
+        final String contentType = encodeContentType(entry.contentType());
+        map.put("contentType", contentType);
         map.put("queryParameters", entry.queryParameters().asStringMap());
         return map;
+    }
+
+    private static String encodeContentType(final ContentType contentType) {
+        if (contentType.isEmpty()) {
+            return null;
+        } else {
+            return contentType.internalValueForMapping();
+        }
     }
 }
