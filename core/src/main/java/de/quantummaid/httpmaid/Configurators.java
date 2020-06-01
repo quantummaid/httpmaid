@@ -22,19 +22,27 @@
 package de.quantummaid.httpmaid;
 
 import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.responsetemplate.ResponseTemplate;
-import de.quantummaid.httpmaid.util.Validators;
+
+import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
+import static de.quantummaid.httpmaid.exceptions.HandlerExceptionMapper.handlerExceptionMapper;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 public final class Configurators {
 
     private Configurators() {
     }
 
+    public static Configurator toHandlePageNotFoundUsing(final HttpHandler handler) {
+        validateNotNull(handler, "handler");
+        return configuratorForType(CoreModule.class,
+                coreModule -> coreModule.setPageNotFoundExceptionMapper(handlerExceptionMapper(handler)));
+    }
+
     public static Configurator toCustomizeResponsesUsing(final ResponseTemplate responseTemplate) {
-        Validators.validateNotNull(responseTemplate, "responseTemplate");
-        return dependencyRegistry -> {
-            final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
-            coreModule.setResponseTemplate(responseTemplate);
-        };
+        validateNotNull(responseTemplate, "responseTemplate");
+        return configuratorForType(CoreModule.class,
+                coreModule -> coreModule.setResponseTemplate(responseTemplate));
     }
 }

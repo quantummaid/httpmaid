@@ -47,6 +47,7 @@ public final class Then {
     }
 
     public Then anExceptionHasBeenThrownDuringInitializationWithAMessageContaining(final String expectedMessage) {
+        initializationException.printStackTrace();
         final String actualMessage = initializationException.getMessage();
         assertThat(actualMessage, containsString(expectedMessage));
         return this;

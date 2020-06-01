@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.specs;
 
-import de.quantummaid.httpmaid.handler.PageNotFoundException;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,21 +31,8 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.debug.DebugConfigurator.toBeInDebugMode;
-import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 
 public final class LowLevelSpecs {
-
-    @ParameterizedTest
-    @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)
-    public void pageNotFoundExceptionContainsContext(final TestEnvironment testEnvironment) {
-        testEnvironment.given(() ->
-                anHttpMaid()
-                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody(exception.getMessage())))
-                        .build()
-        )
-                .when().aRequestToThePath("/foo").viaThePostMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyContains("No handler found for path '/foo' and method 'POST'");
-    }
 
     @ParameterizedTest
     @MethodSource(TestEnvironment.ALL_ENVIRONMENTS)

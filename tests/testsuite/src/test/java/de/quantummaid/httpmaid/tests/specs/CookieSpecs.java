@@ -37,9 +37,11 @@ public final class CookieSpecs {
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void cookieCanBeSet(final TestEnvironment testEnvironment) {
-        testEnvironment.given(anHttpMaid()
-                .get("/cookie", (request, response) -> response.setCookie("asdf", "qwer"))
-                .build())
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/cookie", (request, response) -> response.setCookie("asdf", "qwer"))
+                        .build()
+        )
                 .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theReponseContainsTheHeader("Set-Cookie", "asdf=\"qwer\"");
     }
