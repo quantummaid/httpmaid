@@ -121,14 +121,14 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     @SuppressWarnings("unchecked")
     @Override
     public Then isIssued() {
-        try (clientWrapper) {
+        try (HttpClientWrapper copy = clientWrapper) {
             final HttpClientResponse response;
             if (body == null) {
-                response = clientWrapper.issueRequestWithoutBody(path, method, headers);
+                response = copy.issueRequestWithoutBody(path, method, headers);
             } else if (body instanceof String) {
-                response = clientWrapper.issueRequestWithStringBody(path, method, headers, (String) body);
+                response = copy.issueRequestWithStringBody(path, method, headers, (String) body);
             } else {
-                response = clientWrapper.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
+                response = copy.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
             }
             return Then.then(response, initializationException);
         }

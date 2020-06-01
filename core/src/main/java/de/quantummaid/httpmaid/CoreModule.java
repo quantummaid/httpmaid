@@ -38,6 +38,7 @@ import de.quantummaid.httpmaid.generator.Generators;
 import de.quantummaid.httpmaid.handler.DetermineHandlerProcessor;
 import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.InvokeHandlerProcessor;
+import de.quantummaid.httpmaid.handler.PageNotFoundException;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
 import de.quantummaid.httpmaid.http.Http;
@@ -58,6 +59,8 @@ import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
 import static de.quantummaid.httpmaid.exceptions.DefaultExceptionMapper.theDefaultExceptionMapper;
+import static de.quantummaid.httpmaid.exceptions.HandlerExceptionMapper.handlerExceptionMapper;
+import static de.quantummaid.httpmaid.handler.DefaultPageNotFoundHandler.defaultPageNotFoundHandler;
 import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.handlerDistributors;
@@ -78,6 +81,7 @@ public final class CoreModule implements ChainModule {
     private final List<Generator<Handler>> lowLevelHandlers = new LinkedList<>();
     private ResponseTemplate responseTemplate = emptyResponseTemplate();
     private final FilterMapBuilder<Throwable, ExceptionMapper<Throwable>> exceptionMappers = FilterMapBuilder.filterMapBuilder();
+    private ExceptionMapper<?> pageNotFoundExceptionMapper = handlerExceptionMapper(defaultPageNotFoundHandler());
     private final ClosingActions closingActions = ClosingActions.closingActions();
 
     public static CoreModule coreModule() {
@@ -98,6 +102,11 @@ public final class CoreModule implements ChainModule {
     public void setResponseTemplate(final ResponseTemplate responseTemplate) {
         validateNotNull(responseTemplate, "responseTemplate");
         this.responseTemplate = responseTemplate;
+    }
+
+    public void setPageNotFoundExceptionMapper(final ExceptionMapper<PageNotFoundException> pageNotFoundExceptionMapper) {
+        validateNotNull(pageNotFoundExceptionMapper, "pageNotFoundExceptionMapper");
+        this.pageNotFoundExceptionMapper = pageNotFoundExceptionMapper;
     }
 
     public void addExceptionMapper(final Predicate<Throwable> filter,
@@ -131,8 +140,10 @@ public final class CoreModule implements ChainModule {
         handlers.forEach(handler -> handlerDistributors.distribute(handler, dependencyRegistry));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void register(final ChainExtender extender) {
+        addExceptionMapper(throwable -> throwable instanceof PageNotFoundException, (ExceptionMapper<Throwable>) pageNotFoundExceptionMapper);
         final ExceptionSerializer exceptionSerializer = ExceptionSerializer.exceptionSerializer(exceptionMappers.build());
         ChainBuilder.extendAChainWith(extender)
                 .append(INIT)
