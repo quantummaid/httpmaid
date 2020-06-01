@@ -45,4 +45,15 @@ public interface RemoteSpecs {
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
                 .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
     }
+
+    @Test
+    default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
+                .theStatusCodeWas(200)
+                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+    }
 }

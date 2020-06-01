@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.testwar;
 
+import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.jsr356.Jsr356ApplicationConfig;
 import de.quantummaid.httpmaid.servlet.ServletEndpoint;
 
@@ -31,8 +32,9 @@ import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMa
 @WebServlet("/*")
 public class TestServlet extends ServletEndpoint implements Jsr356ApplicationConfig {
     private static final long serialVersionUID = 1L;
+    private static final HttpMaid HTTP_MAID = httpMaid();
 
     public TestServlet() {
-        super(httpMaid());
+        super(HTTP_MAID);
     }
 }
