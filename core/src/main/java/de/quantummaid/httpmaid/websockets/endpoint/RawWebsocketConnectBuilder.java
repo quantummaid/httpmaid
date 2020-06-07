@@ -79,7 +79,6 @@ public final class RawWebsocketConnectBuilder {
         return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
     }
 
-    // TODO
     private static Map<String, String> queryToMap(final String query) {
         final Map<String, String> result = new HashMap<>();
         if (query == null || query.isEmpty()) {

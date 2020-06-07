@@ -70,7 +70,6 @@ public final class FakeWebsocketLambda implements AutoCloseable {
         }
     }
 
-    // TODO
     private static HttpConnectionFactory extractConnectionFactory(final Server server) {
         final Connector[] connectors = server.getConnectors();
         if (connectors.length != 1) {

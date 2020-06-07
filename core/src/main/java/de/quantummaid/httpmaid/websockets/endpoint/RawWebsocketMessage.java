@@ -51,7 +51,6 @@ public final class RawWebsocketMessage implements RawRequest {
     @Override
     public void enter(final MetaData metaData) {
         metaData.set(REQUEST_TYPE, WEBSOCKET_MESSAGE);
-        // TODO
         metaData.set(IS_HTTP_REQUEST, false);
         metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
         metaData.set(REQUEST_BODY_STRING, body);

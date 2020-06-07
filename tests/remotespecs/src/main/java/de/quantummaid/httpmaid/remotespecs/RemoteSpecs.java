@@ -30,8 +30,6 @@ public interface RemoteSpecs {
 
     Deployer provideDeployer();
 
-    // TODO trailing slash
-
     @Test
     default void httpTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()

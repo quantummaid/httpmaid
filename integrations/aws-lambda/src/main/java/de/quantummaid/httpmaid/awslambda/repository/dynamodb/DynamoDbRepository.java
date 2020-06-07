@@ -48,10 +48,7 @@ public final class DynamoDbRepository implements Repository {
 
     public static DynamoDbRepository dynamoDbRepository(final String tableName,
                                                         final String primaryKey) {
-        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
-                // TODO
-                .region(Region.EU_CENTRAL_1)
-                .build();
+        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
         return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey);
     }
 
