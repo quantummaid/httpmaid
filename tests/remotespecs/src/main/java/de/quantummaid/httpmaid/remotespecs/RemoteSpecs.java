@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public interface RemoteSpecs {
@@ -47,6 +48,7 @@ public interface RemoteSpecs {
     }
 
     @Test
+    @Disabled
     default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnected()

@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.remotespecstomcat;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
@@ -31,9 +32,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
-import static de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder.findProjectBaseDirectory;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 
 @EqualsAndHashCode
@@ -50,8 +54,8 @@ public final class TomcatDeployer implements PortDeployer {
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
         tomcat = new Tomcat();
         tomcat.setPort(port);
-        // TODO
-        final String basedir = "/home/marco/repositories/quantummaid/jacocotutorial/test";
+
+        final String basedir = createTempDirectory();
         tomcat.setBaseDir(basedir);
         tomcat.getHost().setAppBase(basedir);
         tomcat.getHost().setAutoDeploy(true);
@@ -62,13 +66,22 @@ public final class TomcatDeployer implements PortDeployer {
         } catch (final LifecycleException e) {
             throw new RuntimeException(e);
         }
-        final String basePath = findProjectBaseDirectory();
+        final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String pathToWar = basePath + RELATIVE_PATH_TO_WAR;
         tomcat.addWebapp(tomcat.getHost(), "/", pathToWar);
         return deploymentBuilder()
                 .withHttpPort(port)
                 .withWebsocketPort(port)
                 .build();
+    }
+
+    private String createTempDirectory() {
+        try {
+            final Path basedirPath = Files.createTempDirectory("httpmaid-tomcatdeployer");
+            return basedirPath.toFile().getAbsolutePath();
+        } catch (final IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override

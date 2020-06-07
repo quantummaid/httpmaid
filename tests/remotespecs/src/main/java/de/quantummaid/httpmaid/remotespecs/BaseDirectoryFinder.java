@@ -21,12 +21,42 @@
 
 package de.quantummaid.httpmaid.remotespecs;
 
+import java.io.File;
+
 public final class BaseDirectoryFinder {
+    private static final String PROJECT_ROOT_ANCHOR_FILENAME = ".projectrootanchor";
+    private static final String PROJECT_ROOT_DIRECTORY = computeProjectBaseDirectory();
 
     private BaseDirectoryFinder() {
     }
 
     public static String findProjectBaseDirectory() {
-        return "/home/marco/repositories/quantummaid/httpmaid";
+        return PROJECT_ROOT_DIRECTORY;
+    }
+
+    private static String computeProjectBaseDirectory() {
+        final String location = BaseDirectoryFinder.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+
+        File currentDirectory = new File(location);
+        while (!anchorFileIn(currentDirectory).exists()) {
+            if (isRootDirectory(currentDirectory)) {
+                throw new BaseDirectoryNotFoundException(location);
+            }
+            currentDirectory = parentOf(currentDirectory);
+        }
+
+        return currentDirectory.getAbsolutePath();
+    }
+
+    private static File anchorFileIn(final File parent) {
+        return new File(parent, PROJECT_ROOT_ANCHOR_FILENAME);
+    }
+
+    private static boolean isRootDirectory(final File f) {
+        return f.getParent() == null;
+    }
+
+    private static File parentOf(final File directory) {
+        return new File(directory.getParent());
     }
 }

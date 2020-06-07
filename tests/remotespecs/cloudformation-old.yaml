@@ -215,17 +215,3 @@ Resources:
       StageName: !Ref StackIdentifier
       DeploymentId: !Ref HttpMaidWebsocketsApiDeployment
       ApiId: !Ref HttpMaidWebsocketsApi
-      #DefaultRouteSettings:
-      #  DetailedMetricsEnabled: true
-      #  LoggingLevel: INFO
-      #  DataTraceEnabled: true
-      #  #ThrottlingBurstLimit: 10 ... TODO, revisit later!
-      #  #ThrottlingRateLimit: 10  ... TODO, revisit later!
-      #AccessLogSettings:
-      #  DestinationArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ProjectId}-wss-access-logs'
-      #  Format: >-2
-      #    '{"requestId":"$context.requestId", "ip": "$context.identity.sourceIp",
-      #    "caller":"$context.identity.caller",
-      #    "user":"$context.identity.user","requestTime":"$context.requestTime",
-      #    "eventType":"$context.eventType","routeKey":"$context.routeKey",
-      #    "status":"$context.status","connectionId":"$context.connectionId"}'
