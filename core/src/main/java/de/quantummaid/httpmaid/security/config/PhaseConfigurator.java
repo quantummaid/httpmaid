@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.security.config;
 
-import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.HttpMaidChains;
+import de.quantummaid.httpmaid.chains.ChainName;
 
 @SuppressWarnings("rawtypes")
 public interface PhaseConfigurator<T extends PhaseConfigurator> {

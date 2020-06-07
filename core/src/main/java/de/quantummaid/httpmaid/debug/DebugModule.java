@@ -25,16 +25,14 @@ import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.ChainName;
 import de.quantummaid.httpmaid.chains.ChainRegistry;
-import de.quantummaid.httpmaid.path.PathTemplate;
 import de.quantummaid.httpmaid.chains.rules.Drop;
 import de.quantummaid.httpmaid.chains.rules.Jump;
+import de.quantummaid.httpmaid.path.PathTemplate;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.PATH;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_STRING;
 import java.util.HashMap;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;

@@ -67,3 +67,15 @@ When starting the application and navigating to http://localhost:1337/exception,
 the `Operation not supported` message instead of `Something went wrong`.
 
 
+## Page not found
+Whenever HttpMaid receives a request to a route that does not exist in its configuration,
+it will answer the request with the status code `404` ("Not Found").
+You can alter this behaviour like this:
+
+<!---[CodeSnippet] (pageNotFoundExample)-->
+```java
+final HttpMaid httpMaid = anHttpMaid()
+        .post("/hello", (request, response) -> response.setBody("Hello!"))
+        .configured(Configurators.toHandlePageNotFoundUsing((request, response) -> response.setStatus(403)))
+        .build();
+```

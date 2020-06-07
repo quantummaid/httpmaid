@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.usecases.eventfactories;
 
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.events.EventFactory;
+import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

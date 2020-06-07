@@ -22,11 +22,11 @@
 package de.quantummaid.httpmaid.handler.http;
 
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.handler.http.files.FileLoader;
 import de.quantummaid.httpmaid.handler.http.files.MultiformatPath;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.http.headers.cookies.CookieBuilder;
 import de.quantummaid.httpmaid.path.Path;
-import de.quantummaid.httpmaid.handler.http.files.FileLoader;
 import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.multipart;
 
-import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -31,8 +31,8 @@ import lombok.ToString;
 
 import java.io.InputStream;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_CONTENT_TYPE;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_BODY_STREAM;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_CONTENT_TYPE;
 import static de.quantummaid.httpmaid.multipart.MultipartChainKeys.MULTIPART_ITERATOR_BODY;
 import static de.quantummaid.httpmaid.multipart.MultipartParser.parse;
 

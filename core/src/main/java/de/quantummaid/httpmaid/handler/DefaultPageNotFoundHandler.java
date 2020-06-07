@@ -19,39 +19,31 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.eventfactories;
+package de.quantummaid.httpmaid.handler;
 
-import de.quantummaid.httpmaid.events.EventFactory;
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import de.quantummaid.httpmaid.handler.http.HttpHandler;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Map;
-
-import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.enrichableMap;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.http.Http.StatusCodes.NOT_FOUND;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MultipleParametersEventFactory implements EventFactory {
-    private final List<String> parameterNames;
+@Slf4j
+public final class DefaultPageNotFoundHandler implements HttpHandler {
 
-    public static EventFactory multipleParametersEventFactory(final List<String> parameterNames) {
-        validateNotNull(parameterNames, "parameterNames");
-        return new MultipleParametersEventFactory(parameterNames);
+    public static DefaultPageNotFoundHandler defaultPageNotFoundHandler() {
+        return new DefaultPageNotFoundHandler();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public EnrichableMap createEvent(final Object unmarshalledBody) {
-        final EnrichableMap event = enrichableMap(parameterNames);
-        if (unmarshalledBody instanceof Map) {
-            event.overwriteTopLevel((Map<String, ?>) unmarshalledBody);
-        }
-        return event;
+    public void handle(final HttpRequest request, final HttpResponse response) {
+        response.setStatus(NOT_FOUND);
     }
 }

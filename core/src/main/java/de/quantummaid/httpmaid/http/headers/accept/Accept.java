@@ -21,9 +21,9 @@
 
 package de.quantummaid.httpmaid.http.headers.accept;
 
+import de.quantummaid.httpmaid.HttpMaidChainKeys;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.http.headers.ContentType;
-import de.quantummaid.httpmaid.HttpMaidChainKeys;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

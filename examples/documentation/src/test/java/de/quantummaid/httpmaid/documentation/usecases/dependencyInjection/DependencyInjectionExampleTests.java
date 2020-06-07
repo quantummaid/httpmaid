@@ -42,6 +42,6 @@ public final class DependencyInjectionExampleTests {
                 .configured(toCreateUseCaseInstancesUsing(injector::instantiate))
                 .build();
         //Showcase end dependencyInjectionSample
-        Deployer.test(httpMaid, client -> Deployer.assertGet("/", "", 500, client));
+        Deployer.test(httpMaid, client -> Deployer.assertGet("/", "", 404, client));
     }
 }

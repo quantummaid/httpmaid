@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.documentation.multipart;
 
-import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-
 public final class MultipartIteratorExample {
 
 

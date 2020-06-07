@@ -27,8 +27,8 @@ import lombok.RequiredArgsConstructor;
 import java.io.InputStream;
 import java.util.Optional;
 
-import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

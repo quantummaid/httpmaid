@@ -73,7 +73,7 @@ public final class DivisionUseCaseExampleStep3Tests {
         final int statusCode = response.getStatusCode();
         assertThat(statusCode, is(200));
         final String body = response.getBody();
-        assertThat(body, is("{\"result\":\"4\"}"));
+        assertThat(body, is("{\"result\":4}"));
     }
 
     private void assertDivisionByZero(final HttpMaidClient client) {

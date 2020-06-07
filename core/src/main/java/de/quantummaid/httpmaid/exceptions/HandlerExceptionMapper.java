@@ -19,39 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.eventfactories;
+package de.quantummaid.httpmaid.exceptions;
 
-import de.quantummaid.httpmaid.events.EventFactory;
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-
-import java.util.List;
-import java.util.Map;
-
-import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.enrichableMap;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import lombok.extern.slf4j.Slf4j;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MultipleParametersEventFactory implements EventFactory {
-    private final List<String> parameterNames;
+@Slf4j
+public final class HandlerExceptionMapper<T extends Throwable> implements ExceptionMapper<T> {
+    private final HttpHandler handler;
 
-    public static EventFactory multipleParametersEventFactory(final List<String> parameterNames) {
-        validateNotNull(parameterNames, "parameterNames");
-        return new MultipleParametersEventFactory(parameterNames);
+    public static <T extends Throwable> HandlerExceptionMapper<T> handlerExceptionMapper(final HttpHandler handler) {
+        return new HandlerExceptionMapper<>(handler);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public EnrichableMap createEvent(final Object unmarshalledBody) {
-        final EnrichableMap event = enrichableMap(parameterNames);
-        if (unmarshalledBody instanceof Map) {
-            event.overwriteTopLevel((Map<String, ?>) unmarshalledBody);
-        }
-        return event;
+    public void map(final T exception, final MetaData metaData) {
+        log.debug("Handled exception during HttpMaid request processing", exception);
+        handler.handle(metaData);
     }
 }

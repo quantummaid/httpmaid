@@ -21,18 +21,18 @@
 
 package de.quantummaid.httpmaid.tests.specs.events;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.eventmaid.identification.CorrelationId;
 import de.quantummaid.eventmaid.messagebus.MessageBus;
 import de.quantummaid.eventmaid.messagebus.MessageBusType;
+import de.quantummaid.httpmaid.HttpMaid;
 
 import java.util.HashMap;
 
-import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toUseTheMessageBus;
 import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.constantPoolSizeAsynchronousConfiguration;
 import static de.quantummaid.eventmaid.messagebus.MessageBusBuilder.aMessageBus;
 import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.events.EventConfigurators.toUseTheMessageBus;
 
 final class EventsHttpMaidConfiguration {
     private static MessageBus messageBus;

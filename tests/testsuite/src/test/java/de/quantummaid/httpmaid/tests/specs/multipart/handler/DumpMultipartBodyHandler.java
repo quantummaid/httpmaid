@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.specs.multipart.handler;
 
-import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import de.quantummaid.httpmaid.handler.Handler;
+import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import de.quantummaid.httpmaid.multipart.MultipartIteratorBody;
 import de.quantummaid.httpmaid.multipart.handler.MultipartHandler;
 import de.quantummaid.httpmaid.multipart.handler.MultipartRequest;

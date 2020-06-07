@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.documentation.routing;
 
-import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
-
 public final class PathParametersExample {
 
 

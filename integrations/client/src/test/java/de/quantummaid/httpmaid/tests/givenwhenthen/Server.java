@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 
-import static de.quantummaid.httpmaid.tests.givenwhenthen.Request.request;
-
 final class Server {
     private static final int OK = 200;
 
