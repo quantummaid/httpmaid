@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,9 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocketCreator implements WebSocketCreator {
-    private final AwsLambdaEndpoint endpoint;
+    private final AwsWebsocketLambdaEndpoint endpoint;
 
-    public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final AwsLambdaEndpoint endpoint) {
+    public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final AwsWebsocketLambdaEndpoint endpoint) {
         return new FakeLambdaWebsocketCreator(endpoint);
     }
 

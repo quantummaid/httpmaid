@@ -25,6 +25,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
+import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
@@ -38,29 +39,35 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.*;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AwsLambdaEndpoint {
+public final class AwsWebsocketLambdaEndpoint {
     private static final String CONNECT_EVENT_TYPE = "CONNECT";
     private static final String DISCONNECT_EVENT_TYPE = "DISCONNECT";
     private static final String MESSAGE_EVENT_TYPE = "MESSAGE";
 
     private final HttpMaid httpMaid;
 
-    public static AwsLambdaEndpoint awsLambdaEndpointFor(final HttpMaid httpMaid) {
+    public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");
-        return new AwsLambdaEndpoint(httpMaid);
+        return new AwsWebsocketLambdaEndpoint(httpMaid);
     }
 
     public APIGatewayProxyResponseEvent delegate(final Map<String, Object> event,
                                                  final Context context) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
-        // TODO if (awsLambdaEvent.isWebSocketRequest())?
-        return handleNormalRequest(awsLambdaEvent);
+        if (awsLambdaEvent.isWebSocketRequest()) {
+            return handleWebsocketRequest(awsLambdaEvent);
+        } else {
+            return handleNormalRequest(awsLambdaEvent);
+        }
     }
 
     private APIGatewayProxyResponseEvent handleNormalRequest(final AwsLambdaEvent event) {
@@ -85,6 +92,44 @@ public final class AwsLambdaEndpoint {
                     .withStatusCode(statusCode)
                     .withHeaders(responseHeaders)
                     .withBody(responseBody);
+        });
+    }
+
+    private APIGatewayProxyResponseEvent handleWebsocketRequest(final AwsLambdaEvent event) {
+        final String eventType = event.getFromContext("eventType");
+        final String connectionId = event.getFromContext("connectionId");
+        final String stage = event.getFromContext("stage");
+        final String apiId = event.getFromContext("apiId");
+        final String domainName = event.getFromContext("domainName");
+        final String region = extractRegionFromDomain(domainName);
+        final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
+        if (CONNECT_EVENT_TYPE.equals(eventType)) {
+            handleConnect(event, connectionInformation);
+            return new APIGatewayProxyResponseEvent();
+        } else if (DISCONNECT_EVENT_TYPE.equals(eventType)) {
+            httpMaid.handleWebsocketDisconnect();
+            return new APIGatewayProxyResponseEvent();
+        } else if (MESSAGE_EVENT_TYPE.equals(eventType)) {
+            return handleMessage(event, connectionInformation);
+        } else {
+            throw new UnsupportedOperationException(String.format("Unsupported lambda event type '%s' with event '%s'", eventType, event));
+        }
+    }
+
+    private void handleConnect(final AwsLambdaEvent event,
+                               final AwsWebsocketConnectionInformation connectionInformation) {
+        httpMaid.handleRequest(() -> {
+            final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
+            builder.withConnectionInformation(AWS_WEBSOCKET_SENDER, connectionInformation);
+
+            final HashMap<String, String> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
+            builder.withUniqueQueryParameters(queryParameters);
+
+            final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
+            builder.withHeaders(headers);
+
+            return builder.build();
+        }, response -> {
         });
     }
 

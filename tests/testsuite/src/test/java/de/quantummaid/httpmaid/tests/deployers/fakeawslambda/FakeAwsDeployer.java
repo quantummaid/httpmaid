@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest.FakeRestLambda;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
@@ -36,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest.FakeRestLambda.fakeRestLambda;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
@@ -58,9 +60,10 @@ public final class FakeAwsDeployer implements PortDeployer {
     @Override
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
         final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
+        final AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpoint = awsWebsocketLambdaEndpointFor(httpMaid);
         currentRestLambda = fakeRestLambda(awsLambdaEndpoint, port);
         final int websocketsPort = freePort();
-        currentWebsocketLambda = fakeWebsocketLambda(awsLambdaEndpoint, websocketsPort);
+        currentWebsocketLambda = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort);
 
         return deploymentBuilder()
                 .withHttpPort(port)

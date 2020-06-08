@@ -38,6 +38,7 @@
     <modules>
         <module>all</module>
         <module>aws-lambda</module>
+        <module>aws-lambda-websocket</module>
         <module>multipart</module>
         <module>mapmaid</module>
         <module>jetty</module>

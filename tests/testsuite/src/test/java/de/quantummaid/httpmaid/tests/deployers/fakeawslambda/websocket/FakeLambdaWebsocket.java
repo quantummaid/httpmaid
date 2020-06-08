@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +39,10 @@ import java.util.Map;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocket implements WebSocketListener {
-    private final AwsLambdaEndpoint endpoint;
+    private final AwsWebsocketLambdaEndpoint endpoint;
     private Session session;
 
-    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsLambdaEndpoint endpoint) {
+    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsWebsocketLambdaEndpoint endpoint) {
         return new FakeLambdaWebsocket(endpoint);
     }
 
