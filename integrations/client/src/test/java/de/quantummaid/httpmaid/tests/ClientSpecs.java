@@ -120,24 +120,21 @@ public final class ClientSpecs {
     public void clientResponseHasAUserFriendlyDescription() {
         givenTheHttpMaidServer(
                 anHttpMaid()
-                        .get("/test", (request, response) -> response.setBody("foobar"))
+                        .get("/test", (request, response) -> {
+                            response.setStatus(203);
+                            response.setBody("Foobar");
+                            response.addHeader("HeaderName", "HeaderValue");
+                        })
                         .build()
         )
                 .when().aRequestIsMade(aGetRequestToThePath("/test"))
-                .theResponseDescriptionContains("" +
-                        "|===================================================|\n" +
-                        "|                   HTTP Response                   |\n" +
-                        "|===================================================|\n"
-                )
-                .theResponseDescriptionContains("" +
-                        "| Status Code | 200                                 |\n" +
-                        "|---------------------------------------------------|\n"
-                )
-                .theResponseDescriptionContains("" +
-                        "|---------------------------------------------------|\n" +
-                        "| Body        | foobar                              |\n" +
-                        "|---------------------------------------------------|"
-                );
+                .theResponseDescriptionContains(" HTTP Response ")
+                .theResponseDescriptionContains(" Status Code ")
+                .theResponseDescriptionContains(" 203 ")
+                .theResponseDescriptionContains(" Headers ")
+                .theResponseDescriptionContains(" headername = [HeaderValue] ")
+                .theResponseDescriptionContains(" Body ")
+                .theResponseDescriptionContains(" Foobar ");
     }
 
     @Test

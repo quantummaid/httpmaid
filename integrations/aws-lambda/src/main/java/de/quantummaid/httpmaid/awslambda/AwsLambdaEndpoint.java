@@ -22,17 +22,15 @@
 package de.quantummaid.httpmaid.awslambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
-import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
-import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +43,6 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AwsLambdaEndpoint {
-    private static final String CONNECT_EVENT_TYPE = "CONNECT";
-    private static final String DISCONNECT_EVENT_TYPE = "DISCONNECT";
-    private static final String MESSAGE_EVENT_TYPE = "MESSAGE";
-
     private final HttpMaid httpMaid;
 
     public static AwsLambdaEndpoint awsLambdaEndpointFor(final HttpMaid httpMaid) {
@@ -56,14 +50,14 @@ public final class AwsLambdaEndpoint {
         return new AwsLambdaEndpoint(httpMaid);
     }
 
-    public APIGatewayProxyResponseEvent delegate(final Map<String, Object> event,
+    public Map<String, Object> delegate(final Map<String, Object> event,
                                                  final Context context) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
         // TODO if (awsLambdaEvent.isWebSocketRequest())?
         return handleNormalRequest(awsLambdaEvent);
     }
 
-    private APIGatewayProxyResponseEvent handleNormalRequest(final AwsLambdaEvent event) {
+    private Map<String, Object> handleNormalRequest(final AwsLambdaEvent event) {
         return httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
             final String httpRequestMethod = event.getAsString(HTTP_METHOD);
@@ -79,29 +73,15 @@ public final class AwsLambdaEndpoint {
             return builder.build();
         }, response -> {
             final int statusCode = response.status();
-            final Map<String, String> responseHeaders = response.uniqueHeaders();
+            final Map<String, List<String>> responseHeaders = response.headers();
             final String responseBody = response.stringBody();
-            return new APIGatewayProxyResponseEvent()
-                    .withStatusCode(statusCode)
-                    .withHeaders(responseHeaders)
-                    .withBody(responseBody);
-        });
-    }
 
-    private APIGatewayProxyResponseEvent handleMessage(final AwsLambdaEvent event,
-                                                       final ConnectionInformation connectionInformation) {
-        return httpMaid.handleRequestSynchronously(() -> {
-            final String body = event.getAsString("body");
-            return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body);
-        }, response -> {
-            final APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
-            response.optionalStringBody()
-                    .ifPresent(responseEvent::setBody);
-            return responseEvent;
-        });
-    }
+            final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
+            responseMap.put("statusCode", statusCode);
+            responseMap.put("multiValueHeaders", responseHeaders);
+            responseMap.put("body", responseBody);
 
-    private static String extractRegionFromDomain(final String domain) {
-        return domain.split("\\.")[2];
+            return responseMap;
+        });
     }
 }

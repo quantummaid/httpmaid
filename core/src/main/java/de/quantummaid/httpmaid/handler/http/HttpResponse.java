@@ -57,7 +57,7 @@ public final class HttpResponse {
     }
 
     public void addHeader(final String key, final String value) {
-        metaData.get(RESPONSE_HEADERS).put(key, value);
+        metaData.get(RESPONSE_HEADERS).addHeader(key, value);
     }
 
     public void setCookie(final CookieBuilder cookie) {

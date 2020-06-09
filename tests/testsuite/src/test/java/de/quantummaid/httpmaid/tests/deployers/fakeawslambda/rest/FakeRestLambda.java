@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -44,7 +43,8 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeAwsContext.fakeAwsContext;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 
 @ToString
 @EqualsAndHashCode
@@ -57,9 +57,14 @@ public final class FakeRestLambda implements AutoCloseable {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             final HttpHandler httpHandler = exchange -> {
-                final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
-                final APIGatewayProxyResponseEvent responseEvent = endpoint.delegate(requestEvent, fakeAwsContext());
-                mapEventToResponse(responseEvent, exchange);
+                try {
+                    final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
+                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent, fakeAwsContext());
+                    mapEventToResponse(responseEvent, exchange);
+                } catch (final Exception e) {
+                    e.printStackTrace(System.err);
+                    throw e;
+                }
             };
             server.createContext("/", httpHandler);
             server.setExecutor(null);
@@ -92,13 +97,15 @@ public final class FakeRestLambda implements AutoCloseable {
         return event;
     }
 
-    private static void mapEventToResponse(final APIGatewayProxyResponseEvent event,
+    private static void mapEventToResponse(final Map<String, Object> event,
                                            final HttpExchange exchange) throws IOException {
         final Headers responseHeaders = exchange.getResponseHeaders();
-        event.getHeaders().forEach((key, value) -> responseHeaders.put(key, singletonList(value)));
-        final Integer statusCode = event.getStatusCode();
+        @SuppressWarnings("unchecked")
+        final Map<String, List<String>> headerMap = (Map<String, List<String>>) ofNullable(event.get("multiValueHeaders")).orElse(emptyMap());
+        responseHeaders.putAll(headerMap);
+        final Integer statusCode = (Integer) event.get("statusCode");
         exchange.sendResponseHeaders(statusCode, 0);
-        final InputStream bodyStream = Streams.stringToInputStream(event.getBody());
+        final InputStream bodyStream = Streams.stringToInputStream((String) event.get("body"));
         streamInputStreamToOutputStream(bodyStream, exchange.getResponseBody());
     }
 

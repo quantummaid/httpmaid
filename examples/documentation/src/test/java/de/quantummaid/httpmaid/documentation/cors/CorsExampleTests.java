@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.documentation.support.Deployer;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
@@ -52,8 +53,7 @@ public final class CorsExampleTests {
                             .withHeader("Origin", "frontend.example.org")
                             .withHeader("Access-Control-Request-Method", "PUT")
             );
-            final Map<String, String> headers = responseObject.getHeaders();
-            final String method = headers.get("access-control-allow-methods");
+            final String method = responseObject.getSingleHeader("access-control-allow-methods");
             assertThat(method, is("PUT"));
         });
     }

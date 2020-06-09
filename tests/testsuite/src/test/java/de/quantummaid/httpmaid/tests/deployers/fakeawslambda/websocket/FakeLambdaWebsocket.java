@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -51,8 +50,8 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         final Map<String, Object> event = createEvent("MESSAGE");
         event.put("body", message);
 
-        final APIGatewayProxyResponseEvent responseEvent = endpoint.delegate(event, null);
-        final String body = responseEvent.getBody();
+        final Map<String, Object> responseEvent = endpoint.delegate(event, null);
+        final String body = (String) responseEvent.get("body");
         if (body != null) {
             try {
                 session.getRemote().sendString(body);

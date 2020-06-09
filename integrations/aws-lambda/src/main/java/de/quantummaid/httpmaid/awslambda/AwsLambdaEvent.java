@@ -72,6 +72,10 @@ public final class AwsLambdaEvent {
     }
 
     public boolean isWebSocketRequest() {
+        return isWebSocketRequest(event);
+    }
+
+    public static boolean isWebSocketRequest(final Map<String, Object> event) {
         return !event.containsKey(HTTP_METHOD);
     }
 }

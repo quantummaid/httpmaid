@@ -91,6 +91,7 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
         final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
 
         final String senderId = (String) map.get("senderId");
+        // TODO: should be Map<String, List<String>>
         final Map<String, String> headers = (Map<String, String>) map.get("headers");
         final Optional<String> contentType = Optional.ofNullable((String) map.get("contentType"));
         final Map<String, String> queryParameters = (Map<String, String>) map.get("queryParameters");

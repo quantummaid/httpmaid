@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,11 +40,11 @@ import static java.util.Optional.ofNullable;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawClientResponse {
     private final int statusCode;
-    private final Map<String, String> headers;
+    private final Map<String, List<String>> headers;
     private final InputStream content;
 
     public static RawClientResponse rawClientResponse(final int statusCode,
-                                                      final Map<String, String> headers,
+                                                      final Map<String, List<String>> headers,
                                                       final InputStream content) {
         validateNotNull(headers, "headers");
         validateNotNull(content, "content");
@@ -54,12 +55,13 @@ public final class RawClientResponse {
         return statusCode;
     }
 
-    public Map<String, String> headers() {
+    public Map<String, List<String>> headers() {
         return headers;
     }
 
     public Optional<String> header(final String key) {
-        return ofNullable(headers.get(key));
+        final Optional<String> result = ofNullable(headers.get(key)).flatMap(values -> values.stream().findFirst());
+        return result;
     }
 
     public Optional<String> contentType() {

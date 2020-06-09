@@ -24,13 +24,12 @@ package de.quantummaid.httpmaid.cors;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.cors.policy.ResourceSharingPolicy;
+import de.quantummaid.httpmaid.http.ResponseHeaders;
 import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-
-import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.cors.Cors.*;
@@ -57,15 +56,15 @@ public final class SimpleCrossOriginRequestProcessor implements Processor {
             }
 
             // 3
-            final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-            responseHeaders.put(ACCESS_CONTROL_ALLOW_ORIGIN, origin.internalValueForMapping());
+            final ResponseHeaders responseHeaders = metaData.get(RESPONSE_HEADERS);
+            responseHeaders.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, origin.internalValueForMapping());
             if (resourceSharingPolicy.supportsCredentials()) {
-                responseHeaders.put(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+                responseHeaders.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
             }
 
             // 4
             resourceSharingPolicy.exposedHeaders().generateHeaderValue()
-                    .ifPresent(value -> responseHeaders.put(ACCESS_CONTROL_EXPOSE_HEADERS, value));
+                    .ifPresent(value -> responseHeaders.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS, value));
         });
     }
 }

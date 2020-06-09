@@ -37,6 +37,11 @@ import static java.lang.String.join;
 final class HeaderValue {
     private final String value;
 
+    static HeaderValue singleHeaderValue(final String value) {
+        Validators.validateNotNull(value, "value");
+        return new HeaderValue(value);
+    }
+
     static HeaderValue headerValue(final List<String> values) {
         Validators.validateNotNull(values, "values");
         final String value = join(", ", values);

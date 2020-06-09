@@ -29,6 +29,7 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
@@ -83,7 +84,7 @@ public final class RequestPath {
     }
 
     public String render() {
-        final String path = path();
+        final String path = encodedPath();
 
         final String queryString;
         if (queryParameters.isEmpty()) {
@@ -96,7 +97,15 @@ public final class RequestPath {
         return path + queryString;
     }
 
-    public String path() {
+    public String unencodedPath() {
+        return buildPath(UriString::unencoded);
+    }
+
+    public String encodedPath() {
+        return buildPath(UriString::encoded);
+    }
+
+    private String buildPath(final Function<UriString, String> encoder) {
         final String suffix;
         if(trailingSlash) {
             suffix = "/";
@@ -104,7 +113,7 @@ public final class RequestPath {
             suffix = "";
         }
         return pathElements.stream()
-                .map(UriString::encoded)
+                .map(encoder)
                 .collect(joining("/", "/", suffix));
     }
 

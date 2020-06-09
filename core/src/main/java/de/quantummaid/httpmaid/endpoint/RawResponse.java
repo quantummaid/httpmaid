@@ -37,8 +37,6 @@ import java.util.function.BiConsumer;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toMap;
 
 @ToString
 @EqualsAndHashCode
@@ -56,16 +54,7 @@ public final class RawResponse {
     }
 
     public Map<String, List<String>> headers() {
-        return uniqueHeaders().entrySet()
-                .stream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        entry -> singletonList(entry.getValue()))
-                );
-    }
-
-    public Map<String, String> uniqueHeaders() {
-        return metaData.get(RESPONSE_HEADERS);
+        return metaData.get(RESPONSE_HEADERS).asStringMap();
     }
 
     public void setHeaders(final BiConsumer<String, String> setter) {

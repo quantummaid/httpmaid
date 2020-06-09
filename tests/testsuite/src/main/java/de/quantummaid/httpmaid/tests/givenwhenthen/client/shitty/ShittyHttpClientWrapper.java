@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,9 +161,14 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
             final HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
             final HttpResponse response = httpexecutor.execute(request, connection, context);
             final int statusCode = response.getStatusLine().getStatusCode();
-            final Map<String, String> responseHeaders = new HashMap<>();
+            final Map<String, List<String>> responseHeaders = new HashMap<>();
             stream(response.getAllHeaders())
-                    .forEach(header -> responseHeaders.put(header.getName().toLowerCase(), header.getValue()));
+                    .forEach(header -> {
+                        final String headerName = header.getName().toLowerCase();
+                        final List<String> headerValues = responseHeaders.getOrDefault(headerName, new ArrayList<>());
+                        headerValues.add(header.getValue());
+                        responseHeaders.put(headerName, headerValues);
+                    });
             final String responseBody = inputStreamToString(response.getEntity().getContent());
             return httpClientResponse(statusCode, responseHeaders, responseBody);
         } catch (final IOException | HttpException e) {

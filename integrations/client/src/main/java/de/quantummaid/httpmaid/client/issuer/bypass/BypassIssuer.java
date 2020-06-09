@@ -60,14 +60,14 @@ public final class BypassIssuer implements Issuer {
                 );
         final RawClientResponse rawClientResponse = httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
-            builder.withPath(requestPath.path());
+            builder.withPath(requestPath.unencodedPath());
             builder.withMethod(request.method());
             builder.withUniqueHeaders(request.headers());
             builder.withUniqueQueryParameters(queryParameters);
             final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
             builder.withBody(body);
             return builder.build();
-        }, response -> rawClientResponse(response.status(), response.uniqueHeaders(), response.body()));
+        }, response -> rawClientResponse(response.status(), response.headers(), response.body()));
         return responseMapper.apply(rawClientResponse);
     }
 

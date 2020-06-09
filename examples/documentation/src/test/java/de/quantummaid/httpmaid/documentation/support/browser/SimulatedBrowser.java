@@ -50,8 +50,7 @@ public final class SimulatedBrowser implements Browser {
         assertThat(statusCode, is(200));
         this.currentPageContent = response.getBody();
 
-        final Map<String, String> headers = response.getHeaders();
-        final String cookieHeader = headers.get("set-cookie");
+        final String cookieHeader = response.getSingleHeader("set-cookie");
         cookies.add(cookieHeader);
     }
 

@@ -29,8 +29,7 @@ import lombok.ToString;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
 
@@ -64,15 +63,25 @@ public final class Then {
         return theReponseContainsTheHeader("Content-Type", expectedContentType);
     }
 
-    public Then theReponseContainsTheHeader(final String key, final String value) {
-        final Map<String, String> headers = testData.getResponse().getHeaders();
-        final Map<String, String> normalizedHeaders = new HashMap<>();
-        headers.forEach((k, v) -> normalizedHeaders.put(k.toLowerCase(), v));
+    public Then theReponseContainsTheHeader(final String key, final String... values) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final Map<String, List<String>> normalizedHeaders = normalizeHeaderNames(headers);
         final String normalizedKey = key.toLowerCase();
-        MatcherAssert.assertThat(normalizedHeaders.keySet(), CoreMatchers.hasItem(normalizedKey));
-        final String actualValue = normalizedHeaders.get(normalizedKey);
-        MatcherAssert.assertThat(actualValue, CoreMatchers.is(value));
+        final List<String> actualValues = normalizedHeaders.get(normalizedKey);
+        final List<String> expectedValues = Arrays.asList(values);
+        MatcherAssert.assertThat(actualValues, CoreMatchers.is(expectedValues));
         return this;
+    }
+
+    private Map<String, List<String>> normalizeHeaderNames(final Map<String, List<String>> headers) {
+        final Map<String, List<String>> normalizedHeaders = new HashMap<>();
+        headers.forEach((k, v) -> {
+            final String headerName = k.toLowerCase();
+            final List<String> headerValues = normalizedHeaders.getOrDefault(k, new ArrayList<>());
+            headerValues.addAll(v);
+            normalizedHeaders.put(headerName, headerValues);
+        });
+        return normalizedHeaders;
     }
 
     public Then theResponseBodyWas(final String expectedResponseBody) {

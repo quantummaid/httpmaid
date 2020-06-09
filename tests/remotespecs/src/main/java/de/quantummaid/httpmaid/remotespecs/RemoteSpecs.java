@@ -34,7 +34,33 @@ public interface RemoteSpecs {
     default void httpTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
                 .theResponseBodyWas("fooooo");
+    }
+
+    @Test
+    default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/statusCode/201").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(201)
+                .theResponseBodyWas("");
+    }
+
+    @Test
+    default void handlersCanSetSingleValueHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/headers/HeaderName/HeaderValue").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theReponseContainsTheHeader("HeaderName", "HeaderValue")
+                .theResponseBodyWas("");
+    }
+
+    @Test
+    default void handlersCanSetMultiValueHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/multiValueHeaders/HeaderName/HeaderValue1,HeaderValue2").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theReponseContainsTheHeader("HeaderName", "HeaderValue1", "HeaderValue2")
+                .theResponseBodyWas("");
     }
 
     @Test

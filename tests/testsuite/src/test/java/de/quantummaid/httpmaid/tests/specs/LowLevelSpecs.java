@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.specs;
 
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -30,6 +31,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.Configurators.toCustomizeResponsesUsing;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.HttpMaid.httpMaid;
 import static de.quantummaid.httpmaid.debug.DebugConfigurator.toBeInDebugMode;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
@@ -210,5 +212,22 @@ public final class LowLevelSpecs {
                 .theResponseBodyContains("a=1")
                 .theResponseBodyContains("b=2")
                 .theResponseBodyContains("c=3");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void handlersCanSetMultiValueHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/multiValueHeaders/HeaderName/HeaderValue1,HeaderValue2", (request, response) -> {
+                            response.addHeader("HeaderName", "HeaderValue1");
+                            response.addHeader("HeaderName", "HeaderValue2");
+                        })
+                        .build()
+        )
+                .when().aRequestToThePath("/multiValueHeaders/HeaderName/HeaderValue1,HeaderValue2").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theReponseContainsTheHeader("HeaderName", "HeaderValue1", "HeaderValue2")
+                .theResponseBodyWas("");
     }
 }

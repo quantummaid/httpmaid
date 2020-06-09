@@ -140,7 +140,7 @@ public final class CustomLoginExampleTests {
                     .withTheBody("username=joe&password=qrpk4L?>L(DBa[mN")
                     .withContentType("application/x-www-form-urlencoded"));
             assertThat(normalLogin.getStatusCode(), is(200));
-            final String normalJwtCookie = normalLogin.getHeaders().get("set-cookie");
+            final String normalJwtCookie = normalLogin.getSingleHeader("set-cookie");
 
             final String normalAsNormal = client.issue(aGetRequestToThePath("/normal").withHeader("Cookie", normalJwtCookie).mappedToString());
             assertThat(normalAsNormal, is("The normal section"));
@@ -152,7 +152,7 @@ public final class CustomLoginExampleTests {
                     .withTheBody("username=jack&password=*eG)r@;{'4g'cM?3")
                     .withContentType("application/x-www-form-urlencoded"));
             assertThat(adminLogin.getStatusCode(), is(200));
-            final String adminJwtCookie = adminLogin.getHeaders().get("set-cookie");
+            final String adminJwtCookie = adminLogin.getSingleHeader("set-cookie");
 
             final String normalAsAdmin = client.issue(aGetRequestToThePath("/normal").withHeader("Cookie", adminJwtCookie).mappedToString());
             assertThat(normalAsAdmin, is("The normal section"));
@@ -161,4 +161,5 @@ public final class CustomLoginExampleTests {
             assertThat(adminAsAdmin, is("The admin section"));
         });
     }
+
 }

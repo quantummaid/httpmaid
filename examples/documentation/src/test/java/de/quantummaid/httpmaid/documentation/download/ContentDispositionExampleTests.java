@@ -52,10 +52,9 @@ public final class ContentDispositionExampleTests {
             assertThat(statusCode, is(200));
             final String body = response.getBody();
             assertThat(body, is("Hello World"));
-            final Map<String, String> headers = response.getHeaders();
-            final String contentDispositionHeader = headers.get("content-disposition");
+            final String contentDispositionHeader = response.getSingleHeader("content-disposition");
             assertThat(contentDispositionHeader, is("attachment; filename=\"hello-world.txt\""));
-            final String contentTypeHeader = headers.get("content-type");
+            final String contentTypeHeader = response.getSingleHeader("content-type");
             assertThat(contentTypeHeader, is("application/x-msdownload"));
         });
     }

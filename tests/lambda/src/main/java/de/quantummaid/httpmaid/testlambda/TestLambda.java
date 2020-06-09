@@ -23,7 +23,9 @@ package de.quantummaid.httpmaid.testlambda;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.websockets.WebsocketsModule;
 import lombok.EqualsAndHashCode;
@@ -31,6 +33,7 @@ import lombok.ToString;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
@@ -38,17 +41,22 @@ import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMa
 
 @ToString
 @EqualsAndHashCode
-public final class TestLambda implements RequestHandler<Map<String, Object>, APIGatewayProxyResponseEvent> {
-    private static final AwsWebsocketLambdaEndpoint ENDPOINT = awsWebsocketLambdaEndpointFor(
-            httpMaid(httpMaidBuilder ->
-                    httpMaidBuilder.configured(configuratorForType(
-                            WebsocketsModule.class,
-                            websocketsModule -> websocketsModule.setWebsocketRegistry(dynamoDbWebsocketRegistry()))))
-    );
+public final class TestLambda implements RequestHandler<Map<String, Object>, Map<String, Object>> {
+    private static final HttpMaid HTTP_MAID = httpMaid(httpMaidBuilder ->
+            httpMaidBuilder.configured(configuratorForType(
+                    WebsocketsModule.class,
+                    websocketsModule -> websocketsModule.setWebsocketRegistry(dynamoDbWebsocketRegistry()))));
+
+    private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
+    private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(final Map<String, Object> event,
+    public Map<String, Object> handleRequest(final Map<String, Object> event,
                                                       final Context context) {
-        return ENDPOINT.delegate(event, context);
+        if (!AwsLambdaEvent.isWebSocketRequest(event)) {
+            return PLAIN_ENDPOINT.delegate(event, context);
+        } else {
+            return WEBSOCKET_ENDPOINT.delegate(event, context);
+        }
     }
 }

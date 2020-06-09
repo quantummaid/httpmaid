@@ -70,7 +70,7 @@ final class JettyEndpointHandler extends AbstractHandler {
                     return builder.build();
                 },
                 response -> {
-                    response.setHeaders(httpServletResponse::setHeader);
+                    response.setHeaders(httpServletResponse::addHeader);
                     httpServletResponse.setStatus(response.status());
                     final OutputStream outputStream = httpServletResponse.getOutputStream();
                     response.streamBodyToOutputStream(outputStream);

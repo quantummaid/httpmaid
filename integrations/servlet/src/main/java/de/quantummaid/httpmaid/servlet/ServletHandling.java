@@ -51,7 +51,7 @@ public final class ServletHandling {
             builder.withBody(body);
             return builder.build();
         }, rawResponse -> {
-            rawResponse.setHeaders(response::setHeader);
+            rawResponse.setHeaders(response::addHeader);
             final int responseStatus = rawResponse.status();
             response.setStatus(responseStatus);
             final OutputStream outputStream = response.getOutputStream();

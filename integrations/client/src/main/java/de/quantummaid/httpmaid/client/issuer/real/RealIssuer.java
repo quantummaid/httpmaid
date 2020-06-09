@@ -35,7 +35,9 @@ import org.apache.http.protocol.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -89,9 +91,14 @@ public final class RealIssuer implements Issuer {
             final HttpClientConnection connectionObject = connection.connectionObject();
             final HttpResponse response = httpRequestExecutor.execute(lowLevelRequest, connectionObject, context);
             final int statusCode = response.getStatusLine().getStatusCode();
-            final Map<String, String> headers = new HashMap<>();
+            final Map<String, List<String>> headers = new HashMap<>();
             stream(response.getAllHeaders())
-                    .forEach(header -> headers.put(header.getName().toLowerCase(), header.getValue()));
+                    .forEach(header -> {
+                        final String headerName = header.getName().toLowerCase();
+                        final List<String> headerValues = headers.getOrDefault(headerName, new ArrayList<>());
+                        headerValues.add(header.getValue());
+                        headers.put(headerName, headerValues);
+                    });
             final InputStream body = response.getEntity().getContent();
             final RawClientResponse rawClientResponse = rawClientResponse(statusCode, headers, body);
             return responseMapper.apply(rawClientResponse);

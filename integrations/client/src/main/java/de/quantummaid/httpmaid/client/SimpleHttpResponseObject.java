@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.valueOf;
@@ -36,11 +37,11 @@ import static java.lang.String.valueOf;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SimpleHttpResponseObject {
     private final int statusCode;
-    private final Map<String, String> headers;
+    private final Map<String, List<String>> headers;
     private final String body;
 
     public static SimpleHttpResponseObject httpClientResponse(final int statusCode,
-                                                              final Map<String, String> headers,
+                                                              final Map<String, List<String>> headers,
                                                               final String body) {
         return new SimpleHttpResponseObject(statusCode, headers, body);
     }
@@ -49,7 +50,7 @@ public final class SimpleHttpResponseObject {
         return statusCode;
     }
 
-    public Map<String, String> getHeaders() {
+    public Map<String, List<String>> getHeaders() {
         return headers;
     }
 
@@ -62,5 +63,15 @@ public final class SimpleHttpResponseObject {
                 "Headers", headers,
                 "Body", body);
         return MapDumper.describe("HTTP Response", map);
+    }
+
+    public String getSingleHeader(final String headerName) {
+        final List<String> headerValues = getHeaders().get(headerName);
+        if (headerValues.size() != 1) {
+            throw new UnsupportedOperationException(
+                    String.format("getSingleHeader('%s') expects a single header, found %d instead (%s)",
+                            headerName, headerValues.size(), headerValues));
+        }
+        return headerValues.get(0);
     }
 }

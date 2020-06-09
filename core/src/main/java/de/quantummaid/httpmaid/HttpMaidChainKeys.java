@@ -23,10 +23,7 @@ package de.quantummaid.httpmaid;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.handler.Handler;
-import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.HttpRequestMethod;
-import de.quantummaid.httpmaid.http.PathParameters;
-import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.*;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.path.Path;
 
@@ -69,6 +66,6 @@ public final class HttpMaidChainKeys {
     public static final MetaDataKey<InputStream> RESPONSE_STREAM = MetaDataKey.metaDataKey("RESPONSE_STREAM");
 
     public static final MetaDataKey<ContentType> RESPONSE_CONTENT_TYPE = MetaDataKey.metaDataKey("RESPONSE_CONTENT_TYPE");
-    public static final MetaDataKey<Map<String, String>> RESPONSE_HEADERS = MetaDataKey.metaDataKey("RESPONSE_HEADERS");
+    public static final MetaDataKey<ResponseHeaders> RESPONSE_HEADERS = MetaDataKey.metaDataKey("RESPONSE_HEADERS");
     public static final MetaDataKey<Integer> RESPONSE_STATUS = MetaDataKey.metaDataKey("RESPONSE_STATUS");
 }

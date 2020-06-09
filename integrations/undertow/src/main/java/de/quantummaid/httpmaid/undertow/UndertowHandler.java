@@ -40,8 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.undertow.util.HttpString.tryFromString;
-
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -83,7 +81,9 @@ public final class UndertowHandler implements HttpHandler {
             httpServerExchange.setStatusCode(status);
 
             final HeaderMap responseHeaders = httpServerExchange.getResponseHeaders();
-            response.setHeaders((key, value) -> responseHeaders.put(tryFromString(key), value));
+            response.headers().forEach((name, values) -> {
+                responseHeaders.putAll(HttpString.tryFromString(name), values);
+            });
 
             final OutputStream outputStream = httpServerExchange.getOutputStream();
             response.streamBodyToOutputStream(outputStream);

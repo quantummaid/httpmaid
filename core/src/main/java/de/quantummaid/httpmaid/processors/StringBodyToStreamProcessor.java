@@ -44,7 +44,7 @@ public final class StringBodyToStreamProcessor implements Processor {
     public void apply(final MetaData metaData) {
         metaData.getOptional(HttpMaidChainKeys.RESPONSE_CONTENT_TYPE)
                 .ifPresent(contentType -> metaData.getOptional(HttpMaidChainKeys.RESPONSE_HEADERS)
-                        .ifPresent(headers -> headers.put(Http.Headers.CONTENT_TYPE, contentType.internalValueForMapping())));
+                        .ifPresent(headers -> headers.addHeader(Http.Headers.CONTENT_TYPE, contentType.internalValueForMapping())));
         if (!metaData.contains(HttpMaidChainKeys.RESPONSE_STREAM)) {
             metaData.getOptional(HttpMaidChainKeys.RESPONSE_BODY_STRING).ifPresent(stringResponse ->
                     metaData.set(HttpMaidChainKeys.RESPONSE_STREAM, Streams.stringToInputStream(stringResponse)));

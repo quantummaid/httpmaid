@@ -24,16 +24,17 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.client;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpClientResponse {
     private final int statusCode;
-    private final Map<String, String> headers;
+    private final Map<String, List<String>> headers;
     private final String body;
 
     public static HttpClientResponse httpClientResponse(final int statusCode,
-                                                        final Map<String, String> headers,
+                                                        final Map<String, List<String>> headers,
                                                         final String body) {
         return new HttpClientResponse(statusCode, headers, body);
     }
@@ -42,7 +43,7 @@ public final class HttpClientResponse {
         return statusCode;
     }
 
-    public Map<String, String> getHeaders() {
+    public Map<String, List<String>> getHeaders() {
         return headers;
     }
 
