@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.testlambda;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
@@ -41,7 +39,7 @@ import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMa
 
 @ToString
 @EqualsAndHashCode
-public final class TestLambda implements RequestHandler<Map<String, Object>, Map<String, Object>> {
+public final class TestLambda {
     private static final HttpMaid HTTP_MAID = httpMaid(httpMaidBuilder ->
             httpMaidBuilder.configured(configuratorForType(
                     WebsocketsModule.class,
@@ -50,13 +48,11 @@ public final class TestLambda implements RequestHandler<Map<String, Object>, Map
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
     private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
 
-    @Override
-    public Map<String, Object> handleRequest(final Map<String, Object> event,
-                                                      final Context context) {
+    public Map<String, Object> handleRequest(final Map<String, Object> event) {
         if (!AwsLambdaEvent.isWebSocketRequest(event)) {
-            return PLAIN_ENDPOINT.delegate(event, context);
+            return PLAIN_ENDPOINT.delegate(event);
         } else {
-            return WEBSOCKET_ENDPOINT.delegate(event, context);
+            return WEBSOCKET_ENDPOINT.delegate(event);
         }
     }
 }

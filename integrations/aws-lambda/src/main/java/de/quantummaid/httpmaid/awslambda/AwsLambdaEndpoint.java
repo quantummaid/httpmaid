@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.awslambda;
 
-import com.amazonaws.services.lambda.runtime.Context;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import lombok.AccessLevel;
@@ -50,8 +49,7 @@ public final class AwsLambdaEndpoint {
         return new AwsLambdaEndpoint(httpMaid);
     }
 
-    public Map<String, Object> delegate(final Map<String, Object> event,
-                                                 final Context context) {
+    public Map<String, Object> delegate(final Map<String, Object> event) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
         // TODO if (awsLambdaEvent.isWebSocketRequest())?
         return handleNormalRequest(awsLambdaEvent);

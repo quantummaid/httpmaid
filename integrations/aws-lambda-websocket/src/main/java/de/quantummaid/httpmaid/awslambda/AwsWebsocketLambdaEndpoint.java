@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.awslambda;
 
-import com.amazonaws.services.lambda.runtime.Context;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
@@ -60,8 +59,7 @@ public final class AwsWebsocketLambdaEndpoint {
         return new AwsWebsocketLambdaEndpoint(httpMaid);
     }
 
-    public Map<String, Object> delegate(final Map<String, Object> event,
-                                        final Context context) {
+    public Map<String, Object> delegate(final Map<String, Object> event) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
         // TODO: if ! (awsLambdaEvent.isWebSocketRequest())
         final Map<String, Object> response = handleWebsocketRequest(awsLambdaEvent);

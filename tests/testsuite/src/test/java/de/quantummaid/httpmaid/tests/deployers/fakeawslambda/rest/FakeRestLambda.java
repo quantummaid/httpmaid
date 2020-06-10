@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeAwsContext.fakeAwsContext;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 import static java.util.Collections.emptyMap;
@@ -59,7 +58,7 @@ public final class FakeRestLambda implements AutoCloseable {
             final HttpHandler httpHandler = exchange -> {
                 try {
                     final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
-                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent, fakeAwsContext());
+                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
                     mapEventToResponse(responseEvent, exchange);
                 } catch (final Exception e) {
                     e.printStackTrace(System.err);

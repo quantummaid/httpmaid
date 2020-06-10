@@ -50,7 +50,7 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         final Map<String, Object> event = createEvent("MESSAGE");
         event.put("body", message);
 
-        final Map<String, Object> responseEvent = endpoint.delegate(event, null);
+        final Map<String, Object> responseEvent = endpoint.delegate(event);
         final String body = (String) responseEvent.get("body");
         if (body != null) {
             try {
@@ -81,7 +81,7 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         event.put("queryStringParameters", queryParameters);
         final Map<String, List<String>> headers = session.getUpgradeRequest().getHeaders();
         event.put("multiValueHeaders", headers);
-        endpoint.delegate(event, null);
+        endpoint.delegate(event);
     }
 
     @Override
