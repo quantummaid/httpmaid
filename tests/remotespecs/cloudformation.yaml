@@ -84,10 +84,21 @@ Resources:
   #    ProtocolType: HTTP
   #    Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
 
+  HttpMaidWebsocketApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Api Lambda Proxy"
+      ProtocolType: HTTP
+      Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+      #FailOnWarnings: true -> FailOnWarnings is not applicable without Body or BodyS3Location (Service: null; Status Code: 0; Error Code: null; Request ID: null; Proxy: null) (Service: null; Status Code: 404; Error Code: BadRequestException; Request ID: null; Proxy: null)
+      #ProtocolType: WEBSOCKET
+      #RouteSelectionExpression: \$default
+
   HttpMaidApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Lambda Proxy"
+      Name: !Sub "${StackIdentifier} RemoteSpecs Rest Api Lambda Proxy"
       FailOnWarnings: true
 
   ApiResource:

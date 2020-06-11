@@ -107,4 +107,9 @@ public final class LambdaDeployer implements Deployer {
         final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE;
         createStack(stackIdentifier, templatePath);
     }
+
+    public static void main(String[] args) {
+        LambdaDeployer lambdaDeployer = lambdaDeployer();
+        create(lambdaDeployer.stackIdentifier);
+    }
 }
