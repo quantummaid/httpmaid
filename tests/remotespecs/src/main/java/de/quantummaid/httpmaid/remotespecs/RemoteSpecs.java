@@ -26,6 +26,8 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+
 public interface RemoteSpecs {
 
     Deployer provideDeployer();
@@ -81,5 +83,37 @@ public interface RemoteSpecs {
                 .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
                 .theStatusCodeWas(200)
                 .aWebsocketMessageHasBeenReceivedWithContent("foo");
+    }
+
+    /**
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
+     * Cookie: <cookie-list>
+     * Cookie: name=value; name2=value2; name3=value3
+     * <cookie-list> A list of name-value pairs in the form of <cookie-name>=<cookie-value>.
+     *  Pairs in the list are separated by a semicolon and a space ('; ').
+     */
+    @Test
+    default void requestCanContainMultipleCookiesInOneCookieHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("Cookie", "cookie1=qwer; cookie2=asdf").isIssued()
+                .theResponseBodyWas("qwer and asdf");
+    }
+
+    /**
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+     * A <cookie-value> can optionally be wrapped in double quotes and include any US-ASCII characters
+     * excluding control characters, Whitespace, double quotes, comma, semicolon, and backslash.
+     * Encoding: Many implementations perform URL encoding on cookie values, however it is not
+     * required per the RFC specification. It does help satisfying the requirements about which
+     * characters are allowed for <cookie-value> though.
+     */
+    @Test
+    default void responseCanContainMultipleCookies(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/setcookies").viaTheGetMethod().withAnEmptyBody()
+                .isIssued()
+                .theReponseContainsTheHeader("Set-Cookie", "name=\"value\"", "name2=\"value2\"")
+                .theResponseBodyWas("");
     }
 }

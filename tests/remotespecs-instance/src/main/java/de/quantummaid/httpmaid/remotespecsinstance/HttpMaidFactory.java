@@ -47,6 +47,15 @@ public final class HttpMaidFactory {
                     response.addHeader("HeaderName", "HeaderValue1");
                     response.addHeader("HeaderName", "HeaderValue2");
                 })
+                .get("/cookie", (request, response) -> {
+                    final String cookie1 = request.cookies().getCookie("cookie1");
+                    final String cookie2 = request.cookies().getCookie("cookie2");
+                    response.setBody(cookie1 + " and " + cookie2);
+                })
+                .get("/setcookies", (request, response) -> {
+                    response.setCookie("name", "value");
+                    response.setCookie("name2", "value2");
+                })
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
                 .websocket("handler2", (request, response) -> response.setBody("handler 2"))
                 .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))

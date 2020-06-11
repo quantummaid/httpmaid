@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static de.quantummaid.httpmaid.remotespecs.lambda.LambdaDeployer.lambdaDeployer;
 
 @ExtendWith(RemoteSpecsExtension.class)
-public final class LambdaRemoteSpecs implements RemoteSpecs {
+public final class LambdaRestApiRemoteSpecs implements RemoteSpecs {
 
     @Override
     public Deployer provideDeployer() {
