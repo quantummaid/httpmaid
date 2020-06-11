@@ -51,11 +51,45 @@ public final class AwsLambdaEndpoint {
 
     public Map<String, Object> delegate(final Map<String, Object> event) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
-        // TODO if (awsLambdaEvent.isWebSocketRequest())?
-        return handleNormalRequest(awsLambdaEvent);
+
+        if (event.containsKey("version")) {
+            return handleHttpApiRequest(awsLambdaEvent);
+        } else {
+            return handleRestApiRequest(awsLambdaEvent);
+        }
     }
 
-    private Map<String, Object> handleNormalRequest(final AwsLambdaEvent event) {
+    private Map<String, Object> handleHttpApiRequest(final AwsLambdaEvent event) {
+        return httpMaid.handleRequestSynchronously(() -> {
+            final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
+            Map<String, Object> requestContext = event.getMap("requestContext");
+            Map<String, Object> httpInformation = (Map<String, Object>) requestContext.get("http");
+            final String httpRequestMethod = (String) httpInformation.get("method");
+            builder.withMethod(httpRequestMethod);
+            final String path = (String) httpInformation.get("path");
+            builder.withPath(path);
+            final Map<String, List<String>> headers = Map.of();
+            builder.withHeaders(headers);
+            final Map<String, String> queryParameters = Map.of();
+            builder.withUniqueQueryParameters(queryParameters);
+            final String body = "";
+            builder.withBody(body);
+            return builder.build();
+        }, response -> {
+            final int statusCode = response.status();
+            final Map<String, List<String>> responseHeaders = response.headers();
+            final String responseBody = response.stringBody();
+
+            final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
+            responseMap.put("statusCode", statusCode);
+            responseMap.put("multiValueHeaders", responseHeaders);
+            responseMap.put("body", responseBody);
+
+            return responseMap;
+        });
+    }
+
+    private Map<String, Object> handleRestApiRequest(final AwsLambdaEvent event) {
         return httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
             final String httpRequestMethod = event.getAsString(HTTP_METHOD);

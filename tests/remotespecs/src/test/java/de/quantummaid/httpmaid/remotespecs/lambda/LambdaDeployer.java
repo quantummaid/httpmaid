@@ -23,6 +23,8 @@ package de.quantummaid.httpmaid.remotespecs.lambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiHandler;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
@@ -108,8 +110,17 @@ public final class LambdaDeployer implements Deployer {
         createStack(stackIdentifier, templatePath);
     }
 
-    public static void main(String[] args) {
-        LambdaDeployer lambdaDeployer = lambdaDeployer();
-        create(lambdaDeployer.stackIdentifier);
+    public static void main(String[] args) { // TODO
+        //deleteStacksStartingWith(PREFIX);
+        //LambdaDeployer lambdaDeployer = lambdaDeployer();
+        //create(lambdaDeployer.stackIdentifier);
+
+        HttpApiInformation httpApiInformation = HttpApiHandler.loadHttpApiInformation("remotespecsXa34fa56d-6363-4a6f-9d3b-1deab801909d RemoteSpecs HTTP Api Lambda Proxy");
+        System.out.println("httpApiInformation = " + httpApiInformation);
+        String host = httpApiInformation.host();
+        System.out.println("host = " + host);
+
+        final String basePath = httpApiInformation.basePath();
+        System.out.println("basePath = " + basePath);
     }
 }

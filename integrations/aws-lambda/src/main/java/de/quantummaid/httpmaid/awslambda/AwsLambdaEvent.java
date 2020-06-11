@@ -29,7 +29,6 @@ import lombok.ToString;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.HTTP_METHOD;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.REQUEST_CONTEXT;
 import static de.quantummaid.httpmaid.awslambda.EmptyLambdaEventException.emptyLambdaEventException;
 import static java.util.Objects.requireNonNullElse;
@@ -67,6 +66,10 @@ public final class AwsLambdaEvent {
         return requireNonNullElseGet(value, alternative);
     }
 
+    public Map<String, Object> getMap(final String key) {
+        return (Map<String, Object>) event.get(key);
+    }
+
     public String getFromContext(final String key) {
         return (String) requestContext.get(key);
     }
@@ -76,6 +79,12 @@ public final class AwsLambdaEvent {
     }
 
     public static boolean isWebSocketRequest(final Map<String, Object> event) {
-        return !event.containsKey(HTTP_METHOD);
+        if (!event.containsKey("version")) {
+            return false;
+        }
+        if (event.containsKey("rawPath")) {
+            return false;
+        }
+        return true;
     }
 }

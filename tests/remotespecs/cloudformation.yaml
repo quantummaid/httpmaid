@@ -77,23 +77,16 @@ Resources:
   ## HTTP ApiGateway ##
   #####################
 
-  #HttpApi:
-  #  Type: 'AWS::ApiGatewayV2::Api'
-  #  Properties:
-  #    Name: RemoteSpecs HTTP Lambda Proxy
-  #    ProtocolType: HTTP
-  #    Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
-
   HttpMaidWebsocketApiGateway:
     Type: AWS::ApiGatewayV2::Api
     Properties:
-      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Api Lambda Proxy"
+      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy"
       ProtocolType: HTTP
       Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
 
-      #FailOnWarnings: true -> FailOnWarnings is not applicable without Body or BodyS3Location (Service: null; Status Code: 0; Error Code: null; Request ID: null; Proxy: null) (Service: null; Status Code: 404; Error Code: BadRequestException; Request ID: null; Proxy: null)
-      #ProtocolType: WEBSOCKET
-      #RouteSelectionExpression: \$default
+  #####################
+  ## REST ApiGateway ##
+  #####################
 
   HttpMaidApi:
     Type: AWS::ApiGateway::RestApi
@@ -218,7 +211,6 @@ Resources:
       ApiId: !Ref HttpMaidWebsocketsApi
       RouteResponseKey: $default
 
-  # NATPunch websocket deployment descriptor; see 'stage' below.
   HttpMaidWebsocketsApiDeployment:
     Type: AWS::ApiGatewayV2::Deployment
     # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-deployment.html for
@@ -232,7 +224,6 @@ Resources:
     Properties:
       ApiId: !Ref HttpMaidWebsocketsApi
 
-  # NATPunch websocket deployment stage descriptor; see 'deployment' above.
   HttpMaidWebsocketsApiStage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:

@@ -46,7 +46,6 @@ public final class RemoteSpecsExtension implements ParameterResolver,
     public Object resolveParameter(final ParameterContext parameterContext,
                                    final ExtensionContext extensionContext) throws ParameterResolutionException {
         final Deployer deployer = dummyDeployer(deployment);
-        //final ClientFactory clientFactory = theRealHttpMaidClient();
         final ClientFactory clientFactory = theShittyTestClient();
         return testEnvironment(deployer, clientFactory);
     }

@@ -49,6 +49,7 @@ public final class TestLambda {
     private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
+        System.out.println("event = " + event);
         if (!AwsLambdaEvent.isWebSocketRequest(event)) {
             return PLAIN_ENDPOINT.delegate(event);
         } else {
