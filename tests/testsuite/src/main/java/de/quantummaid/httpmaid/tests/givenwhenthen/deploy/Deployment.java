@@ -43,30 +43,40 @@ public final class Deployment {
     private final String httpBasePath;
     private final String websocketBasePath;
 
-    public static Deployment httpDeployment(final String httpProtocol,
-                                            final String httpHostname,
-                                            final String websocketProtocol,
-                                            final String websocketHostname,
-                                            final int httpPort,
-                                            final int websocketPort,
-                                            final String httpBasePath,
-                                            final String websocketBasePath) {
-        if (httpBasePath != null && !httpBasePath.startsWith("/")) {
+    public static Deployment localhostHttpDeployment(int httpPort) {
+        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), null);
+    }
+
+    public static Deployment localhostWebsocketDeployment(int websocketPort) {
+        return httpDeployment(null, ApiBaseUrl.localhostWebsocketBaseUrl(websocketPort));
+    }
+
+    public static Deployment localhostHttpAndWebsocketDeployment(int port) {
+        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(port), ApiBaseUrl.localhostWebsocketBaseUrl(port));
+    }
+
+    public static Deployment localhostHttpAndWebsocketDeployment(int httpPort, int websocketPort) {
+        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), ApiBaseUrl.localhostWebsocketBaseUrl(httpPort));
+    }
+
+    public static Deployment httpDeployment(final ApiBaseUrl httpBaseUrl,
+                                            final ApiBaseUrl webSocketBaseUrl) {
+        if (httpBaseUrl.basePath != null && !httpBaseUrl.basePath.startsWith("/")) {
             throw new IllegalArgumentException("httpBasePath has to start with a '/'");
         }
-        if (websocketBasePath != null && !websocketBasePath.startsWith("/")) {
+        if (webSocketBaseUrl.basePath != null && !webSocketBaseUrl.basePath.startsWith("/")) {
             throw new IllegalArgumentException("websocketBasePath has to start with a '/'");
         }
         return new Deployment(
                 null,
-                httpProtocol,
-                httpHostname,
-                websocketProtocol,
-                websocketHostname,
-                httpPort,
-                websocketPort,
-                httpBasePath,
-                websocketBasePath
+                httpBaseUrl.protocol,
+                httpBaseUrl.hostName,
+                webSocketBaseUrl.protocol,
+                webSocketBaseUrl.hostName,
+                httpBaseUrl.port,
+                webSocketBaseUrl.port,
+                httpBaseUrl.basePath,
+                webSocketBaseUrl.basePath
         );
     }
 

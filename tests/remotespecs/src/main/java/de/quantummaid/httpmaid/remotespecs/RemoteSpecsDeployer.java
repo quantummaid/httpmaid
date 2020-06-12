@@ -19,15 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.deployers.awslambda.lambdastatus;
+package de.quantummaid.httpmaid.remotespecs;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-public final class StackIdentifier {
-    private final String stackIdentifier;
-
-    public String getStackIdentifier() {
-        return stackIdentifier;
-    }
+public interface RemoteSpecsDeployer {
+    RemoteSpecsDeployment deploy();
 }

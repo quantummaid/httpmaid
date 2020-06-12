@@ -43,7 +43,7 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool.freePort;
 import static java.util.Arrays.asList;
 
@@ -64,11 +64,7 @@ public final class FakeAwsDeployer implements PortDeployer {
         currentRestLambda = fakeRestLambda(awsLambdaEndpoint, port);
         final int websocketsPort = freePort();
         currentWebsocketLambda = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort);
-
-        return deploymentBuilder()
-                .withHttpPort(port)
-                .withWebsocketPort(websocketsPort)
-                .build();
+        return localhostHttpAndWebsocketDeployment(port, websocketsPort);
     }
 
     @Override

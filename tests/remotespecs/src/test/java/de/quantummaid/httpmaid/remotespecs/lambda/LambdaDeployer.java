@@ -21,14 +21,11 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiHandler;
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiInformation;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -36,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.io.File;
-import java.util.List;
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.createStack;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.deleteStacksStartingWith;
@@ -44,13 +41,12 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiHand
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.deleteAllObjectsInBucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
 import static java.util.UUID.randomUUID;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class LambdaDeployer implements Deployer {
+public final class LambdaDeployer implements RemoteSpecsDeployer {
     private static final String PREFIX = "remotespecsX";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
     private static final String BUCKET_NAME = "remotespecs";
@@ -67,38 +63,25 @@ public final class LambdaDeployer implements Deployer {
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
+    public RemoteSpecsDeployment deploy() {
         cleanUp();
         create(stackIdentifier);
 
-        final RestApiInformation restApiInformation = loadRestApiInformation(stackIdentifier + REST_API_NAME);
-        final WebsocketApiInformation websocketApiInformation = loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
-        final String region = websocketApiInformation.region();
-        final String httpHost = restApiInformation.host(region);
-        final String httpBasePath = restApiInformation.basePath();
-        final String websocketHost = websocketApiInformation.host();
-        final String websocketBasePath = websocketApiInformation.basePath();
+        final WebsocketApiInformation websocketApiInformation =
+                loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
+        final RestApiInformation restApiInformation =
+                loadRestApiInformation(stackIdentifier + REST_API_NAME, websocketApiInformation.region());
 
-        return deploymentBuilder()
-                .usingHttpsAndWss()
-                .withHttpHostname(httpHost)
-                .withWebsocketHostname(websocketHost)
-                .withHttpPort(PORT)
-                .withWebsocketPort(PORT)
-                .withHttpBasePath(httpBasePath)
-                .withWebsocketBasePath(websocketBasePath)
-                .build();
+        final Deployment restApiDeployment = Deployment.httpDeployment(
+                restApiInformation.baseUrl(), websocketApiInformation.baseUrl());
+
+        return RemoteSpecsDeployment.remoteSpecsDeployment(this::cleanUp,
+                Map.of(LambdaRestApiRemoteSpecs.class, restApiDeployment));
     }
 
-    @Override
-    public void cleanUp() {
+    private void cleanUp() {
         deleteAllObjectsInBucket(BUCKET_NAME);
         deleteStacksStartingWith(PREFIX);
-    }
-
-    @Override
-    public List<ClientFactory> supportedClients() {
-        throw new UnsupportedOperationException();
     }
 
     private static void create(final String stackIdentifier) {
@@ -108,19 +91,5 @@ public final class LambdaDeployer implements Deployer {
         uploadToS3Bucket(BUCKET_NAME, stackIdentifier, file);
         final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE;
         createStack(stackIdentifier, templatePath);
-    }
-
-    public static void main(String[] args) { // TODO
-        //deleteStacksStartingWith(PREFIX);
-        //LambdaDeployer lambdaDeployer = lambdaDeployer();
-        //create(lambdaDeployer.stackIdentifier);
-
-        HttpApiInformation httpApiInformation = HttpApiHandler.loadHttpApiInformation("remotespecsXa34fa56d-6363-4a6f-9d3b-1deab801909d RemoteSpecs HTTP Api Lambda Proxy");
-        System.out.println("httpApiInformation = " + httpApiInformation);
-        String host = httpApiInformation.host();
-        System.out.println("host = " + host);
-
-        final String basePath = httpApiInformation.basePath();
-        System.out.println("basePath = " + basePath);
     }
 }

@@ -26,8 +26,6 @@ import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.documentation.support.Deployer;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
 import static org.hamcrest.CoreMatchers.is;

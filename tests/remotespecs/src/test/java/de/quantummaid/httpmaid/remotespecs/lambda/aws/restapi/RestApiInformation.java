@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -34,21 +35,23 @@ import static java.lang.String.format;
 public final class RestApiInformation {
     private final String apiId;
     private final String stageName;
+    private final String region;
 
     public static RestApiInformation restApiInformation(final String apiId,
-                                                        final String stageName) {
-        return new RestApiInformation(apiId, stageName);
+                                                        final String stageName,
+                                                        final String region) {
+        return new RestApiInformation(apiId, stageName, region);
     }
 
-    public String renderUri(final String region) {
-        return format("https://%s.execute-api.%s.amazonaws.com/%s", apiId, region, stageName);
-    }
-
-    public String host(final String region) {
+    public String host() {
         return format("%s.execute-api.%s.amazonaws.com", apiId, region);
     }
 
     public String basePath() {
         return String.format("/%s", stageName);
+    }
+
+    public ApiBaseUrl baseUrl() {
+        return new ApiBaseUrl("https", host(), 443, basePath());
     }
 }

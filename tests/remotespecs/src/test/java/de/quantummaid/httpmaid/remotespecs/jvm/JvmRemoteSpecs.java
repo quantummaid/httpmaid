@@ -22,8 +22,8 @@
 package de.quantummaid.httpmaid.remotespecs.jvm;
 
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static de.quantummaid.httpmaid.remotespecs.jvm.JvmDeployer.jvmDeployer;
@@ -32,7 +32,7 @@ import static de.quantummaid.httpmaid.remotespecs.jvm.JvmDeployer.jvmDeployer;
 public final class JvmRemoteSpecs implements RemoteSpecs {
 
     @Override
-    public Deployer provideDeployer() {
+    public RemoteSpecsDeployer provideDeployer() {
         return jvmDeployer();
     }
 }

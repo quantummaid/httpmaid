@@ -30,12 +30,12 @@ public final class RestApiHandler {
     private RestApiHandler() {
     }
 
-    public static RestApiInformation loadRestApiInformation(final String apiName) {
+    public static RestApiInformation loadRestApiInformation(final String apiName, final String region) {
         final AmazonApiGateway amazonApiGateway = AmazonApiGatewayClientBuilder.defaultClient();
         try {
             final String apiId = restApiIdByName(apiName, amazonApiGateway);
             final String stageName = restApiStageName(apiId, amazonApiGateway);
-            return RestApiInformation.restApiInformation(apiId, stageName);
+            return RestApiInformation.restApiInformation(apiId, stageName, region);
         } finally {
             amazonApiGateway.shutdown();
         }

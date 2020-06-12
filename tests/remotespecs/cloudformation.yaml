@@ -77,12 +77,35 @@ Resources:
   ## HTTP ApiGateway ##
   #####################
 
-  HttpMaidWebsocketApiGateway:
+  HttpMaidHttpApiWithV2Payloads:
     Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy"
       ProtocolType: HTTP
       Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidHttpApiWithV1Payloads:
+    Type: "AWS::ApiGatewayV2::Api"
+    Properties:
+      Body:
+        info:
+          version: "1.0"
+          title: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy"
+        paths:
+          "/{path+}":
+            x-amazon-apigateway-any-method:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+                payloadFormatVersion: "1.0"
+              responses: {}
+              parameters:
+                - required: true
+                  name: path+
+                  in: path
+        openapi: 3.0.1
 
   #####################
   ## REST ApiGateway ##
@@ -114,7 +137,6 @@ Resources:
         IntegrationHttpMethod: POST
         PassthroughBehavior: WHEN_NO_MATCH
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
-
 
   SecondAnyMethod:
     Type: AWS::ApiGateway::Method

@@ -22,16 +22,12 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-
 public interface RemoteSpecs {
 
-    Deployer provideDeployer();
+    RemoteSpecsDeployer provideDeployer();
 
     @Test
     default void httpTest(final TestEnvironment testEnvironment) {

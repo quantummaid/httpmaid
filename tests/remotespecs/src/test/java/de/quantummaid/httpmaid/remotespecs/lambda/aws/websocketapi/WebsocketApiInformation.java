@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,9 @@ public final class WebsocketApiInformation {
 
     public String basePath() {
         return format("/%s", stageName);
+    }
+
+    public ApiBaseUrl baseUrl() {
+        return new ApiBaseUrl("wss", host(), 443, basePath());
     }
 }
