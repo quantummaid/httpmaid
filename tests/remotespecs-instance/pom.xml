@@ -51,8 +51,8 @@
         </dependency>
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
-            <artifactId>mapmaid-jackson</artifactId>
-            <version>0.9.55</version>
+            <artifactId>mapmaid-minimal-json</artifactId>
+            <version>0.9.63</version>
         </dependency>
     </dependencies>
 </project>
