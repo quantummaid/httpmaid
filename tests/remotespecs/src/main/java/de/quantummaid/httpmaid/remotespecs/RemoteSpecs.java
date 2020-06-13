@@ -38,6 +38,15 @@ public interface RemoteSpecs {
     }
 
     @Test
+    default void bodyCanContainJson(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/jsonResponse").viaTheGetMethod().withAnEmptyBody()
+                .withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("{\"foo\":\"bar\"}");
+    }
+
+    @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/statusCode/201").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -62,6 +71,7 @@ public interface RemoteSpecs {
                 .theResponseBodyWas("");
     }
 
+    @Disabled
     @Test
     default void websocketTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()

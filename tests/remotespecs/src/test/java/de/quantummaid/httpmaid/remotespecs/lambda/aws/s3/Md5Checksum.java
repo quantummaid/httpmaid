@@ -32,6 +32,10 @@ public class Md5Checksum {
         this.value = value.toLowerCase();
     }
 
+    public String getValue() {
+        return value;
+    }
+
     public static Md5Checksum ofFile(final File file) {
         byte[] b = md5ChecksumBytesOf(file.getAbsolutePath());
         StringBuilder result = new StringBuilder();

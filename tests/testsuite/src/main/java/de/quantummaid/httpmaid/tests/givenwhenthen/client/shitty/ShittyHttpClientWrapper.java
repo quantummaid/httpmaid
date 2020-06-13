@@ -145,6 +145,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                                             final Map<String, String> headers,
                                             final Consumer<HttpEntityEnclosingRequest> bodyAppender) {
         final String url = appendPathToUrl(deployment.baseUrl(), path);
+        System.out.println("url = " + url);
         final HttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, url);
         headers.forEach(request::addHeader);
         bodyAppender.accept(request);

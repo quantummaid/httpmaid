@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
@@ -50,7 +51,8 @@ public final class RemoteSpecsExtension implements ParameterResolver,
         final RemoteSpecsDeployment deployment = getDeployment(ctx);
         validateNotNull(deployment, "deployment");
         final Deployer deployer = dummyDeployer(deployment.descriptorFor((Class<? extends RemoteSpecs>) testClass));
-        final ClientFactory clientFactory = theShittyTestClient();
+        //final ClientFactory clientFactory = theShittyTestClient();
+        final ClientFactory clientFactory = RealHttpMaidClientFactory.theRealHttpMaidClient();
         return testEnvironment(deployer, clientFactory);
     }
 

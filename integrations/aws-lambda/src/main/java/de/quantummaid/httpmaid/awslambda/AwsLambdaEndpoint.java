@@ -32,11 +32,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.*;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.stream.Collectors.joining;
 
 @ToString
 @EqualsAndHashCode
@@ -82,8 +84,35 @@ public final class AwsLambdaEndpoint {
 
             final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
             responseMap.put("statusCode", statusCode);
-            responseMap.put("multiValueHeaders", responseHeaders);
+
+            final Map<String, String> singleHeaders = new LinkedHashMap<>();
+            responseHeaders.forEach((key, values) -> singleHeaders.put(key, values.stream().collect(joining(","))));
+            responseMap.put("headers", singleHeaders);
+            //responseMap.put("headers", responseHeaders);
             responseMap.put("body", responseBody);
+
+            /*
+            System.out.println("starting to create response");
+            try {
+                final int statusCode = response.status();
+                final Map<String, List<String>> responseHeaders = response.headers();
+                final String responseBody = response.stringBody();
+
+                final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
+                responseMap.put("statusCode", statusCode);
+                responseMap.put("multiValueHeaders", responseHeaders);
+                final Map<String, String> singleHeaders = new LinkedHashMap<>();
+                responseHeaders.forEach((key, values) -> singleHeaders.put(key, values.get(0)));
+                responseMap.put("headers", singleHeaders);
+                responseMap.put("body", responseBody);
+
+                System.out.println("responseMap = " + responseMap);
+                return responseMap;
+            } catch (final Throwable e) {
+                e.printStackTrace();
+                throw e;
+            }
+             */
 
             return responseMap;
         });

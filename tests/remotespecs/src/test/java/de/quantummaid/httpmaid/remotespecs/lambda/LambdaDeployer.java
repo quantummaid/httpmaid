@@ -81,6 +81,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     private static final String REST_API_NAME = " RemoteSpecs Rest Api Lambda Proxy";
     private static final String HTTP_V2_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = " RemoteSpecs WebSockets Lambda Proxy";
+    public static final String REMOTESPECS_STACK_IDENTIFIER_ENV = "REMOTESPECS_STACK_IDENTIFIER";
 
     private final String stackIdentifier;
     private final Boolean developerMode;
@@ -118,12 +119,12 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
         final File file = new File(lambdaPath);
-        uploadToS3Bucket(artifactBucketName, stackIdentifier, file);
+        final String s3Key = uploadToS3Bucket(artifactBucketName, file);
 
         create("cf-lambda.yml", stackIdentifier + "-lambda",
                 Map.of("StackIdentifier", stackIdentifier,
                     "ArtifactBucketName", artifactBucketName,
-                "ArtifactKey", stackIdentifier));
+                "ArtifactKey", s3Key));
 
         final WebsocketApiInformation websocketApiInformation =
                 loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
@@ -166,7 +167,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     }
 
     private static Optional<String> userProvidedStackIdentifier() {
-        final String stackIdentifier = System.getenv("REMOTESPECS_STACK_IDENTIFIER");
+        final String stackIdentifier = System.getenv(REMOTESPECS_STACK_IDENTIFIER_ENV);
         return ofNullable(stackIdentifier).map(s -> "dev-" + s);
     }
 

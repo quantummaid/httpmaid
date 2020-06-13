@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
 import com.amazonaws.services.cloudformation.model.*;
-import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +39,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackCreation;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackDeletion;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.*;
 import static java.lang.String.format;
 
 @ToString
@@ -114,12 +112,13 @@ public final class CloudFormationHandler implements AutoCloseable {
             final String message = e.getMessage();
             if (message.contains("No updates are to be performed.")) {
                 log.info("Stack {} was already up to date.", stackIdentifier);
+                return;
             } else {
                 throw new CloudFormationHandlerException(
                         format("Exception thrown during update of stack %s", stackIdentifier), e);
             }
         }
-        waitForStackCreation(stackIdentifier, amazonCloudFormation);
+        waitForStackUpdate(stackIdentifier, amazonCloudFormation);
         log.info("Updated stack {}.", stackIdentifier);
     }
 
