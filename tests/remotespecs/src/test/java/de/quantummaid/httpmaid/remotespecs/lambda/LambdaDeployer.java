@@ -35,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,6 +50,26 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.http
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
 
+/**
+ * When stackIdentifier is not user-supplied, then
+ * - the default stackIdentifier is: httpmaid-remotespecs-${AWS::AccountId}
+ * - the default stack naming scheme is: ${stackIdentifier}-(lambda|bucket)
+ * - The bucket is owned by ??? (whoever runs through the test setup first)
+ * - Any other user needing access must have that access granted some other way
+ *   (additional policy, etc...). Users who cannot do that simply define
+ *   a user-supplied stackidentifier.
+ * - cleanup policy
+ *   - bucket stack remains
+ *   - lambda stack is deleted
+ *
+ * When stackIdentifier is user-supplied, we're in the "per-user-infra" mode
+ * - $stackIdentifier-lambda is created, owned by the user running the test
+ * - $stackIdentifier-bucket is created, ditto
+ * - cleanup policy
+ *   - bucket stack remains
+ *   - lambda stack remains
+ *   (ie Both must be cleaned up / managed by the user)
+ */
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -55,7 +77,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     private static final String PREFIX = "remotespecsX";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
     private static final String BUCKET_NAME = "remotespecs";
-    private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";
+    private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs";
     private static final String REST_API_NAME = " RemoteSpecs Rest Api Lambda Proxy";
     private static final String HTTP_V2_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = " RemoteSpecs WebSockets Lambda Proxy";
@@ -72,7 +94,21 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     @Override
     public RemoteSpecsDeployment deploy() {
         cleanUp();
-        create(stackIdentifier);
+        final String artifactBucketName = stackIdentifier + "-bucket"; // compute this
+
+        create("cf-bucket.yml", stackIdentifier + "-bucket",
+                Map.of("StackIdentifier", stackIdentifier,
+                        "ArtifactBucketName", artifactBucketName));
+
+        final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
+        final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
+        final File file = new File(lambdaPath);
+        uploadToS3Bucket(BUCKET_NAME, stackIdentifier, file);
+
+        create("cf-lambda.yml", stackIdentifier + "-lambda",
+                Map.of("StackIdentifier", stackIdentifier,
+                    "ArtifactBucketName", artifactBucketName,
+                "ArtifactKey", stackIdentifier));
 
         final WebsocketApiInformation websocketApiInformation =
                 loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
@@ -116,14 +152,15 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         return ofNullable(stackIdentifier);
     }
 
-    private static void create(final String stackIdentifier) {
+    private static void create(
+            final String templateFilename,
+            final String stackName,
+            final Map<String, String> stackParameters) {
+
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
-        final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
-        final File file = new File(lambdaPath);
-        uploadToS3Bucket(BUCKET_NAME, stackIdentifier, file);
-        final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE;
+        final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE + "/" + templateFilename;
         try (final CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
-            cloudFormationHandler.createOrUpdateStack(stackIdentifier, templatePath);
+            cloudFormationHandler.createOrUpdateStack(stackName, templatePath, stackParameters);
         }
     }
 }

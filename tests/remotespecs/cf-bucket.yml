@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 bucket required to run remote specs tests.
+
+Parameters:
+  ArtifactBucketName:
+    Type: String
+    Description: "S3 Bucket were remotespecs jars are located"
+
+  StackIdentifier:
+    Type: String
+
+Resources:
+  RemoteSpecsArtifactBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      AccessControl: Private
+      BucketName: !Ref ArtifactBucketName
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            ExpirationInDays: 7

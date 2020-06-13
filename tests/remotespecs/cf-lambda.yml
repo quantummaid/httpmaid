@@ -7,6 +7,14 @@ Parameters:
     Type: String
     Description: "Unique string to identify the stack"
 
+  ArtifactBucketName:
+    Type: String
+    Description: "S3 Bucket were remotespecs jars are located"
+
+  ArtifactKey:
+    Type: String
+    Description: "S3 Key of the remotespecs lamba jar to deploy"
+
 Resources:
   ############
   ## Lambda ##
@@ -26,6 +34,19 @@ Resources:
               - Action:
                   - sts:AssumeRole
                 Resource: '*'
+                Effect: Allow
+        - PolicyName: !Sub "${StackIdentifier}-UseDBPolicy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Query'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:UpdateItem'
+                Resource: 'arn:aws:dynamodb:eu-central-1:712767472906:table/WebsocketsTest'
                 Effect: Allow
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -49,12 +70,12 @@ Resources:
     Properties:
       FunctionName: !Sub "${StackIdentifier}-Deployment"
       Code:
-        S3Bucket: "remotespecs"
-        S3Key: !Sub "${StackIdentifier}"
+        S3Bucket: !Ref ArtifactBucketName
+        S3Key: !Sub ArtifactKey
       Tags:
         - Key: StackIdentifier
           Value: !Ref StackIdentifier
-      MemorySize: 192
+      MemorySize: 512
       Handler: de.quantummaid.httpmaid.testlambda.TestLambda::handleRequest
       Role: !GetAtt FunctionRole.Arn
       Timeout: 20
@@ -64,17 +85,44 @@ Resources:
   ## HTTP ApiGateway ##
   #####################
 
-  #HttpApi:
-  #  Type: 'AWS::ApiGatewayV2::Api'
-  #  Properties:
-  #    Name: RemoteSpecs HTTP Lambda Proxy
-  #    ProtocolType: HTTP
-  #    Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+  HttpMaidHttpApiWithV2Payloads:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy"
+      ProtocolType: HTTP
+      Target: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidHttpApiWithV1Payloads:
+    Type: "AWS::ApiGatewayV2::Api"
+    Properties:
+      Body:
+        info:
+          version: "1.0"
+          title: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy"
+        paths:
+          "/{path+}":
+            x-amazon-apigateway-any-method:
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                type: aws_proxy
+                uri: !Sub >-
+                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+                payloadFormatVersion: "1.0"
+              responses: {}
+              parameters:
+                - required: true
+                  name: path+
+                  in: path
+        openapi: 3.0.1
+
+  #####################
+  ## REST ApiGateway ##
+  #####################
 
   HttpMaidApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Lambda Proxy"
+      Name: !Sub "${StackIdentifier} RemoteSpecs Rest Api Lambda Proxy"
       FailOnWarnings: true
 
   ApiResource:
@@ -97,7 +145,6 @@ Resources:
         IntegrationHttpMethod: POST
         PassthroughBehavior: WHEN_NO_MATCH
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
-
 
   SecondAnyMethod:
     Type: AWS::ApiGateway::Method
@@ -194,7 +241,6 @@ Resources:
       ApiId: !Ref HttpMaidWebsocketsApi
       RouteResponseKey: $default
 
-  # NATPunch websocket deployment descriptor; see 'stage' below.
   HttpMaidWebsocketsApiDeployment:
     Type: AWS::ApiGatewayV2::Deployment
     # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-deployment.html for
@@ -208,7 +254,6 @@ Resources:
     Properties:
       ApiId: !Ref HttpMaidWebsocketsApi
 
-  # NATPunch websocket deployment stage descriptor; see 'deployment' above.
   HttpMaidWebsocketsApiStage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:

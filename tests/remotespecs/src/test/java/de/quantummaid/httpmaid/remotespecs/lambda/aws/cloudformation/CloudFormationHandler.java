@@ -36,6 +36,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.waitForStackCreation;
@@ -54,39 +56,34 @@ public final class CloudFormationHandler implements AutoCloseable {
         return new CloudFormationHandler(amazonCloudFormation);
     }
 
-    public void createOrUpdateStack(final String stackIdentifier,
-                                    final String pathToTemplate) {
+    public void createOrUpdateStack(final String stackName,
+                                    final String pathToTemplate, Map<String, String> stackParameters) {
         try {
-            createStack(stackIdentifier, pathToTemplate);
+            createStack(stackName, pathToTemplate, stackParameters);
         } catch (final AlreadyExistsException e) {
-            log.info("Stack {} already exists, updating instead.", stackIdentifier);
-            updateStack(stackIdentifier, pathToTemplate);
+            log.info("Stack {} already exists, updating instead.", stackName);
+            updateStack(stackName, pathToTemplate, stackParameters);
         }
     }
 
-    public static void main(String[] args) {
-        final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
-        final String lambdaPath = basePath + "/tests/lambda/target/remotespecs.jar";
-        CloudFormationHandler cloudFormationHandler = CloudFormationHandler.connectToCloudFormation();
-        System.out.println("first");
-        cloudFormationHandler.createStack("foo", lambdaPath);
-        System.out.println("second");
-        cloudFormationHandler.createStack("foo", lambdaPath);
-    }
-
     public void createStack(final String stackIdentifier,
-                            final String pathToTemplate) {
+                            final String pathToTemplate,
+                            final Map<String, String> stackParameters) {
         log.info("Creating stack {}...", stackIdentifier);
         final String templateBody = fileToString(pathToTemplate);
         final CreateStackRequest createStackRequest = new CreateStackRequest();
         createStackRequest.setStackName(stackIdentifier);
         createStackRequest.setCapabilities(List.of("CAPABILITY_NAMED_IAM"));
         createStackRequest.setTemplateBody(templateBody);
-
-        final Parameter parameter = new Parameter();
-        parameter.setParameterKey("StackIdentifier");
-        parameter.setParameterValue(stackIdentifier);
-        createStackRequest.setParameters(List.of(parameter));
+        createStackRequest.setParameters(
+                stackParameters.entrySet().stream().map(
+                        kv -> {
+                            Parameter param = new Parameter();
+                            param.setParameterKey(kv.getKey());
+                            param.setParameterValue(kv.getValue());
+                            return param;
+                        }).collect(Collectors.toList())
+        );
 
         amazonCloudFormation.createStack(createStackRequest);
         waitForStackCreation(stackIdentifier, amazonCloudFormation);
@@ -94,18 +91,22 @@ public final class CloudFormationHandler implements AutoCloseable {
     }
 
     public void updateStack(final String stackIdentifier,
-                            final String pathToTemplate) {
+                            final String pathToTemplate, Map<String, String> stackParameters) {
         log.info("Updating stack {}...", stackIdentifier);
         final String templateBody = fileToString(pathToTemplate);
         final UpdateStackRequest updateStackRequest = new UpdateStackRequest();
         updateStackRequest.setStackName(stackIdentifier);
         updateStackRequest.setCapabilities(List.of("CAPABILITY_NAMED_IAM"));
         updateStackRequest.setTemplateBody(templateBody);
-
-        final Parameter parameter = new Parameter();
-        parameter.setParameterKey("StackIdentifier");
-        parameter.setParameterValue(stackIdentifier);
-        updateStackRequest.setParameters(List.of(parameter));
+        updateStackRequest.setParameters(
+                stackParameters.entrySet().stream().map(
+                        kv -> {
+                            Parameter param = new Parameter();
+                            param.setParameterKey(kv.getKey());
+                            param.setParameterValue(kv.getValue());
+                            return param;
+                        }).collect(Collectors.toList())
+        );
 
         try {
             amazonCloudFormation.updateStack(updateStackRequest);
