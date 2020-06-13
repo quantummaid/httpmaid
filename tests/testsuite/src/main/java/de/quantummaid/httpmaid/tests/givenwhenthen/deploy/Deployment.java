@@ -56,7 +56,7 @@ public final class Deployment {
     }
 
     public static Deployment localhostHttpAndWebsocketDeployment(int httpPort, int websocketPort) {
-        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), ApiBaseUrl.localhostWebsocketBaseUrl(httpPort));
+        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), ApiBaseUrl.localhostWebsocketBaseUrl(websocketPort));
     }
 
     public static Deployment httpDeployment(final ApiBaseUrl httpBaseUrl,

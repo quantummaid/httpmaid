@@ -39,8 +39,15 @@ public final class CloudFormationWaiter {
     private CloudFormationWaiter() {
     }
 
+    public static void waitForStackUpdate(final String stackIdentifier,
+                                          final AmazonCloudFormation amazonCloudFormation) {
+        final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackUpdateComplete();
+        final String description = format("update of stack '%s'", stackIdentifier);
+        wait(waiter, stackIdentifier, description);
+    }
+
     public static void waitForStackCreation(final String stackIdentifier,
-                                             final AmazonCloudFormation amazonCloudFormation) {
+                                            final AmazonCloudFormation amazonCloudFormation) {
         final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackCreateComplete();
         final String description = format("creation of stack '%s'", stackIdentifier);
         wait(waiter, stackIdentifier, description);
@@ -61,7 +68,7 @@ public final class CloudFormationWaiter {
         final Future<Void> waitFuture = waiter.runAsync(new WaiterParameters<>(request), waiterHandler);
 
         try {
-            waitFuture.get(2, TimeUnit.MINUTES);
+            waitFuture.get(4, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (final ExecutionException | TimeoutException e) {

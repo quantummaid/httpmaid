@@ -79,12 +79,11 @@ public final class AwsLambdaEvent {
     }
 
     public static boolean isWebSocketRequest(final Map<String, Object> event) {
-        if (!event.containsKey("version")) {
-            return false;
+        final Map<String, Object> context = (Map<String, Object>) event.get(REQUEST_CONTEXT);
+        if(context.containsKey("connectionId")) {
+            System.out.println("connectionId found");
+            return true;
         }
-        if (event.containsKey("rawPath")) {
-            return false;
-        }
-        return true;
+        return false;
     }
 }
