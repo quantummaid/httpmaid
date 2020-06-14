@@ -41,11 +41,6 @@ public interface HttpClientWrapper extends AutoCloseable {
                                    Map<String, String> queryParameters,
                                    Map<String, List<String>> headers);
 
-    void openWebsocketAndSendMessage(Consumer<String> responseHandler,
-                                     String message,
-                                     Map<String, String> queryParameters,
-                                     Map<String, List<String>> headers);
-
     @Override
     default void close() {
     }

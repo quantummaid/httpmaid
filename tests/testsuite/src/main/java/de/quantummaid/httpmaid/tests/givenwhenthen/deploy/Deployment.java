@@ -27,21 +27,16 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static java.lang.String.format;
+import java.util.Objects;
+import java.util.Optional;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Deployment {
     private final HttpMaid httpMaid;
-    private final String httpProtocol;
-    private final String httpHostname;
-    private final String websocketProtocol;
-    private final String websocketHostname;
-    private final int httpPort;
-    private final int websocketPort;
-    private final String httpBasePath;
-    private final String websocketBasePath;
+    private final ApiBaseUrl httpBaseUrl;
+    private final ApiBaseUrl webSocketBaseUrl;
 
     public static Deployment localhostHttpDeployment(int httpPort) {
         return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), null);
@@ -61,66 +56,22 @@ public final class Deployment {
 
     public static Deployment httpDeployment(final ApiBaseUrl httpBaseUrl,
                                             final ApiBaseUrl webSocketBaseUrl) {
-        if (httpBaseUrl.basePath != null && !httpBaseUrl.basePath.startsWith("/")) {
-            throw new IllegalArgumentException("httpBasePath has to start with a '/'");
-        }
-        if (webSocketBaseUrl.basePath != null && !webSocketBaseUrl.basePath.startsWith("/")) {
-            throw new IllegalArgumentException("websocketBasePath has to start with a '/'");
-        }
-        return new Deployment(
-                null,
-                httpBaseUrl.protocol,
-                httpBaseUrl.hostName,
-                webSocketBaseUrl.protocol,
-                webSocketBaseUrl.hostName,
-                httpBaseUrl.port,
-                webSocketBaseUrl.port,
-                httpBaseUrl.basePath,
-                webSocketBaseUrl.basePath
-        );
+        return new Deployment(null, httpBaseUrl, webSocketBaseUrl);
     }
 
     public static Deployment bypassedDeployment(final HttpMaid httpMaid) {
-        return new Deployment(httpMaid, null, null, null, null, -1, -1, null, null);
+        return new Deployment(httpMaid, null, null);
     }
 
-    public HttpMaid httpMaid() {
-        return httpMaid;
+    public Optional<HttpMaid> httpMaid() {
+        return Optional.ofNullable(httpMaid);
     }
 
-    public String protocol() {
-        return httpProtocol;
+    public Optional<ApiBaseUrl> httpBaseUrl() {
+        return Optional.ofNullable(httpBaseUrl);
     }
 
-    public int httpPort() {
-        return httpPort;
-    }
-
-    public int websocketPort() {
-        return websocketPort;
-    }
-
-    public String httpHostname() {
-        return httpHostname;
-    }
-
-    public String websocketHostname() {
-        return websocketHostname;
-    }
-
-    public String httpBasePath() {
-        return httpBasePath;
-    }
-
-    public String websocketBasePath() {
-        return websocketBasePath;
-    }
-
-    public String baseUrl() {
-        return httpProtocol + "://" + httpHostname + ":" + httpPort + httpBasePath;
-    }
-
-    public String websocketUri() {
-        return format("%s://%s:%d%s", websocketProtocol, websocketHostname, websocketPort, websocketBasePath);
+    public Optional<ApiBaseUrl> webSocketBaseUrl() {
+        return Optional.ofNullable(webSocketBaseUrl);
     }
 }

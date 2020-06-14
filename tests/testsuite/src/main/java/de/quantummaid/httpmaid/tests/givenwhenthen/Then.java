@@ -30,6 +30,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
 
@@ -82,6 +83,17 @@ public final class Then {
             normalizedHeaders.put(headerName, headerValues);
         });
         return normalizedHeaders;
+    }
+
+    private List<String> normalizeHeaderValues(final List<String> values) {
+        return values.stream()
+                .map(this::normalizeHeaderValue)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> normalizeHeaderValue(final String value) {
+        return Arrays.asList(value.split(","));
     }
 
     public Then theResponseBodyWas(final String expectedResponseBody) {

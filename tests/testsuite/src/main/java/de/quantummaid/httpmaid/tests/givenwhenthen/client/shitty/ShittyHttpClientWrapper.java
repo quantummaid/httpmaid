@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
@@ -74,20 +75,12 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     }
 
     @Override
-    public void openWebsocketAndSendMessage(final Consumer<String> responseHandler,
-                                            final String message,
-                                            final Map<String, String> queryParameters,
-                                            final Map<String, List<String>> headers) {
-        final ShittyWebsocketClient shittyWebsocketClient = ShittyWebsocketClient.openWebsocket(
-                deployment.websocketUri(), responseHandler, headers, queryParameters);
-        shittyWebsocketClient.send(message);
-    }
-
-    @Override
     public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
                                           final Map<String, String> queryParameters,
                                           final Map<String, List<String>> headers) {
-        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(deployment.websocketUri(), responseHandler, headers, queryParameters);
+        ApiBaseUrl url = deployment.webSocketBaseUrl()
+                .orElseThrow(() -> new UnsupportedOperationException("Not a websocket deployment " + toString()));
+        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(url.toUrlString(), responseHandler, headers, queryParameters);
         return wrappedWebsocket(client::send, client);
     }
 
@@ -144,20 +137,21 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                                             final String method,
                                             final Map<String, String> headers,
                                             final Consumer<HttpEntityEnclosingRequest> bodyAppender) {
-        final String url = appendPathToUrl(deployment.baseUrl(), path);
-        System.out.println("url = " + url);
+        final ApiBaseUrl baseUrl = deployment.httpBaseUrl()
+                .orElseThrow(() -> new UnsupportedOperationException("Not an http deployment " + toString()));
+        final String url = appendPathToUrl(baseUrl.toUrlString(), path);
         final HttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, url);
         headers.forEach(request::addHeader);
         bodyAppender.accept(request);
         try (DefaultBHttpClientConnection connection = new DefaultBHttpClientConnection(BUFFER_SIZE);
-             Socket socket = createSocket(deployment)) {
+             Socket socket = createSocket(baseUrl)) {
             connection.bind(socket);
             final HttpProcessor httpProcessor = create()
                     .add(new RequestContent())
                     .add(new RequestTargetHost())
                     .build();
             final HttpCoreContext context = HttpCoreContext.create();
-            context.setTargetHost(new HttpHost(deployment.httpHostname()));
+            context.setTargetHost(new HttpHost(baseUrl.hostName));
             httpProcessor.process(request, context);
             final HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
             final HttpResponse response = httpexecutor.execute(request, connection, context);
@@ -194,15 +188,15 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
         return normalizedUrl + "/" + normalizedPath;
     }
 
-    private static Socket createSocket(final Deployment deployment) {
+    private static Socket createSocket(final ApiBaseUrl baseUrl) {
         try {
-            if (deployment.protocol().equals("http")) {
-                return new Socket(deployment.httpHostname(), deployment.httpPort());
+            if (baseUrl.transportProtocol().equals("http")) {
+                return new Socket(baseUrl.hostName, baseUrl.port);
             }
             final SSLContext sslcontext = SSLContexts.createSystemDefault();
             final SocketFactory socketFactory = sslcontext.getSocketFactory();
 
-            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(deployment.httpHostname(), deployment.httpPort());
+            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(baseUrl.hostName, baseUrl.port);
             // Enforce TLS and disable SSL
             socket.setEnabledProtocols(new String[]{
                     "TLSv1",

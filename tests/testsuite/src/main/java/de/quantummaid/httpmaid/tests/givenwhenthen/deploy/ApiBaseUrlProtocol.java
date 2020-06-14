@@ -19,21 +19,40 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.issuer.real;
+package de.quantummaid.httpmaid.tests.givenwhenthen.deploy;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public enum Protocol {
-    HTTP("http"), HTTPS("https");
-    private final String identifier;
+public enum ApiBaseUrlProtocol {
+    HTTP("http", "http"),
+    HTTPS("https", "https"),
+    WS("ws", "http"),
+    WSS("wss", "https");
 
-    public static Protocol parse(final String input) {
-        return valueOf(input.toUpperCase());
+    private final String urlProtocol;
+    private final String transportProtocol;
+
+    public static ApiBaseUrlProtocol protocol(final String value) {
+        if ("http".equals(value)) {
+            return HTTP;
+        } else if ("https".equals(value)) {
+            return HTTPS;
+        } else if ("ws".equals(value)) {
+            return WS;
+        } else if ("wss".equals(value)) {
+            return WSS;
+        } else {
+            throw new UnsupportedOperationException("Unknown protocol: " + value);
+        }
     }
 
-    public String identifier() {
-        return this.identifier;
+    public String transportProtocol() {
+        return transportProtocol;
+    }
+
+    public String urlProtocol() {
+        return this.urlProtocol;
     }
 }

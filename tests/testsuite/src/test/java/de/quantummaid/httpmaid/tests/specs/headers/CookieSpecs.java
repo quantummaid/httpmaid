@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.specs;
+package de.quantummaid.httpmaid.tests.specs.headers;
 
 import de.quantummaid.httpmaid.http.headers.cookies.SameSitePolicy;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
