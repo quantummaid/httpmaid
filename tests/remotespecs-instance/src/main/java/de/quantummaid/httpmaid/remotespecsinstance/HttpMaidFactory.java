@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
@@ -52,7 +51,7 @@ public final class HttpMaidFactory {
 
                 .get("/returnHeader/<name>", (request, response) -> {
                     final String headerName = request.pathParameters().getPathParameter("name");
-                    final String header = request.headers().getHeader(headerName);
+                    final String header = request.headers().header(headerName);
                     response.setBody(header);
                 })
 

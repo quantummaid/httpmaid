@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toSelectWebsocketRoutesBasedOn;
 
@@ -70,7 +69,7 @@ public final class WebsocketSpecs {
         testEnvironment.given(checkpoints ->
                 anHttpMaid()
                         .websocket("handler", (request, response) -> {
-                            final String myHeader = request.headers().getHeader("myHeader");
+                            final String myHeader = request.headers().header("myHeader");
                             checkpoints.visitCheckpoint(myHeader);
                         })
                         .build()

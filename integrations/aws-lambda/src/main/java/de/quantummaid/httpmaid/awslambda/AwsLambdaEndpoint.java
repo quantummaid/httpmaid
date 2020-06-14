@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.awslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +33,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.*;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
+import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.joining;
 
@@ -71,9 +72,9 @@ public final class AwsLambdaEndpoint {
             final String path = (String) httpInformation.get("path");
             builder.withPath(path);
             final Map<String, Object> headers = event.getMap("headers");
-            final Map<String, List<String>> multiHeaders = new LinkedHashMap<>();
-            headers.forEach((key, value) -> multiHeaders.put(key, List.of((String) value)));
-            builder.withHeaders(multiHeaders);
+            final HeadersBuilder headersBuilder = headersBuilder();
+            headers.forEach((key, value) -> headersBuilder.withAdditionalHeader(key, (String) value));
+            builder.withHeaders(headersBuilder.build());
             final Map<String, String> queryParameters = Map.of();
             builder.withUniqueQueryParameters(queryParameters);
             final String body = "";
@@ -139,7 +140,9 @@ public final class AwsLambdaEndpoint {
             final String path = event.getAsString(PATH);
             builder.withPath(path);
             final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
-            builder.withHeaders(headers);
+            final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
+            headersBuilder.withHeadersMap(headers);
+            builder.withHeaders(headersBuilder.build());
             final Map<String, String> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
             builder.withUniqueQueryParameters(queryParameters);
             final String body = event.getOrDefault(BODY, "");

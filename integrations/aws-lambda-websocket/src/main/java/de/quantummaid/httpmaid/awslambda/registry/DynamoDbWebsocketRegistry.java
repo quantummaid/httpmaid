@@ -92,11 +92,12 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
 
         final String senderId = (String) map.get("senderId");
         // TODO: should be Map<String, List<String>>
-        final Map<String, String> headers = (Map<String, String>) map.get("headers");
+        //final Map<String, String> headers = (Map<String, String>) map.get("headers");
         final Optional<String> contentType = Optional.ofNullable((String) map.get("contentType"));
         final Map<String, String> queryParameters = (Map<String, String>) map.get("queryParameters");
 
-        return restoreFromStrings(connectionInformation, senderId, headers, contentType, queryParameters);
+        throw new UnsupportedOperationException("tilt");
+        //return restoreFromStrings(connectionInformation, senderId, null, contentType, queryParameters); // TODO
     }
 
     private static Map<String, Object> serializeEntry(final WebsocketRegistryEntry entry) {
@@ -110,7 +111,7 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
         final Map<String, Object> map = new HashMap<>();
         map.put("connectionInformation", connectionInformationMap);
         map.put("senderId", entry.senderId().asString());
-        map.put("headers", entry.headers().asStringMap());
+        //map.put("headers", entry.headers()); TODO
         final String contentType = encodeContentType(entry.contentType());
         map.put("contentType", contentType);
         map.put("queryParameters", entry.queryParameters().asStringMap());

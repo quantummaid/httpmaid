@@ -22,7 +22,8 @@
 package de.quantummaid.httpmaid.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
-import de.quantummaid.httpmaid.util.Maps;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
@@ -44,7 +44,7 @@ import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 public final class RawHttpRequestBuilder {
     private String path;
     private String requestMethod;
-    private Map<String, List<String>> headers = new HashMap<>();
+    private Headers headers;
     private Map<String, String> queryParameters = new HashMap<>();
     private InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData = new HashMap<>();
@@ -69,12 +69,7 @@ public final class RawHttpRequestBuilder {
         return this;
     }
 
-    public RawHttpRequestBuilder withUniqueHeaders(final Map<String, String> headers) {
-        final Map<String, List<String>> multiMap = Maps.mapToMultiMap(headers);
-        return withHeaders(multiMap);
-    }
-
-    public RawHttpRequestBuilder withHeaders(final Map<String, List<String>> headers) {
+    public RawHttpRequestBuilder withHeaders(final Headers headers) {
         this.headers = headers;
         return this;
     }

@@ -45,7 +45,7 @@ public final class Cookies {
 
     public static Cookies cookiesFromHeaders(final Headers headers) {
         final Map<CookieName, CookieValue> cookies = new HashMap<>();
-        headers.getOptionalHeader(COOKIE).ifPresent(header -> {
+        headers.optionalHeader(COOKIE).ifPresent(header -> {
             final String[] keyValuePairs = header.split("; ");
             stream(keyValuePairs)
                     .map(Cookies::parseKeyValuePair)

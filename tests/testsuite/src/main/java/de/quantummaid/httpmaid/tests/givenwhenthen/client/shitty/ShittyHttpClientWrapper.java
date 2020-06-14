@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
@@ -87,7 +88,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     @Override
     public HttpClientResponse issueRequestWithoutBody(final String path,
                                                       final String method,
-                                                      final Map<String, String> headers) {
+                                                      final Headers headers) {
         return issueRequest(path, method, headers, request -> {
         });
     }
@@ -95,7 +96,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     @Override
     public HttpClientResponse issueRequestWithStringBody(final String path,
                                                          final String method,
-                                                         final Map<String, String> headers,
+                                                         final Headers headers,
                                                          final String body) {
         return issueRequest(path, method, headers, request -> {
             try {
@@ -110,7 +111,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     @Override
     public HttpClientResponse issueRequestWithMultipartBody(final String path,
                                                             final String method,
-                                                            final Map<String, String> headers,
+                                                            final Headers headers,
                                                             final List<MultipartElement> parts) {
         return issueRequest(path, method, headers, request -> {
             final MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder
@@ -135,7 +136,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
 
     private HttpClientResponse issueRequest(final String path,
                                             final String method,
-                                            final Map<String, String> headers,
+                                            final Headers headers,
                                             final Consumer<HttpEntityEnclosingRequest> bodyAppender) {
         final ApiBaseUrl baseUrl = deployment.httpBaseUrl()
                 .orElseThrow(() -> new UnsupportedOperationException("Not an http deployment " + toString()));

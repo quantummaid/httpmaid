@@ -23,13 +23,13 @@ package de.quantummaid.httpmaid.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.http.Headers;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
@@ -41,7 +41,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 public final class RawHttpRequest implements RawRequest {
     private final String path;
     private final String requestMethod;
-    private final Map<String, List<String>> headers;
+    private final Headers headers;
     private final Map<String, String> queryParameters;
     private final InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData;
@@ -52,7 +52,7 @@ public final class RawHttpRequest implements RawRequest {
 
     public static RawHttpRequest rawHttpRequest(final String path,
                                                 final String requestMethod,
-                                                final Map<String, List<String>> headers,
+                                                final Headers headers,
                                                 final Map<String, String> queryParameters,
                                                 final InputStream body,
                                                 final Map<MetaDataKey<?>, Object> additionalMetaData) {
@@ -68,7 +68,7 @@ public final class RawHttpRequest implements RawRequest {
     public void enter(final MetaData metaData) {
         metaData.set(RAW_PATH, path);
         metaData.set(RAW_METHOD, requestMethod);
-        metaData.set(RAW_REQUEST_HEADERS, headers);
+        metaData.set(REQUEST_HEADERS, headers);
         metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
         metaData.set(REQUEST_BODY_STREAM, body);
         metaData.set(IS_HTTP_REQUEST, true);

@@ -64,14 +64,14 @@ public final class ResponseHeaders {
     public void addHeader(final String name, final String value) {
         final HeaderKey headerKey = headerKey(name);
         final List<HeaderValue> headerValues = ofNullable(headers.get(headerKey)).orElse(new ArrayList<>());
-        final HeaderValue headerValue = HeaderValue.singleHeaderValue(value);
+        final HeaderValue headerValue = HeaderValue.headerValue(value);
         headerValues.add(headerValue);
         headers.put(headerKey, headerValues);
     }
 
     public void setHeader(final String name, final String value) {
         final HeaderKey headerKey = headerKey(name);
-        final HeaderValue headerValue = HeaderValue.singleHeaderValue(value);
+        final HeaderValue headerValue = HeaderValue.headerValue(value);
         headers.put(headerKey, new ArrayList<>(List.of(headerValue)));
     }
 }

@@ -26,18 +26,19 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.client.HeaderValue.headerValue;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
+import static java.util.Collections.unmodifiableList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpClientRequest<T> {
     private final RequestPath path;
     private final String method;
-    private final Map<HeaderKey, HeaderValue> headers;
+    private final List<Header> headers;
     private final InputStream body;
     private final Class<T> targetType;
 
@@ -69,15 +70,15 @@ public final class HttpClientRequest<T> {
     static <T> HttpClientRequest<T> httpClientRequest(
             final RequestPath requestPath,
             final String method,
-            final Map<HeaderKey, HeaderValue> headers,
+            final List<Header> headers,
             final Optional<Body> bodyOptional,
             final Class<T> targetType) {
-        final Map<HeaderKey, HeaderValue> fixedHeaders = new HashMap<>(headers);
+        final List<Header> fixedHeaders = new ArrayList<>(headers);
         final InputStream bodyStream;
         if (bodyOptional.isPresent()) {
             final Body body = bodyOptional.get();
             body.contentType().ifPresent(contentType ->
-                    fixedHeaders.put(HeaderKey.headerKey(CONTENT_TYPE), headerValue(contentType))
+                    fixedHeaders.add(Header.header(HeaderName.headerKey(CONTENT_TYPE), headerValue(contentType)))
             );
             bodyStream = body.inputStream();
         } else {
@@ -95,10 +96,8 @@ public final class HttpClientRequest<T> {
         return this.method;
     }
 
-    public Map<String, String> headers() {
-        final Map<String, String> stringMap = new HashMap<>();
-        headers.forEach((key, value) -> stringMap.put(key.value(), value.value()));
-        return stringMap;
+    public List<Header> headers() {
+        return unmodifiableList(headers);
     }
 
     public Optional<InputStream> body() {

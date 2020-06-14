@@ -38,7 +38,7 @@ public final class FilterSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/test", (request, response) -> response.setBody("test"))
-                        .configured(toFilterRequestsThat(request -> request.headers().getOptionalHeader("illegal_header").isPresent())
+                        .configured(toFilterRequestsThat(request -> request.headers().optionalHeader("illegal_header").isPresent())
                                 .rejectingFilteredRequestsUsing((request, response) -> response.setStatus(BAD_REQUEST)))
                         .build()
         )

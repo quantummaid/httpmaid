@@ -22,6 +22,8 @@
 package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,7 @@ public final class Jsr356EndpointConfigurator extends ServerEndpointConfig.Confi
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <T> T getEndpointInstance(final Class<T> endpointClass) {
-        final Map<String, List<String>> headers = handshakeMetaData.getHeaders();
+        final Headers headers = handshakeMetaData.getHeaders();
         return (T) programmaticJsr356Endpoint(httpMaid, headers);
     }
 
@@ -58,7 +60,10 @@ public final class Jsr356EndpointConfigurator extends ServerEndpointConfig.Confi
     public synchronized void modifyHandshake(final ServerEndpointConfig serverEndpointConfig,
                                              final HandshakeRequest request,
                                              final HandshakeResponse response) {
-        final Map<String, List<String>> headers = request.getHeaders();
+        final Map<String, List<String>> requestHeaders = request.getHeaders();
+        final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
+        headersBuilder.withHeadersMap(requestHeaders);
+        final Headers headers = headersBuilder.build();
         handshakeMetaData.setHeaders(headers);
     }
 }

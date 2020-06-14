@@ -27,11 +27,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static de.quantummaid.httpmaid.client.HeaderKey.headerKey;
+import static de.quantummaid.httpmaid.client.HeaderName.headerKey;
 import static de.quantummaid.httpmaid.client.HeaderValue.headerValue;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.httpClientRequest;
 import static de.quantummaid.httpmaid.client.QueryParameter.queryParameter;
@@ -46,7 +46,7 @@ public final class HttpClientRequestBuilder<T> {
     private final String method;
     private final RequestPath path;
     private Body body;
-    private final Map<HeaderKey, HeaderValue> headers = new HashMap<>();
+    private final List<Header> headers = new ArrayList<>();
     private Class<T> targetType;
 
     static HttpClientRequestBuilder<SimpleHttpResponseObject> httpClientRequestBuilderImplementation(
@@ -80,9 +80,10 @@ public final class HttpClientRequestBuilder<T> {
     }
 
     public HttpClientRequestBuilder<T> withHeader(final String key, final String value) {
-        final HeaderKey headerKey = headerKey(key);
+        final HeaderName headerName = headerKey(key);
         final HeaderValue headerValue = headerValue(value);
-        this.headers.put(headerKey, headerValue);
+        final Header header = Header.header(headerName, headerValue);
+        this.headers.add(header);
         return this;
     }
 

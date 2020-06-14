@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.client;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.Header;
+import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 
 import java.util.List;
@@ -29,13 +31,13 @@ import java.util.function.Consumer;
 
 public interface HttpClientWrapper extends AutoCloseable {
     HttpClientResponse issueRequestWithoutBody(
-            String path, String method, Map<String, String> headers);
+            String path, String method, Headers headers);
 
     HttpClientResponse issueRequestWithStringBody(
-            String path, String method, Map<String, String> headers, String body);
+            String path, String method, Headers headers, String body);
 
     HttpClientResponse issueRequestWithMultipartBody(
-            String path, String method, Map<String, String> headers, List<MultipartElement> parts);
+            String path, String method, Headers headers, List<MultipartElement> parts);
 
     WrappedWebsocket openWebsocket(Consumer<String> responseHandler,
                                    Map<String, String> queryParameters,

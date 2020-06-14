@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.*;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.client.RawClientResponse.rawClientResponse;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
+import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toMap;
 
@@ -62,7 +64,10 @@ public final class BypassIssuer implements Issuer {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
             builder.withPath(requestPath.unencodedPath());
             builder.withMethod(request.method());
-            builder.withUniqueHeaders(request.headers());
+
+            final HeadersBuilder headersBuilder = headersBuilder();
+            request.headers().forEach(header -> headersBuilder.withAdditionalHeader(header.name(), header.value()));
+            builder.withHeaders(headersBuilder.build());
             builder.withUniqueQueryParameters(queryParameters);
             final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
             builder.withBody(body);

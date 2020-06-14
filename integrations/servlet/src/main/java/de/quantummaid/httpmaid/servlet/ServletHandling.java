@@ -24,17 +24,15 @@ package de.quantummaid.httpmaid.servlet;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequest;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 
 public final class ServletHandling {
@@ -65,21 +63,24 @@ public final class ServletHandling {
         builder.withPath(path);
         final String method = request.getMethod();
         builder.withMethod(method);
-        final Map<String, List<String>> headers = extractHeaders(request);
+        final Headers headers = extractHeaders(request);
         builder.withHeaders(headers);
         final String queryString = ofNullable(request.getQueryString()).orElse("");
         builder.withEncodedQueryParameters(queryString);
         return builder;
     }
 
-    private static Map<String, List<String>> extractHeaders(final HttpServletRequest request) {
+    private static Headers extractHeaders(final HttpServletRequest request) {
+        final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
         final Enumeration<String> headerNames = request.getHeaderNames();
-        final Map<String, List<String>> headers = new HashMap<>();
         while (headerNames.hasMoreElements()) {
             final String headerName = headerNames.nextElement();
-            final String value = request.getHeader(headerName);
-            headers.put(headerName, singletonList(value));
+            final Enumeration<String> values = request.getHeaders(headerName);
+            while (values.hasMoreElements()) {
+                final String value = values.nextElement();
+                headersBuilder.withAdditionalHeader(headerName, value);
+            }
         }
-        return headers;
+        return headersBuilder.build();
     }
 }

@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
@@ -32,8 +33,6 @@ import lombok.ToString;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
-import java.util.List;
-import java.util.Map;
 
 import static de.quantummaid.httpmaid.jsr356.Jsr356MessageHandler.jsr356MessageHandler;
 import static de.quantummaid.httpmaid.jsr356.SenderHelper.sendMessage;
@@ -44,10 +43,10 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.ra
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Jsr356Endpoint extends Endpoint {
     private final HttpMaid httpMaid;
-    private final Map<String, List<String>> headers;
+    private final Headers headers;
 
     public static Jsr356Endpoint programmaticJsr356Endpoint(final HttpMaid httpMaid,
-                                                            final Map<String, List<String>> headers) {
+                                                            final Headers headers) {
         return new Jsr356Endpoint(httpMaid, headers);
     }
 

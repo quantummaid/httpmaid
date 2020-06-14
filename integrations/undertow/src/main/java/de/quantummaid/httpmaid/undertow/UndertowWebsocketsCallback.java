@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.undertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import io.undertow.websockets.WebSocketConnectionCallback;
@@ -31,6 +32,9 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+
+import java.util.List;
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.undertow.ReceiveListener.receiveListener;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
@@ -53,7 +57,10 @@ public final class UndertowWebsocketsCallback implements WebSocketConnectionCall
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withNonSerializableConnectionInformation(connectionInformation);
             builder.withEncodedQueryParameters(exchange.getQueryString());
-            builder.withHeaders(exchange.getRequestHeaders());
+            final Map<String, List<String>> requestHeaders = exchange.getRequestHeaders();
+            final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
+            headersBuilder.withHeadersMap(requestHeaders);
+            builder.withHeaders(headersBuilder.build());
             return builder.build();
         }, response -> {
         });

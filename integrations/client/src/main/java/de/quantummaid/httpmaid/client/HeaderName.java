@@ -31,13 +31,13 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class HeaderKey {
+final class HeaderName {
     private final String value;
 
-    static HeaderKey headerKey(final String value) {
+    static HeaderName headerKey(final String value) {
         validateNotNullNorEmpty(value, "value");
         final String normalizedKey = value.toLowerCase();
-        return new HeaderKey(normalizedKey);
+        return new HeaderName(normalizedKey);
     }
 
     String value() {

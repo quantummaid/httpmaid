@@ -37,7 +37,7 @@ public final class Accept {
 
     public static Accept fromMetaData(final MetaData metaData) {
         return metaData.getOptional(HttpMaidChainKeys.REQUEST_HEADERS).map(headers -> {
-            final String header = headers.getOptionalHeader("Accept").orElse("*/*");
+            final String header = headers.optionalHeader("Accept").orElse("*/*");
             final MimeTypeMatcher mimeTypeMatcher = MimeTypeMatcher.parseMimeTypeMatcher(header);
             return new Accept(mimeTypeMatcher);
         }).orElseGet(() -> new Accept(MimeTypeMatcher.parseMimeTypeMatcher("*/*")));

@@ -21,19 +21,20 @@
 
 package de.quantummaid.httpmaid.http;
 
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-final class HeaderKey {
+public final class HeaderKey {
     private final String value;
 
-    static HeaderKey headerKey(final String value) {
-        Validators.validateNotNullNorEmpty(value, "stringValue");
+    public static HeaderKey headerKey(final String value) {
+        validateNotNullNorEmpty(value, "stringValue");
         final String cleanValue = value.toLowerCase();
         return new HeaderKey(cleanValue);
     }

@@ -74,7 +74,7 @@ public final class RealIssuer implements Issuer {
         final String url = this.endpoint.toUrl(path);
         final String method = request.method();
         final HttpEntityEnclosingRequest lowLevelRequest = new BasicHttpEntityEnclosingRequest(method, url);
-        request.headers().forEach(lowLevelRequest::addHeader);
+        request.headers().forEach(header -> lowLevelRequest.addHeader(header.name(), header.value()));
         request.body().ifPresent(requestBody -> {
             final InputStreamEntity entity = new InputStreamEntity(requestBody);
             lowLevelRequest.setEntity(entity);

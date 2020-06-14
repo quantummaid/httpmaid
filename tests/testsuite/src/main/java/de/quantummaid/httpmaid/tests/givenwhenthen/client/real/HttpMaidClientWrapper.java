@@ -29,6 +29,7 @@ import de.quantummaid.httpmaid.client.body.multipart.Part;
 import de.quantummaid.httpmaid.client.clientbuilder.PortStage;
 import de.quantummaid.httpmaid.client.issuer.real.Protocol;
 import de.quantummaid.httpmaid.client.websocket.Websocket;
+import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
@@ -92,7 +93,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     @Override
     public HttpClientResponse issueRequestWithoutBody(final String path,
                                                       final String method,
-                                                      final Map<String, String> headers) {
+                                                      final Headers headers) {
         return issueRequest(path, method, headers, builder -> {
         });
     }
@@ -100,7 +101,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     @Override
     public HttpClientResponse issueRequestWithStringBody(final String path,
                                                          final String method,
-                                                         final Map<String, String> headers,
+                                                         final Headers headers,
                                                          final String body) {
         return issueRequest(path, method, headers, bodyStage -> bodyStage.withTheBody(body));
     }
@@ -108,7 +109,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     @Override
     public HttpClientResponse issueRequestWithMultipartBody(final String path,
                                                             final String method,
-                                                            final Map<String, String> headers,
+                                                            final Headers headers,
                                                             final List<MultipartElement> parts) {
         return issueRequest(path, method, headers, builder -> {
             final Part[] partsArray = parts.stream()
@@ -122,7 +123,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
 
     private HttpClientResponse issueRequest(final String path,
                                             final String method,
-                                            final Map<String, String> headers,
+                                            final Headers headers,
                                             final Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
         if (httpClient == null) {
             throw new UnsupportedOperationException("There is no http deployment to connect to. " +

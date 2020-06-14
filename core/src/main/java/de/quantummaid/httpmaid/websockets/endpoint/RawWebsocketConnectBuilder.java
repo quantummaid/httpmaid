@@ -21,6 +21,9 @@
 
 package de.quantummaid.httpmaid.websockets.endpoint;
 
+import de.quantummaid.httpmaid.http.Header;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
@@ -30,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnect;
@@ -42,7 +44,7 @@ import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocket
 public final class RawWebsocketConnectBuilder {
     private ConnectionInformation connectionInformation;
     private WebsocketSenderId websocketSenderId;
-    private Map<String, List<String>> headers = new HashMap<>();
+    private Headers headers;
     private Map<String, String> queryParameters = new HashMap<>();
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
@@ -60,7 +62,7 @@ public final class RawWebsocketConnectBuilder {
         return this;
     }
 
-    public RawWebsocketConnectBuilder withHeaders(final Map<String, List<String>> headers) {
+    public RawWebsocketConnectBuilder withHeaders(final Headers headers) {
         this.headers = headers;
         return this;
     }

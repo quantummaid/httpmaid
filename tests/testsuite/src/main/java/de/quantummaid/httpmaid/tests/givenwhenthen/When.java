@@ -29,15 +29,18 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Headers.emptyHeaders;
+import static java.lang.String.format;
+import static java.util.Arrays.stream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, HeaderBuilder {
     private String path;
     private String method;
-    private final Map<String, String> headers = new HashMap<>();
+    private final Headers headers = emptyHeaders();
     private Object body;
     private final TestData testData;
 
@@ -122,14 +125,12 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     }
 
     @Override
-    public HeaderBuilder withTheHeader(final String key, final String value) {
-        headers.put(key, value);
+    public HeaderBuilder withHeaderOccuringMultipleTimesHavingDistinctValue(final String key, final String... values) {
+        if (headers.containsName(key)) {
+            throw new IllegalArgumentException(format("Header key '%s' is already present in %s", key, headers));
+        }
+        stream(values).forEach(value -> headers.add(key, value));
         return this;
-    }
-
-    @Override
-    public HeaderBuilder withContentType(final String contentType) {
-        return withTheHeader("Content-Type", contentType);
     }
 
     @SuppressWarnings("unchecked")

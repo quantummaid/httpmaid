@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.awslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
@@ -97,7 +98,9 @@ public final class AwsWebsocketLambdaEndpoint {
             builder.withUniqueQueryParameters(queryParameters);
 
             final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
-            builder.withHeaders(headers);
+            final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
+            headersBuilder.withHeadersMap(headers);
+            builder.withHeaders(headersBuilder.build());
 
             return builder.build();
         }, response -> {

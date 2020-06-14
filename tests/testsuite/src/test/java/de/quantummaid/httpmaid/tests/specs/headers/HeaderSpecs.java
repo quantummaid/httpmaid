@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Map;
+import java.util.List;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
@@ -44,27 +44,6 @@ public final class HeaderSpecs {
                 .theStatusCodeWas(200)
                 .theReponseContainsTheHeader("foo", "bar");
     }
-
-    @ParameterizedTest
-    @MethodSource(ALL_ENVIRONMENTS)
-    public void requestHeadersCanBeAMap(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/test", (request, response) -> {
-                            final Map<String, String> headersMap = request.headers().asStringMap();
-                            response.setBody(headersMap.toString());
-                        })
-                        .build()
-        )
-                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody()
-                .withTheHeader("a", "1").withTheHeader("b", "2").withTheHeader("c", "3")
-                .isIssued()
-                .theStatusCodeWas(200)
-                .theResponseBodyContains("a=1")
-                .theResponseBodyContains("b=2")
-                .theResponseBodyContains("c=3");
-    }
-
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
@@ -96,5 +75,24 @@ public final class HeaderSpecs {
                 .theStatusCodeWas(200)
                 .theReponseContainsTheHeader("X-HeaderName", "HeaderValue1", "HeaderValue2")
                 .theResponseBodyWas("");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void aRequestHeaderThatOccursMultipleTimesWithDifferentValues(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/<name>", (request, response) -> {
+                            final String name = request.pathParameters().getPathParameter("name");
+                            final List<String> values = request.headers().allValuesFor(name);
+                            final String joined = String.join("+", values);
+                            response.setBody(joined);
+                        })
+                        .build()
+        )
+                .when().aRequestToThePath("/X-HeaderName").viaTheGetMethod().withAnEmptyBody()
+                .withHeaderOccuringMultipleTimesHavingDistinctValue("X-Headername", "value1", "value2").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("value1+value2");
     }
 }

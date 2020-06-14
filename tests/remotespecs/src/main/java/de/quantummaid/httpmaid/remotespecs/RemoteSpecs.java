@@ -56,8 +56,13 @@ public interface RemoteSpecs {
     }
 
     @Test
-    default void canReceiveHeaderWithMultipleValues() {
-
+    default void canReceiveDuplicatedHeaderWithDistinctValues(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody()
+                .withHeaderOccuringMultipleTimesHavingDistinctValue("X-My-Header", "foo", "bar")
+                .isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("foo");
     }
 
     @Test
