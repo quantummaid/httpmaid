@@ -68,9 +68,10 @@ public final class Then {
         final Map<String, List<String>> headers = testData.getResponse().getHeaders();
         final Map<String, List<String>> normalizedHeaders = normalizeHeaderNames(headers);
         final String normalizedKey = key.toLowerCase();
-        final List<String> actualValues = normalizedHeaders.get(normalizedKey);
+        final List<String> potentiallyCommaSeparatedValues = normalizedHeaders.get(normalizedKey);
+        final List<String> normalizedValues = normalizeHeaderValues(potentiallyCommaSeparatedValues);
         final List<String> expectedValues = Arrays.asList(values);
-        MatcherAssert.assertThat(actualValues, CoreMatchers.is(expectedValues));
+        MatcherAssert.assertThat(normalizedValues, CoreMatchers.is(expectedValues));
         return this;
     }
 
