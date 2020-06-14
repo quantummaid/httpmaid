@@ -109,7 +109,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
 
     @Override
     public RemoteSpecsDeployment deploy() {
-        cleanUp();
+        //cleanUp();
         final String artifactBucketName = stackIdentifier + "-bucket"; // compute this
 
         create("cf-bucket.yml", stackIdentifier + "-bucket",
@@ -154,16 +154,8 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         }
         deleteAllObjectsInBucket(BUCKET_NAME);
         try (final CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
-            cloudFormationHandler.deleteStacksStartingWith(SHARED_STACK_PREFIX);
+            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier + "-lambda");
         }
-    }
-
-    public static void main(String[] args) {
-        final LambdaDeployer lambdaDeployer = lambdaDeployer();
-        System.out.println("first");
-        lambdaDeployer.deploy();
-        System.out.println("second");
-        lambdaDeployer.deploy();
     }
 
     private static Optional<String> userProvidedStackIdentifier() {

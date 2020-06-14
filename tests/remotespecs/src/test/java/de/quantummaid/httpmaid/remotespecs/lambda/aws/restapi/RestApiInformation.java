@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl.apiBaseUrl;
 import static java.lang.String.format;
 
 @ToString
@@ -52,6 +53,6 @@ public final class RestApiInformation {
     }
 
     public ApiBaseUrl baseUrl() {
-        return new ApiBaseUrl("https", host(), 443, basePath());
+        return apiBaseUrl("https", host(), 443, basePath());
     }
 }

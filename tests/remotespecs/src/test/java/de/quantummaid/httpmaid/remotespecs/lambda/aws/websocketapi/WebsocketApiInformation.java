@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl.apiBaseUrl;
 import static java.lang.String.format;
 
 @ToString
@@ -56,6 +57,6 @@ public final class WebsocketApiInformation {
     }
 
     public ApiBaseUrl baseUrl() {
-        return new ApiBaseUrl("wss", host(), 443, basePath());
+        return apiBaseUrl("wss", host(), 443, basePath());
     }
 }

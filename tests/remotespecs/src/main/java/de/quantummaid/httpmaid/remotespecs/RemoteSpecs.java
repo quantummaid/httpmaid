@@ -42,9 +42,35 @@ public interface RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/jsonResponse").viaTheGetMethod().withAnEmptyBody()
                 .withContentType("application/json").isIssued()
-                .theStatusCodeWas(200)
+                .theStatusCodeWas(201)
                 .theResponseBodyWas("{\"foo\":\"bar\"}");
     }
+
+    @Test
+    default void canReceiveSingleHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/returnHeader/X-My-Header").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("X-My-Header", "foo").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("foo");
+    }
+
+    @Test
+    default void canReceiveHeaderWithMultipleValues() {
+
+    }
+
+    @Test
+    default void canReceiveQueryParameter() {
+
+    }
+
+    @Test
+    default void canReceiveQueryParameterWithMultipleValues() {
+
+    }
+
+    // TODO cookies
 
     @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
