@@ -33,11 +33,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
-import static de.quantummaid.httpmaid.http.QueryParameters.queryToMap;
 import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 
 @ToString
@@ -57,7 +55,7 @@ public final class RawHttpRequestBuilder {
 
     public RawHttpRequestBuilder withUri(final URI uri) {
         withPath(uri.getPath());
-        withEncodedQueryParameters(uri.getRawQuery());
+        withQueryString(uri.getRawQuery());
         return this;
     }
 
@@ -76,16 +74,7 @@ public final class RawHttpRequestBuilder {
         return this;
     }
 
-    public RawHttpRequestBuilder withQueryParameterMap(final Map<String, ? extends Collection<String>> queryParameters) {
-        final Map<String, String> uniqueQueryParameters = new HashMap<>(queryParameters.size());
-        queryParameters.forEach((key, values) -> {
-            final String firstValue = values.iterator().next();
-            uniqueQueryParameters.put(key, firstValue);
-        });
-        return withUniqueQueryParameters(uniqueQueryParameters);
-    }
-
-    public RawHttpRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
+    public RawHttpRequestBuilder withQueryString(final String encodedQueryParameters) {
         final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
         return withQueryParameters(queryParameters);
     }

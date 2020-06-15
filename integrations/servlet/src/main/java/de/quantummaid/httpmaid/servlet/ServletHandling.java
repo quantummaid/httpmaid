@@ -66,7 +66,7 @@ public final class ServletHandling {
         final Headers headers = extractHeaders(request);
         builder.withHeaders(headers);
         final String queryString = ofNullable(request.getQueryString()).orElse("");
-        builder.withEncodedQueryParameters(queryString);
+        builder.withQueryString(queryString);
         return builder;
     }
 

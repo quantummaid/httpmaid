@@ -70,8 +70,8 @@ public final class UndertowHandler implements HttpHandler {
             final HttpString requestMethod = httpServerExchange.getRequestMethod();
             builder.withMethod(requestMethod.toString());
 
-            final Map<String, Deque<String>> queryParameters = httpServerExchange.getQueryParameters();
-            builder.withQueryParameterMap(queryParameters);
+            final String queryString = httpServerExchange.getQueryString();
+            builder.withQueryString(queryString);
 
             httpServerExchange.startBlocking();
             final InputStream body = httpServerExchange.getInputStream();
