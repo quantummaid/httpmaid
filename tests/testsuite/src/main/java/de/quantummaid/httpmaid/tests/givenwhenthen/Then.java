@@ -88,6 +88,14 @@ public final class Then {
         return this;
     }
 
+    public Then theReponseContainsTheHeaderRawValues(final String key, final String... expectedRawValues) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final String normalizedKey = key.toLowerCase();
+        final List<String> actualRawValues = headers.get(normalizedKey);
+        assertThat(actualRawValues, is(Arrays.asList(expectedRawValues)));
+        return this;
+    }
+
     private Map<String, List<String>> normalizeHeaderNames(final Map<String, List<String>> headers) {
         final Map<String, List<String>> normalizedHeaders = new HashMap<>();
         headers.forEach((k, v) -> {

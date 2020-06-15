@@ -54,7 +54,7 @@ public final class CookieSpecs {
                         response.setCookie(cookie("asdf", "qwer").withExpiration(ofEpochMilli(123456789))))
                 .build())
                 .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theReponseContainsTheHeader("Set-Cookie", "asdf=\"qwer\"; Expires=Fri, 02 Jan 1970 10:17:36 GMT");
+                .theReponseContainsTheHeaderRawValue("Set-Cookie", "asdf=\"qwer\"; Expires=Fri, 02 Jan 1970 10:17:36 GMT");
     }
 
     @ParameterizedTest
@@ -76,7 +76,7 @@ public final class CookieSpecs {
                         response.setCookie(cookie("asdf", "qwer").exposedToAllSubdomainsOf("example.org", "foo.com")))
                 .build())
                 .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theReponseContainsTheHeader("Set-Cookie", "asdf=\"qwer\"; Domain=example.org,foo.com");
+                .theReponseContainsTheHeaderRawValue("Set-Cookie", "asdf=\"qwer\"; Domain=example.org,foo.com");
     }
 
     @ParameterizedTest
@@ -87,7 +87,7 @@ public final class CookieSpecs {
                         response.setCookie(cookie("asdf", "qwer").exposedOnlyToSubpathsOf("/docs", "/img")))
                 .build())
                 .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theReponseContainsTheHeader("Set-Cookie", "asdf=\"qwer\"; Path=/docs,/img");
+                .theReponseContainsTheHeaderRawValue("Set-Cookie", "asdf=\"qwer\"; Path=/docs,/img");
     }
 
     @ParameterizedTest
@@ -153,7 +153,7 @@ public final class CookieSpecs {
                         response.invalidateCookie("asdf"))
                 .build())
                 .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theReponseContainsTheHeader("Set-Cookie", "asdf=\"\"; Expires=Thu, 01 Jan 1970 00:00:00 GMT");
+                .theReponseContainsTheHeaderRawValue("Set-Cookie", "asdf=\"\"; Expires=Thu, 01 Jan 1970 00:00:00 GMT");
     }
 
     @ParameterizedTest
@@ -225,5 +225,21 @@ public final class CookieSpecs {
                 .when().aRequestToThePath("/cookie").viaTheGetMethod().withAnEmptyBody()
                 .withTheHeader("Cookie", "myCookie=\"foo bar\"").isIssued()
                 .theResponseBodyWas("foo bar");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void multipleCookies(final TestEnvironment testEnvironment) {
+        testEnvironment.given(anHttpMaid()
+                .get("/cookies", (request, response) -> {
+                    response.setCookie("cookie1", "cookie,value,1");
+                    response.setCookie("cookie2", "cookie,value,2");
+                })
+                .build())
+                .when().aRequestToThePath("/cookies").viaTheGetMethod().withAnEmptyBody()
+                .isIssued()
+                .theReponseContainsTheHeaderRawValues("Set-Cookie",
+                        "cookie1=\"cookie,value,1\"",
+                        "cookie2=\"cookie,value,2\"");
     }
 }
