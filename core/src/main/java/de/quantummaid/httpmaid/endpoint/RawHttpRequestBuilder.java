@@ -48,7 +48,6 @@ public final class RawHttpRequestBuilder {
     private String requestMethod;
     private Headers headers;
     private QueryParameters queryParameters;
-    private Map<String, String> queryParameterMap = new HashMap<>();
     private InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData = new HashMap<>();
 
@@ -92,8 +91,7 @@ public final class RawHttpRequestBuilder {
     }
 
     public RawHttpRequestBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
-        this.queryParameterMap = queryParameters;
-        return this;
+        throw new UnsupportedOperationException("tilt");
     }
 
     public RawHttpRequestBuilder withQueryParameters(final QueryParameters queryParameters) {
@@ -120,10 +118,6 @@ public final class RawHttpRequestBuilder {
         if (body == null) {
             withBody("");
         }
-        if (queryParameters ==  null) {
-            return rawHttpRequest(path, requestMethod, headers, queryParameterMap, body, additionalMetaData);
-        } else {
-            return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
-        }
+        return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
     }
 }

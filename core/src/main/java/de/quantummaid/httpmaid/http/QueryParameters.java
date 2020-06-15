@@ -28,10 +28,12 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import javax.management.Query;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.quantummaid.httpmaid.http.QueryParameter.QueryParameter;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static java.lang.String.format;
@@ -43,17 +45,16 @@ import static java.util.Collections.emptyMap;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class QueryParameters {
-    private static final QueryParameters EMPTY = new QueryParameters(emptyList(), emptyMap());
+    private static final QueryParameters EMPTY = new QueryParameters(emptyList());
 
     private final List<QueryParameter> queryParameters;
-    private final Map<QueryParameterName, QueryParameterValue> queryParameterMap;
 
     public static QueryParametersBuilder builder() {
         return new QueryParametersBuilder();
     }
 
     public static QueryParameters queryParameters(final List<QueryParameter> parameters) {
-        return new QueryParameters(List.copyOf(parameters), Collections.emptyMap());
+        return new QueryParameters(List.copyOf(parameters));
     }
 
     public static QueryParameters fromQueryString(final String queryString) {
@@ -61,28 +62,15 @@ public final class QueryParameters {
             return QueryParameters.EMPTY;
         }
         final Map<QueryParameterName, QueryParameterValue> queryMap = new HashMap<>();
+        final List<QueryParameter> queryParameters = new ArrayList<>();
         for (final String param : queryString.split("&")) {
             final String[] entry = param.split("=");
-            final QueryParameterName key = queryParameterName(decode(entry[0]));
+            final QueryParameterName name = queryParameterName(decode(entry[0]));
             final QueryParameterValue value = (entry.length > 1)
                     ? queryParameterValue(decode(entry[1])) : queryParameterValue("");
-            queryMap.put(key, value);
+            queryParameters.add(QueryParameter.QueryParameter(name, value));
         }
-        return QueryParameters.fromQueryParameterMap(queryMap);
-    }
-
-    public static QueryParameters fromQueryParameterMap(final Map<QueryParameterName, QueryParameterValue> queryMap) {
-        Validators.validateNotNull(queryMap, "queryMap");
-        return new QueryParameters(Collections.emptyList(), queryMap);
-    }
-
-    public static QueryParameters fromStringMap(final Map<String, String> stringMap) {
-        Validators.validateNotNull(stringMap, "stringMap");
-        final Map<QueryParameterName, QueryParameterValue> queryParameters = Maps.stringsToValueObjects(
-                stringMap,
-                QueryParameterName::queryParameterName,
-                QueryParameterValue::queryParameterValue);
-        return new QueryParameters(Collections.emptyList(), queryParameters);
+        return QueryParameters.queryParameters(queryParameters);
     }
 
     public static Map<String, List<String>> queryToMap(final String query) {
@@ -99,9 +87,19 @@ public final class QueryParameters {
                 .orElseThrow(() -> new RuntimeException(format("No query parameter with the key '%s'", key)));
     }
 
-    public Optional<String> getOptionalQueryParameter(final String key) {
-        final QueryParameterName queryParameterName = queryParameterName(key);
-        return Maps.getOptionally(queryParameterMap, queryParameterName).map(QueryParameterValue::stringValue);
+    public Optional<String> getOptionalQueryParameter(final String name) {
+        final QueryParameterName requestedName = queryParameterName(name);
+        final List<String> found = queryParameters.stream()
+                .filter(queryParameter -> queryParameter.name().equals(requestedName))
+                .map(queryParameter -> queryParameter.value().stringValue())
+                .collect(Collectors.toList());
+        if (found.isEmpty()) {
+            return Optional.empty();
+        } else if (found.size() > 1) {
+            throw new UnsupportedOperationException("tilt"); // TODO
+        } else {
+            return Optional.of(found.get(0));
+        }
     }
 
     public Map<String, List<String>> asMap() {
