@@ -99,7 +99,7 @@ public final class HttpResponse {
         metaData.set(RESPONSE_STATUS, status);
     }
 
-    public void setBody(final Map<String, Object> map) {
+    public void setBody(final Map<String, ?> map) {
         metaData.set(RESPONSE_BODY_OBJECT, map);
     }
 

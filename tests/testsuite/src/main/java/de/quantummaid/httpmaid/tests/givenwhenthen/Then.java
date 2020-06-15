@@ -27,7 +27,9 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -132,9 +134,17 @@ public final class Then {
 
     public Then theJsonResponseEquals(final String expectedJson) {
         final Map<String, Object> normalizedExpected = normalizeJsonToMap(expectedJson);
+        return theJsonResponseStrictlyEquals(normalizedExpected);
+    }
+
+    public Then theJsonResponseStrictlyEquals(final Map<String, Object> expectedJsonMap) {
         final String actualResponseBody = testData.getResponse().getBody();
-        final Map<String, Object> normalizedActual = normalizeJsonToMap(actualResponseBody);
-        assertThat(normalizedActual, is(normalizedExpected));
+        final Map<String, Object> actualJsonMap = normalizeJsonToMap(actualResponseBody);
+        try {
+            JSONAssert.assertEquals(new JSONObject(expectedJsonMap), new JSONObject(actualJsonMap), true);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 

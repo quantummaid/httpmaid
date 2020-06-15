@@ -28,10 +28,8 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.http.Http.Headers.COOKIE;
 import static java.lang.String.format;
@@ -45,12 +43,11 @@ public final class Cookies {
 
     public static Cookies cookiesFromHeaders(final Headers headers) {
         final Map<CookieName, CookieValue> cookies = new HashMap<>();
-        headers.optionalHeader(COOKIE).ifPresent(header -> {
-            final String[] keyValuePairs = header.split("; ");
-            stream(keyValuePairs)
-                    .map(Cookies::parseKeyValuePair)
-                    .forEach(entry -> cookies.put(entry.getKey(), entry.getValue()));
-        });
+        headers.allValuesFor(COOKIE).stream()
+                .map(header -> header.split("; "))
+                .flatMap(Arrays::stream)
+                .map(Cookies::parseKeyValuePair)
+                .forEach(entry -> cookies.put(entry.getKey(), entry.getValue()));
         return new Cookies(cookies);
     }
 
@@ -81,5 +78,11 @@ public final class Cookies {
         }
         final String key = tokens[0];
         return new AbstractMap.SimpleEntry<>(CookieName.cookieName(key), CookieValue.cookieValue(adjustedValue));
+    }
+
+    public Map<String, String> asMap() {
+        return cookies.entrySet().stream().collect(Collectors.toMap(
+                entry -> entry.getKey().stringValue(), entry -> entry.getValue().stringValue())
+        );
     }
 }
