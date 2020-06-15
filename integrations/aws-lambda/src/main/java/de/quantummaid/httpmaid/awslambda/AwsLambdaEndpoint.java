@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.awslambda;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -143,8 +145,12 @@ public final class AwsLambdaEndpoint {
             final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
             headersBuilder.withHeadersMap(headers);
             builder.withHeaders(headersBuilder.build());
-            final Map<String, String> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
-            builder.withUniqueQueryParameters(queryParameters);
+
+            final Map<String, List<String>> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
+            final QueryParametersBuilder queryParametersBuilder = QueryParameters.builder();
+            queryParameters.forEach(queryParametersBuilder::withParameter);
+            builder.withQueryParameters(queryParametersBuilder.build());
+
             final String body = event.getOrDefault(BODY, "");
             builder.withBody(body);
             return builder.build();

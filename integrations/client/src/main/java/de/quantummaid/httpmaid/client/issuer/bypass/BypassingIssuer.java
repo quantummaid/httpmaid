@@ -26,6 +26,8 @@ import de.quantummaid.httpmaid.client.*;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +56,7 @@ public final class BypassingIssuer implements Issuer {
                        final Function<RawClientResponse, T> responseMapper,
                        final BasePath basePath) {
         final RequestPath requestPath = request.path(basePath);
+        final QueryParametersBuilder queryParametersBuilder = QueryParameters.builder();
         final Map<String, String> queryParameters = requestPath.queryParameters()
                 .stream()
                 .collect(toMap(

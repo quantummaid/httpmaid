@@ -36,12 +36,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 
@@ -84,8 +87,8 @@ public final class FakeRestLambda implements AutoCloseable {
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
         event.put("path", path);
-        final Map<String, String> queryParameters = queryToMap(requestURI.getRawQuery());
-        event.put("queryStringParameters", queryParameters);
+        final Map<String, List<String>> queryParameters = queryToMap(requestURI.getRawQuery());
+        event.put("multiValueQueryStringParameters", queryParameters);
         final String method = exchange.getRequestMethod();
         event.put("httpMethod", method);
         final String body = inputStreamToString(exchange.getRequestBody());
@@ -108,19 +111,24 @@ public final class FakeRestLambda implements AutoCloseable {
         streamInputStreamToOutputStream(bodyStream, exchange.getResponseBody());
     }
 
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
+    private static Map<String, List<String>> queryToMap(final String query) {
+        final Map<String, List<String>> result = new HashMap<>();
         if (query == null) {
             return result;
         }
         for (final String param : query.split("&")) {
             final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
+            final String key = decode(entry[0]);
+            final String value = (entry.length > 1)? decode(entry[1]) : "";
+            final List<String> values = result.getOrDefault(key, new ArrayList<>());
+            values.add(value);
+            result.put(key, values);
         }
         return result;
+    }
+
+    private static String decode(String s) {
+        final String decoded = URLDecoder.decode(s, UTF_8);
+        return decoded;
     }
 }

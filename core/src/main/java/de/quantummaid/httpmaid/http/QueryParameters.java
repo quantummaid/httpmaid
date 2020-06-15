@@ -61,7 +61,6 @@ public final class QueryParameters {
         if (queryString == null || queryString.isEmpty()) {
             return QueryParameters.EMPTY;
         }
-        final Map<QueryParameterName, QueryParameterValue> queryMap = new HashMap<>();
         final List<QueryParameter> queryParameters = new ArrayList<>();
         for (final String param : queryString.split("&")) {
             final String[] entry = param.split("=");
@@ -71,10 +70,6 @@ public final class QueryParameters {
             queryParameters.add(QueryParameter.QueryParameter(name, value));
         }
         return QueryParameters.queryParameters(queryParameters);
-    }
-
-    public static Map<String, List<String>> queryToMap(final String query) {
-        return fromQueryString(query).asMap();
     }
 
     private static String decode(String s) {
