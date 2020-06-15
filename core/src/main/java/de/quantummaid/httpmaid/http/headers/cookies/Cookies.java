@@ -80,7 +80,7 @@ public final class Cookies {
         return new AbstractMap.SimpleEntry<>(CookieName.cookieName(key), CookieValue.cookieValue(adjustedValue));
     }
 
-    public Map<String, String> asMap() {
+    public Map<String, String> asStringMap() {
         return cookies.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().stringValue(), entry -> entry.getValue().stringValue())
         );

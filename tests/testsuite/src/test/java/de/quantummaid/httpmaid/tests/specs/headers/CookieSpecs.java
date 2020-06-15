@@ -251,7 +251,7 @@ public final class CookieSpecs {
     public void handlerCanReceiveMultipleCookiesSentAsDistinctCookieHeaders(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid()
                 .get("/cookies", (request, response) -> {
-                    final Map<String, String> cookies = request.cookies().asMap();
+                    final Map<String, String> cookies = request.cookies().asStringMap();
                     response.setBody(cookies);
                 })
                 .build())
@@ -271,7 +271,7 @@ public final class CookieSpecs {
     public void handlerCanReceiveMultipleSemicolonSeparatedCookiesInOneSingleHeader(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid()
                 .get("/cookies", (request, response) -> {
-                    final Map<String, String> cookies = request.cookies().asMap();
+                    final Map<String, String> cookies = request.cookies().asStringMap();
                     response.setBody(cookies);
                 })
                 .build())

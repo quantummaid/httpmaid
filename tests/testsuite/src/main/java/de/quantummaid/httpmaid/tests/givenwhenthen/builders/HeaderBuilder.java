@@ -25,6 +25,8 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.Then;
 
 public interface HeaderBuilder {
 
+    HeaderBuilder withQueryStringParameter(String name, String value);
+
     default HeaderBuilder withDistinctCookieHeaders(final String... rawCookieHeaders) {
         return withHeaderOccuringMultipleTimesHavingDistinctValue("Cookie", rawCookieHeaders);
     }

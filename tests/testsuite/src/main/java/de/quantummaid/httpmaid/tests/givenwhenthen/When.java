@@ -23,23 +23,27 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.*;
 import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Headers.emptyHeaders;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest.httpClientRequest;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, HeaderBuilder {
-    private String path;
     private String method;
+    private String path;
+    private List<QueryStringParameter> queryStringParameters = new ArrayList<>();
     private final Headers headers = emptyHeaders();
     private Object body;
     private final TestData testData;
@@ -125,6 +129,12 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     }
 
     @Override
+    public HeaderBuilder withQueryStringParameter(final String name, final String value) {
+        queryStringParameters.add(QueryStringParameter.queryStringParameter(name, value));
+        return this;
+    }
+
+    @Override
     public HeaderBuilder withHeaderOccuringMultipleTimesHavingDistinctValue(final String key, final String... values) {
         if (headers.containsName(key)) {
             throw new IllegalArgumentException(format("Header key '%s' is already present in %s", key, headers));
@@ -137,13 +147,14 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     @Override
     public Then isIssued() {
         try (HttpClientWrapper clientWrapper = testData.getClientWrapper()) {
+            final HttpClientRequest request = httpClientRequest(path, method, queryStringParameters, headers);
             final HttpClientResponse response;
             if (body == null) {
-                response = clientWrapper.issueRequestWithoutBody(path, method, headers);
+                response = clientWrapper.issueRequestWithoutBody(request);
             } else if (body instanceof String) {
-                response = clientWrapper.issueRequestWithStringBody(path, method, headers, (String) body);
+                response = clientWrapper.issueRequestWithStringBody(request, (String) body);
             } else {
-                response = clientWrapper.issueRequestWithMultipartBody(path, method, headers, (List<MultipartElement>) body);
+                response = clientWrapper.issueRequestWithMultipartBody(request, (List<MultipartElement>) body);
             }
             testData.setResponse(response);
             return Then.then(testData);

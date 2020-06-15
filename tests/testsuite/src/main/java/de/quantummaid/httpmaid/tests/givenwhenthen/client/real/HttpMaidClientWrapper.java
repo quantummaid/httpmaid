@@ -33,6 +33,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
@@ -91,27 +92,32 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     }
 
     @Override
-    public HttpClientResponse issueRequestWithoutBody(final String path,
-                                                      final String method,
-                                                      final Headers headers) {
-        return issueRequest(path, method, headers, builder -> {
-        });
+    public HttpClientResponse issueRequestWithoutBody(final HttpClientRequest request) {
+        return issueRequest(request, ((Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>>) builder -> {
+        }));
+    }
+
+    private HttpClientResponse issueRequest(HttpClientRequest request, Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
+        if (httpClient == null) {
+            throw new UnsupportedOperationException("There is no http deployment to connect to. " +
+                    "Probably the endpoint does not support http requests.");
+        }
+        final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder = aRequest(request.method, request.path);
+        request.queryStringParameters.forEach(parameter -> requestBuilder.withQueryParameter(parameter.name(), parameter.value()));
+        bodyAppender.accept(requestBuilder);
+        request.headers.forEach(requestBuilder::withHeader);
+        final SimpleHttpResponseObject response = this.httpClient.issue(requestBuilder);
+        return httpClientResponse(response.getStatusCode(), response.getHeaders(), response.getBody());
     }
 
     @Override
-    public HttpClientResponse issueRequestWithStringBody(final String path,
-                                                         final String method,
-                                                         final Headers headers,
-                                                         final String body) {
-        return issueRequest(path, method, headers, bodyStage -> bodyStage.withTheBody(body));
+    public HttpClientResponse issueRequestWithStringBody(HttpClientRequest request, String body) {
+        return issueRequest(request, bodyStage -> bodyStage.withTheBody(body));
     }
 
     @Override
-    public HttpClientResponse issueRequestWithMultipartBody(final String path,
-                                                            final String method,
-                                                            final Headers headers,
-                                                            final List<MultipartElement> parts) {
-        return issueRequest(path, method, headers, builder -> {
+    public HttpClientResponse issueRequestWithMultipartBody(HttpClientRequest request, List<MultipartElement> parts) {
+        return issueRequest(request, builder -> {
             final Part[] partsArray = parts.stream()
                     .map(part -> aPartWithTheControlName(part.controlName())
                             .withTheFileName(part.fileName().orElse(null))
@@ -119,21 +125,6 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
                     .toArray(Part[]::new);
             builder.withAMultipartBodyWithTheParts(partsArray);
         });
-    }
-
-    private HttpClientResponse issueRequest(final String path,
-                                            final String method,
-                                            final Headers headers,
-                                            final Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
-        if (httpClient == null) {
-            throw new UnsupportedOperationException("There is no http deployment to connect to. " +
-                    "Probably the endpoint does not support http requests.");
-        }
-        final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder = aRequest(method, path);
-        bodyAppender.accept(requestBuilder);
-        headers.forEach(requestBuilder::withHeader);
-        final SimpleHttpResponseObject response = this.httpClient.issue(requestBuilder);
-        return httpClientResponse(response.getStatusCode(), response.getHeaders(), response.getBody());
     }
 
     @Override
