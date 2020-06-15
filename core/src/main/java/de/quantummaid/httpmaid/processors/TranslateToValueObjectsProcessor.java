@@ -58,7 +58,7 @@ public final class TranslateToValueObjectsProcessor implements Processor {
         );
 
         metaData.getOptional(RAW_REQUEST_QUERY_PARAMETERS).ifPresent(rawQueryParameters -> {
-            final QueryParameters queryParameters = QueryParameters.queryParameters(rawQueryParameters);
+            final QueryParameters queryParameters = QueryParameters.fromStringMap(rawQueryParameters);
             metaData.set(QUERY_PARAMETERS, queryParameters);
         });
 

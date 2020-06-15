@@ -41,12 +41,12 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BypassIssuer implements Issuer {
+public final class BypassingIssuer implements Issuer {
     private final HttpMaid httpMaid;
 
     public static Issuer bypassIssuer(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");
-        return new BypassIssuer(httpMaid);
+        return new BypassingIssuer(httpMaid);
     }
 
     @Override
@@ -57,8 +57,8 @@ public final class BypassIssuer implements Issuer {
         final Map<String, String> queryParameters = requestPath.queryParameters()
                 .stream()
                 .collect(toMap(
-                        queryParameter -> queryParameter.key().encoded(),
-                        queryParameter -> queryParameter.value().map(UriString::encoded).orElse(""))
+                        queryParameter -> queryParameter.key().unencoded(),
+                        queryParameter -> queryParameter.value().map(UriString::unencoded).orElse(""))
                 );
         final RawClientResponse rawClientResponse = httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();

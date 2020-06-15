@@ -79,7 +79,7 @@ public final class WebsocketRegistryEntry {
                                                             final Map<String, String> queryParameters) {
         final WebsocketSenderId websocketSenderId = websocketSenderId(senderId);
         final ContentType contentTypeObject = ContentType.fromString(contentType);
-        final QueryParameters queryParametersObject = QueryParameters.queryParameters(queryParameters);
+        final QueryParameters queryParametersObject = QueryParameters.fromStringMap(queryParameters);
         return websocketRegistryEntry(connectionInformation, websocketSenderId, headers, contentTypeObject, queryParametersObject);
     }
 

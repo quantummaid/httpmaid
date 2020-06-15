@@ -35,6 +35,7 @@ import lombok.ToString;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.http.QueryParameters.queryToMap;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnect;
 import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocketSender.NON_SERIALIZABLE_WEBSOCKET_SENDER;
 
@@ -79,21 +80,5 @@ public final class RawWebsocketConnectBuilder {
 
     public RawWebsocketConnect build() {
         return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
-    }
-
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
-        if (query == null || query.isEmpty()) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
-        }
-        return result;
     }
 }

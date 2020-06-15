@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.http.QueryParameters.queryToMap;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 import static java.util.Collections.emptyMap;
@@ -84,7 +85,7 @@ public final class FakeRestLambda implements AutoCloseable {
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
         event.put("path", path);
-        final Map<String, String> queryParameters = queryToMap(requestURI.getQuery());
+        final Map<String, String> queryParameters = queryToMap(requestURI.getRawQuery());
         event.put("queryStringParameters", queryParameters);
         final String method = exchange.getRequestMethod();
         event.put("httpMethod", method);
@@ -106,21 +107,5 @@ public final class FakeRestLambda implements AutoCloseable {
         exchange.sendResponseHeaders(statusCode, 0);
         final InputStream bodyStream = Streams.stringToInputStream((String) event.get("body"));
         streamInputStreamToOutputStream(bodyStream, exchange.getResponseBody());
-    }
-
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
-        if (query == null) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
-        }
-        return result;
     }
 }

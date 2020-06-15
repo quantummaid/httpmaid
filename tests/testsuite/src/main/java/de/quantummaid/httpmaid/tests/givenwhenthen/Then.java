@@ -141,7 +141,9 @@ public final class Then {
         final String actualResponseBody = testData.getResponse().getBody();
         final Map<String, Object> actualJsonMap = normalizeJsonToMap(actualResponseBody);
         try {
-            JSONAssert.assertEquals(new JSONObject(expectedJsonMap), new JSONObject(actualJsonMap), true);
+            final JSONObject actual = new JSONObject(actualJsonMap);
+            final JSONObject expected = new JSONObject(expectedJsonMap);
+            JSONAssert.assertEquals(expected, actual, true);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         } catch (AssertionError e) {

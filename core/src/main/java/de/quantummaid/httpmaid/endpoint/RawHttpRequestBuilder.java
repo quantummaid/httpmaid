@@ -31,12 +31,16 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
+import static de.quantummaid.httpmaid.http.QueryParameters.queryToMap;
 import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @ToString
 @EqualsAndHashCode
@@ -55,7 +59,7 @@ public final class RawHttpRequestBuilder {
 
     public RawHttpRequestBuilder withUri(final URI uri) {
         withPath(uri.getPath());
-        withEncodedQueryParameters(uri.getQuery());
+        withEncodedQueryParameters(uri.getRawQuery());
         return this;
     }
 
@@ -113,21 +117,5 @@ public final class RawHttpRequestBuilder {
             withBody("");
         }
         return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
-    }
-
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
-        if (query == null || query.isEmpty()) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
-        }
-        return result;
     }
 }

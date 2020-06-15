@@ -12,7 +12,7 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_E
 public class QueryStringParameterSpecs {
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
-    public void handlerCanReceiveSingleQueryParameter(final TestEnvironment testEnvironment) {
+    public void handlerCanReceiveSingleQueryStringParameter(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", (request, response) -> {
@@ -22,7 +22,7 @@ public class QueryStringParameterSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod()
-                .withAnEmptyBody().withQueryStringParameter("param1", "value1").isIssued()
-                .theJsonResponseStrictlyEquals(Map.of("param1", "value1"));
+                .withAnEmptyBody().withQueryStringParameter("param+1 %ü", "value+1 %ü").isIssued()
+                .theJsonResponseStrictlyEquals(Map.of("param+1 %ü", "value+1 %ü"));
     }
 }
