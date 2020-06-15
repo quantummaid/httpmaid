@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @ToString
 @EqualsAndHashCode
@@ -50,13 +52,13 @@ public final class Then {
 
     public Then anExceptionHasBeenThrownDuringInitializationWithAMessageContaining(final String expectedMessage) {
         final String actualMessage = testData.getInitializationException().getMessage();
-        MatcherAssert.assertThat(actualMessage, CoreMatchers.containsString(expectedMessage));
+        assertThat(actualMessage, CoreMatchers.containsString(expectedMessage));
         return this;
     }
 
     public Then theStatusCodeWas(final int expectedStatusCode) {
         final int actualStatusCode = testData.getResponse().getStatusCode();
-        MatcherAssert.assertThat(actualStatusCode, CoreMatchers.is(expectedStatusCode));
+        assertThat(actualStatusCode, is(expectedStatusCode));
         return this;
     }
 
@@ -71,7 +73,18 @@ public final class Then {
         final List<String> potentiallyCommaSeparatedValues = normalizedHeaders.get(normalizedKey);
         final List<String> normalizedValues = normalizeHeaderValues(potentiallyCommaSeparatedValues);
         final List<String> expectedValues = Arrays.asList(values);
-        MatcherAssert.assertThat(normalizedValues, CoreMatchers.is(expectedValues));
+        assertThat(normalizedValues, is(expectedValues));
+        return this;
+    }
+
+    public Then theReponseContainsTheHeaderRawValue(final String key, final String rawValue) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final String normalizedKey = key.toLowerCase();
+        final String expectedValue = rawValue;
+        final List<String> actualValue = headers.get(normalizedKey);
+        assertThat("there is one and only one header by that name",  actualValue.size(), is(1));
+        assertThat("the header by that name has a value matching exactly our expected value",
+                actualValue.get(0), is(expectedValue));
         return this;
     }
 
@@ -99,13 +112,13 @@ public final class Then {
 
     public Then theResponseBodyWas(final String expectedResponseBody) {
         final String actualResponseBody = testData.getResponse().getBody();
-        MatcherAssert.assertThat(actualResponseBody, CoreMatchers.is(expectedResponseBody));
+        assertThat(actualResponseBody, is(expectedResponseBody));
         return this;
     }
 
     public Then theResponseBodyContains(final String expectedResponseBody) {
         final String actualResponseBody = testData.getResponse().getBody();
-        MatcherAssert.assertThat(actualResponseBody, CoreMatchers.containsString(expectedResponseBody));
+        assertThat(actualResponseBody, CoreMatchers.containsString(expectedResponseBody));
         return this;
     }
 
@@ -113,12 +126,12 @@ public final class Then {
         final Map<String, Object> normalizedExpected = normalizeJsonToMap(expectedJson);
         final String actualResponseBody = testData.getResponse().getBody();
         final Map<String, Object> normalizedActual = normalizeJsonToMap(actualResponseBody);
-        MatcherAssert.assertThat(normalizedActual, CoreMatchers.is(normalizedExpected));
+        assertThat(normalizedActual, is(normalizedExpected));
         return this;
     }
 
     public Then theCheckpointHasBeenVisited(final String checkpoint) {
-        MatcherAssert.assertThat(testData.getCheckpoints().checkpointHasBeenVisited(checkpoint), CoreMatchers.is(true));
+        assertThat(testData.getCheckpoints().checkpointHasBeenVisited(checkpoint), is(true));
         return this;
     }
 

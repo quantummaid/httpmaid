@@ -51,6 +51,6 @@ public final class ExposedHeaders {
         return of(exposedHeaders.stream()
                 .filter(exposedHeader -> !exposedHeader.isSimpleHeader())
                 .map(ExposedHeader::internalValueForMapping)
-                .collect(joining(",")));
+                .collect(joining(", ")));
     }
 }
