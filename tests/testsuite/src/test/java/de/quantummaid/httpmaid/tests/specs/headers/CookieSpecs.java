@@ -265,4 +265,21 @@ public final class CookieSpecs {
                         "cookie2", "cookie,value,2"));
     }
 
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void handlerCanReceiveMultipleSemicolonSeparatedCookiesInOneSingleHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.given(anHttpMaid()
+                .get("/cookies", (request, response) -> {
+                    final Map<String, String> cookies = request.cookies().asMap();
+                    response.setBody(cookies);
+                })
+                .build())
+                .when().aRequestToThePath("/cookies").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("Cookie", "cookie1=\"cookie,value,1\"; cookie2=\"cookie,value,2\"")
+                .isIssued()
+                .theJsonResponseStrictlyEquals(Map.of(
+                        "cookie1", "cookie,value,1",
+                        "cookie2", "cookie,value,2"));
+    }
 }
