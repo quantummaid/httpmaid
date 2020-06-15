@@ -135,7 +135,8 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
             final URIBuilder uriBuilder = new URIBuilder(url);
             request.queryStringParameters.forEach(
                     parameter -> uriBuilder.addParameter(parameter.name(), parameter.value()));
-            return uriBuilder.build().toASCIIString();
+            final String uri = uriBuilder.build().toASCIIString();
+            return uri;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

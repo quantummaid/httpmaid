@@ -44,6 +44,7 @@ public final class HttpMaidChainKeys {
 
     public static final MetaDataKey<Boolean> IS_HTTP_REQUEST = MetaDataKey.metaDataKey("IS_HTTP_REQUEST");
 
+    @Deprecated
     public static final MetaDataKey<Map<String, String>> RAW_REQUEST_QUERY_PARAMETERS =
             MetaDataKey.metaDataKey("RAW_REQUEST_QUERY_PARAMETERS");
     public static final MetaDataKey<String> RAW_METHOD = MetaDataKey.metaDataKey("RAW_METHOD");

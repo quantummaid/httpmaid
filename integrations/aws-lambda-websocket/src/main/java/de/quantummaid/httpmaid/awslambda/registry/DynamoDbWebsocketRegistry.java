@@ -41,7 +41,6 @@ import java.util.Optional;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
 import static de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry.inMemoryRegistry;
-import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.restoreFromStrings;
 import static java.util.stream.Collectors.toList;
 
 @ToString
@@ -114,7 +113,7 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
         //map.put("headers", entry.headers()); TODO
         final String contentType = encodeContentType(entry.contentType());
         map.put("contentType", contentType);
-        map.put("queryParameters", entry.queryParameters().asStringMap());
+        map.put("queryParameters", entry.queryParameters().asMap());
         return map;
     }
 

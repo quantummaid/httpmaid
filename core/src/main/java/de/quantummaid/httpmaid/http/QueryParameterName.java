@@ -30,12 +30,12 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class QueryParameterKey {
+final class QueryParameterName {
     private final String key;
 
-    static QueryParameterKey queryParameterKey(final String key) {
+    static QueryParameterName queryParameterName(final String key) {
         Validators.validateNotNullNorEmpty(key, "key");
-        return new QueryParameterKey(key);
+        return new QueryParameterName(key);
     }
 
     String stringValue() {

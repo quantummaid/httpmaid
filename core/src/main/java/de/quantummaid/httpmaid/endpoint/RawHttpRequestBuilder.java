@@ -23,7 +23,7 @@ package de.quantummaid.httpmaid.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.http.QueryParameters;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,16 +31,14 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryToMap;
 import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @ToString
 @EqualsAndHashCode
@@ -49,7 +47,8 @@ public final class RawHttpRequestBuilder {
     private String path;
     private String requestMethod;
     private Headers headers;
-    private Map<String, String> queryParameters = new HashMap<>();
+    private QueryParameters queryParameters;
+    private Map<String, String> queryParameterMap = new HashMap<>();
     private InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData = new HashMap<>();
 
@@ -78,7 +77,7 @@ public final class RawHttpRequestBuilder {
         return this;
     }
 
-    public RawHttpRequestBuilder withQueryParameters(final Map<String, ? extends Collection<String>> queryParameters) {
+    public RawHttpRequestBuilder withQueryParameterMap(final Map<String, ? extends Collection<String>> queryParameters) {
         final Map<String, String> uniqueQueryParameters = new HashMap<>(queryParameters.size());
         queryParameters.forEach((key, values) -> {
             final String firstValue = values.iterator().next();
@@ -88,11 +87,16 @@ public final class RawHttpRequestBuilder {
     }
 
     public RawHttpRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
-        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
-        return withUniqueQueryParameters(queryParametersMap);
+        final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
+        return withQueryParameters(queryParameters);
     }
 
     public RawHttpRequestBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
+        this.queryParameterMap = queryParameters;
+        return this;
+    }
+
+    public RawHttpRequestBuilder withQueryParameters(final QueryParameters queryParameters) {
         this.queryParameters = queryParameters;
         return this;
     }
@@ -116,6 +120,10 @@ public final class RawHttpRequestBuilder {
         if (body == null) {
             withBody("");
         }
-        return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
+        if (queryParameters ==  null) {
+            return rawHttpRequest(path, requestMethod, headers, queryParameterMap, body, additionalMetaData);
+        } else {
+            return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
+        }
     }
 }

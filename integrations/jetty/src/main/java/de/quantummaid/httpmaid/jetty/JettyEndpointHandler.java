@@ -25,6 +25,8 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.server.Request;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +44,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.Arrays.asList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class JettyEndpointHandler extends AbstractHandler {
@@ -64,8 +68,8 @@ final class JettyEndpointHandler extends AbstractHandler {
                     builder.withMethod(method);
                     final Headers headers = extractHeaders(request);
                     builder.withHeaders(headers);
-                    final Map<String, String> queryParameters = extractQueryParameters(request);
-                    builder.withUniqueQueryParameters(queryParameters);
+                    final QueryParameters queryParameters = extractQueryParameters(request);
+                    builder.withQueryParameters(queryParameters);
                     final InputStream body = request.getInputStream();
                     builder.withBody(body);
                     return builder.build();
@@ -92,14 +96,14 @@ final class JettyEndpointHandler extends AbstractHandler {
         return headersBuilder.build();
     }
 
-    private static Map<String, String> extractQueryParameters(final HttpServletRequest request) {
+    private static QueryParameters extractQueryParameters(final HttpServletRequest request) {
         final Enumeration<String> parameterNames = request.getParameterNames();
-        final Map<String, String> queryParameters = new HashMap<>();
+        final QueryParametersBuilder builder = QueryParameters.builder();
         while (parameterNames.hasMoreElements()) {
             final String parameterName = parameterNames.nextElement();
-            final String value = request.getParameter(parameterName);
-            queryParameters.put(parameterName, value);
+            final String[] parameterValues = request.getParameterValues(parameterName);
+            builder.withParameter(parameterName, asList(parameterValues));
         }
-        return queryParameters;
+        return builder.build();
     }
 }

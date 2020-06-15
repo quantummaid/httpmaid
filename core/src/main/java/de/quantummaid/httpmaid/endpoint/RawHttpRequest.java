@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.endpoint;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.QueryParameters;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +43,27 @@ public final class RawHttpRequest implements RawRequest {
     private final String path;
     private final String requestMethod;
     private final Headers headers;
-    private final Map<String, String> queryParameters;
+    private final QueryParameters queryParameters;
+    private final Map<String, String> queryParameterMap;
     private final InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData;
 
     public static RawHttpRequestBuilder rawHttpRequestBuilder() {
         return RawHttpRequestBuilder.rawHttpRequestBuilder();
+    }
+
+    public static RawHttpRequest rawHttpRequest(final String path,
+                                                final String requestMethod,
+                                                final Headers headers,
+                                                final QueryParameters queryParameters,
+                                                final InputStream body,
+                                                final Map<MetaDataKey<?>, Object> additionalMetaData) {
+        validateNotNull(path, "path");
+        validateNotNull(requestMethod, "requestMethod");
+        validateNotNull(headers, "headers");
+        validateNotNull(queryParameters, "queryParameters");
+        validateNotNull(body, "body");
+        return new RawHttpRequest(path, requestMethod, headers, queryParameters, null, body, additionalMetaData);
     }
 
     public static RawHttpRequest rawHttpRequest(final String path,
@@ -61,7 +77,7 @@ public final class RawHttpRequest implements RawRequest {
         validateNotNull(headers, "headers");
         validateNotNull(queryParameters, "queryParameters");
         validateNotNull(body, "body");
-        return new RawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
+        return new RawHttpRequest(path, requestMethod, headers, null, queryParameters, body, additionalMetaData);
     }
 
     @Override
@@ -69,7 +85,8 @@ public final class RawHttpRequest implements RawRequest {
         metaData.set(RAW_PATH, path);
         metaData.set(RAW_METHOD, requestMethod);
         metaData.set(REQUEST_HEADERS, headers);
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
+        metaData.set(QUERY_PARAMETERS, queryParameters);
+        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameterMap);
         metaData.set(REQUEST_BODY_STREAM, body);
         metaData.set(IS_HTTP_REQUEST, true);
         additionalMetaData.forEach(metaData::setUnchecked);
