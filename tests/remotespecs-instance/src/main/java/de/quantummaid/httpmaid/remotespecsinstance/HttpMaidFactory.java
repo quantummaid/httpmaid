@@ -23,7 +23,11 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
+import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
+import de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshallerAndUnmarshaller;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
@@ -41,6 +45,7 @@ public final class HttpMaidFactory {
     public static HttpMaid httpMaid(final Consumer<HttpMaidBuilder> configurator) {
         final HttpMaidBuilder builder = anHttpMaid()
                 .get("/", (request, response) -> response.setBody("fooooo"))
+
                 .get("/jsonResponse", (request, response) -> {
                     System.out.println("json response route");
                     response.setStatus(201);
@@ -50,9 +55,13 @@ public final class HttpMaidFactory {
                 .get("/statusCode/201", (request, response) -> response.setStatus(201))
 
                 .get("/returnHeader/<name>", (request, response) -> {
+                    System.out.println("returnHeader route");
+                    System.out.println("request.headers().asMap() = " + request.headers().asMap());
                     final String headerName = request.pathParameters().getPathParameter("name");
-                    final String header = request.headers().header(headerName);
-                    response.setBody(header);
+                    System.out.println("headerName = " + headerName);
+                    final List<String> header = request.headers().allValuesFor(headerName);
+                    System.out.println("header = " + header);
+                    response.setBody(Map.of("headers", header));
                 })
 
                 .get("/headers/HeaderName/HeaderValue", (request, response) -> response.addHeader("HeaderName", "HeaderValue"))
@@ -72,7 +81,13 @@ public final class HttpMaidFactory {
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
                 .websocket("handler2", (request, response) -> response.setBody("handler 2"))
                 .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
-                .websocket("check", (request, response) -> response.setBody("websocket has been registered"));
+                .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+                    mapMaidBuilder.withAdvancedSettings(advancedBuilder -> {
+                        final MinimalJsonMarshallerAndUnmarshaller minimalJsonMarshallerAndUnmarshaller = MinimalJsonMarshallerAndUnmarshaller.minimalJsonMarshallerAndUnmarshaller();
+                        advancedBuilder.usingJsonMarshaller(minimalJsonMarshallerAndUnmarshaller.marshaller(), minimalJsonMarshallerAndUnmarshaller.unmarshaller());
+                    });
+                }));
         configurator.accept(builder);
         return builder.build();
     }

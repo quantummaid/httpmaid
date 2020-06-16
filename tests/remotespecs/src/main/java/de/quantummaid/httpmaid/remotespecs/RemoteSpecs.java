@@ -22,8 +22,14 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.HttpMaidClientWrapper;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 public interface RemoteSpecs {
 
@@ -49,20 +55,20 @@ public interface RemoteSpecs {
     @Test
     default void canReceiveSingleHeader(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aRequestToThePath("/returnHeader/X-My-Header").viaTheGetMethod().withAnEmptyBody()
+                .when().aRequestToThePath("/returnHeader/X-My-Header").viaTheGetMethod().withAnEmptyBody().withContentType("application/json")
                 .withTheHeader("X-My-Header", "foo").isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("foo");
+                .theJsonResponseStrictlyEquals(Map.of("headers", List.of("foo")));
     }
 
     @Test
     default void canReceiveDuplicatedHeaderWithDistinctValues(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody()
+                .when().aRequestToThePath("/returnHeader/X-My-Header").viaTheGetMethod().withAnEmptyBody()
                 .withHeaderOccuringMultipleTimesHavingDistinctValue("X-My-Header", "foo", "bar")
                 .isIssued()
                 .theStatusCodeWas(200)
-                .theResponseBodyWas("foo");
+                .theJsonResponseStrictlyEquals(Map.of("headers", List.of("foo", "bar")));
     }
 
     @Test
