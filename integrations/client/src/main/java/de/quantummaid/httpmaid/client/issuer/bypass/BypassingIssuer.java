@@ -33,14 +33,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
-import java.util.Map;
 import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.client.RawClientResponse.rawClientResponse;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BypassingIssuer implements Issuer {
@@ -57,11 +55,13 @@ public final class BypassingIssuer implements Issuer {
                        final BasePath basePath) {
         final RequestPath requestPath = request.path(basePath);
         final QueryParametersBuilder queryParametersBuilder = QueryParameters.builder();
-        final Map<String, String> queryParameters = requestPath.queryParameters()
-                .stream()
-                .collect(toMap(
-                        queryParameter -> queryParameter.key().unencoded(),
-                        queryParameter -> queryParameter.value().map(UriString::unencoded).orElse(""))
+        requestPath.queryParameters()
+                .forEach(queryParameter -> queryParametersBuilder.withParameter(
+                        queryParameter.key()
+                                .unencoded(),
+                        queryParameter.value()
+                                .map(UriString::unencoded)
+                                .orElse(""))
                 );
         final RawClientResponse rawClientResponse = httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
@@ -71,7 +71,7 @@ public final class BypassingIssuer implements Issuer {
             final HeadersBuilder headersBuilder = headersBuilder();
             request.headers().forEach(header -> headersBuilder.withAdditionalHeader(header.name(), header.value()));
             builder.withHeaders(headersBuilder.build());
-            builder.withUniqueQueryParameters(queryParameters);
+            builder.withQueryParameters(queryParametersBuilder.build());
             final InputStream body = request.body().orElseGet(() -> Streams.stringToInputStream(""));
             builder.withBody(body);
             return builder.build();

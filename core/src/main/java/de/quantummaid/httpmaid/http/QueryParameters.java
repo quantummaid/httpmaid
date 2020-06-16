@@ -21,25 +21,20 @@
 
 package de.quantummaid.httpmaid.http;
 
-import de.quantummaid.httpmaid.util.Maps;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import javax.management.Query;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.quantummaid.httpmaid.http.QueryParameter.QueryParameter;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 @ToString
 @EqualsAndHashCode
@@ -67,7 +62,7 @@ public final class QueryParameters {
             final QueryParameterName name = queryParameterName(decode(entry[0]));
             final QueryParameterValue value = (entry.length > 1)
                     ? queryParameterValue(decode(entry[1])) : queryParameterValue("");
-            queryParameters.add(QueryParameter.QueryParameter(name, value));
+            queryParameters.add(QueryParameter.queryParameter(name, value));
         }
         return QueryParameters.queryParameters(queryParameters);
     }

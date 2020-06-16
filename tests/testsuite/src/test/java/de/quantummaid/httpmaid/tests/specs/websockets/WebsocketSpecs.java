@@ -106,7 +106,7 @@ public final class WebsocketSpecs {
                         })
                         .build()
         )
-                .when().aWebsocketIsConnected(Map.of("foo", "bar"), Map.of())
+                .when().aWebsocketIsConnected(Map.of("foo", List.of("bar")), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
                 .theCheckpointHasBeenVisited("bar");
     }

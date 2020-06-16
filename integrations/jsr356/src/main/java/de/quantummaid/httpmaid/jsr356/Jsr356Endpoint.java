@@ -59,7 +59,7 @@ public class Jsr356Endpoint extends Endpoint {
                     builder.withNonSerializableConnectionInformation(connectionInformation);
                     builder.withHeaders(headers);
                     final String queryString = session.getQueryString();
-                    builder.withEncodedQueryParameters(queryString);
+                    builder.withEncodedQueryString(queryString);
                     return builder.build();
                 },
                 response -> {

@@ -126,7 +126,7 @@ public final class HttpMaidClient implements AutoCloseable {
     }
 
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
-                                   final Map<String, String> queryParameters,
+                                   final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers) {
         return websocketClient.openWebsocket(messageHandler, queryParameters, headers, basePath.render());
     }

@@ -75,10 +75,12 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
     public synchronized void onWebSocketConnect(final Session session) {
         this.session = session;
         final Map<String, Object> event = createEvent("CONNECT");
-        final Map<String, String> queryParameters = new HashMap<>();
-        session.getUpgradeRequest().getParameterMap()
-                .forEach((key, values) -> queryParameters.put(key, values.get(0)));
-        event.put("queryStringParameters", queryParameters);
+        final Map<String, List<String>> queryParameters = new HashMap<>();
+        final Map<String, List<String>> parameterMap = session.getUpgradeRequest().getParameterMap();
+        parameterMap.forEach((key, value) -> {
+            queryParameters.put(key, value);
+        });
+        event.put("multiValueQueryStringParameters", queryParameters);
         final Map<String, List<String>> headers = session.getUpgradeRequest().getHeaders();
         event.put("multiValueHeaders", headers);
         endpoint.delegate(event);

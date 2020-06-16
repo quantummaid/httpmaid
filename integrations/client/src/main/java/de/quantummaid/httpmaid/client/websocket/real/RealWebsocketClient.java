@@ -55,7 +55,7 @@ public final class RealWebsocketClient implements WebsocketClient {
 
     @Override
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
-                                   final Map<String, String> queryParameters,
+                                   final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers,
                                    final String path) {
         final String fullUri = uri + path;
@@ -74,9 +74,11 @@ public final class RealWebsocketClient implements WebsocketClient {
         }
     }
 
-    private static URI createUri(final String rawUri, final Map<String, String> queryParameters) throws URISyntaxException {
+    private static URI createUri(final String rawUri,
+                                 final Map<String, List<String>> queryParameters) throws URISyntaxException {
         final StringJoiner stringJoiner = new StringJoiner("&", rawUri + "?", "");
-        queryParameters.forEach((key, value) -> stringJoiner.add(format("%s=%s", key, value)));
+        queryParameters.forEach((key, values) ->
+                values.forEach(value -> stringJoiner.add(format("%s=%s", key, value))));
         final String fullUri = stringJoiner.toString();
         return new URI(fullUri);
     }

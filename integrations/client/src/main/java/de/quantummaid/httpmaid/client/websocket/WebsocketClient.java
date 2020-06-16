@@ -27,7 +27,7 @@ import java.util.Map;
 public interface WebsocketClient {
 
     Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            Map<String, String> queryParameters,
+                            Map<String, List<String>> queryParameters,
                             Map<String, List<String>> headers,
                             String path);
 }

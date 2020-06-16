@@ -129,7 +129,7 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
 
     @Override
     public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
-                                          final Map<String, String> queryParameters,
+                                          final Map<String, List<String>> queryParameters,
                                           final Map<String, List<String>> headers) {
         if (websocketClient == null) {
             throw new UnsupportedOperationException("There is no websocket deployment to connect to. " +

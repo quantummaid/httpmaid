@@ -11,7 +11,7 @@ public class QueryParameter {
     private final QueryParameterName name;
     private final QueryParameterValue value;
 
-    public static QueryParameter QueryParameter(final QueryParameterName name, final QueryParameterValue value) {
+    public static QueryParameter queryParameter(final QueryParameterName name, final QueryParameterValue value) {
         Validators.validateNotNull(name, "name");
         Validators.validateNotNull(value, "value");
         return new QueryParameter(name, value);

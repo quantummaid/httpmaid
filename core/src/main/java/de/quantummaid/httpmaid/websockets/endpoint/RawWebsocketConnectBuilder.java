@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
@@ -31,7 +32,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnect;
@@ -44,7 +45,6 @@ public final class RawWebsocketConnectBuilder {
     private ConnectionInformation connectionInformation;
     private WebsocketSenderId websocketSenderId;
     private Headers headers;
-    private Map<String, String> queryParameterMap = new HashMap<>();
     private QueryParameters queryParameters;
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
@@ -67,7 +67,7 @@ public final class RawWebsocketConnectBuilder {
         return this;
     }
 
-    public RawWebsocketConnectBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
+    public RawWebsocketConnectBuilder withEncodedQueryString(final String encodedQueryParameters) {
         final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
         return withQueryParameters(queryParameters);
     }
@@ -77,13 +77,14 @@ public final class RawWebsocketConnectBuilder {
         return this;
     }
 
-    public RawWebsocketConnectBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
-        this.queryParameterMap = queryParameters;
+    public RawWebsocketConnectBuilder withQueryParameterMap(final Map<String, List<String>> queryParameters) {
+        final QueryParametersBuilder builder = QueryParameters.builder();
+        queryParameters.forEach(builder::withParameter);
+        this.queryParameters = builder.build();
         return this;
     }
 
     public RawWebsocketConnect build() {
-        if (true) throw new UnsupportedOperationException("tilt#RawWebsocketConnectBuilder");
-        return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameterMap, headers);
+        return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
     }
 }

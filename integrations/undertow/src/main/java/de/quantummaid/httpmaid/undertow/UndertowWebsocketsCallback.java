@@ -56,7 +56,7 @@ public final class UndertowWebsocketsCallback implements WebSocketConnectionCall
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withNonSerializableConnectionInformation(connectionInformation);
-            builder.withEncodedQueryParameters(exchange.getQueryString());
+            builder.withEncodedQueryString(exchange.getQueryString());
             final Map<String, List<String>> requestHeaders = exchange.getRequestHeaders();
             final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
             headersBuilder.withHeadersMap(requestHeaders);

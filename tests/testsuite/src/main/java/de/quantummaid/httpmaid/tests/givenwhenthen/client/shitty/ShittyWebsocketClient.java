@@ -34,6 +34,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -53,14 +54,19 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
     public static ShittyWebsocketClient openWebsocket(final String uri,
                                                       final Consumer<String> responseHandler,
                                                       final Map<String, List<String>> headers,
-                                                      final Map<String, String> queryParameters) {
+                                                      final Map<String, List<String>> queryParameters) {
         final String queryParametersTail;
         if (queryParameters.isEmpty()) {
             queryParametersTail = "";
         } else {
-            queryParametersTail = queryParameters.entrySet().stream()
-                    .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                    .collect(Collectors.joining("&", "?", ""));
+            final StringJoiner joiner = new StringJoiner("&", "?", "");
+            queryParameters.forEach((key, values) -> {
+                values.forEach(value -> {
+                    final String parameter = format("%s=%s", key, value);
+                    joiner.add(parameter);
+                });
+            });
+            queryParametersTail = joiner.toString();
         }
         final String fullUri = uri + queryParametersTail;
         try {

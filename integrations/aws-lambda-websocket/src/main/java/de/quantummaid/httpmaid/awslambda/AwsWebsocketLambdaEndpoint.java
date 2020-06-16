@@ -94,8 +94,8 @@ public final class AwsWebsocketLambdaEndpoint {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withConnectionInformation(AWS_WEBSOCKET_SENDER, connectionInformation);
 
-            final HashMap<String, String> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
-            builder.withUniqueQueryParameters(queryParameters);
+            final Map<String, List<String>> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
+            builder.withQueryParameterMap(queryParameters);
 
             final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
             final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();

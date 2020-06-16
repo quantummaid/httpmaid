@@ -58,7 +58,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     }
 
     @Override
-    public Then aWebsocketIsConnected(final Map<String, String> queryParameters,
+    public Then aWebsocketIsConnected(final Map<String, List<String>> queryParameters,
                                       final Map<String, List<String>> headers) {
         final Checkpoints checkpoints = testData.getCheckpoints();
         final WrappedWebsocket websocket = testData.getClientWrapper().openWebsocket(checkpoints::visitCheckpoint, queryParameters, headers);
