@@ -81,13 +81,7 @@ public final class HttpMaidFactory {
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
                 .websocket("handler2", (request, response) -> response.setBody("handler 2"))
                 .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
-                .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
-                .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
-                    mapMaidBuilder.withAdvancedSettings(advancedBuilder -> {
-                        final MinimalJsonMarshallerAndUnmarshaller minimalJsonMarshallerAndUnmarshaller = MinimalJsonMarshallerAndUnmarshaller.minimalJsonMarshallerAndUnmarshaller();
-                        advancedBuilder.usingJsonMarshaller(minimalJsonMarshallerAndUnmarshaller.marshaller(), minimalJsonMarshallerAndUnmarshaller.unmarshaller());
-                    });
-                }));
+                .websocket("check", (request, response) -> response.setBody("websocket has been registered"));
         configurator.accept(builder);
         return builder.build();
     }
