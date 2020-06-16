@@ -31,16 +31,17 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.*;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
+import static de.quantummaid.httpmaid.http.Http.Headers.COOKIE;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
 @ToString
@@ -73,63 +74,35 @@ public final class AwsLambdaEndpoint {
             builder.withMethod(httpRequestMethod);
             final String path = (String) httpInformation.get("path");
             builder.withPath(path);
-            final Map<String, Object> headers = event.getMap("headers");
+
+            final Map<String, String> headers = event.getOrDefault("headers", LinkedHashMap::new);
             final HeadersBuilder headersBuilder = headersBuilder();
-            headers.forEach((key, value) -> headersBuilder.withAdditionalHeader(key, (String) value));
+            headers.forEach((key, commaSeparatedValues) -> {
+                final String[] values = commaSeparatedValues.split(",");
+                stream(values).forEach(value -> headersBuilder.withAdditionalHeader(key, value));
+            });
+            final List<String> cookies = event.getOrDefault("cookies", ArrayList::new);
+            cookies.forEach(cookie -> headersBuilder.withAdditionalHeader(COOKIE, cookie));
             builder.withHeaders(headersBuilder.build());
-            final Map<String, String> queryParameters = Map.of();
-            builder.withUniqueQueryParameters(queryParameters);
+
+            final String queryString = event.getAsString("rawQueryString");
+            final QueryParameters queryParameters = QueryParameters.fromQueryString(queryString);
+            builder.withQueryParameters(queryParameters);
+
             final String body = "";
             builder.withBody(body);
             return builder.build();
         }, response -> {
-            System.out.println("step -4");
             final int statusCode = response.status();
-            System.out.println("step -3");
             final Map<String, List<String>> responseHeaders = response.headers();
-            System.out.println("step -2");
             final String responseBody = response.stringBody();
 
-            System.out.println("step -1");
             final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
-            System.out.println("step 0");
             responseMap.put("statusCode", statusCode);
-
-            System.out.println("step 1");
             final Map<String, String> singleHeaders = new LinkedHashMap<>();
-            System.out.println("step 2");
-            responseHeaders.forEach((key, values) -> singleHeaders.put(key, values.stream().collect(joining(","))));
-            System.out.println("step 3");
+            responseHeaders.forEach((key, values) -> singleHeaders.put(key, String.join(",", values)));
             responseMap.put("headers", singleHeaders);
-            //responseMap.put("headers", responseHeaders);
-            System.out.println("responseBody = " + responseBody);
-            System.out.println("step 4");
             responseMap.put("body", responseBody);
-            System.out.println("step 5");
-
-            /*
-            System.out.println("starting to create response");
-            try {
-                final int statusCode = response.status();
-                final Map<String, List<String>> responseHeaders = response.headers();
-                final String responseBody = response.stringBody();
-
-                final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
-                responseMap.put("statusCode", statusCode);
-                responseMap.put("multiValueHeaders", responseHeaders);
-                final Map<String, String> singleHeaders = new LinkedHashMap<>();
-                responseHeaders.forEach((key, values) -> singleHeaders.put(key, values.get(0)));
-                responseMap.put("headers", singleHeaders);
-                responseMap.put("body", responseBody);
-
-                System.out.println("responseMap = " + responseMap);
-                return responseMap;
-            } catch (final Throwable e) {
-                e.printStackTrace();
-                throw e;
-            }
-             */
-
             return responseMap;
         });
     }
@@ -139,7 +112,11 @@ public final class AwsLambdaEndpoint {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
             final String httpRequestMethod = event.getAsString(HTTP_METHOD);
             builder.withMethod(httpRequestMethod);
-            final String path = event.getAsString(PATH);
+
+            final String encodedPath = event.getAsString(PATH);
+            final String path = URLDecoder.decode(encodedPath, UTF_8);
+            builder.withPath(path);
+
             builder.withPath(path);
             final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
             final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();

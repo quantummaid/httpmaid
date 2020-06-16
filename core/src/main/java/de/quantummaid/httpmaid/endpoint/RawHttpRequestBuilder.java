@@ -31,7 +31,6 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,10 +76,6 @@ public final class RawHttpRequestBuilder {
     public RawHttpRequestBuilder withQueryString(final String encodedQueryParameters) {
         final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
         return withQueryParameters(queryParameters);
-    }
-
-    public RawHttpRequestBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
-        throw new UnsupportedOperationException("tilt");
     }
 
     public RawHttpRequestBuilder withQueryParameters(final QueryParameters queryParameters) {

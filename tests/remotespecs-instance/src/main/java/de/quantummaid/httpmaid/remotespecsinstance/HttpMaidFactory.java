@@ -49,8 +49,7 @@ public final class HttpMaidFactory {
                 .get("/jsonResponse", (request, response) -> {
                     System.out.println("json response route");
                     response.setStatus(201);
-                    //response.setBody(Map.of("foo", "bar"));
-                    response.setBody("{\"foo\":\"bar\"}");
+                    response.setBody(Map.of("foo", "bar"));
                 })
                 .get("/statusCode/201", (request, response) -> response.setStatus(201))
 
@@ -62,6 +61,11 @@ public final class HttpMaidFactory {
                     final List<String> header = request.headers().allValuesFor(headerName);
                     System.out.println("header = " + header);
                     response.setBody(Map.of("headers", header));
+                })
+
+                .get("/dumpQueryParameters", (request, response) -> {
+                    final Map<String, List<String>> params = request.queryParameters().asMap();
+                    response.setBody(params);
                 })
 
                 .get("/headers/HeaderName/HeaderValue", (request, response) -> response.addHeader("HeaderName", "HeaderValue"))

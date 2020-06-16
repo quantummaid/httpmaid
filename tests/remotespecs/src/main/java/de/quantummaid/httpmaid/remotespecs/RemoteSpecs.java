@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+
 public interface RemoteSpecs {
 
     RemoteSpecsDeployer provideDeployer();
@@ -72,16 +74,30 @@ public interface RemoteSpecs {
     }
 
     @Test
-    default void canReceiveQueryParameter() {
-
+    default void canReceiveQueryParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/dumpQueryParameters").viaTheGetMethod()
+                .withAnEmptyBody().withQueryStringParameter("param+1 %ü", "value+1 %ü").isIssued()
+                .theJsonResponseStrictlyEquals(Map.of("param+1 %ü", List.of("value+1 %ü")));
     }
 
     @Test
-    default void canReceiveQueryParameterWithMultipleValues() {
-
+    default void canReceiveQueryParameterWithMultipleValues(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/dumpQueryParameters").viaTheGetMethod()
+                .withAnEmptyBody()
+                .withQueryStringParameter("param1", "value1")
+                .withQueryStringParameter("otherparam", "othervalue")
+                .withQueryStringParameter("param1", "value2")
+                .isIssued()
+                .theJsonResponseStrictlyEquals(
+                        Map.of("param1", List.of("value1", "value2"),
+                                "otherparam", List.of("othervalue")));
     }
 
-    // TODO cookies
+    // TODO header with comma
+    // TODO cookies with more information (lifetime, etc.)
+    // TODO cookie with encoding, comma
 
     @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
@@ -143,6 +159,8 @@ public interface RemoteSpecs {
                 .withTheHeader("Cookie", "cookie1=qwer; cookie2=asdf").isIssued()
                 .theResponseBodyWas("qwer and asdf");
     }
+
+    // TODO cookies with lifetime, etc.
 
     /**
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
