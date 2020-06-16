@@ -95,7 +95,6 @@ public final class JeeOnUndertowDeployer implements PortDeployer {
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(
-                theShittyTestClient(),
                 theRealHttpMaidClient(),
                 theRealHttpMaidClientWithConnectionReuse()
         );

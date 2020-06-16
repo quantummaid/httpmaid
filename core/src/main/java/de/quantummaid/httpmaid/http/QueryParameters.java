@@ -98,7 +98,7 @@ public final class QueryParameters {
             final String name = queryParameter.name().stringValue();
             final String value = queryParameter.value().stringValue();
             final List<String> values = result.getOrDefault(name, new ArrayList<>());
-            values.add(queryParameter.value().stringValue());
+            values.add(value);
             result.put(name, values);
         });
         return result;

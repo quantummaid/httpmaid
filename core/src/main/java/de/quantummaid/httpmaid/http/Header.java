@@ -11,18 +11,18 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Header {
-    private final HeaderKey key;
+    private final HeaderName name;
     private final HeaderValue value;
 
-    public static Header header(final HeaderKey key,
+    public static Header header(final HeaderName name,
                                 final HeaderValue value) {
-        validateNotNull(key, "key");
+        validateNotNull(name, "name");
         validateNotNull(value, "value");
-        return new Header(key, value);
+        return new Header(name, value);
     }
 
-    public HeaderKey key() {
-        return key;
+    public HeaderName name() {
+        return name;
     }
 
     public HeaderValue value() {

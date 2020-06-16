@@ -29,7 +29,7 @@ import lombok.ToString;
 
 import java.util.*;
 
-import static de.quantummaid.httpmaid.http.HeaderKey.headerKey;
+import static de.quantummaid.httpmaid.http.HeaderName.headerKey;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -38,15 +38,15 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResponseHeaders {
-    private final Map<HeaderKey, List<HeaderValue>> headers;
+    private final Map<HeaderName, List<HeaderValue>> headers;
 
     public static ResponseHeaders emptyResponseHeaders() {
         return new ResponseHeaders(new LinkedHashMap<>());
     }
 
     public Optional<String> getOptionalHeader(final String key) {
-        final HeaderKey headerKey = headerKey(key);
-        return Maps.getOptionally(headers, headerKey)
+        final HeaderName headerName = headerKey(key);
+        return Maps.getOptionally(headers, headerName)
                 .flatMap(headerValues -> headerValues.stream().findFirst())
                 .map(HeaderValue::stringValue);
     }
@@ -57,21 +57,21 @@ public final class ResponseHeaders {
     }
 
     public Map<String, List<String>> asStringMap() {
-        return Maps.transformMap(headers, HeaderKey::stringValue,
+        return Maps.transformMap(headers, HeaderName::stringValue,
                 headerValues -> headerValues.stream().map(HeaderValue::stringValue).collect(toList()));
     }
 
     public void addHeader(final String name, final String value) {
-        final HeaderKey headerKey = headerKey(name);
-        final List<HeaderValue> headerValues = ofNullable(headers.get(headerKey)).orElse(new ArrayList<>());
+        final HeaderName headerName = headerKey(name);
+        final List<HeaderValue> headerValues = ofNullable(headers.get(headerName)).orElse(new ArrayList<>());
         final HeaderValue headerValue = HeaderValue.headerValue(value);
         headerValues.add(headerValue);
-        headers.put(headerKey, headerValues);
+        headers.put(headerName, headerValues);
     }
 
     public void setHeader(final String name, final String value) {
-        final HeaderKey headerKey = headerKey(name);
+        final HeaderName headerName = headerKey(name);
         final HeaderValue headerValue = HeaderValue.headerValue(value);
-        headers.put(headerKey, new ArrayList<>(List.of(headerValue)));
+        headers.put(headerName, new ArrayList<>(List.of(headerValue)));
     }
 }

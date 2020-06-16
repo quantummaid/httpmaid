@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.http.Header.header;
-import static de.quantummaid.httpmaid.http.HeaderKey.headerKey;
+import static de.quantummaid.httpmaid.http.HeaderName.headerKey;
 import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
 import static de.quantummaid.httpmaid.http.Headers.headers;
 

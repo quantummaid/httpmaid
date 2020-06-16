@@ -70,7 +70,6 @@ public final class Jsr356OnTyrusDeployer implements PortDeployer {
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(
-                theShittyTestClient(),
                 theRealHttpMaidClient(),
                 theRealHttpMaidClientWithConnectionReuse()
         );

@@ -88,7 +88,6 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
 
     @Override
     public void onWebSocketError(final Throwable throwable) {
-
     }
 
     private static Map<String, Object> createEvent(final String eventType) {

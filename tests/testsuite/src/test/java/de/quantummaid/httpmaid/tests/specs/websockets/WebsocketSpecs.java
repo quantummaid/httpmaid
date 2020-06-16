@@ -65,54 +65,6 @@ public final class WebsocketSpecs {
 
     @ParameterizedTest
     @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsCanAccessHeaders(final TestEnvironment testEnvironment) {
-        testEnvironment.given(checkpoints ->
-                anHttpMaid()
-                        .websocket("handler", (request, response) -> {
-                            final String myHeader = request.headers().header("myHeader");
-                            checkpoints.visitCheckpoint(myHeader);
-                        })
-                        .build()
-        )
-                .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .theCheckpointHasBeenVisited("foo");
-    }
-
-    @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsCanHaveContentType(final TestEnvironment testEnvironment) {
-        testEnvironment.given(checkpoints ->
-                anHttpMaid()
-                        .websocket("handler", (request, response) -> {
-                            final ContentType contentType = request.contentType();
-                            checkpoints.visitCheckpoint(contentType.internalValueForMapping());
-                        })
-                        .build()
-        )
-                .when().aWebsocketIsConnected(Map.of(), Map.of("Content-Type", List.of("application/json")))
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .theCheckpointHasBeenVisited("application/json");
-    }
-
-    @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsAccessQueryParameters(final TestEnvironment testEnvironment) {
-        testEnvironment.given(checkpoints ->
-                anHttpMaid()
-                        .websocket("handler", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
-                            checkpoints.visitCheckpoint(queryParameter);
-                        })
-                        .build()
-        )
-                .when().aWebsocketIsConnected(Map.of("foo", List.of("bar")), Map.of())
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .theCheckpointHasBeenVisited("bar");
-    }
-
-    @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
     public void handlerResponseIsSentBackOnWebsocket(final TestEnvironment testEnvironment) {
         testEnvironment.given(checkpoints ->
                 anHttpMaid()

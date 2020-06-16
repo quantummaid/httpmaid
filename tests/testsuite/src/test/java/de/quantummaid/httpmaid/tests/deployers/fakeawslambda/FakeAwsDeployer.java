@@ -93,7 +93,6 @@ public final class FakeAwsDeployer implements PortDeployer {
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(
-                theShittyTestClient(),
                 theRealHttpMaidClient(),
                 theRealHttpMaidClientWithConnectionReuse()
         );

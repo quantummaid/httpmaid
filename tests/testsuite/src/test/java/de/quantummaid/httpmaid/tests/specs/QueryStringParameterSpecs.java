@@ -11,6 +11,7 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public class QueryStringParameterSpecs {
+
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void handlerCanReceiveSingleQueryStringParameter(final TestEnvironment testEnvironment) {

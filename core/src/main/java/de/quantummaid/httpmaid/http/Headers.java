@@ -26,13 +26,10 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.quantummaid.httpmaid.http.HeaderKey.headerKey;
+import static de.quantummaid.httpmaid.http.HeaderName.headerKey;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
 
@@ -48,9 +45,9 @@ public final class Headers {
     }
 
     public List<String> allValuesFor(final String key) {
-        final HeaderKey headerKey = headerKey(key);
+        final HeaderName headerName = headerKey(key);
         return headers.stream()
-                .filter(header -> headerKey.equals(header.key()))
+                .filter(header -> headerName.equals(header.name()))
                 .map(Header::value)
                 .map(HeaderValue::stringValue)
                 .collect(Collectors.toList());
@@ -71,5 +68,17 @@ public final class Headers {
     public String header(final String key) {
         return optionalHeader(key)
                 .orElseThrow(() -> new IllegalArgumentException(format("No header with name %s", key)));
+    }
+
+    public Map<String, List<String>> asMap() {
+        final LinkedHashMap<String, List<String>> result = new LinkedHashMap<>();
+        headers.forEach(header -> {
+            final String name = header.name().stringValue();
+            final String value = header.value().stringValue();
+            final List<String> values = result.getOrDefault(name, new ArrayList<>());
+            values.add(value);
+            result.put(name, values);
+        });
+        return result;
     }
 }

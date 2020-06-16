@@ -30,13 +30,13 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public final class HeaderKey {
+public final class HeaderName {
     private final String value;
 
-    public static HeaderKey headerKey(final String value) {
+    public static HeaderName headerKey(final String value) {
         validateNotNullNorEmpty(value, "stringValue");
         final String cleanValue = value.toLowerCase();
-        return new HeaderKey(cleanValue);
+        return new HeaderName(cleanValue);
     }
 
     String stringValue() {
