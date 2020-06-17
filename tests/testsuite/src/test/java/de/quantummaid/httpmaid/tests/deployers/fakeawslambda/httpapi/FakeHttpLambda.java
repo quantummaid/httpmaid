@@ -26,7 +26,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
-import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGateway;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -45,7 +44,7 @@ import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOu
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeHttpLambda implements FakeApiGateway {
+public final class FakeHttpLambda implements AutoCloseable {
     private final HttpServer server;
 
     public static FakeHttpLambda fakeHttpLambda(final AwsLambdaEndpoint endpoint,

@@ -49,6 +49,6 @@ public class QueryParameterEnricher implements TopEnricher {
     @Override
     public Optional<String> extractValue(final HttpRequest request) {
         return request.queryParameters()
-                .getOptionalQueryParameter(parameterName);
+                .optionalParameter(parameterName);
     }
 }

@@ -96,7 +96,7 @@ public final class RequestExampleTests {
         final HttpMaid httpMaid = anHttpMaid()
                 .get("/hello", (request, response) -> {
                     final QueryParameters queryParameters = request.queryParameters();
-                    final String name = queryParameters.getQueryParameter("name");
+                    final String name = queryParameters.parameter("name");
                     response.setBody("hi " + name + "!");
                 })
                 .build();

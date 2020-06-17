@@ -17,7 +17,7 @@ public final class WebsocketQueryParameterSpecs {
     public void websocketsAccessQueryParameters(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid()
                 .websocket("handler", (request, response) -> {
-                    final String queryParameter = request.queryParameters().getQueryParameter("param+1 %ü");
+                    final String queryParameter = request.queryParameters().parameter("param+1 %ü");
                     response.setBody(queryParameter);
                 })
                 .build()

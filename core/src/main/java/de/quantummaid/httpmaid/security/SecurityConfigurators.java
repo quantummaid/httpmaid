@@ -81,7 +81,7 @@ public final class SecurityConfigurators {
         validateNotNullNorEmpty(parameterName, "parameterName");
         validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.queryParameters()
-                .getOptionalQueryParameter(parameterName)
+                .optionalParameter(parameterName)
                 .flatMap(authenticator::authenticate));
     }
 

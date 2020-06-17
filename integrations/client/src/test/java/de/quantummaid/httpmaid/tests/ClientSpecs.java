@@ -68,7 +68,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -82,7 +82,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -96,7 +96,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -110,7 +110,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()

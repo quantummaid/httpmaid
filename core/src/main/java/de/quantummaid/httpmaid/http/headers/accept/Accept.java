@@ -29,7 +29,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.http.Http.Headers.ACCEPT;

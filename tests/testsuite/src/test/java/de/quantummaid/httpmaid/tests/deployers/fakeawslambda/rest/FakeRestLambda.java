@@ -26,7 +26,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
-import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGateway;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -44,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ApiGatewayUtils.addBodyToEvent;
-import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
@@ -53,7 +51,7 @@ import static java.util.Optional.ofNullable;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeRestLambda implements FakeApiGateway {
+public final class FakeRestLambda implements AutoCloseable {
     private final HttpServer server;
 
     public static FakeRestLambda fakeRestLambda(final AwsLambdaEndpoint endpoint,

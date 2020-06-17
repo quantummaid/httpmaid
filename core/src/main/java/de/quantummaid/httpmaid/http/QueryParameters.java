@@ -30,6 +30,7 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.quantummaid.httpmaid.http.HttpRequestException.httpHandlerException;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static java.lang.String.format;
@@ -76,12 +77,12 @@ public final class QueryParameters {
         return decoded;
     }
 
-    public String getQueryParameter(final String key) {
-        return getOptionalQueryParameter(key)
-                .orElseThrow(() -> new RuntimeException(format("No query parameter with the key '%s'", key)));
+    public String parameter(final String name) {
+        return optionalParameter(name)
+                .orElseThrow(() -> httpHandlerException(format("No query parameter with the name '%s'", name)));
     }
 
-    public Optional<String> getOptionalQueryParameter(final String name) {
+    public Optional<String> optionalParameter(final String name) {
         final QueryParameterName requestedName = queryParameterName(name);
         final List<String> found = queryParameters.stream()
                 .filter(queryParameter -> queryParameter.name().equals(requestedName))
@@ -90,7 +91,9 @@ public final class QueryParameters {
         if (found.isEmpty()) {
             return Optional.empty();
         } else if (found.size() > 1) {
-            throw new UnsupportedOperationException("tilt"); // TODO
+            final String joinedValues = String.join(", ", found);
+            throw httpHandlerException(format("Expecting query string parameter '%s' to only have one value but got [%s]",
+                    name, joinedValues));
         } else {
             return Optional.of(found.get(0));
         }
@@ -115,22 +118,5 @@ public final class QueryParameters {
                 .map(QueryParameter::value)
                 .map(QueryParameterValue::stringValue)
                 .collect(Collectors.toList());
-    }
-
-    public Optional<String> optionalParameter(final String name) {
-        final List<String> values = allValuesFor(name);
-        if (values.isEmpty()) {
-            return Optional.empty();
-        }
-        if (values.size() > 1) {
-            throw new UnsupportedOperationException("tilt"); // TODO
-            // more that one exception
-        }
-        return Optional.of(values.get(0));
-    }
-
-    public String parameter(final String name) {
-        return optionalParameter(name)
-                .orElseThrow(() -> new IllegalArgumentException(format("No parameter with name %s", name)));
     }
 }
