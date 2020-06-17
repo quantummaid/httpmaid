@@ -119,7 +119,7 @@ of strings. You can access the headers of a request using the `headers()` method
 final HttpMaid httpMaid = anHttpMaid()
         .get("/hello", (request, response) -> {
             final Headers headers = request.headers();
-            final String name = headers.getHeader("name");
+            final String name = headers.header("name");
             response.setBody("hi " + name + "!");
         })
         .build();

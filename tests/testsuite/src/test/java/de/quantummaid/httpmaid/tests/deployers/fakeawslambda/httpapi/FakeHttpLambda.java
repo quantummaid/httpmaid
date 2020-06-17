@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.httpapi;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -37,26 +37,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ApiGatewayUtils.addBodyToEvent;
-import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.ofNullable;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeRestLambda implements FakeApiGateway {
+public final class FakeHttpLambda implements FakeApiGateway {
     private final HttpServer server;
 
-    public static FakeRestLambda fakeRestLambda(final AwsLambdaEndpoint endpoint,
+    public static FakeHttpLambda fakeHttpLambda(final AwsLambdaEndpoint endpoint,
                                                 final int port) {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
@@ -73,7 +65,7 @@ public final class FakeRestLambda implements FakeApiGateway {
             server.createContext("/", httpHandler);
             server.setExecutor(null);
             server.start();
-            return new FakeRestLambda(server);
+            return new FakeHttpLambda(server);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,52 +76,65 @@ public final class FakeRestLambda implements FakeApiGateway {
         server.stop(0);
     }
 
+    // event = {version=2.0,
+    // routeKey=$default,
+    // rawPath=/jsonResponse,
+    // rawQueryString=,
+    // headers={accept=text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8, content-length=0,
+    // content-type=application/json,
+    // host=hvckksyipg.execute-api.eu-central-1.amazonaws.com,
+    // x-amzn-trace-id=Root=1-5eea0cc6-b679a8383b6c2508c9873288,
+    // x-forwarded-for=79.112.11.227,
+    // x-forwarded-port=443,
+    // x-forwarded-proto=https},
+    // requestContext={accountId=712767472906, apiId=hvckksyipg, domainName=hvckksyipg.execute-api.eu-central-1.amazonaws.com, domainPrefix=hvckksyipg,
+    // http={method=GET, path=/jsonResponse, protocol=HTTP/1.1, sourceIp=79.112.11.227, userAgent=}, requestId=ORbvFg5qliAEJfw=, routeKey=$default, stage=$default, time=17/Jun/2020:12:29:58 +0000, timeEpoch=1592396998821}, isBase64Encoded=false}
     private static Map<String, Object> mapRequestToEvent(final HttpExchange exchange) {
         final Map<String, Object> event = new HashMap<>();
+        event.put("version", "2.0");
+
+        final Map<String, Object> httpInformation = new LinkedHashMap<>();
+
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
-        event.put("path", path);
-        final Map<String, List<String>> queryParameters = queryToMap(requestURI.getRawQuery());
-        event.put("multiValueQueryStringParameters", queryParameters);
+        httpInformation.put("path", path);
+
         final String method = exchange.getRequestMethod();
-        event.put("httpMethod", method);
+        httpInformation.put("method", method);
+
+        event.put("requestContext", Map.of("http", httpInformation));
+
+        final Map<String, String> headers = new LinkedHashMap<>();
+        final List<String> cookies = new ArrayList<>();
+        exchange.getRequestHeaders().forEach((name, values) -> {
+            if (name.equalsIgnoreCase("Cookie")) {
+                cookies.addAll(values);
+            } else {
+                final String joinedHeaders = String.join(",", values);
+                headers.put(name, joinedHeaders);
+            }
+        });
+        event.put("headers", headers);
+        event.put("cookies", cookies);
+
+        event.put("rawQueryString", requestURI.getRawQuery());
+
         addBodyToEvent(exchange.getRequestBody(), event);
-        final Map<String, List<String>> headers = new HashMap<>();
-        exchange.getRequestHeaders().forEach(headers::put);
-        event.put("multiValueHeaders", headers);
         return event;
     }
 
     private static void mapEventToResponse(final Map<String, Object> event,
                                            final HttpExchange exchange) throws IOException {
         final Headers responseHeaders = exchange.getResponseHeaders();
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>> headerMap = (Map<String, List<String>>) ofNullable(event.get("multiValueHeaders")).orElse(emptyMap());
-        responseHeaders.putAll(headerMap);
+        final Map<String, String> headers = (Map<String, String>) event.get("headers");
+        headers.forEach(responseHeaders::add);
+        final List<String> cookies = (List<String>) event.get("cookies");
+        if (!cookies.isEmpty()) {
+            responseHeaders.put("Set-Cookie", cookies);
+        }
         final Integer statusCode = (Integer) event.get("statusCode");
         exchange.sendResponseHeaders(statusCode, 0);
         final InputStream bodyStream = Streams.stringToInputStream((String) event.get("body"));
         streamInputStreamToOutputStream(bodyStream, exchange.getResponseBody());
-    }
-
-    private static Map<String, List<String>> queryToMap(final String query) {
-        final Map<String, List<String>> result = new HashMap<>();
-        if (query == null) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            final String key = decode(entry[0]);
-            final String value = (entry.length > 1)? decode(entry[1]) : "";
-            final List<String> values = result.getOrDefault(key, new ArrayList<>());
-            values.add(value);
-            result.put(key, values);
-        }
-        return result;
-    }
-
-    private static String decode(String s) {
-        final String decoded = URLDecoder.decode(s, UTF_8);
-        return decoded;
     }
 }

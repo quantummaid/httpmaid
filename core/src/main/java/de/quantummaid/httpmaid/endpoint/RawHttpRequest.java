@@ -86,7 +86,6 @@ public final class RawHttpRequest implements RawRequest {
         metaData.set(RAW_METHOD, requestMethod);
         metaData.set(REQUEST_HEADERS, headers);
         metaData.set(QUERY_PARAMETERS, queryParameters);
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameterMap);
         metaData.set(REQUEST_BODY_STREAM, body);
         metaData.set(IS_HTTP_REQUEST, true);
         additionalMetaData.forEach(metaData::setUnchecked);

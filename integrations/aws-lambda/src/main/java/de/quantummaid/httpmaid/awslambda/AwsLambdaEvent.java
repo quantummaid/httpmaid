@@ -54,6 +54,11 @@ public final class AwsLambdaEvent {
         return (String) event.get(key);
     }
 
+
+    public Boolean getAsBoolean(final String key) {
+        return (Boolean) event.get(key);
+    }
+
     @SuppressWarnings("unchecked")
     public <T> T getOrDefault(final String key, final T alternative) {
         final T value = (T) event.get(key);

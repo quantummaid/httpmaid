@@ -33,7 +33,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 public final class HeaderName {
     private final String value;
 
-    public static HeaderName headerKey(final String value) {
+    public static HeaderName headerName(final String value) {
         validateNotNullNorEmpty(value, "stringValue");
         final String cleanValue = value.toLowerCase();
         return new HeaderName(cleanValue);

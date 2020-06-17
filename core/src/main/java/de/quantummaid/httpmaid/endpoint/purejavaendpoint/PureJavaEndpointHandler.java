@@ -21,25 +21,21 @@
 
 package de.quantummaid.httpmaid.endpoint.purejavaendpoint;
 
-import com.sun.net.httpserver.Headers; // NOSONAR
-import com.sun.net.httpserver.HttpExchange; // NOSONAR
-import com.sun.net.httpserver.HttpHandler; // NOSONAR
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
-import de.quantummaid.httpmaid.http.QueryParameters;
-import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Enumeration;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
-import static java.util.Arrays.asList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class PureJavaEndpointHandler implements HttpHandler {

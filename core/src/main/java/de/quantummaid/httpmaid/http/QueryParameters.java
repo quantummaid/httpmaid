@@ -60,14 +60,18 @@ public final class QueryParameters {
         for (final String param : queryString.split("&")) {
             final String[] entry = param.split("=");
             final QueryParameterName name = queryParameterName(decode(entry[0]));
-            final QueryParameterValue value = (entry.length > 1)
-                    ? queryParameterValue(decode(entry[1])) : queryParameterValue("");
+            final QueryParameterValue value;
+            if (entry.length > 1) {
+                value = queryParameterValue(decode(entry[1]));
+            } else {
+                value = queryParameterValue("");
+            }
             queryParameters.add(QueryParameter.queryParameter(name, value));
         }
         return QueryParameters.queryParameters(queryParameters);
     }
 
-    private static String decode(String s) {
+    private static String decode(final String s) {
         final String decoded = URLDecoder.decode(s, UTF_8);
         return decoded;
     }

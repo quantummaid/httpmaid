@@ -33,7 +33,6 @@ import static de.quantummaid.httpmaid.http.headers.cookies.CookieBuilder.cookie;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.concurrent.TimeUnit.HOURS;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public final class CookieSpecs {
 
@@ -232,7 +231,7 @@ public final class CookieSpecs {
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
-    public void handlerCanSetmultipleCookies(final TestEnvironment testEnvironment) {
+    public void handlerCanSetMultipleCookies(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid()
                 .get("/cookies", (request, response) -> {
                     response.setCookie("cookie1", "cookie,value,1");

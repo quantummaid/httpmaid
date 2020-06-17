@@ -29,7 +29,7 @@ import lombok.ToString;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.quantummaid.httpmaid.http.HeaderName.headerKey;
+import static de.quantummaid.httpmaid.http.HeaderName.headerName;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
 
@@ -44,8 +44,8 @@ public final class Headers {
         return new Headers(headers);
     }
 
-    public List<String> allValuesFor(final String key) {
-        final HeaderName headerName = headerKey(key);
+    public List<String> allValuesFor(final String name) {
+        final HeaderName headerName = headerName(name);
         return headers.stream()
                 .filter(header -> headerName.equals(header.name()))
                 .map(Header::value)
@@ -53,8 +53,8 @@ public final class Headers {
                 .collect(Collectors.toList());
     }
 
-    public Optional<String> optionalHeader(final String key) {
-        final List<String> values = allValuesFor(key);
+    public Optional<String> optionalHeader(final String name) {
+        final List<String> values = allValuesFor(name);
         if (values.isEmpty()) {
             return Optional.empty();
         }
@@ -65,9 +65,9 @@ public final class Headers {
         return Optional.of(values.get(0));
     }
 
-    public String header(final String key) {
-        return optionalHeader(key)
-                .orElseThrow(() -> new IllegalArgumentException(format("No header with name %s", key)));
+    public String header(final String name) {
+        return optionalHeader(name)
+                .orElseThrow(() -> new IllegalArgumentException(format("No header with name %s", name)));
     }
 
     public Map<String, List<String>> asMap() {

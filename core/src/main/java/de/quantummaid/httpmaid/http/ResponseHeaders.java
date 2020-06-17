@@ -29,7 +29,7 @@ import lombok.ToString;
 
 import java.util.*;
 
-import static de.quantummaid.httpmaid.http.HeaderName.headerKey;
+import static de.quantummaid.httpmaid.http.HeaderName.headerName;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -45,7 +45,7 @@ public final class ResponseHeaders {
     }
 
     public Optional<String> getOptionalHeader(final String key) {
-        final HeaderName headerName = headerKey(key);
+        final HeaderName headerName = headerName(key);
         return Maps.getOptionally(headers, headerName)
                 .flatMap(headerValues -> headerValues.stream().findFirst())
                 .map(HeaderValue::stringValue);
@@ -62,7 +62,7 @@ public final class ResponseHeaders {
     }
 
     public void addHeader(final String name, final String value) {
-        final HeaderName headerName = headerKey(name);
+        final HeaderName headerName = headerName(name);
         final List<HeaderValue> headerValues = ofNullable(headers.get(headerName)).orElse(new ArrayList<>());
         final HeaderValue headerValue = HeaderValue.headerValue(value);
         headerValues.add(headerValue);
@@ -70,7 +70,7 @@ public final class ResponseHeaders {
     }
 
     public void setHeader(final String name, final String value) {
-        final HeaderName headerName = headerKey(name);
+        final HeaderName headerName = headerName(name);
         final HeaderValue headerValue = HeaderValue.headerValue(value);
         headers.put(headerName, new ArrayList<>(List.of(headerValue)));
     }

@@ -41,6 +41,14 @@ public interface RemoteSpecs {
     }
 
     @Test
+    default void handlerCanReceiveBodyOfPostRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/echo").viaThePostMethod().withTheBody("This is a post request.").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("This is a post request.");
+    }
+
+    @Test
     default void bodyCanContainJson(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/jsonResponse").viaTheGetMethod().withAnEmptyBody()
@@ -69,6 +77,14 @@ public interface RemoteSpecs {
     }
 
     @Test
+    default void doesNotDieWhenSendingAnAcceptHeaderWithMultipleSupportedContentTypes(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/jsonResponse").viaTheGetMethod().withAnEmptyBody().withContentType("application/json")
+                .withHeaderOccuringMultipleTimesHavingDistinctValue("Accept", "text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8").isIssued()
+                .theStatusCodeWas(201);
+    }
+
+    @Test
     default void canReceiveQueryParameter(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/dumpQueryParameters").viaTheGetMethod()
@@ -92,8 +108,6 @@ public interface RemoteSpecs {
 
     // TODO header with comma
     // TODO cookies with more information (lifetime, etc.)
-    // TODO cookie with encoding, comma
-    // TODO cookies with lifetime, etc.
 
     @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
@@ -174,5 +188,15 @@ public interface RemoteSpecs {
                         "name2=\"value2\""
                 )
                 .theResponseBodyWas("");
+    }
+
+    @Test
+    default void responseCanContainMultipleCookiesWithCommas(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/setCookiesWithCommas").viaTheGetMethod().withAnEmptyBody()
+                .isIssued()
+                .theReponseContainsTheHeaderRawValues("Set-Cookie",
+                        "cookie1=\"cookie,value,1\"",
+                        "cookie2=\"cookie,value,2\"");
     }
 }

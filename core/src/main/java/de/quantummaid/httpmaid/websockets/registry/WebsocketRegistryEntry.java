@@ -31,7 +31,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;

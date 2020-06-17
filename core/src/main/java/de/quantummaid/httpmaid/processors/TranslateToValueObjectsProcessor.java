@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.processors;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
-import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.path.Path;
 import lombok.AccessLevel;

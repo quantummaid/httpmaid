@@ -51,6 +51,8 @@ public final class HttpMaidFactory {
                 })
                 .get("/statusCode/201", (request, response) -> response.setStatus(201))
 
+                .post("/echo", (request, response) -> response.setBody(request.bodyString()))
+
                 .get("/returnHeader/<name>", (request, response) -> {
                     System.out.println("returnHeader route");
                     System.out.println("request.headers().asMap() = " + request.headers().asMap());
@@ -80,6 +82,11 @@ public final class HttpMaidFactory {
                     response.setCookie("name", "value");
                     response.setCookie("name2", "value2");
                 })
+                .get("/setCookiesWithCommas", (request, response) -> {
+                    response.setCookie("cookie1", "cookie,value,1");
+                    response.setCookie("cookie2", "cookie,value,2");
+                })
+
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
                 .websocket("handler2", (request, response) -> response.setBody("handler 2"))
                 .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))

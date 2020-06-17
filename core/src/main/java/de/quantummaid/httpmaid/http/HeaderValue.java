@@ -21,16 +21,12 @@
 
 package de.quantummaid.httpmaid.http;
 
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.lang.String.join;
 
 @ToString
 @EqualsAndHashCode
