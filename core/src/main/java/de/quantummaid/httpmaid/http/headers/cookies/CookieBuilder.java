@@ -57,20 +57,20 @@ public final class CookieBuilder {
         return new CookieBuilder(elements);
     }
 
-    public CookieBuilder withDirective(final String directive) {
+    public CookieBuilder withAttribute(final String directive) {
         Validators.validateNotNullNorEmpty(directive, "directive");
         elements.add(directive);
         return this;
     }
 
-    public CookieBuilder withDirective(final String key, final String value) {
+    public CookieBuilder withAttribute(final String key, final String value) {
         Validators.validateNotNullNorEmpty(key, "key");
         Validators.validateNotNullNorEmpty(value, "value");
-        return withDirective(format("%s=%s", key, value));
+        return withAttribute(format("%s=%s", key, value));
     }
 
     public CookieBuilder withExpiresDirective(final String expiresDirective) {
-        return withDirective("Expires", expiresDirective);
+        return withAttribute("Expires", expiresDirective);
     }
 
     public CookieBuilder withExpiration(final Instant expiration) {
@@ -81,7 +81,7 @@ public final class CookieBuilder {
     }
 
     public CookieBuilder withMaxAgeDirective(final String maxAgeDirective) {
-        return withDirective("Max-Age", maxAgeDirective);
+        return withAttribute("Max-Age", maxAgeDirective);
     }
 
     public CookieBuilder withMaxAge(final int time, final TimeUnit unit) {
@@ -91,7 +91,7 @@ public final class CookieBuilder {
     }
 
     public CookieBuilder withSecureDirective() {
-        return withDirective("Secure");
+        return withAttribute("Secure");
     }
 
     public CookieBuilder thatIsOnlySentViaHttps() {
@@ -99,7 +99,7 @@ public final class CookieBuilder {
     }
 
     public CookieBuilder withHttpOnlyDirective() {
-        return withDirective("HttpOnly");
+        return withAttribute("HttpOnly");
     }
 
     public CookieBuilder thatIsNotAccessibleFromJavaScript() {
@@ -107,7 +107,7 @@ public final class CookieBuilder {
     }
 
     public CookieBuilder withSameSiteDirective(final String sameSiteDirective) {
-        return withDirective("SameSite", sameSiteDirective);
+        return withAttribute("SameSite", sameSiteDirective);
     }
 
     public CookieBuilder withSameSitePolicy(final SameSitePolicy policy) {
@@ -116,7 +116,7 @@ public final class CookieBuilder {
     }
 
     public CookieBuilder withDomainDirective(final String domainDirective) {
-        return withDirective("Domain", domainDirective);
+        return withAttribute("Domain", domainDirective);
     }
 
     public CookieBuilder exposedToAllSubdomainsOf(final String... domains) {
@@ -124,7 +124,7 @@ public final class CookieBuilder {
     }
 
     public CookieBuilder withPathDirective(final String pathDirective) {
-        return withDirective("Path", pathDirective);
+        return withAttribute("Path", pathDirective);
     }
 
     public CookieBuilder exposedOnlyToSubpathsOf(final String... paths) {

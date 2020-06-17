@@ -28,6 +28,7 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormat
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -80,6 +81,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs";
     private static final String REST_API_NAME = " RemoteSpecs Rest Api Lambda Proxy";
     private static final String HTTP_V2_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy";
+    private static final String HTTP_V1_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = " RemoteSpecs WebSockets Lambda Proxy";
     public static final String REMOTESPECS_STACK_IDENTIFIER_ENV = "REMOTESPECS_STACK_IDENTIFIER";
 
@@ -130,20 +132,28 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
                 loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
         final RestApiInformation restApiInformation =
                 loadRestApiInformation(stackIdentifier + REST_API_NAME, websocketApiInformation.region());
-        final HttpApiInformation httpApiInformation = loadHttpApiInformation(stackIdentifier + HTTP_V2_PAYLOAD_API_NAME);
+        final HttpApiInformation httpApiV2PayloadInformation = loadHttpApiInformation(stackIdentifier + HTTP_V2_PAYLOAD_API_NAME);
+        final HttpApiInformation httpApiV1PayloadInformation = loadHttpApiInformation(stackIdentifier + HTTP_V1_PAYLOAD_API_NAME);
 
         final Deployment restApiDeployment = httpDeployment(
                 restApiInformation.baseUrl(),
                 websocketApiInformation.baseUrl());
-        final Deployment httpApiDeployment = httpDeployment(
-                httpApiInformation.baseUrl(),
+        final Deployment httpApiV2PayloadDeployment = httpDeployment(
+                httpApiV2PayloadInformation.baseUrl(),
+                websocketApiInformation.baseUrl()
+        );
+        final ApiBaseUrl baseUrl = httpApiV1PayloadInformation.baseUrl();
+        System.out.println("baseUrl = " + baseUrl);
+        final Deployment httpApiV1PayloadDeployment = httpDeployment(
+                baseUrl,
                 websocketApiInformation.baseUrl()
         );
 
         return RemoteSpecsDeployment.remoteSpecsDeployment(this::cleanUp,
                 Map.of(
                         LambdaRestApiRemoteSpecs.class, restApiDeployment,
-                        LambdaHttpApiV2PayloadRemoteSpecs.class, httpApiDeployment
+                        LambdaHttpApiV2PayloadRemoteSpecs.class, httpApiV2PayloadDeployment,
+                        LambdaHttpApiV1PayloadRemoteSpecs.class, httpApiV1PayloadDeployment
                 )
         );
     }

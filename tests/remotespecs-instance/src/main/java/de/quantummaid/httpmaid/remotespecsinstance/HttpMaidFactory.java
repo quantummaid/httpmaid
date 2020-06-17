@@ -23,8 +23,6 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
-import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
-import de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshallerAndUnmarshaller;
 
 import java.util.List;
 import java.util.Map;

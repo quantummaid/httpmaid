@@ -37,12 +37,12 @@ public final class HeaderSpecs {
     public void testHeadersInResponse(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
-                        .get("/headers_response", (request, response) -> response.addHeader("foo", "bar"))
+                        .get("/headers_response", (request, response) -> response.addHeader("name+1 %ü", "value+1 %ü"))
                         .build()
         )
                 .when().aRequestToThePath("/headers_response").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
-                .theReponseContainsTheHeader("foo", "bar");
+                .theReponseContainsTheHeader("name+1 %ü", "value+1 %ü");
     }
 
     @ParameterizedTest

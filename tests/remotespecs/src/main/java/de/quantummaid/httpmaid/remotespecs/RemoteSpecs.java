@@ -22,16 +22,11 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.HttpMaidClientWrapper;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-
-import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 
 public interface RemoteSpecs {
 
@@ -98,6 +93,7 @@ public interface RemoteSpecs {
     // TODO header with comma
     // TODO cookies with more information (lifetime, etc.)
     // TODO cookie with encoding, comma
+    // TODO cookies with lifetime, etc.
 
     @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
@@ -150,7 +146,7 @@ public interface RemoteSpecs {
      * Cookie: <cookie-list>
      * Cookie: name=value; name2=value2; name3=value3
      * <cookie-list> A list of name-value pairs in the form of <cookie-name>=<cookie-value>.
-     *  Pairs in the list are separated by a semicolon and a space ('; ').
+     * Pairs in the list are separated by a semicolon and a space ('; ').
      */
     @Test
     default void requestCanContainMultipleCookiesInOneCookieHeader(final TestEnvironment testEnvironment) {
@@ -159,8 +155,6 @@ public interface RemoteSpecs {
                 .withTheHeader("Cookie", "cookie1=qwer; cookie2=asdf").isIssued()
                 .theResponseBodyWas("qwer and asdf");
     }
-
-    // TODO cookies with lifetime, etc.
 
     /**
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
@@ -175,7 +169,10 @@ public interface RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/setcookies").viaTheGetMethod().withAnEmptyBody()
                 .isIssued()
-                .theReponseContainsTheHeader("Set-Cookie", "name=\"value\"", "name2=\"value2\"")
+                .theReponseContainsTheHeader("Set-Cookie",
+                        "name=\"value\"",
+                        "name2=\"value2\""
+                )
                 .theResponseBodyWas("");
     }
 }

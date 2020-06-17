@@ -42,7 +42,6 @@ import static de.quantummaid.httpmaid.http.Http.Headers.COOKIE;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
 
 @ToString
 @EqualsAndHashCode
@@ -58,10 +57,15 @@ public final class AwsLambdaEndpoint {
     public Map<String, Object> delegate(final Map<String, Object> event) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
 
-        if (event.containsKey("version")) {
-            return handleHttpApiRequest(awsLambdaEvent);
-        } else {
+        final String version = (String) event.get("version");
+        if(version == null) {
             return handleRestApiRequest(awsLambdaEvent);
+        } else if("2.0".equals(version)) {
+            return handleHttpApiRequest(awsLambdaEvent);
+        } else if("1.0".equals(version)) {
+            return handleRestApiRequest(awsLambdaEvent);
+        } else {
+            throw new UnsupportedOperationException("Unable to handle lambda event: " + event);
         }
     }
 

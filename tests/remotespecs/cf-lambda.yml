@@ -100,7 +100,7 @@ Resources:
           version: "1.0"
           title: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy"
         paths:
-          "/{path+}":
+          "$default":
             x-amazon-apigateway-any-method:
               x-amazon-apigateway-integration:
                 httpMethod: POST
@@ -109,11 +109,14 @@ Resources:
                   arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
                 payloadFormatVersion: "1.0"
               responses: {}
-              parameters:
-                - required: true
-                  name: path+
-                  in: path
         openapi: 3.0.1
+
+  HttpMaidHttpApiWithV1PayloadsApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: $default
+      ApiId: !Ref HttpMaidHttpApiWithV1Payloads
+      AutoDeploy: true
 
   #####################
   ## REST ApiGateway ##
