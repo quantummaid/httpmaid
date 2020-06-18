@@ -21,14 +21,10 @@
 
 package de.quantummaid.httpmaid.tests.specs.websockets;
 
-import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.websockets.domain.TestUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.List;
-import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
@@ -61,54 +57,6 @@ public final class WebsocketSpecs {
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
                 .theCheckpointHasBeenVisited("handler 2");
-    }
-
-    @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsCanAccessHeaders(final TestEnvironment testEnvironment) {
-        testEnvironment.given(checkpoints ->
-                anHttpMaid()
-                        .websocket("handler", (request, response) -> {
-                            final String myHeader = request.headers().getHeader("myHeader");
-                            checkpoints.visitCheckpoint(myHeader);
-                        })
-                        .build()
-        )
-                .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .theCheckpointHasBeenVisited("foo");
-    }
-
-    @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsCanHaveContentType(final TestEnvironment testEnvironment) {
-        testEnvironment.given(checkpoints ->
-                anHttpMaid()
-                        .websocket("handler", (request, response) -> {
-                            final ContentType contentType = request.contentType();
-                            checkpoints.visitCheckpoint(contentType.internalValueForMapping());
-                        })
-                        .build()
-        )
-                .when().aWebsocketIsConnected(Map.of(), Map.of("Content-Type", List.of("application/json")))
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .theCheckpointHasBeenVisited("application/json");
-    }
-
-    @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsAccessQueryParameters(final TestEnvironment testEnvironment) {
-        testEnvironment.given(checkpoints ->
-                anHttpMaid()
-                        .websocket("handler", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
-                            checkpoints.visitCheckpoint(queryParameter);
-                        })
-                        .build()
-        )
-                .when().aWebsocketIsConnected(Map.of("foo", "bar"), Map.of())
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .theCheckpointHasBeenVisited("bar");
     }
 
     @ParameterizedTest

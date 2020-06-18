@@ -27,6 +27,8 @@ import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.documentation.support.Deployer;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
 import static de.quantummaid.httpmaid.documentation.support.Deployer.test;
@@ -144,14 +146,14 @@ public final class BasicAuthExampleTests {
         final SimpleHttpResponseObject response = client.issue(aGetRequestToThePath(path));
         assertThat(response.getStatusCode(), is(401));
         assertThat(response.getBody(), is(""));
-        assertThat(response.getHeaders(), hasEntry("www-authenticate", "Basic realm=\"Hello, please authenticate!\""));
+        assertThat(response.getHeaders(), hasEntry("www-authenticate", List.of("Basic realm=\"Hello, please authenticate!\"")));
     }
 
     private static void assertWrongCredentials(final String path, final HttpMaidClient client) {
         final SimpleHttpResponseObject response = authenticatedRequest(path, "foo", "bar", client);
         assertThat(response.getStatusCode(), is(401));
         assertThat(response.getBody(), is(""));
-        assertThat(response.getHeaders(), hasEntry("www-authenticate", "Basic realm=\"Hello, please authenticate!\""));
+        assertThat(response.getHeaders(), hasEntry("www-authenticate", List.of("Basic realm=\"Hello, please authenticate!\"")));
     }
 
     private static void assertAuthenticated(final String path,

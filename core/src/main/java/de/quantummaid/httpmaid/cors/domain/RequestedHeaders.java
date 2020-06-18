@@ -48,7 +48,7 @@ public final class RequestedHeaders {
     public static RequestedHeaders load(final MetaData metaData) {
         Validators.validateNotNull(metaData, "metaData");
         final String commaSeparatedHeaders = metaData.get(REQUEST_HEADERS)
-                .getOptionalHeader(Cors.ACCESS_CONTROL_REQUEST_HEADERS).orElse("");
+                .optionalHeader(Cors.ACCESS_CONTROL_REQUEST_HEADERS).orElse("");
         Validators.validateNotNull(commaSeparatedHeaders, "commaSeparatedHeaders");
         final List<RequestedHeader> headers = stream(commaSeparatedHeaders.split(","))
                 .filter(s -> !s.isEmpty())

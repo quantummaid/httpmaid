@@ -135,19 +135,6 @@ public final class LowLevelSpecs {
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
-    public void testHeadersInResponse(final TestEnvironment testEnvironment) {
-        testEnvironment.given(() ->
-                anHttpMaid()
-                        .get("/headers_response", (request, response) -> response.addHeader("foo", "bar"))
-                        .build()
-        )
-                .when().aRequestToThePath("/headers_response").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(200)
-                .theReponseContainsTheHeader("foo", "bar");
-    }
-
-    @ParameterizedTest
-    @MethodSource(ALL_ENVIRONMENTS)
     public void testFileDownload(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
@@ -190,25 +177,5 @@ public final class LowLevelSpecs {
                 .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("OK");
-    }
-
-    @ParameterizedTest
-    @MethodSource(ALL_ENVIRONMENTS)
-    public void requestHeadersCanBeAMap(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/test", (request, response) -> {
-                            final Map<String, String> headersMap = request.headers().asStringMap();
-                            response.setBody(headersMap.toString());
-                        })
-                        .build()
-        )
-                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody()
-                .withTheHeader("a", "1").withTheHeader("b", "2").withTheHeader("c", "3")
-                .isIssued()
-                .theStatusCodeWas(200)
-                .theResponseBodyContains("a=1")
-                .theResponseBodyContains("b=2")
-                .theResponseBodyContains("c=3");
     }
 }

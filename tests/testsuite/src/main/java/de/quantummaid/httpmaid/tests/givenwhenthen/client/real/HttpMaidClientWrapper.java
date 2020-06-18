@@ -21,16 +21,20 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.client.real;
 
+import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.HttpClientRequestBuilder;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
 import de.quantummaid.httpmaid.client.body.multipart.Part;
+import de.quantummaid.httpmaid.client.clientbuilder.PortStage;
 import de.quantummaid.httpmaid.client.issuer.real.Protocol;
 import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,11 +42,11 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aRequest;
-import static de.quantummaid.httpmaid.client.HttpMaidClient.*;
+import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientBypassingRequestsDirectlyTo;
 import static de.quantummaid.httpmaid.client.body.multipart.Part.aPartWithTheControlName;
-import static de.quantummaid.httpmaid.client.issuer.real.Protocol.valueOf;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse.httpClientResponse;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,63 +55,71 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     private final HttpMaidClient websocketClient;
 
     static HttpClientWrapper realHttpMaidClientWithConnectionReuseWrapper(final Deployment deployment) {
-        final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
-        final HttpMaidClient httpClient = aHttpMaidClientThatReusesConnectionsForTheHost(deployment.httpHostname())
-                .withThePort(deployment.httpPort())
-                .viaTheProtocol(protocol)
-                .withBasePath(deployment.httpBasePath())
-                .build();
-        final HttpMaidClient websocketClient = aHttpMaidClientThatReusesConnectionsForTheHost(deployment.websocketHostname())
-                .withThePort(deployment.websocketPort())
-                .viaTheProtocol(protocol)
-                .withBasePath(deployment.websocketBasePath())
-                .build();
-        return new HttpMaidClientWrapper(httpClient, websocketClient);
+        return httpMaidClient(HttpMaidClient::aHttpMaidClientThatReusesConnectionsForTheHost, deployment);
     }
 
     static HttpClientWrapper realHttpMaidClientWrapper(final Deployment deployment) {
-        final Protocol protocol = valueOf(deployment.protocol().toUpperCase());
-        final HttpMaidClient httpClient = aHttpMaidClientForTheHost(deployment.httpHostname())
-                .withThePort(deployment.httpPort())
-                .viaTheProtocol(protocol)
-                .withBasePath(deployment.httpBasePath())
-                .build();
-        final HttpMaidClient websocketClient = aHttpMaidClientForTheHost(deployment.websocketHostname())
-                .withThePort(deployment.websocketPort())
-                .viaTheProtocol(protocol)
-                .withBasePath(deployment.websocketBasePath())
-                .build();
+        return httpMaidClient(HttpMaidClient::aHttpMaidClientForTheHost, deployment);
+    }
+
+    private static HttpClientWrapper httpMaidClient(final Function<String, PortStage> builderEntry,
+                                                    final Deployment deployment) {
+        final HttpMaidClient httpClient = deployment.httpBaseUrl()
+                .map(url -> httpClient(builderEntry, url))
+                .orElse(null);
+        final HttpMaidClient websocketClient = deployment.webSocketBaseUrl()
+                .map(url -> httpClient(builderEntry, url))
+                .orElse(null);
         return new HttpMaidClientWrapper(httpClient, websocketClient);
     }
 
-    static HttpClientWrapper bypassingHttpMaidClientWrapper(final Deployment deployment) {
-        final HttpMaidClient client = aHttpMaidClientBypassingRequestsDirectlyTo(deployment.httpMaid())
+    private static HttpMaidClient httpClient(final Function<String, PortStage> builderEntry,
+                                             final ApiBaseUrl baseUrl) {
+        final Protocol protocol = Protocol.parse(baseUrl.transportProtocol().toUpperCase());
+        return builderEntry.apply(baseUrl.hostName)
+                .withThePort(baseUrl.port)
+                .viaTheProtocol(protocol)
+                .withBasePath(baseUrl.basePath)
                 .build();
+    }
+
+    static HttpClientWrapper bypassingHttpMaidClientWrapper(final Deployment deployment) {
+        final HttpMaid httpMaid = deployment.httpMaid()
+                .orElseThrow(() -> new UnsupportedOperationException("Not a bypassing deployment: " + deployment));
+        final HttpMaidClient client = aHttpMaidClientBypassingRequestsDirectlyTo(httpMaid).build();
         return new HttpMaidClientWrapper(client, client);
     }
 
     @Override
-    public HttpClientResponse issueRequestWithoutBody(final String path,
-                                                      final String method,
-                                                      final Map<String, String> headers) {
-        return issueRequest(path, method, headers, builder -> {
+    public HttpClientResponse issueRequestWithoutBody(final HttpClientRequest request) {
+        return issueRequest(request, builder -> {
         });
     }
 
-    @Override
-    public HttpClientResponse issueRequestWithStringBody(final String path,
-                                                         final String method,
-                                                         final Map<String, String> headers,
-                                                         final String body) {
-        return issueRequest(path, method, headers, bodyStage -> bodyStage.withTheBody(body));
+    private HttpClientResponse issueRequest(final HttpClientRequest request,
+                                            final Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
+        if (httpClient == null) {
+            throw new UnsupportedOperationException("There is no http deployment to connect to. " +
+                    "Probably the endpoint does not support http requests.");
+        }
+        final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder = aRequest(request.method, request.path);
+        request.queryStringParameters.forEach(parameter -> requestBuilder.withQueryParameter(parameter.name(), parameter.value()));
+        bodyAppender.accept(requestBuilder);
+        request.headers.forEach(requestBuilder::withHeader);
+        final SimpleHttpResponseObject response = this.httpClient.issue(requestBuilder);
+        return httpClientResponse(response.getStatusCode(), response.getHeaders(), response.getBody());
     }
 
     @Override
-    public HttpClientResponse issueRequestWithMultipartBody(final String path,
-                                                            final String method,
-                                                            final Map<String, String> headers,
+    public HttpClientResponse issueRequestWithStringBody(final HttpClientRequest request,
+                                                         final String body) {
+        return issueRequest(request, bodyStage -> bodyStage.withTheBody(body));
+    }
+
+    @Override
+    public HttpClientResponse issueRequestWithMultipartBody(final HttpClientRequest request,
                                                             final List<MultipartElement> parts) {
-        return issueRequest(path, method, headers, builder -> {
+        return issueRequest(request, builder -> {
             final Part[] partsArray = parts.stream()
                     .map(part -> aPartWithTheControlName(part.controlName())
                             .withTheFileName(part.fileName().orElse(null))
@@ -117,37 +129,25 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
         });
     }
 
-    private HttpClientResponse issueRequest(final String path,
-                                            final String method,
-                                            final Map<String, String> headers,
-                                            final Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
-        final HttpClientRequestBuilder<SimpleHttpResponseObject> requestBuilder = aRequest(method, path);
-        bodyAppender.accept(requestBuilder);
-        headers.forEach(requestBuilder::withHeader);
-        final SimpleHttpResponseObject response = this.httpClient.issue(requestBuilder);
-        return httpClientResponse(response.getStatusCode(), response.getHeaders(), response.getBody());
-    }
-
-    @Override
-    public void openWebsocketAndSendMessage(final Consumer<String> responseHandler,
-                                            final String message,
-                                            final Map<String, String> queryParameters,
-                                            final Map<String, List<String>> headers) {
-        final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, queryParameters, headers);
-        websocket.send(message);
-    }
-
     @Override
     public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
-                                          final Map<String, String> queryParameters,
+                                          final Map<String, List<String>> queryParameters,
                                           final Map<String, List<String>> headers) {
+        if (websocketClient == null) {
+            throw new UnsupportedOperationException("There is no websocket deployment to connect to. " +
+                    "Probably the endpoint does not support websockets.");
+        }
         final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, queryParameters, headers);
         return WrappedWebsocket.wrappedWebsocket(websocket::send, websocket);
     }
 
     @Override
     public void close() {
-        httpClient.close();
-        websocketClient.close();
+        if (httpClient != null) {
+            httpClient.close();
+        }
+        if (websocketClient != null) {
+            websocketClient.close();
+        }
     }
 }

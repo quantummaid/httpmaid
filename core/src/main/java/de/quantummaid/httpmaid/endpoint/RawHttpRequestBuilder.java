@@ -22,7 +22,8 @@
 package de.quantummaid.httpmaid.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
-import de.quantummaid.httpmaid.util.Maps;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.QueryParameters;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,7 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
@@ -44,8 +43,8 @@ import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 public final class RawHttpRequestBuilder {
     private String path;
     private String requestMethod;
-    private Map<String, List<String>> headers = new HashMap<>();
-    private Map<String, String> queryParameters = new HashMap<>();
+    private Headers headers;
+    private QueryParameters queryParameters;
     private InputStream body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData = new HashMap<>();
 
@@ -55,7 +54,7 @@ public final class RawHttpRequestBuilder {
 
     public RawHttpRequestBuilder withUri(final URI uri) {
         withPath(uri.getPath());
-        withEncodedQueryParameters(uri.getQuery());
+        withQueryString(uri.getRawQuery());
         return this;
     }
 
@@ -69,31 +68,17 @@ public final class RawHttpRequestBuilder {
         return this;
     }
 
-    public RawHttpRequestBuilder withUniqueHeaders(final Map<String, String> headers) {
-        final Map<String, List<String>> multiMap = Maps.mapToMultiMap(headers);
-        return withHeaders(multiMap);
-    }
-
-    public RawHttpRequestBuilder withHeaders(final Map<String, List<String>> headers) {
+    public RawHttpRequestBuilder withHeaders(final Headers headers) {
         this.headers = headers;
         return this;
     }
 
-    public RawHttpRequestBuilder withQueryParameters(final Map<String, ? extends Collection<String>> queryParameters) {
-        final Map<String, String> uniqueQueryParameters = new HashMap<>(queryParameters.size());
-        queryParameters.forEach((key, values) -> {
-            final String firstValue = values.iterator().next();
-            uniqueQueryParameters.put(key, firstValue);
-        });
-        return withUniqueQueryParameters(uniqueQueryParameters);
+    public RawHttpRequestBuilder withQueryString(final String encodedQueryParameters) {
+        final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
+        return withQueryParameters(queryParameters);
     }
 
-    public RawHttpRequestBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
-        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
-        return withUniqueQueryParameters(queryParametersMap);
-    }
-
-    public RawHttpRequestBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
+    public RawHttpRequestBuilder withQueryParameters(final QueryParameters queryParameters) {
         this.queryParameters = queryParameters;
         return this;
     }
@@ -118,21 +103,5 @@ public final class RawHttpRequestBuilder {
             withBody("");
         }
         return rawHttpRequest(path, requestMethod, headers, queryParameters, body, additionalMetaData);
-    }
-
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
-        if (query == null || query.isEmpty()) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
-        }
-        return result;
     }
 }

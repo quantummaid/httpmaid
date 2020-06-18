@@ -29,6 +29,10 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
+import static de.quantummaid.httpmaid.http.Http.Headers.ACCEPT;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,10 +41,15 @@ public final class Accept {
 
     public static Accept fromMetaData(final MetaData metaData) {
         return metaData.getOptional(HttpMaidChainKeys.REQUEST_HEADERS).map(headers -> {
-            final String header = headers.getOptionalHeader("Accept").orElse("*/*");
-            final MimeTypeMatcher mimeTypeMatcher = MimeTypeMatcher.parseMimeTypeMatcher(header);
+            final List<String> mimeTypes = headers.allValuesFor(ACCEPT);
+            final MimeTypeMatcher mimeTypeMatcher;
+            if (mimeTypes.isEmpty()) {
+                mimeTypeMatcher = MimeTypeMatcher.anyMatcher();
+            } else {
+                mimeTypeMatcher = MimeTypeMatcher.parseMimeTypeMatcher(mimeTypes);
+            }
             return new Accept(mimeTypeMatcher);
-        }).orElseGet(() -> new Accept(MimeTypeMatcher.parseMimeTypeMatcher("*/*")));
+        }).orElseGet(() -> new Accept(MimeTypeMatcher.anyMatcher()));
     }
 
     public boolean contentTypeIsAccepted(final ContentType contentType) {

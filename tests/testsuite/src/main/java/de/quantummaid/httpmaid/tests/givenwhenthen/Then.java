@@ -27,12 +27,16 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @ToString
 @EqualsAndHashCode
@@ -50,13 +54,13 @@ public final class Then {
 
     public Then anExceptionHasBeenThrownDuringInitializationWithAMessageContaining(final String expectedMessage) {
         final String actualMessage = testData.getInitializationException().getMessage();
-        MatcherAssert.assertThat(actualMessage, CoreMatchers.containsString(expectedMessage));
+        assertThat(actualMessage, CoreMatchers.containsString(expectedMessage));
         return this;
     }
 
     public Then theStatusCodeWas(final int expectedStatusCode) {
         final int actualStatusCode = testData.getResponse().getStatusCode();
-        MatcherAssert.assertThat(actualStatusCode, CoreMatchers.is(expectedStatusCode));
+        assertThat(actualStatusCode, is(expectedStatusCode));
         return this;
     }
 
@@ -64,39 +68,93 @@ public final class Then {
         return theReponseContainsTheHeader("Content-Type", expectedContentType);
     }
 
-    public Then theReponseContainsTheHeader(final String key, final String value) {
-        final Map<String, String> headers = testData.getResponse().getHeaders();
-        final Map<String, String> normalizedHeaders = new HashMap<>();
-        headers.forEach((k, v) -> normalizedHeaders.put(k.toLowerCase(), v));
+    public Then theReponseContainsTheHeader(final String key, final String... values) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final Map<String, List<String>> normalizedHeaders = normalizeHeaderNames(headers);
         final String normalizedKey = key.toLowerCase();
-        MatcherAssert.assertThat(normalizedHeaders.keySet(), CoreMatchers.hasItem(normalizedKey));
-        final String actualValue = normalizedHeaders.get(normalizedKey);
-        MatcherAssert.assertThat(actualValue, CoreMatchers.is(value));
+        final List<String> potentiallyCommaSeparatedValues = normalizedHeaders.get(normalizedKey);
+        final List<String> normalizedValues = normalizeHeaderValues(potentiallyCommaSeparatedValues);
+        final List<String> expectedValues = Arrays.asList(values);
+        assertThat(normalizedValues, is(expectedValues));
         return this;
+    }
+
+    public Then theReponseContainsTheHeaderRawValue(final String key, final String rawValue) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final String normalizedKey = key.toLowerCase();
+        final String expectedValue = rawValue;
+        final List<String> actualValue = headers.get(normalizedKey);
+        assertThat("there is one and only one header by that name", actualValue.size(), is(1));
+        assertThat("the header by that name has a value matching exactly our expected value",
+                actualValue.get(0), is(expectedValue));
+        return this;
+    }
+
+    public Then theReponseContainsTheHeaderRawValues(final String key, final String... expectedRawValues) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final String normalizedKey = key.toLowerCase();
+        final List<String> actualRawValues = headers.get(normalizedKey);
+        assertThat(actualRawValues, is(Arrays.asList(expectedRawValues)));
+        return this;
+    }
+
+    private Map<String, List<String>> normalizeHeaderNames(final Map<String, List<String>> headers) {
+        final Map<String, List<String>> normalizedHeaders = new HashMap<>();
+        headers.forEach((k, v) -> {
+            final String headerName = k.toLowerCase();
+            final List<String> headerValues = normalizedHeaders.getOrDefault(k, new ArrayList<>());
+            headerValues.addAll(v);
+            normalizedHeaders.put(headerName, headerValues);
+        });
+        return normalizedHeaders;
+    }
+
+    private List<String> normalizeHeaderValues(final List<String> values) {
+        return values.stream()
+                .map(this::normalizeHeaderValue)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> normalizeHeaderValue(final String value) {
+        return Arrays.asList(value.split(","));
     }
 
     public Then theResponseBodyWas(final String expectedResponseBody) {
         final String actualResponseBody = testData.getResponse().getBody();
-        MatcherAssert.assertThat(actualResponseBody, CoreMatchers.is(expectedResponseBody));
+        assertThat(actualResponseBody, is(expectedResponseBody));
         return this;
     }
 
     public Then theResponseBodyContains(final String expectedResponseBody) {
         final String actualResponseBody = testData.getResponse().getBody();
-        MatcherAssert.assertThat(actualResponseBody, CoreMatchers.containsString(expectedResponseBody));
+        assertThat(actualResponseBody, CoreMatchers.containsString(expectedResponseBody));
         return this;
     }
 
     public Then theJsonResponseEquals(final String expectedJson) {
         final Map<String, Object> normalizedExpected = normalizeJsonToMap(expectedJson);
+        return theJsonResponseStrictlyEquals(normalizedExpected);
+    }
+
+    public Then theJsonResponseStrictlyEquals(final Map<String, Object> expectedJsonMap) {
         final String actualResponseBody = testData.getResponse().getBody();
-        final Map<String, Object> normalizedActual = normalizeJsonToMap(actualResponseBody);
-        MatcherAssert.assertThat(normalizedActual, CoreMatchers.is(normalizedExpected));
+        final Map<String, Object> actualJsonMap = normalizeJsonToMap(actualResponseBody);
+        try {
+            final JSONObject actual = new JSONObject(actualJsonMap);
+            final JSONObject expected = new JSONObject(expectedJsonMap);
+            JSONAssert.assertEquals(expected, actual, true);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (AssertionError e) {
+            assertThat(String.format("JSONAssert.assertEquals() failed: %s", e.getMessage()),
+                    actualResponseBody, is(expectedJsonMap));
+        }
         return this;
     }
 
     public Then theCheckpointHasBeenVisited(final String checkpoint) {
-        MatcherAssert.assertThat(testData.getCheckpoints().checkpointHasBeenVisited(checkpoint), CoreMatchers.is(true));
+        assertThat(testData.getCheckpoints().checkpointHasBeenVisited(checkpoint), is(true));
         return this;
     }
 

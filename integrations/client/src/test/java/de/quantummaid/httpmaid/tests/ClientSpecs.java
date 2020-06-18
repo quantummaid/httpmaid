@@ -6,11 +6,14 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.FreePortPool;
 import de.quantummaid.httpmaid.tests.givenwhenthen.Given;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.*;
 import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
 import static de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint.pureJavaEndpointFor;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Given.givenTheHttpMaidServer;
+import static java.lang.String.join;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -65,7 +68,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -79,7 +82,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -93,7 +96,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -107,7 +110,7 @@ public final class ClientSpecs {
         givenTheHttpMaidServer(
                 anHttpMaid()
                         .get("/test", (request, response) -> {
-                            final String queryParameter = request.queryParameters().getQueryParameter("foo");
+                            final String queryParameter = request.queryParameters().parameter("foo");
                             response.setBody(queryParameter);
                         })
                         .build()
@@ -117,27 +120,54 @@ public final class ClientSpecs {
     }
 
     @Test
+    public void clientCanSendSingleHeader() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/", (request, response) -> {
+                            final String header = request.headers().header("X-My-Header");
+                            response.setBody(header);
+                        })
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/").withHeader("X-My-Header", "foo"))
+                .theResponseStatusCodeWas(200)
+                .theResponseBodyWas("foo");
+    }
+
+    @Test
+    public void clientCanSendHeaderMultipleTimesWithDistinctValues() {
+        givenTheHttpMaidServer(
+                anHttpMaid()
+                        .get("/", (request, response) -> {
+                            final List<String> headers = request.headers().allValuesFor("X-My-Header");
+                            response.setBody(join(" / ", headers));
+                        })
+                        .build()
+        )
+                .when().aRequestIsMade(aGetRequestToThePath("/")
+                .withHeader("X-My-Header", "foo").withHeader("X-My-Header", "bar"))
+                .theResponseBodyWas("foo / bar");
+    }
+
+    @Test
     public void clientResponseHasAUserFriendlyDescription() {
         givenTheHttpMaidServer(
                 anHttpMaid()
-                        .get("/test", (request, response) -> response.setBody("foobar"))
+                        .get("/test", (request, response) -> {
+                            response.setStatus(203);
+                            response.setBody("Foobar");
+                            response.addHeader("HeaderName", "HeaderValue");
+                        })
                         .build()
         )
                 .when().aRequestIsMade(aGetRequestToThePath("/test"))
-                .theResponseDescriptionContains("" +
-                        "|===================================================|\n" +
-                        "|                   HTTP Response                   |\n" +
-                        "|===================================================|\n"
-                )
-                .theResponseDescriptionContains("" +
-                        "| Status Code | 200                                 |\n" +
-                        "|---------------------------------------------------|\n"
-                )
-                .theResponseDescriptionContains("" +
-                        "|---------------------------------------------------|\n" +
-                        "| Body        | foobar                              |\n" +
-                        "|---------------------------------------------------|"
-                );
+                .theResponseDescriptionContains(" HTTP Response ")
+                .theResponseDescriptionContains(" Status Code ")
+                .theResponseDescriptionContains(" 203 ")
+                .theResponseDescriptionContains(" Headers ")
+                .theResponseDescriptionContains(" headername = [HeaderValue] ")
+                .theResponseDescriptionContains(" Body ")
+                .theResponseDescriptionContains(" Foobar ");
     }
 
     @Test

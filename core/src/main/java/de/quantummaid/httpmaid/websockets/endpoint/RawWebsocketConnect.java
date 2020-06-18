@@ -23,6 +23,8 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
@@ -30,11 +32,8 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-import java.util.Map;
-
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RAW_REQUEST_HEADERS;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.RAW_REQUEST_QUERY_PARAMETERS;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.QUERY_PARAMETERS;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
@@ -45,8 +44,8 @@ import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOC
 public final class RawWebsocketConnect implements RawRequest {
     private final ConnectionInformation connectionInformation;
     private final WebsocketSenderId websocketSenderId;
-    private final Map<String, String> queryParameters;
-    private final Map<String, List<String>> headers;
+    private final QueryParameters queryParameters;
+    private final Headers headers;
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
         return RawWebsocketConnectBuilder.rawWebsocketConnectBuilder();
@@ -54,8 +53,8 @@ public final class RawWebsocketConnect implements RawRequest {
 
     public static RawWebsocketConnect rawWebsocketConnect(final ConnectionInformation connectionInformation,
                                                           final WebsocketSenderId websocketSenderId,
-                                                          final Map<String, String> queryParameters,
-                                                          final Map<String, List<String>> headers) {
+                                                          final QueryParameters queryParameters,
+                                                          final Headers headers) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(websocketSenderId, "websocketSenderId");
         validateNotNull(queryParameters, "queryParameters");
@@ -68,7 +67,7 @@ public final class RawWebsocketConnect implements RawRequest {
         metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
         metaData.set(WEBSOCKET_SENDER_ID, websocketSenderId);
         metaData.set(REQUEST_TYPE, WEBSOCKET_CONNECT);
-        metaData.set(RAW_REQUEST_QUERY_PARAMETERS, queryParameters);
-        metaData.set(RAW_REQUEST_HEADERS, headers);
+        metaData.set(QUERY_PARAMETERS, queryParameters);
+        metaData.set(REQUEST_HEADERS, headers);
     }
 }

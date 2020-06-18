@@ -77,7 +77,7 @@ public final class ResponseExampleTests {
             final SimpleHttpResponseObject response = client.issue(request);
             final int statusCode = response.getStatusCode();
             assertThat(statusCode, is(200));
-            final String header = response.getHeaders().get("name");
+            final String header = response.getSingleHeader("name");
             assertThat(header, is("Bob"));
         });
     }

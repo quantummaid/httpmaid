@@ -47,7 +47,7 @@ public final class OAuth2Authenticator implements Authenticator<HttpRequest> {
 
     @Override
     public Optional<Object> authenticate(final HttpRequest request) {
-        return request.headers().getOptionalHeader(AUTHORIZATION)
+        return request.headers().optionalHeader(AUTHORIZATION)
                 .flatMap(AuthorizationHeader::parse)
                 .filter(authorizationHeader -> authorizationHeader.type().equals("Bearer"))
                 .map(AuthorizationHeader::credentials)

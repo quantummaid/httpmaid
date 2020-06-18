@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public final class DummyDeployer implements Deployer {
     private final Deployment deployment;
 
     public static DummyDeployer dummyDeployer(final Deployment deployment) {
+        Validators.validateNotNull(deployment, "deployment");
         return new DummyDeployer(deployment);
     }
 

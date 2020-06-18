@@ -24,9 +24,27 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.builders;
 import de.quantummaid.httpmaid.tests.givenwhenthen.Then;
 
 public interface HeaderBuilder {
-    HeaderBuilder withTheHeader(String key, String value);
 
-    HeaderBuilder withContentType(String contentType);
+    HeaderBuilder withQueryStringParameter(String name, String value);
+
+    default HeaderBuilder withDistinctCookieHeaders(final String... rawCookieHeaders) {
+        return withHeaderOccuringMultipleTimesHavingDistinctValue("Cookie", rawCookieHeaders);
+    }
+
+    default HeaderBuilder withTheHeader(final String key, final String value) {
+        return withHeaderOccuringMultipleTimesHavingDistinctValue(key, value);
+    }
+
+    default HeaderBuilder withCommaSeparatedMultiValueHeader(String key, String... values) {
+        final String joinedValues = String.join(",", values);
+        return withTheHeader(key, joinedValues);
+    }
+
+    default HeaderBuilder withContentType(String contentType) {
+        return withTheHeader("Content-Type", contentType);
+    }
+
+    HeaderBuilder withHeaderOccuringMultipleTimesHavingDistinctValue(String key, String... values);
 
     Then isIssued();
 }

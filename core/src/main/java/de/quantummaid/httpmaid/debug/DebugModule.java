@@ -33,12 +33,11 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
-
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.HttpMaidChains.POST_PROCESS;
 import static de.quantummaid.httpmaid.HttpMaidChains.PRE_PROCESS;
 import static de.quantummaid.httpmaid.http.Http.StatusCodes.OK;
+import static de.quantummaid.httpmaid.http.ResponseHeaders.emptyResponseHeaders;
 
 @ToString
 @EqualsAndHashCode
@@ -59,7 +58,7 @@ public final class DebugModule implements ChainModule {
             final String dump = registry.dump();
             metaData.set(RESPONSE_BODY_STRING, dump);
             metaData.set(RESPONSE_STATUS, OK);
-            metaData.set(RESPONSE_HEADERS, new HashMap<>());
+            metaData.set(RESPONSE_HEADERS, emptyResponseHeaders());
         });
         extender.routeIf(PRE_PROCESS, Jump.jumpTo(DEBUG_CHAIN), PATH, PATH_TEMPLATE::matches, PATH_TEMPLATE.toString());
     }

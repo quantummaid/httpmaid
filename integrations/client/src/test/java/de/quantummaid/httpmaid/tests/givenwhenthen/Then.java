@@ -50,6 +50,11 @@ public final class Then {
         return this;
     }
 
+    public Then theResponseStatusCodeWas(final int statusCode) {
+        assertThat(responseObject.getStatusCode(), is(statusCode));
+        return this;
+    }
+
     public Then theResponseBodyWas(final String body) {
         assertThat(responseObject.getBody(), is(body));
         return this;

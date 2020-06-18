@@ -28,23 +28,15 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public interface HttpClientWrapper extends AutoCloseable {
-    HttpClientResponse issueRequestWithoutBody(
-            String path, String method, Map<String, String> headers);
+    HttpClientResponse issueRequestWithoutBody(HttpClientRequest request);
 
-    HttpClientResponse issueRequestWithStringBody(
-            String path, String method, Map<String, String> headers, String body);
+    HttpClientResponse issueRequestWithStringBody(HttpClientRequest request, String body);
 
-    HttpClientResponse issueRequestWithMultipartBody(
-            String path, String method, Map<String, String> headers, List<MultipartElement> parts);
+    HttpClientResponse issueRequestWithMultipartBody(HttpClientRequest request, List<MultipartElement> parts);
 
     WrappedWebsocket openWebsocket(Consumer<String> responseHandler,
-                                   Map<String, String> queryParameters,
+                                   Map<String, List<String>> queryParameters,
                                    Map<String, List<String>> headers);
-
-    void openWebsocketAndSendMessage(Consumer<String> responseHandler,
-                                     String message,
-                                     Map<String, String> queryParameters,
-                                     Map<String, List<String>> headers);
 
     @Override
     default void close() {

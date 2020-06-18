@@ -137,4 +137,17 @@ public final class PathSpecs {
                 .theStatusCodeWas(405)
                 .theResponseBodyWas("No use case found.");
     }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void testCommaIsSupportedInPath(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/this,that", (request, response) -> response.setBody("pass"))
+                        .build()
+        )
+                .when().aRequestToThePath("/this,that").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("pass");
+    }
 }

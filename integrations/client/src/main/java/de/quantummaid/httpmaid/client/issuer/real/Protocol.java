@@ -29,6 +29,10 @@ public enum Protocol {
     HTTP("http"), HTTPS("https");
     private final String identifier;
 
+    public static Protocol parse(final String input) {
+        return valueOf(input.toUpperCase());
+    }
+
     public String identifier() {
         return this.identifier;
     }

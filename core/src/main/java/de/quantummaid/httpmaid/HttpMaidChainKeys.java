@@ -23,52 +23,46 @@ package de.quantummaid.httpmaid;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.handler.Handler;
-import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.HttpRequestMethod;
-import de.quantummaid.httpmaid.http.PathParameters;
-import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.*;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.path.Path;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 
 public final class HttpMaidChainKeys {
 
     private HttpMaidChainKeys() {
     }
 
-    public static final MetaDataKey<Throwable> EXCEPTION = MetaDataKey.metaDataKey("EXCEPTION");
+    public static final MetaDataKey<Throwable> EXCEPTION = metaDataKey("EXCEPTION");
 
-    public static final MetaDataKey<Object> AUTHENTICATION_INFORMATION = MetaDataKey.metaDataKey("AUTHENTICATION_INFORMATION");
+    public static final MetaDataKey<Object> AUTHENTICATION_INFORMATION = metaDataKey("AUTHENTICATION_INFORMATION");
 
-    public static final MetaDataKey<Handler> HANDLER = MetaDataKey.metaDataKey("HANDLER");
+    public static final MetaDataKey<Handler> HANDLER = metaDataKey("HANDLER");
 
-    public static final MetaDataKey<Boolean> IS_HTTP_REQUEST = MetaDataKey.metaDataKey("IS_HTTP_REQUEST");
+    public static final MetaDataKey<Boolean> IS_HTTP_REQUEST = metaDataKey("IS_HTTP_REQUEST");
 
-    public static final MetaDataKey<Map<String, List<String>>> RAW_REQUEST_HEADERS = MetaDataKey.metaDataKey("RAW_REQUEST_HEADERS");
-    public static final MetaDataKey<Map<String, String>> RAW_REQUEST_QUERY_PARAMETERS =
-            MetaDataKey.metaDataKey("RAW_REQUEST_QUERY_PARAMETERS");
-    public static final MetaDataKey<String> RAW_METHOD = MetaDataKey.metaDataKey("RAW_METHOD");
-    public static final MetaDataKey<String> RAW_PATH = MetaDataKey.metaDataKey("RAW_PATH");
-    public static final MetaDataKey<Path> PATH = MetaDataKey.metaDataKey("PATH");
-    public static final MetaDataKey<PathParameters> PATH_PARAMETERS = MetaDataKey.metaDataKey("PATH_PARAMETERS");
-    public static final MetaDataKey<QueryParameters> QUERY_PARAMETERS = MetaDataKey.metaDataKey("QUERY_PARAMETERS");
-    public static final MetaDataKey<HttpRequestMethod> METHOD = MetaDataKey.metaDataKey("METHOD");
+    public static final MetaDataKey<String> RAW_METHOD = metaDataKey("RAW_METHOD");
+    public static final MetaDataKey<String> RAW_PATH = metaDataKey("RAW_PATH");
+    public static final MetaDataKey<Path> PATH = metaDataKey("PATH");
+    public static final MetaDataKey<PathParameters> PATH_PARAMETERS = metaDataKey("PATH_PARAMETERS");
+    public static final MetaDataKey<QueryParameters> QUERY_PARAMETERS = metaDataKey("QUERY_PARAMETERS");
+    public static final MetaDataKey<HttpRequestMethod> METHOD = metaDataKey("METHOD");
 
-    public static final MetaDataKey<InputStream> REQUEST_BODY_STREAM = MetaDataKey.metaDataKey("REQUEST_BODY_STREAM");
-    public static final MetaDataKey<String> REQUEST_BODY_STRING = MetaDataKey.metaDataKey("REQUEST_BODY_STRING");
-    public static final MetaDataKey<Object> UNMARSHALLED_REQUEST_BODY = MetaDataKey.metaDataKey("UNMARSHALLED_REQUEST_BODY");
+    public static final MetaDataKey<InputStream> REQUEST_BODY_STREAM = metaDataKey("REQUEST_BODY_STREAM");
+    public static final MetaDataKey<String> REQUEST_BODY_STRING = metaDataKey("REQUEST_BODY_STRING");
+    public static final MetaDataKey<Object> UNMARSHALLED_REQUEST_BODY = metaDataKey("UNMARSHALLED_REQUEST_BODY");
 
-    public static final MetaDataKey<ContentType> REQUEST_CONTENT_TYPE = MetaDataKey.metaDataKey("REQUEST_CONTENT_TYPE");
-    public static final MetaDataKey<Headers> REQUEST_HEADERS = MetaDataKey.metaDataKey("REQUEST_HEADERS");
+    public static final MetaDataKey<ContentType> REQUEST_CONTENT_TYPE = metaDataKey("REQUEST_CONTENT_TYPE");
+    public static final MetaDataKey<Headers> REQUEST_HEADERS = metaDataKey("REQUEST_HEADERS");
 
-    public static final MetaDataKey<Object> RESPONSE_BODY_OBJECT = MetaDataKey.metaDataKey("RESPONSE_BODY_MAP");
-    public static final MetaDataKey<String> RESPONSE_BODY_STRING = MetaDataKey.metaDataKey("RESPONSE_BODY_STRING");
-    public static final MetaDataKey<InputStream> RESPONSE_STREAM = MetaDataKey.metaDataKey("RESPONSE_STREAM");
+    public static final MetaDataKey<Object> RESPONSE_BODY_OBJECT = metaDataKey("RESPONSE_BODY_MAP");
+    public static final MetaDataKey<String> RESPONSE_BODY_STRING = metaDataKey("RESPONSE_BODY_STRING");
+    public static final MetaDataKey<InputStream> RESPONSE_STREAM = metaDataKey("RESPONSE_STREAM");
 
-    public static final MetaDataKey<ContentType> RESPONSE_CONTENT_TYPE = MetaDataKey.metaDataKey("RESPONSE_CONTENT_TYPE");
-    public static final MetaDataKey<Map<String, String>> RESPONSE_HEADERS = MetaDataKey.metaDataKey("RESPONSE_HEADERS");
-    public static final MetaDataKey<Integer> RESPONSE_STATUS = MetaDataKey.metaDataKey("RESPONSE_STATUS");
+    public static final MetaDataKey<ContentType> RESPONSE_CONTENT_TYPE = metaDataKey("RESPONSE_CONTENT_TYPE");
+    public static final MetaDataKey<ResponseHeaders> RESPONSE_HEADERS = metaDataKey("RESPONSE_HEADERS");
+    public static final MetaDataKey<Integer> RESPONSE_STATUS = metaDataKey("RESPONSE_STATUS");
 }

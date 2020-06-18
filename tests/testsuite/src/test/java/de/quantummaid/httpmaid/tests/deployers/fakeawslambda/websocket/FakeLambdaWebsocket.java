@@ -21,8 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +38,10 @@ import java.util.Map;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocket implements WebSocketListener {
-    private final AwsLambdaEndpoint endpoint;
+    private final AwsWebsocketLambdaEndpoint endpoint;
     private Session session;
 
-    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsLambdaEndpoint endpoint) {
+    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsWebsocketLambdaEndpoint endpoint) {
         return new FakeLambdaWebsocket(endpoint);
     }
 
@@ -51,8 +50,8 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         final Map<String, Object> event = createEvent("MESSAGE");
         event.put("body", message);
 
-        final APIGatewayProxyResponseEvent responseEvent = endpoint.delegate(event, null);
-        final String body = responseEvent.getBody();
+        final Map<String, Object> responseEvent = endpoint.delegate(event);
+        final String body = (String) responseEvent.get("body");
         if (body != null) {
             try {
                 session.getRemote().sendString(body);
@@ -76,18 +75,19 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
     public synchronized void onWebSocketConnect(final Session session) {
         this.session = session;
         final Map<String, Object> event = createEvent("CONNECT");
-        final Map<String, String> queryParameters = new HashMap<>();
-        session.getUpgradeRequest().getParameterMap()
-                .forEach((key, values) -> queryParameters.put(key, values.get(0)));
-        event.put("queryStringParameters", queryParameters);
+        final Map<String, List<String>> queryParameters = new HashMap<>();
+        final Map<String, List<String>> parameterMap = session.getUpgradeRequest().getParameterMap();
+        parameterMap.forEach((key, value) -> {
+            queryParameters.put(key, value);
+        });
+        event.put("multiValueQueryStringParameters", queryParameters);
         final Map<String, List<String>> headers = session.getUpgradeRequest().getHeaders();
         event.put("multiValueHeaders", headers);
-        endpoint.delegate(event, null);
+        endpoint.delegate(event);
     }
 
     @Override
     public void onWebSocketError(final Throwable throwable) {
-
     }
 
     private static Map<String, Object> createEvent(final String eventType) {

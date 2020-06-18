@@ -72,7 +72,7 @@ public final class SecurityConfigurators {
         validateNotNullNorEmpty(headerName, "headerName");
         validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.headers()
-                .getOptionalHeader(headerName)
+                .optionalHeader(headerName)
                 .flatMap(authenticator::authenticate));
     }
 
@@ -81,7 +81,7 @@ public final class SecurityConfigurators {
         validateNotNullNorEmpty(parameterName, "parameterName");
         validateNotNull(authenticator, "authenticator"); // NOSONAR
         return toAuthenticateRequestsUsing(request -> request.queryParameters()
-                .getOptionalQueryParameter(parameterName)
+                .optionalParameter(parameterName)
                 .flatMap(authenticator::authenticate));
     }
 

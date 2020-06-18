@@ -21,29 +21,25 @@
 
 package de.quantummaid.httpmaid.http;
 
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-
-import static java.lang.String.join;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class HeaderValue {
+public final class HeaderValue {
     private final String value;
 
-    static HeaderValue headerValue(final List<String> values) {
-        Validators.validateNotNull(values, "values");
-        final String value = join(", ", values);
+    public static HeaderValue headerValue(final String value) {
+        validateNotNull(value, "value");
         return new HeaderValue(value);
     }
 
-    String stringValue() {
+    public String stringValue() {
         return this.value;
     }
 }

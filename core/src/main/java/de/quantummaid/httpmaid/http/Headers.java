@@ -21,43 +21,72 @@
 
 package de.quantummaid.httpmaid.http;
 
-import de.quantummaid.httpmaid.util.Maps;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static de.quantummaid.httpmaid.http.HeaderName.headerName;
+import static de.quantummaid.httpmaid.http.HttpRequestException.httpHandlerException;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.Collections.unmodifiableList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Headers {
-    private final Map<HeaderKey, HeaderValue> headers;
+    private final List<Header> headers;
 
-    public static Headers headers(final Map<String, List<String>> stringMap) {
-        Validators.validateNotNull(stringMap, "stringMap");
-        final Map<HeaderKey, HeaderValue> headers = Maps.transformMap(stringMap, HeaderKey::headerKey, HeaderValue::headerValue);
+    public static Headers headers(final List<Header> headers) {
+        validateNotNull(headers, "headers");
         return new Headers(headers);
     }
 
-    public Optional<String> getOptionalHeader(final String key) {
-        final HeaderKey headerKey = HeaderKey.headerKey(key);
-        return Maps.getOptionally(headers, headerKey)
-                .map(HeaderValue::stringValue);
+    public List<String> allValuesFor(final String name) {
+        final HeaderName headerName = headerName(name);
+        return headers.stream()
+                .filter(header -> headerName.equals(header.name()))
+                .map(Header::value)
+                .map(HeaderValue::stringValue)
+                .collect(Collectors.toList());
     }
 
-    public String getHeader(final String key) {
-        return getOptionalHeader(key)
-                .orElseThrow(() -> new IllegalArgumentException(format("No header with name %s", key)));
+    public Optional<String> optionalHeader(final String name) {
+        final List<String> values = allValuesFor(name);
+        if (values.isEmpty()) {
+            return Optional.empty();
+        }
+        if (values.size() > 1) {
+            final String joinedValues = join(", ", values);
+            throw httpHandlerException(format("Expecting header '%s' to only have one value but got [%s]",
+                    name, joinedValues));
+        }
+        return Optional.of(values.get(0));
     }
 
-    public Map<String, String> asStringMap() {
-        return Maps.valueObjectsToStrings(headers, HeaderKey::stringValue, HeaderValue::stringValue);
+    public String header(final String name) {
+        return optionalHeader(name)
+                .orElseThrow(() -> httpHandlerException(format("No header with name '%s'", name)));
+    }
+
+    public List<Header> asList() {
+        return unmodifiableList(headers);
+    }
+
+    public Map<String, List<String>> asMap() {
+        final LinkedHashMap<String, List<String>> result = new LinkedHashMap<>();
+        headers.forEach(header -> {
+            final String name = header.name().stringValue();
+            final String value = header.value().stringValue();
+            final List<String> values = result.getOrDefault(name, new ArrayList<>());
+            values.add(value);
+            result.put(name, values);
+        });
+        return result;
     }
 }

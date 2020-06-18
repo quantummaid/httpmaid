@@ -22,50 +22,40 @@
 package de.quantummaid.httpmaid.remotespecs.jvm;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
-import de.quantummaid.httpmaid.undertow.UndertowEndpoint;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeploymentResult;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
+import java.util.Map;
 
+import static de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment.remoteSpecsDeployment;
 import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
 import static de.quantummaid.httpmaid.undertow.UndertowEndpoint.startUndertowEndpoint;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JvmDeployer implements PortDeployer {
-    private UndertowEndpoint endpoint;
+public final class JvmDeployer implements RemoteSpecsDeployer {
 
     public static JvmDeployer jvmDeployer() {
         return new JvmDeployer();
     }
 
     @Override
-    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+    public RemoteSpecsDeployment deploy() {
         final HttpMaid realHttpMaid = httpMaid();
-        endpoint = startUndertowEndpoint(realHttpMaid, port);
-        return deploymentBuilder()
-                .withHttpPort(port)
-                .withWebsocketPort(port)
-                .build();
-    }
-
-    @Override
-    public void cleanUp() {
-        if (endpoint != null) {
-            endpoint.close();
-        }
-    }
-
-    @Override
-    public List<ClientFactory> supportedClients() {
-        throw new UnsupportedOperationException();
+        final PortDeploymentResult<AutoCloseable> result =
+                PortDeployer.tryToDeploy(port -> startUndertowEndpoint(realHttpMaid, port));
+        final Deployment deployment = localhostHttpAndWebsocketDeployment(result.port);
+        final RemoteSpecsDeployment remoteSpecsDeployment =
+                remoteSpecsDeployment(result.cleanup, Map.of(JvmRemoteSpecs.class, deployment));
+        return remoteSpecsDeployment;
     }
 }

@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -37,14 +36,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeAwsContext.fakeAwsContext;
-import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ApiGatewayUtils.addBodyToEvent;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
-import static java.util.Collections.singletonList;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 
 @ToString
 @EqualsAndHashCode
@@ -57,9 +59,14 @@ public final class FakeRestLambda implements AutoCloseable {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             final HttpHandler httpHandler = exchange -> {
-                final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
-                final APIGatewayProxyResponseEvent responseEvent = endpoint.delegate(requestEvent, fakeAwsContext());
-                mapEventToResponse(responseEvent, exchange);
+                try {
+                    final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
+                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
+                    mapEventToResponse(responseEvent, exchange);
+                } catch (final Exception e) {
+                    e.printStackTrace(System.err);
+                    throw e;
+                }
             };
             server.createContext("/", httpHandler);
             server.setExecutor(null);
@@ -80,41 +87,51 @@ public final class FakeRestLambda implements AutoCloseable {
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
         event.put("path", path);
-        final Map<String, String> queryParameters = queryToMap(requestURI.getQuery());
-        event.put("queryStringParameters", queryParameters);
+        final Map<String, List<String>> queryParameters = queryToMap(requestURI.getRawQuery());
+        event.put("multiValueQueryStringParameters", queryParameters);
         final String method = exchange.getRequestMethod();
         event.put("httpMethod", method);
-        final String body = inputStreamToString(exchange.getRequestBody());
-        event.put("body", body);
+        addBodyToEvent(exchange.getRequestBody(), event);
         final Map<String, List<String>> headers = new HashMap<>();
         exchange.getRequestHeaders().forEach(headers::put);
         event.put("multiValueHeaders", headers);
         return event;
     }
 
-    private static void mapEventToResponse(final APIGatewayProxyResponseEvent event,
+    private static void mapEventToResponse(final Map<String, Object> event,
                                            final HttpExchange exchange) throws IOException {
         final Headers responseHeaders = exchange.getResponseHeaders();
-        event.getHeaders().forEach((key, value) -> responseHeaders.put(key, singletonList(value)));
-        final Integer statusCode = event.getStatusCode();
+        @SuppressWarnings("unchecked") final Map<String, List<String>> headerMap = (Map<String, List<String>>) ofNullable(event.get("multiValueHeaders")).orElse(emptyMap());
+        responseHeaders.putAll(headerMap);
+        final Integer statusCode = (Integer) event.get("statusCode");
         exchange.sendResponseHeaders(statusCode, 0);
-        final InputStream bodyStream = Streams.stringToInputStream(event.getBody());
+        final InputStream bodyStream = Streams.stringToInputStream((String) event.get("body"));
         streamInputStreamToOutputStream(bodyStream, exchange.getResponseBody());
     }
 
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
+    private static Map<String, List<String>> queryToMap(final String query) {
+        final Map<String, List<String>> result = new HashMap<>();
         if (query == null) {
             return result;
         }
         for (final String param : query.split("&")) {
             final String[] entry = param.split("=");
+            final String key = decode(entry[0]);
+            final String value;
             if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
+                value = decode(entry[1]);
             } else {
-                result.put(entry[0], "");
+                value = "";
             }
+            final List<String> values = result.getOrDefault(key, new ArrayList<>());
+            values.add(value);
+            result.put(key, values);
         }
         return result;
+    }
+
+    private static String decode(final String s) {
+        final String decoded = URLDecoder.decode(s, UTF_8);
+        return decoded;
     }
 }

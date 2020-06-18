@@ -33,6 +33,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -41,6 +42,7 @@ import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidCli
 import static de.quantummaid.httpmaid.client.websocket.real.RealWebsocket.realWebsocket;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @ToString
 @EqualsAndHashCode
@@ -55,7 +57,7 @@ public final class RealWebsocketClient implements WebsocketClient {
 
     @Override
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
-                                   final Map<String, String> queryParameters,
+                                   final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers,
                                    final String path) {
         final String fullUri = uri + path;
@@ -74,9 +76,15 @@ public final class RealWebsocketClient implements WebsocketClient {
         }
     }
 
-    private static URI createUri(final String rawUri, final Map<String, String> queryParameters) throws URISyntaxException {
+    private static URI createUri(final String rawUri,
+                                 final Map<String, List<String>> queryParameters) throws URISyntaxException {
         final StringJoiner stringJoiner = new StringJoiner("&", rawUri + "?", "");
-        queryParameters.forEach((key, value) -> stringJoiner.add(format("%s=%s", key, value)));
+        queryParameters.forEach((name, values) ->
+                values.forEach(value -> {
+                    final String encodedName = URLEncoder.encode(name, UTF_8);
+                    final String encodedValue = URLEncoder.encode(value, UTF_8);
+                    stringJoiner.add(format("%s=%s", encodedName, encodedValue));
+                }));
         final String fullUri = stringJoiner.toString();
         return new URI(fullUri);
     }

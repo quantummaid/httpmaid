@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.client.HttpMaidClientBuilder.clientBuilder;
-import static de.quantummaid.httpmaid.client.issuer.bypass.BypassIssuer.bypassIssuer;
+import static de.quantummaid.httpmaid.client.issuer.bypass.BypassingIssuer.bypassIssuer;
 import static de.quantummaid.httpmaid.client.issuer.real.RealIssuer.realIssuer;
 import static de.quantummaid.httpmaid.client.websocket.bypass.BypassingWebsocketClient.bypassingWebsocketClient;
 import static de.quantummaid.httpmaid.client.websocket.real.RealWebsocketClient.realWebsocketClient;
@@ -126,7 +126,7 @@ public final class HttpMaidClient implements AutoCloseable {
     }
 
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
-                                   final Map<String, String> queryParameters,
+                                   final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers) {
         return websocketClient.openWebsocket(messageHandler, queryParameters, headers, basePath.render());
     }

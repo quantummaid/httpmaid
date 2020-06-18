@@ -45,7 +45,7 @@ public final class RequestedMethod {
 
     public static RequestedMethod load(final MetaData metaData) {
         Validators.validateNotNull(metaData, "metaData");
-        final String method = metaData.get(REQUEST_HEADERS).getOptionalHeader(Cors.ACCESS_CONTROL_REQUEST_METHOD).orElseThrow();
+        final String method = metaData.get(REQUEST_HEADERS).optionalHeader(Cors.ACCESS_CONTROL_REQUEST_METHOD).orElseThrow();
         Validators.validateNotNullNorEmpty(method, "method");
         return new RequestedMethod(HttpRequestMethod.parse(method));
     }

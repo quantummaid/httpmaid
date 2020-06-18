@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.undertow;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequest;
 import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.HeadersBuilder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
@@ -35,12 +37,8 @@ import lombok.ToString;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static io.undertow.util.HttpString.tryFromString;
+import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 
 @ToString
 @EqualsAndHashCode
@@ -61,7 +59,7 @@ public final class UndertowHandler implements HttpHandler {
         httpMaid.handleRequest(() -> {
             final RawHttpRequestBuilder builder = RawHttpRequest.rawHttpRequestBuilder();
 
-            final Map<String, List<String>> headers = extractHeaders(httpServerExchange);
+            final Headers headers = extractHeaders(httpServerExchange);
             builder.withHeaders(headers);
 
             final String path = httpServerExchange.getRequestPath();
@@ -70,8 +68,8 @@ public final class UndertowHandler implements HttpHandler {
             final HttpString requestMethod = httpServerExchange.getRequestMethod();
             builder.withMethod(requestMethod.toString());
 
-            final Map<String, Deque<String>> queryParameters = httpServerExchange.getQueryParameters();
-            builder.withQueryParameters(queryParameters);
+            final String queryString = httpServerExchange.getQueryString();
+            builder.withQueryString(queryString);
 
             httpServerExchange.startBlocking();
             final InputStream body = httpServerExchange.getInputStream();
@@ -83,20 +81,22 @@ public final class UndertowHandler implements HttpHandler {
             httpServerExchange.setStatusCode(status);
 
             final HeaderMap responseHeaders = httpServerExchange.getResponseHeaders();
-            response.setHeaders((key, value) -> responseHeaders.put(tryFromString(key), value));
+            response.headers().forEach((name, values) -> {
+                responseHeaders.putAll(HttpString.tryFromString(name), values);
+            });
 
             final OutputStream outputStream = httpServerExchange.getOutputStream();
             response.streamBodyToOutputStream(outputStream);
         });
     }
 
-    private static Map<String, List<String>> extractHeaders(final HttpServerExchange httpServerExchange) {
-        final Map<String, List<String>> headerMap = new HashMap<>();
+    private static Headers extractHeaders(final HttpServerExchange httpServerExchange) {
+        final HeadersBuilder headersBuilder = headersBuilder();
         final HeaderMap requestHeaders = httpServerExchange.getRequestHeaders();
-        requestHeaders.getHeaderNames().forEach(httpString -> {
-            final List<String> headerValues = requestHeaders.get(httpString);
-            headerMap.put(httpString.toString(), headerValues);
+        requestHeaders.forEach(header -> {
+            final String name = header.getHeaderName().toString();
+            headersBuilder.withAdditionalHeader(name, header);
         });
-        return headerMap;
+        return headersBuilder.build();
     }
 }

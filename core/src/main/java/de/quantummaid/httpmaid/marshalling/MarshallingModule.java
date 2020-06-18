@@ -45,13 +45,13 @@ import static de.quantummaid.httpmaid.HttpMaidChains.POST_INVOKE;
 import static de.quantummaid.httpmaid.HttpMaidChains.PROCESS_BODY_STRING;
 import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
-import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
 import static de.quantummaid.httpmaid.http.headers.accept.Accept.fromMetaData;
 import static de.quantummaid.httpmaid.marshalling.UnsupportedContentTypeException.unsupportedContentTypeException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.*;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 @ToString
@@ -199,14 +199,8 @@ public final class MarshallingModule implements ChainModule {
     }
 
     private static Optional<ContentType> responseContentType(final MetaData metaData) {
-        return metaData.getOptional(RESPONSE_HEADERS).flatMap(headers -> {
-            if (headers.containsKey(CONTENT_TYPE)) {
-                final String contentType = headers.get(CONTENT_TYPE);
-                return of(fromString(contentType));
-            } else {
-                return empty();
-            }
-        });
+        return metaData.getOptional(RESPONSE_HEADERS).flatMap(headers ->
+                headers.getOptionalHeader(CONTENT_TYPE).map(ContentType::fromString));
     }
 
     private void failIfConfiguredToDoSo(final Supplier<RuntimeException> exceptionSupplier) {

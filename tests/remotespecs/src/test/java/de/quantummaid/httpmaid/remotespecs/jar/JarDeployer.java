@@ -21,28 +21,32 @@
 
 package de.quantummaid.httpmaid.remotespecs.jar;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.Poller;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeploymentResult;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
+import java.util.Map;
 
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment.remoteSpecsDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Slf4j
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JarDeployer implements PortDeployer {
+public final class JarDeployer implements RemoteSpecsDeployer {
     private static final String RELATIVE_PATH_TO_JAR = "/tests/jar/target/remotespecs.jar";
     private static final String READY_MESSAGE = "TestJar ready to be tested.";
 
@@ -53,18 +57,34 @@ public final class JarDeployer implements PortDeployer {
     }
 
     @Override
-    public Deployment deploy(final int port,
-                             final HttpMaid httpMaid) {
+    public RemoteSpecsDeployment deploy() {
         final String projectBaseDirectory = BaseDirectoryFinder.findProjectBaseDirectory();
         final String jarPath = projectBaseDirectory + RELATIVE_PATH_TO_JAR;
-        final String command = format("java -jar %s %d", jarPath, port);
+
+        final PortDeploymentResult<AutoCloseable> result =
+                PortDeployer.tryToDeploy(port -> {
+                    final String command = format("java -jar %s %d", jarPath, port);
+                    final Process process = startProcess(command);
+                    return () -> {
+                        log.info("process.destroy()");
+                        process.destroy();
+                    };
+                });
+
+        final Deployment jarDeployment = localhostHttpAndWebsocketDeployment(result.port);
+        final RemoteSpecsDeployment remoteSpecsDeployment =
+                remoteSpecsDeployment(result.cleanup,
+                        Map.of(
+                                JarRemoteSpecs.class, jarDeployment));
+        return remoteSpecsDeployment;
+    }
+
+    private Process startProcess(final String command) {
         try {
+            log.info("startProcess({})", command);
             process = Runtime.getRuntime().exec(command);
             waitForEndpointToBecomeAvailable();
-            return deploymentBuilder()
-                    .withHttpPort(port)
-                    .withWebsocketPort(port)
-                    .build();
+            return process;
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -97,18 +117,6 @@ public final class JarDeployer implements PortDeployer {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void cleanUp() {
-        if (process != null) {
-            process.destroy();
-        }
-    }
-
-    @Override
-    public List<ClientFactory> supportedClients() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

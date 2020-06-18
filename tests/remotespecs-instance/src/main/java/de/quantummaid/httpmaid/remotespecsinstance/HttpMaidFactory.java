@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
@@ -41,6 +43,45 @@ public final class HttpMaidFactory {
     public static HttpMaid httpMaid(final Consumer<HttpMaidBuilder> configurator) {
         final HttpMaidBuilder builder = anHttpMaid()
                 .get("/", (request, response) -> response.setBody("fooooo"))
+
+                .get("/jsonResponse", (request, response) -> {
+                    response.setStatus(201);
+                    response.setBody(Map.of("foo", "bar"));
+                })
+                .get("/statusCode/201", (request, response) -> response.setStatus(201))
+
+                .post("/echo", (request, response) -> response.setBody(request.bodyString()))
+
+                .get("/returnHeader/<name>", (request, response) -> {
+                    final String headerName = request.pathParameters().getPathParameter("name");
+                    final List<String> header = request.headers().allValuesFor(headerName);
+                    response.setBody(Map.of("headers", header));
+                })
+
+                .get("/dumpQueryParameters", (request, response) -> {
+                    final Map<String, List<String>> params = request.queryParameters().asMap();
+                    response.setBody(params);
+                })
+
+                .get("/headers/HeaderName/HeaderValue", (request, response) -> response.addHeader("HeaderName", "HeaderValue"))
+                .get("/multiValueHeaders/HeaderName/HeaderValue1,HeaderValue2", (request, response) -> {
+                    response.addHeader("HeaderName", "HeaderValue1");
+                    response.addHeader("HeaderName", "HeaderValue2");
+                })
+                .get("/cookie", (request, response) -> {
+                    final String cookie1 = request.cookies().getCookie("cookie1");
+                    final String cookie2 = request.cookies().getCookie("cookie2");
+                    response.setBody(cookie1 + " and " + cookie2);
+                })
+                .get("/setcookies", (request, response) -> {
+                    response.setCookie("name", "value");
+                    response.setCookie("name2", "value2");
+                })
+                .get("/setCookiesWithCommas", (request, response) -> {
+                    response.setCookie("cookie1", "cookie,value,1");
+                    response.setCookie("cookie2", "cookie,value,2");
+                })
+
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
                 .websocket("handler2", (request, response) -> response.setBody("handler 2"))
                 .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))

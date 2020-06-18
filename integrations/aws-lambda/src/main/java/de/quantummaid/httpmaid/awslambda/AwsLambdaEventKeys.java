@@ -26,7 +26,7 @@ public final class AwsLambdaEventKeys {
     public static final String HTTP_METHOD = "httpMethod";
     public static final String PATH = "path";
     public static final String MULTIVALUE_HEADERS = "multiValueHeaders";
-    public static final String QUERY_STRING_PARAMETERS = "queryStringParameters";
+    public static final String QUERY_STRING_PARAMETERS = "multiValueQueryStringParameters";
     public static final String BODY = "body";
 
     private AwsLambdaEventKeys() {

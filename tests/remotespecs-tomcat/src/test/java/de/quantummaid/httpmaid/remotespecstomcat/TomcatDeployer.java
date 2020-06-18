@@ -23,9 +23,12 @@ package de.quantummaid.httpmaid.remotespecstomcat;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeploymentResult;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +40,14 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
+import static de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment.remoteSpecsDeployment;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class TomcatDeployer implements PortDeployer {
+public final class TomcatDeployer implements RemoteSpecsDeployer, PortDeployer {
     private static final String RELATIVE_PATH_TO_WAR = "/tests/war/target/remotespecs.war";
     private Tomcat tomcat;
 
@@ -51,7 +56,26 @@ public final class TomcatDeployer implements PortDeployer {
     }
 
     @Override
+    public RemoteSpecsDeployment deploy() {
+        final PortDeploymentResult<AutoCloseable> result =
+                PortDeployer.tryToDeploy(port -> {
+                    final Tomcat tomcat = deployTomcatOnPort(port);
+                    return () -> tomcat.stop();
+                });
+
+        final Deployment tomcatDeployment = localhostHttpAndWebsocketDeployment(result.port);
+        final RemoteSpecsDeployment remoteSpecsDeployment =
+                remoteSpecsDeployment(result.cleanup, Map.of(TomcatRemoteSpecs.class, tomcatDeployment));
+        return remoteSpecsDeployment;
+    }
+
+    @Override
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
+        deployTomcatOnPort(port);
+        return localhostHttpAndWebsocketDeployment(port);
+    }
+
+    private Tomcat deployTomcatOnPort(final int port) {
         tomcat = new Tomcat();
         tomcat.setPort(port);
 
@@ -69,10 +93,7 @@ public final class TomcatDeployer implements PortDeployer {
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String pathToWar = basePath + RELATIVE_PATH_TO_WAR;
         tomcat.addWebapp(tomcat.getHost(), "/", pathToWar);
-        return deploymentBuilder()
-                .withHttpPort(port)
-                .withWebsocketPort(port)
-                .build();
+        return tomcat;
     }
 
     private String createTempDirectory() {

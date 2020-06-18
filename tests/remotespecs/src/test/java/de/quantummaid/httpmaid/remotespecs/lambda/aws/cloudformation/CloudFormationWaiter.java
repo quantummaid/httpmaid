@@ -25,6 +25,7 @@ import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
 import com.amazonaws.waiters.Waiter;
 import com.amazonaws.waiters.WaiterParameters;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -34,13 +35,22 @@ import java.util.concurrent.TimeoutException;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.SynchronousWaiterHandler.synchronousWaiterHandler;
 import static java.lang.String.format;
 
+@Slf4j
 public final class CloudFormationWaiter {
+    private static final int TIMEOUT_IN_MINUTES = 4;
 
     private CloudFormationWaiter() {
     }
 
+    public static void waitForStackUpdate(final String stackIdentifier,
+                                          final AmazonCloudFormation amazonCloudFormation) {
+        final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackUpdateComplete();
+        final String description = format("update of stack '%s'", stackIdentifier);
+        wait(waiter, stackIdentifier, description);
+    }
+
     public static void waitForStackCreation(final String stackIdentifier,
-                                             final AmazonCloudFormation amazonCloudFormation) {
+                                            final AmazonCloudFormation amazonCloudFormation) {
         final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackCreateComplete();
         final String description = format("creation of stack '%s'", stackIdentifier);
         wait(waiter, stackIdentifier, description);
@@ -56,17 +66,19 @@ public final class CloudFormationWaiter {
     private static void wait(final Waiter<DescribeStacksRequest> waiter,
                              final String stackIdentifier,
                              final String description) {
+        log.info("Waiting for {}...", description);
         final DescribeStacksRequest request = new DescribeStacksRequest().withStackName(stackIdentifier);
         final SynchronousWaiterHandler waiterHandler = synchronousWaiterHandler(description);
         final Future<Void> waitFuture = waiter.runAsync(new WaiterParameters<>(request), waiterHandler);
 
         try {
-            waitFuture.get(2, TimeUnit.MINUTES);
+            waitFuture.get(TIMEOUT_IN_MINUTES, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (final ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }
         waiterHandler.verifySuccessful();
+        log.info("Succeesfully waited for {}.", description);
     }
 }

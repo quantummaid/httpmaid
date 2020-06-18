@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid</groupId>
         <artifactId>integrations-parent</artifactId>
-        <version>0.9.67</version>
+        <version>0.9.68</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
@@ -39,36 +39,11 @@
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
-                <version>2.13.31</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>de.quantummaid.httpmaid</groupId>
             <artifactId>core</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-events</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-core</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>dynamodb</artifactId>
         </dependency>
     </dependencies>
 </project>

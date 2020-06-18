@@ -21,28 +21,26 @@
 
 package de.quantummaid.httpmaid.jsr356;
 
+import de.quantummaid.httpmaid.http.Headers;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-
-import java.util.List;
-import java.util.Map;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public final class HandshakeMetaData {
-    private Map<String, List<String>> headers;
+    private Headers headers;
 
     public static HandshakeMetaData handshakeMetaData() {
         return new HandshakeMetaData();
     }
 
-    public synchronized void setHeaders(final Map<String, List<String>> headers) {
+    public synchronized void setHeaders(final Headers headers) {
         this.headers = headers;
     }
 
-    public synchronized Map<String, List<String>> getHeaders() {
+    public synchronized Headers getHeaders() {
         return headers;
     }
 }

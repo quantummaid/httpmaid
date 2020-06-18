@@ -22,9 +22,11 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
@@ -33,6 +35,7 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -50,6 +53,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,39 +78,75 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     }
 
     @Override
-    public void openWebsocketAndSendMessage(final Consumer<String> responseHandler,
-                                            final String message,
-                                            final Map<String, String> queryParameters,
-                                            final Map<String, List<String>> headers) {
-        final ShittyWebsocketClient shittyWebsocketClient = ShittyWebsocketClient.openWebsocket(
-                deployment.websocketUri(), responseHandler, headers, queryParameters);
-        shittyWebsocketClient.send(message);
-    }
-
-    @Override
     public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
-                                          final Map<String, String> queryParameters,
+                                          final Map<String, List<String>> queryParameters,
                                           final Map<String, List<String>> headers) {
-        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(deployment.websocketUri(), responseHandler, headers, queryParameters);
+        final ApiBaseUrl url = deployment.webSocketBaseUrl()
+                .orElseThrow(() -> new UnsupportedOperationException("Not a websocket deployment " + toString()));
+        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(url.toUrlString(), responseHandler, headers, queryParameters);
         return wrappedWebsocket(client::send, client);
     }
 
     @Override
-    public HttpClientResponse issueRequestWithoutBody(final String path,
-                                                      final String method,
-                                                      final Map<String, String> headers) {
-        return issueRequest(path, method, headers, request -> {
+    public HttpClientResponse issueRequestWithoutBody(final HttpClientRequest request) {
+        return issueRequest(request, req -> {
         });
     }
 
+    private HttpClientResponse issueRequest(final HttpClientRequest request,
+                                            final Consumer<HttpEntityEnclosingRequest> bodyAppender) {
+        final ApiBaseUrl baseUrl = deployment.httpBaseUrl()
+                .orElseThrow(() -> new UnsupportedOperationException("Not an http deployment " + toString()));
+        final String url = appendPathToUrl(baseUrl.toUrlString(), request.path);
+        final String uri = buildUri(request, url);
+        final HttpEntityEnclosingRequest request1 =
+                new BasicHttpEntityEnclosingRequest(request.method, uri);
+        request.headers.forEach(request1::addHeader);
+        bodyAppender.accept(request1);
+        try (DefaultBHttpClientConnection connection = new DefaultBHttpClientConnection(BUFFER_SIZE);
+             Socket socket = createSocket(baseUrl)) {
+            connection.bind(socket);
+            final HttpProcessor httpProcessor = create()
+                    .add(new RequestContent())
+                    .add(new RequestTargetHost())
+                    .build();
+            final HttpCoreContext context = HttpCoreContext.create();
+            context.setTargetHost(new HttpHost(baseUrl.hostName));
+            httpProcessor.process(request1, context);
+            final HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
+            final HttpResponse response = httpexecutor.execute(request1, connection, context);
+            final int statusCode = response.getStatusLine().getStatusCode();
+            final Map<String, List<String>> responseHeaders = new HashMap<>();
+            stream(response.getAllHeaders())
+                    .forEach(header -> {
+                        final String headerName = header.getName().toLowerCase();
+                        final List<String> headerValues = responseHeaders.getOrDefault(headerName, new ArrayList<>());
+                        headerValues.add(header.getValue());
+                        responseHeaders.put(headerName, headerValues);
+                    });
+            final String responseBody = inputStreamToString(response.getEntity().getContent());
+            return httpClientResponse(statusCode, responseHeaders, responseBody);
+        } catch (final IOException | HttpException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String buildUri(final HttpClientRequest request, final String url) {
+        try {
+            final URIBuilder uriBuilder = new URIBuilder(url);
+            request.queryStringParameters.forEach(
+                    parameter -> uriBuilder.addParameter(parameter.name(), parameter.value()));
+            return uriBuilder.build().toASCIIString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
-    public HttpClientResponse issueRequestWithStringBody(final String path,
-                                                         final String method,
-                                                         final Map<String, String> headers,
-                                                         final String body) {
-        return issueRequest(path, method, headers, request -> {
+    public HttpClientResponse issueRequestWithStringBody(final HttpClientRequest request, final String body) {
+        return issueRequest(request, req -> {
             try {
-                request.setEntity(new StringEntity(body));
+                req.setEntity(new StringEntity(body));
             } catch (final UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -114,11 +155,9 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
 
     @SuppressWarnings("deprecation")
     @Override
-    public HttpClientResponse issueRequestWithMultipartBody(final String path,
-                                                            final String method,
-                                                            final Map<String, String> headers,
+    public HttpClientResponse issueRequestWithMultipartBody(final HttpClientRequest request,
                                                             final List<MultipartElement> parts) {
-        return issueRequest(path, method, headers, request -> {
+        return issueRequest(request, builder -> {
             final MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder
                     .create().setBoundary(MULTIPART_BOUNDARY);
             for (final MultipartElement part : parts) {
@@ -135,39 +174,8 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                     }
                 }
             }
-            request.setEntity(multipartEntityBuilder.build());
+            builder.setEntity(multipartEntityBuilder.build());
         });
-    }
-
-    private HttpClientResponse issueRequest(final String path,
-                                            final String method,
-                                            final Map<String, String> headers,
-                                            final Consumer<HttpEntityEnclosingRequest> bodyAppender) {
-        final String url = appendPathToUrl(deployment.baseUrl(), path);
-        final HttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, url);
-        headers.forEach(request::addHeader);
-        bodyAppender.accept(request);
-        try (DefaultBHttpClientConnection connection = new DefaultBHttpClientConnection(BUFFER_SIZE);
-             Socket socket = createSocket(deployment)) {
-            connection.bind(socket);
-            final HttpProcessor httpProcessor = create()
-                    .add(new RequestContent())
-                    .add(new RequestTargetHost())
-                    .build();
-            final HttpCoreContext context = HttpCoreContext.create();
-            context.setTargetHost(new HttpHost(deployment.httpHostname()));
-            httpProcessor.process(request, context);
-            final HttpRequestExecutor httpexecutor = new HttpRequestExecutor();
-            final HttpResponse response = httpexecutor.execute(request, connection, context);
-            final int statusCode = response.getStatusLine().getStatusCode();
-            final Map<String, String> responseHeaders = new HashMap<>();
-            stream(response.getAllHeaders())
-                    .forEach(header -> responseHeaders.put(header.getName().toLowerCase(), header.getValue()));
-            final String responseBody = inputStreamToString(response.getEntity().getContent());
-            return httpClientResponse(statusCode, responseHeaders, responseBody);
-        } catch (final IOException | HttpException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static String appendPathToUrl(final String url, final String path) {
@@ -187,15 +195,15 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
         return normalizedUrl + "/" + normalizedPath;
     }
 
-    private static Socket createSocket(final Deployment deployment) {
+    private static Socket createSocket(final ApiBaseUrl baseUrl) {
         try {
-            if (deployment.protocol().equals("http")) {
-                return new Socket(deployment.httpHostname(), deployment.httpPort());
+            if (baseUrl.transportProtocol().equals("http")) {
+                return new Socket(baseUrl.hostName, baseUrl.port);
             }
             final SSLContext sslcontext = SSLContexts.createSystemDefault();
             final SocketFactory socketFactory = sslcontext.getSocketFactory();
 
-            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(deployment.httpHostname(), deployment.httpPort());
+            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(baseUrl.hostName, baseUrl.port);
             // Enforce TLS and disable SSL
             socket.setEnabledProtocols(new String[]{
                     "TLSv1",

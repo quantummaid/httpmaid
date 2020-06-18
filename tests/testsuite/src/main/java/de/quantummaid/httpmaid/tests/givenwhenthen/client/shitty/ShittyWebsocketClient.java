@@ -32,15 +32,17 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -53,15 +55,8 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
     public static ShittyWebsocketClient openWebsocket(final String uri,
                                                       final Consumer<String> responseHandler,
                                                       final Map<String, List<String>> headers,
-                                                      final Map<String, String> queryParameters) {
-        final String queryParametersTail;
-        if (queryParameters.isEmpty()) {
-            queryParametersTail = "";
-        } else {
-            queryParametersTail = queryParameters.entrySet().stream()
-                    .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                    .collect(Collectors.joining("&", "?", ""));
-        }
+                                                      final Map<String, List<String>> queryParameters) {
+        final String queryParametersTail = buildQueryParametersTail(queryParameters);
         final String fullUri = uri + queryParametersTail;
         try {
             final ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
@@ -112,5 +107,24 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
     @Override
     public void close() throws IOException {
         session.close();
+    }
+
+    private static String buildQueryParametersTail(final Map<String, List<String>> queryParameters) {
+        final String queryParametersTail;
+        if (queryParameters.isEmpty()) {
+            queryParametersTail = "";
+        } else {
+            final StringJoiner joiner = new StringJoiner("&", "?", "");
+            queryParameters.forEach((name, values) -> {
+                values.forEach(value -> {
+                    final String encodedName = URLEncoder.encode(name, UTF_8);
+                    final String encodedValue = URLEncoder.encode(value, UTF_8);
+                    final String parameter = format("%s=%s", encodedName, encodedValue);
+                    joiner.add(parameter);
+                });
+            });
+            queryParametersTail = joiner.toString();
+        }
+        return queryParametersTail;
     }
 }

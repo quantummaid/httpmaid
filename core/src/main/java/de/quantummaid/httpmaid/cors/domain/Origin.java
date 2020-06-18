@@ -41,7 +41,7 @@ public final class Origin {
 
     public static Optional<Origin> load(final MetaData metaData) {
         Validators.validateNotNull(metaData, "metaData");
-        return metaData.get(REQUEST_HEADERS).getOptionalHeader(Cors.ORIGIN).map(Origin::fromString);
+        return metaData.get(REQUEST_HEADERS).optionalHeader(Cors.ORIGIN).map(Origin::fromString);
     }
 
     public static Origin fromString(final String origin) {

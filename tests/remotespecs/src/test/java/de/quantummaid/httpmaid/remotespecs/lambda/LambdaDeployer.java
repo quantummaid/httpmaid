@@ -21,90 +21,169 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda;
 
-import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
+import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
 import java.io.File;
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.createStack;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.deleteStacksStartingWith;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.connectToCloudFormation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiHandler.loadHttpApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiHandler.loadRestApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.deleteAllObjectsInBucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.DeploymentBuilder.deploymentBuilder;
-import static java.util.UUID.randomUUID;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static java.util.Optional.ofNullable;
 
+/**
+ * When stackIdentifier is not user-supplied (developerMode == false), then
+ * - the default stackIdentifier is: httpmaid-remotespecs-${AWS::AccountId}
+ * - the default stack naming scheme is: ${stackIdentifier}-(lambda|bucket)
+ * - The bucket is owned by ??? (whoever runs through the test setup first)
+ * - Any other user needing access must have that access granted some other way
+ * (additional policy, etc...). Users who cannot do that simply define
+ * a user-supplied stackidentifier.
+ * - cleanup policy
+ * - bucket stack remains
+ * - lambda stack is deleted
+ * <p>
+ * When stackIdentifier is user-supplied (developerMode == true), we're in
+ * the "per-user-infra" mode.
+ * - $stackIdentifier-lambda is created, owned by the user running the test
+ * - $stackIdentifier-bucket is created, ditto
+ * - cleanup policy
+ * - bucket stack remains
+ * - lambda stack remains
+ * (ie Both must be cleaned up / managed by the user)
+ */
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class LambdaDeployer implements Deployer {
-    private static final String PREFIX = "remotespecsX";
+public final class LambdaDeployer implements RemoteSpecsDeployer {
+    private static final String SHARED_STACK_PREFIX = "httpmaid-remotespecs";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
     private static final String BUCKET_NAME = "remotespecs";
-    private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs/cloudformation.yaml";
-    private static final String REST_API_NAME = " RemoteSpecs HTTP Lambda Proxy";
+    private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs";
+    private static final String REST_API_NAME = " RemoteSpecs Rest Api Lambda Proxy";
+    private static final String HTTP_V2_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy";
+    private static final String HTTP_V1_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy";
     private static final String WEBSOCKET_API_NAME = " RemoteSpecs WebSockets Lambda Proxy";
+    private static final String REMOTESPECS_STACK_IDENTIFIER_ENV = "REMOTESPECS_STACK_IDENTIFIER";
 
-    private static final int PORT = 443;
     private final String stackIdentifier;
+    private final Boolean developerMode;
 
     public static LambdaDeployer lambdaDeployer() {
-        final String stackIdentifier = PREFIX + randomUUID().toString();
-        return new LambdaDeployer(stackIdentifier);
+        final LambdaDeployer deployer = userProvidedStackIdentifier()
+                .map(LambdaDeployer::perUserLambdaDeployer)
+                .orElseGet(LambdaDeployer::sharedLambdaDeployer);
+        return deployer;
+    }
+
+    private static LambdaDeployer perUserLambdaDeployer(final String stackIdentifier) {
+        return new LambdaDeployer(stackIdentifier, true);
+    }
+
+    private static LambdaDeployer sharedLambdaDeployer() {
+        return new LambdaDeployer(sharedStackIdentifier(), false);
+    }
+
+    private static String sharedStackIdentifier() {
+        final GetCallerIdentityResponse callerIdentity = StsClient.create().getCallerIdentity();
+        final String accountId = callerIdentity.account();
+        return String.format("%s-%s", SHARED_STACK_PREFIX, accountId);
     }
 
     @Override
-    public Deployment deploy(final HttpMaid httpMaid) {
-        cleanUp();
-        create(stackIdentifier);
+    public RemoteSpecsDeployment deploy() {
+        final String artifactBucketName = stackIdentifier + "-bucket";
 
-        final RestApiInformation restApiInformation = loadRestApiInformation(stackIdentifier + REST_API_NAME);
-        final WebsocketApiInformation websocketApiInformation = loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
-        final String region = websocketApiInformation.region();
-        final String httpHost = restApiInformation.host(region);
-        final String httpBasePath = restApiInformation.basePath();
-        final String websocketHost = websocketApiInformation.host();
-        final String websocketBasePath = websocketApiInformation.basePath();
+        create("cf-bucket.yml", stackIdentifier + "-bucket",
+                Map.of("StackIdentifier", stackIdentifier,
+                        "ArtifactBucketName", artifactBucketName));
 
-        return deploymentBuilder()
-                .usingHttpsAndWss()
-                .withHttpHostname(httpHost)
-                .withWebsocketHostname(websocketHost)
-                .withHttpPort(PORT)
-                .withWebsocketPort(PORT)
-                .withHttpBasePath(httpBasePath)
-                .withWebsocketBasePath(websocketBasePath)
-                .build();
-    }
-
-    @Override
-    public void cleanUp() {
-        deleteAllObjectsInBucket(BUCKET_NAME);
-        deleteStacksStartingWith(PREFIX);
-    }
-
-    @Override
-    public List<ClientFactory> supportedClients() {
-        throw new UnsupportedOperationException();
-    }
-
-    private static void create(final String stackIdentifier) {
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
         final File file = new File(lambdaPath);
-        uploadToS3Bucket(BUCKET_NAME, stackIdentifier, file);
-        final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE;
-        createStack(stackIdentifier, templatePath);
+        final String s3Key = uploadToS3Bucket(artifactBucketName, file);
+
+        create("cf-lambda.yml", stackIdentifier + "-lambda",
+                Map.of("StackIdentifier", stackIdentifier,
+                        "ArtifactBucketName", artifactBucketName,
+                        "ArtifactKey", s3Key));
+
+        final Map<Class<? extends RemoteSpecs>, Deployment> deploymentMap = buildDeploymentMap();
+
+        return RemoteSpecsDeployment.remoteSpecsDeployment(this::cleanUp, deploymentMap);
+    }
+
+    private Map<Class<? extends RemoteSpecs>, Deployment> buildDeploymentMap() {
+        final WebsocketApiInformation websocketApiInformation =
+                loadWebsocketApiInformation(stackIdentifier + WEBSOCKET_API_NAME);
+        final RestApiInformation restApiInformation =
+                loadRestApiInformation(stackIdentifier + REST_API_NAME, websocketApiInformation.region());
+        final HttpApiInformation httpApiV2PayloadInformation = loadHttpApiInformation(stackIdentifier + HTTP_V2_PAYLOAD_API_NAME);
+        final HttpApiInformation httpApiV1PayloadInformation = loadHttpApiInformation(stackIdentifier + HTTP_V1_PAYLOAD_API_NAME);
+
+        final Deployment restApiDeployment = httpDeployment(
+                restApiInformation.baseUrl(),
+                websocketApiInformation.baseUrl());
+        final Deployment httpApiV2PayloadDeployment = httpDeployment(
+                httpApiV2PayloadInformation.baseUrl(),
+                websocketApiInformation.baseUrl()
+        );
+        final ApiBaseUrl baseUrl = httpApiV1PayloadInformation.baseUrl();
+        final Deployment httpApiV1PayloadDeployment = httpDeployment(
+                baseUrl,
+                websocketApiInformation.baseUrl()
+        );
+        return Map.of(
+                LambdaRestApiRemoteSpecs.class, restApiDeployment,
+                LambdaHttpApiV2PayloadRemoteSpecs.class, httpApiV2PayloadDeployment,
+                LambdaHttpApiV1PayloadRemoteSpecs.class, httpApiV1PayloadDeployment
+        );
+    }
+
+    private void cleanUp() {
+        if (developerMode) {
+            return;
+        }
+        deleteAllObjectsInBucket(BUCKET_NAME);
+        try (CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
+            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier + "-lambda");
+        }
+    }
+
+    private static Optional<String> userProvidedStackIdentifier() {
+        final String stackIdentifier = System.getenv(REMOTESPECS_STACK_IDENTIFIER_ENV);
+        return ofNullable(stackIdentifier).map(s -> "dev-" + s);
+    }
+
+    private static void create(
+            final String templateFilename,
+            final String stackName,
+            final Map<String, String> stackParameters) {
+
+        final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
+        final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE + "/" + templateFilename;
+        try (CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
+            cloudFormationHandler.createOrUpdateStack(stackName, templatePath, stackParameters);
+        }
     }
 }

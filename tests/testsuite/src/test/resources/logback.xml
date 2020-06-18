@@ -9,4 +9,6 @@
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
+    <!-- can't get this to work (yet), shows uncaught exception when using fakelambda mode and pure java endpoint -->
+    <logger name="com.sun.net.httpserver" level="trace" />
 </configuration>

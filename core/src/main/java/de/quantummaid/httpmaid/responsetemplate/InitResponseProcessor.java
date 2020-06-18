@@ -29,10 +29,9 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
-
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
+import static de.quantummaid.httpmaid.http.ResponseHeaders.emptyResponseHeaders;
 
 @ToString
 @EqualsAndHashCode
@@ -47,7 +46,7 @@ public final class InitResponseProcessor implements Processor {
     public void apply(final MetaData metaData) {
         metaData.set(RESPONSE_STATUS, Http.StatusCodes.OK);
         if (!metaData.contains(RESPONSE_HEADERS)) {
-            metaData.set(RESPONSE_HEADERS, new HashMap<>());
+            metaData.set(RESPONSE_HEADERS, emptyResponseHeaders());
         }
     }
 }

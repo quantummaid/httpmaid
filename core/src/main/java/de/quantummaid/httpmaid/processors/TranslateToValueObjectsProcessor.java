@@ -23,9 +23,7 @@ package de.quantummaid.httpmaid.processors;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
-import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.HttpRequestMethod;
-import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.path.Path;
 import lombok.AccessLevel;
@@ -50,21 +48,13 @@ public final class TranslateToValueObjectsProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
-        metaData.getOptional(RAW_REQUEST_HEADERS).ifPresentOrElse(rawHeaders -> {
-                    final Headers headers = Headers.headers(rawHeaders);
-                    metaData.set(REQUEST_HEADERS, headers);
-                    final Optional<String> optionalContentType = headers.getOptionalHeader(CONTENT_TYPE);
+        metaData.getOptional(REQUEST_HEADERS).ifPresentOrElse(headers -> {
+                    final Optional<String> optionalContentType = headers.optionalHeader(CONTENT_TYPE);
                     final ContentType contentType = ContentType.fromString(optionalContentType);
                     metaData.set(REQUEST_CONTENT_TYPE, contentType);
                 },
                 () -> metaData.set(REQUEST_CONTENT_TYPE, ContentType.fromString(empty()))
         );
-
-        metaData.getOptional(RAW_REQUEST_QUERY_PARAMETERS).ifPresent(rawQueryParameters -> {
-            final QueryParameters queryParameters = QueryParameters.queryParameters(rawQueryParameters);
-            metaData.set(QUERY_PARAMETERS, queryParameters);
-        });
-
         metaData.getOptional(RAW_METHOD).ifPresent(rawMethod -> metaData.set(METHOD, HttpRequestMethod.parse(rawMethod)));
         metaData.getOptional(RAW_PATH).ifPresent(rawPath -> metaData.set(PATH, Path.path(rawPath)));
     }

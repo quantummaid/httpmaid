@@ -28,17 +28,16 @@ import de.quantummaid.httpmaid.cors.domain.RequestedHeaders;
 import de.quantummaid.httpmaid.cors.domain.RequestedMethod;
 import de.quantummaid.httpmaid.cors.policy.ResourceSharingPolicy;
 import de.quantummaid.httpmaid.http.Http;
+import de.quantummaid.httpmaid.http.ResponseHeaders;
 import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_HEADERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_STATUS;
+import static de.quantummaid.httpmaid.http.ResponseHeaders.emptyResponseHeaders;
 
 @ToString
 @EqualsAndHashCode
@@ -53,7 +52,7 @@ public final class PreflightRequestProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
-        metaData.set(RESPONSE_HEADERS, new HashMap<>());
+        metaData.set(RESPONSE_HEADERS, emptyResponseHeaders());
         metaData.set(RESPONSE_STATUS, Http.StatusCodes.OK);
         // 1
         Origin.load(metaData).ifPresent(origin -> {
@@ -74,21 +73,21 @@ public final class PreflightRequestProcessor implements Processor {
                 return;
             }
             // 7
-            final Map<String, String> responseHeaders = metaData.get(RESPONSE_HEADERS);
-            responseHeaders.put(Cors.ACCESS_CONTROL_ALLOW_ORIGIN, origin.internalValueForMapping());
+            final ResponseHeaders responseHeaders = metaData.get(RESPONSE_HEADERS);
+            responseHeaders.setHeader(Cors.ACCESS_CONTROL_ALLOW_ORIGIN, origin.internalValueForMapping());
             if(resourceSharingPolicy.supportsCredentials()) {
-                responseHeaders.put(Cors.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+                responseHeaders.setHeader(Cors.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
             }
             // 8
             resourceSharingPolicy.maxAge().generateHeaderValue()
-                    .ifPresent(maxAge -> responseHeaders.put(Cors.ACCESS_CONTROL_MAX_AGE, maxAge));
+                    .ifPresent(maxAge -> responseHeaders.setHeader(Cors.ACCESS_CONTROL_MAX_AGE, maxAge));
             // 9
             if(!requestedMethod.isSimpleMethod()) {
-                responseHeaders.put(Cors.ACCESS_CONTROL_ALLOW_METHODS, requestedMethod.internalValueForMapping());
+                responseHeaders.setHeader(Cors.ACCESS_CONTROL_ALLOW_METHODS, requestedMethod.internalValueForMapping());
             }
             // 10
             requestedHeaders.generateHeaderValue()
-                    .ifPresent(allowedHeaders -> responseHeaders.put(Cors.ACCESS_CONTROL_ALLOW_HEADERS, allowedHeaders));
+                    .ifPresent(allowedHeaders -> responseHeaders.setHeader(Cors.ACCESS_CONTROL_ALLOW_HEADERS, allowedHeaders));
         });
     }
 }

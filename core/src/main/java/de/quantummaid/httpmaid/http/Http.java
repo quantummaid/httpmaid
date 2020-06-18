@@ -58,6 +58,7 @@ public final class Http {
         public static final String COOKIE = "Cookie";
         public static final String SET_COOKIE = "Set-Cookie";
         public static final String LOCATION = "Location";
+        public static final String ACCEPT = "Accept";
 
         private Headers() {
         }

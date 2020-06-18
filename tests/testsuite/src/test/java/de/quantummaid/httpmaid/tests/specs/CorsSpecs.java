@@ -50,7 +50,7 @@ public final class CorsSpecs {
                 .theResponseBodyWas("qwer")
                 .theReponseContainsTheHeader("Access-Control-Allow-Origin", "localhost")
                 .theReponseContainsTheHeader("Access-Control-Allow-Credentials", "true")
-                .theReponseContainsTheHeader("Access-Control-Expose-Headers", "some-header,another-header,yet-another-header");
+                .theReponseContainsTheHeaderRawValue("Access-Control-Expose-Headers", "some-header, another-header, yet-another-header");
     }
 
     @ParameterizedTest
@@ -73,7 +73,7 @@ public final class CorsSpecs {
                 .theStatusCodeWas(501)
                 .theReponseContainsTheHeader("Access-Control-Allow-Origin", "localhost")
                 .theReponseContainsTheHeader("Access-Control-Allow-Credentials", "true")
-                .theReponseContainsTheHeader("Access-Control-Expose-Headers", "some-header,another-header,yet-another-header");
+                .theReponseContainsTheHeaderRawValue("Access-Control-Expose-Headers", "some-header, another-header, yet-another-header");
     }
 
     @ParameterizedTest

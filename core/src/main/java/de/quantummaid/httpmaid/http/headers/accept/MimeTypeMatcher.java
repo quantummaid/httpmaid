@@ -27,6 +27,8 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -34,9 +36,13 @@ public final class MimeTypeMatcher {
     private final MimeTypeElementMatcher type;
     private final MimeTypeElementMatcher subtype;
 
-    static MimeTypeMatcher parseMimeTypeMatcher(final String string) {
-        Validators.validateNotNullNorEmpty(string, "string");
-        final MimeType mimeType = MimeType.parseMimeType(string);
+    static MimeTypeMatcher anyMatcher() {
+        return parseMimeTypeMatcher(List.of("*/*"));
+    }
+
+    static MimeTypeMatcher parseMimeTypeMatcher(final List<String> mimeTypes) {
+        final String combinedMimeTypes = String.join(", ", mimeTypes);
+        final MimeType mimeType = MimeType.parseMimeType(combinedMimeTypes);
 
         final MimeTypeElementMatcher type = MimeTypeElementMatcher.parse(mimeType.type());
         final MimeTypeElementMatcher subtype = MimeTypeElementMatcher.parse(mimeType.subtype());

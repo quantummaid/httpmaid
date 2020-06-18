@@ -21,6 +21,9 @@
 
 package de.quantummaid.httpmaid.websockets.endpoint;
 
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
@@ -29,7 +32,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +44,8 @@ import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocket
 public final class RawWebsocketConnectBuilder {
     private ConnectionInformation connectionInformation;
     private WebsocketSenderId websocketSenderId;
-    private Map<String, List<String>> headers = new HashMap<>();
-    private Map<String, String> queryParameters = new HashMap<>();
+    private Headers headers;
+    private QueryParameters queryParameters;
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
         return new RawWebsocketConnectBuilder();
@@ -60,38 +62,29 @@ public final class RawWebsocketConnectBuilder {
         return this;
     }
 
-    public RawWebsocketConnectBuilder withHeaders(final Map<String, List<String>> headers) {
+    public RawWebsocketConnectBuilder withHeaders(final Headers headers) {
         this.headers = headers;
         return this;
     }
 
-    public RawWebsocketConnectBuilder withEncodedQueryParameters(final String encodedQueryParameters) {
-        final Map<String, String> queryParametersMap = queryToMap(encodedQueryParameters);
-        return withUniqueQueryParameters(queryParametersMap);
+    public RawWebsocketConnectBuilder withEncodedQueryString(final String encodedQueryParameters) {
+        final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
+        return withQueryParameters(queryParameters);
     }
 
-    public RawWebsocketConnectBuilder withUniqueQueryParameters(final Map<String, String> queryParameters) {
+    private RawWebsocketConnectBuilder withQueryParameters(final QueryParameters queryParameters) {
         this.queryParameters = queryParameters;
+        return this;
+    }
+
+    public RawWebsocketConnectBuilder withQueryParameterMap(final Map<String, List<String>> queryParameters) {
+        final QueryParametersBuilder builder = QueryParameters.builder();
+        queryParameters.forEach(builder::withParameter);
+        this.queryParameters = builder.build();
         return this;
     }
 
     public RawWebsocketConnect build() {
         return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
-    }
-
-    private static Map<String, String> queryToMap(final String query) {
-        final Map<String, String> result = new HashMap<>();
-        if (query == null || query.isEmpty()) {
-            return result;
-        }
-        for (final String param : query.split("&")) {
-            final String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            } else {
-                result.put(entry[0], "");
-            }
-        }
-        return result;
     }
 }
