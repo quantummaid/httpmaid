@@ -34,8 +34,10 @@ import static de.quantummaid.httpmaid.http.HttpRequestException.httpHandlerExcep
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 
 @ToString
 @EqualsAndHashCode
@@ -91,7 +93,7 @@ public final class QueryParameters {
         if (found.isEmpty()) {
             return Optional.empty();
         } else if (found.size() > 1) {
-            final String joinedValues = String.join(", ", found);
+            final String joinedValues = join(", ", found);
             throw httpHandlerException(format("Expecting query string parameter '%s' to only have one value but got [%s]",
                     name, joinedValues));
         } else {
@@ -109,6 +111,10 @@ public final class QueryParameters {
             result.put(name, values);
         });
         return result;
+    }
+
+    public List<QueryParameter> asList() {
+        return unmodifiableList(queryParameters);
     }
 
     public List<String> allValuesFor(final String name) {

@@ -27,7 +27,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @ToString
@@ -38,19 +37,19 @@ public final class Deployment {
     private final ApiBaseUrl httpBaseUrl;
     private final ApiBaseUrl webSocketBaseUrl;
 
-    public static Deployment localhostHttpDeployment(int httpPort) {
+    public static Deployment localhostHttpDeployment(final int httpPort) {
         return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), null);
     }
 
-    public static Deployment localhostWebsocketDeployment(int websocketPort) {
+    public static Deployment localhostWebsocketDeployment(final int websocketPort) {
         return httpDeployment(null, ApiBaseUrl.localhostWebsocketBaseUrl(websocketPort));
     }
 
-    public static Deployment localhostHttpAndWebsocketDeployment(int port) {
+    public static Deployment localhostHttpAndWebsocketDeployment(final int port) {
         return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(port), ApiBaseUrl.localhostWebsocketBaseUrl(port));
     }
 
-    public static Deployment localhostHttpAndWebsocketDeployment(int httpPort, int websocketPort) {
+    public static Deployment localhostHttpAndWebsocketDeployment(final int httpPort, final int websocketPort) {
         return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), ApiBaseUrl.localhostWebsocketBaseUrl(websocketPort));
     }
 

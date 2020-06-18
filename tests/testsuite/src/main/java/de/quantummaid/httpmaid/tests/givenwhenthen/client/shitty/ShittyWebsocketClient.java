@@ -39,7 +39,6 @@ import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -57,21 +56,7 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
                                                       final Consumer<String> responseHandler,
                                                       final Map<String, List<String>> headers,
                                                       final Map<String, List<String>> queryParameters) {
-        final String queryParametersTail;
-        if (queryParameters.isEmpty()) {
-            queryParametersTail = "";
-        } else {
-            final StringJoiner joiner = new StringJoiner("&", "?", "");
-            queryParameters.forEach((name, values) -> {
-                values.forEach(value -> {
-                    final String encodedName = URLEncoder.encode(name, UTF_8);
-                    final String encodedValue = URLEncoder.encode(value, UTF_8);
-                    final String parameter = format("%s=%s", encodedName, encodedValue);
-                    joiner.add(parameter);
-                });
-            });
-            queryParametersTail = joiner.toString();
-        }
+        final String queryParametersTail = buildQueryParametersTail(queryParameters);
         final String fullUri = uri + queryParametersTail;
         try {
             final ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
@@ -122,5 +107,24 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
     @Override
     public void close() throws IOException {
         session.close();
+    }
+
+    private static String buildQueryParametersTail(final Map<String, List<String>> queryParameters) {
+        final String queryParametersTail;
+        if (queryParameters.isEmpty()) {
+            queryParametersTail = "";
+        } else {
+            final StringJoiner joiner = new StringJoiner("&", "?", "");
+            queryParameters.forEach((name, values) -> {
+                values.forEach(value -> {
+                    final String encodedName = URLEncoder.encode(name, UTF_8);
+                    final String encodedValue = URLEncoder.encode(value, UTF_8);
+                    final String parameter = format("%s=%s", encodedName, encodedValue);
+                    joiner.add(parameter);
+                });
+            });
+            queryParametersTail = joiner.toString();
+        }
+        return queryParametersTail;
     }
 }

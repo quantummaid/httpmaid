@@ -55,7 +55,8 @@ public final class CloudFormationHandler implements AutoCloseable {
     }
 
     public void createOrUpdateStack(final String stackName,
-                                    final String pathToTemplate, Map<String, String> stackParameters) {
+                                    final String pathToTemplate,
+                                    final Map<String, String> stackParameters) {
         try {
             createStack(stackName, pathToTemplate, stackParameters);
         } catch (final AlreadyExistsException e) {
@@ -76,7 +77,7 @@ public final class CloudFormationHandler implements AutoCloseable {
         createStackRequest.setParameters(
                 stackParameters.entrySet().stream().map(
                         kv -> {
-                            Parameter param = new Parameter();
+                            final Parameter param = new Parameter();
                             param.setParameterKey(kv.getKey());
                             param.setParameterValue(kv.getValue());
                             return param;
@@ -89,7 +90,8 @@ public final class CloudFormationHandler implements AutoCloseable {
     }
 
     public void updateStack(final String stackIdentifier,
-                            final String pathToTemplate, Map<String, String> stackParameters) {
+                            final String pathToTemplate,
+                            final Map<String, String> stackParameters) {
         log.info("Updating stack {}...", stackIdentifier);
         final String templateBody = fileToString(pathToTemplate);
         final UpdateStackRequest updateStackRequest = new UpdateStackRequest();
@@ -99,7 +101,7 @@ public final class CloudFormationHandler implements AutoCloseable {
         updateStackRequest.setParameters(
                 stackParameters.entrySet().stream().map(
                         kv -> {
-                            Parameter param = new Parameter();
+                            final Parameter param = new Parameter();
                             param.setParameterKey(kv.getKey());
                             param.setParameterValue(kv.getValue());
                             return param;
@@ -154,7 +156,6 @@ public final class CloudFormationHandler implements AutoCloseable {
 
     @Override
     public void close() {
-        // TODO cleanup?
         amazonCloudFormation.shutdown();
     }
 }

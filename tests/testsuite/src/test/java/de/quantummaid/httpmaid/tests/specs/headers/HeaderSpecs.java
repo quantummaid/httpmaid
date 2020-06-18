@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.specs.headers;
 
+import de.quantummaid.httpmaid.http.HttpRequestException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,6 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class HeaderSpecs {
@@ -94,5 +96,40 @@ public final class HeaderSpecs {
                 .withHeaderOccuringMultipleTimesHavingDistinctValue("X-Headername", "value1", "value2").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("value1+value2");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void exceptionWhenAccessingNotExistingHeader(final TestEnvironment testEnvironment) {
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("/", (request, response) -> request.headers().header("not_existing"))
+                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, response) -> {
+                            response.setBody(exception.getMessage());
+                            response.setStatus(501);
+                        }))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(501)
+                .theResponseBodyWas("No header with name 'not_existing'");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void exceptionWhenHandlerAccessesMultiValueQueryParameterButExpectsSingleValue(final TestEnvironment testEnvironment) {
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("/", (request, response) -> request.headers().optionalHeader("multiple_values"))
+                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, response) -> {
+                            response.setBody(exception.getMessage());
+                            response.setStatus(501);
+                        }))
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody()
+                .withHeaderOccuringMultipleTimesHavingDistinctValue("multiple_values", "value1", "value2", "value3").isIssued()
+                .theStatusCodeWas(501)
+                .theResponseBodyWas("Expecting header 'multiple_values' to only have one value but got [value1, value2, value3]");
     }
 }

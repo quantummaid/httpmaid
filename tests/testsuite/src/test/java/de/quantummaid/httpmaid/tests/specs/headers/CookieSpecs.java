@@ -264,7 +264,6 @@ public final class CookieSpecs {
                         "cookie2", "cookie,value,2"));
     }
 
-
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void handlerCanReceiveMultipleSemicolonSeparatedCookiesInOneSingleHeader(final TestEnvironment testEnvironment) {

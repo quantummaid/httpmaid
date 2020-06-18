@@ -62,9 +62,7 @@ public final class AwsWebsocketLambdaEndpoint {
 
     public Map<String, Object> delegate(final Map<String, Object> event) {
         final AwsLambdaEvent awsLambdaEvent = awsLambdaEvent(event);
-        // TODO: if ! (awsLambdaEvent.isWebSocketRequest())
-        final Map<String, Object> response = handleWebsocketRequest(awsLambdaEvent);
-        return response;
+        return handleWebsocketRequest(awsLambdaEvent);
     }
 
     private Map<String, Object> handleWebsocketRequest(final AwsLambdaEvent event) {

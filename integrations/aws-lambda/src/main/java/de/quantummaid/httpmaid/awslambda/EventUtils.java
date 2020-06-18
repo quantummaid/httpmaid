@@ -19,26 +19,34 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.http;
+package de.quantummaid.httpmaid.awslambda;
 
-import de.quantummaid.httpmaid.util.Validators;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import java.util.Base64;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class QueryParameterName {
-    private final String key;
+import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.BODY;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-    public static QueryParameterName queryParameterName(final String key) {
-        Validators.validateNotNullNorEmpty(key, "key");
-        return new QueryParameterName(key);
+final class EventUtils {
+
+    private EventUtils() {
     }
 
-    public String stringValue() {
-        return key;
+    static String extractPotentiallyEncodedBody(final AwsLambdaEvent event) {
+        final String rawBody = event.getAsString(BODY);
+        if (rawBody == null) {
+            return "";
+        }
+        final Boolean isBase64Encoded = event.getAsBoolean("isBase64Encoded");
+        if (isBase64Encoded) {
+            return decodeBase64(rawBody);
+        } else {
+            return rawBody;
+        }
+    }
+
+    private static String decodeBase64(final String encoded) {
+        final Base64.Decoder decoder = Base64.getDecoder();
+        final byte[] decoded = decoder.decode(encoded);
+        return new String(decoded, UTF_8);
     }
 }

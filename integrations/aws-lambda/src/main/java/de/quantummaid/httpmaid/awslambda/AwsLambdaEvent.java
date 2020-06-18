@@ -54,7 +54,6 @@ public final class AwsLambdaEvent {
         return (String) event.get(key);
     }
 
-
     public Boolean getAsBoolean(final String key) {
         return (Boolean) event.get(key);
     }
@@ -71,6 +70,7 @@ public final class AwsLambdaEvent {
         return requireNonNullElseGet(value, alternative);
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getMap(final String key) {
         return (Map<String, Object>) event.get(key);
     }
@@ -83,12 +83,9 @@ public final class AwsLambdaEvent {
         return isWebSocketRequest(event);
     }
 
+    @SuppressWarnings("unchecked")
     public static boolean isWebSocketRequest(final Map<String, Object> event) {
         final Map<String, Object> context = (Map<String, Object>) event.get(REQUEST_CONTEXT);
-        if(context.containsKey("connectionId")) {
-            System.out.println("connectionId found");
-            return true;
-        }
-        return false;
+        return context.containsKey("connectionId");
     }
 }

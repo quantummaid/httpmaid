@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.client;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
 
 import java.util.List;

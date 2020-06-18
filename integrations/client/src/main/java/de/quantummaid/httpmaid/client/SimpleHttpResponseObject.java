@@ -29,6 +29,7 @@ import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.valueOf;
 
@@ -66,12 +67,20 @@ public final class SimpleHttpResponseObject {
     }
 
     public String getSingleHeader(final String headerName) {
-        final List<String> headerValues = getHeaders().get(headerName);
+        return getOptionalSingleHeader(headerName)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("No header with name '%s'", headerName)));
+    }
+
+    public Optional<String> getOptionalSingleHeader(final String headerName) {
+        final List<String> headerValues = headers.get(headerName);
+        if (headerValues == null) {
+            return Optional.empty();
+        }
         if (headerValues.size() != 1) {
             throw new UnsupportedOperationException(
                     String.format("getSingleHeader('%s') expects a single header, found %d instead (%s)",
                             headerName, headerValues.size(), headerValues));
         }
-        return headerValues.get(0);
+        return Optional.of(headerValues.get(0));
     }
 }

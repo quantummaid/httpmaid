@@ -58,7 +58,7 @@ public interface PortDeployer extends Deployer {
         for (int i = 0; i < 3; ++i) {
             final int port = freePort();
             try {
-                T result = deployFunction.apply(port);
+                final T result = deployFunction.apply(port);
                 return portDeploymentResult(port, result);
             } catch (final Exception e) {
                 exceptions.add(e);

@@ -29,11 +29,10 @@ import de.quantummaid.httpmaid.client.body.multipart.Part;
 import de.quantummaid.httpmaid.client.clientbuilder.PortStage;
 import de.quantummaid.httpmaid.client.issuer.real.Protocol;
 import de.quantummaid.httpmaid.client.websocket.Websocket;
-import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
@@ -93,11 +92,12 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
 
     @Override
     public HttpClientResponse issueRequestWithoutBody(final HttpClientRequest request) {
-        return issueRequest(request, ((Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>>) builder -> {
-        }));
+        return issueRequest(request, builder -> {
+        });
     }
 
-    private HttpClientResponse issueRequest(HttpClientRequest request, Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
+    private HttpClientResponse issueRequest(final HttpClientRequest request,
+                                            final Consumer<HttpClientRequestBuilder<SimpleHttpResponseObject>> bodyAppender) {
         if (httpClient == null) {
             throw new UnsupportedOperationException("There is no http deployment to connect to. " +
                     "Probably the endpoint does not support http requests.");
@@ -111,12 +111,14 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
     }
 
     @Override
-    public HttpClientResponse issueRequestWithStringBody(HttpClientRequest request, String body) {
+    public HttpClientResponse issueRequestWithStringBody(final HttpClientRequest request,
+                                                         final String body) {
         return issueRequest(request, bodyStage -> bodyStage.withTheBody(body));
     }
 
     @Override
-    public HttpClientResponse issueRequestWithMultipartBody(HttpClientRequest request, List<MultipartElement> parts) {
+    public HttpClientResponse issueRequestWithMultipartBody(final HttpClientRequest request,
+                                                            final List<MultipartElement> parts) {
         return issueRequest(request, builder -> {
             final Part[] partsArray = parts.stream()
                     .map(part -> aPartWithTheControlName(part.controlName())

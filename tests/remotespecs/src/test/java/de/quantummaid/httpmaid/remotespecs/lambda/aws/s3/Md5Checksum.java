@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.s3;
 
 import lombok.EqualsAndHashCode;
@@ -13,7 +34,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static java.lang.String.format;
 
 /**
- * source: https://stackoverflow.com/questions/304268/getting-a-files-md5-checksum-in-java
+ * Source: https://stackoverflow.com/questions/304268/getting-a-files-md5-checksum-in-java
  */
 @ToString
 @EqualsAndHashCode
@@ -37,8 +58,8 @@ public class Md5Checksum {
     }
 
     public static Md5Checksum ofFile(final File file) {
-        byte[] b = md5ChecksumBytesOf(file.getAbsolutePath());
-        StringBuilder result = new StringBuilder();
+        final byte[] b = md5ChecksumBytesOf(file.getAbsolutePath());
+        final StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < b.length; i++) {
             result.append(Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1));
@@ -48,8 +69,8 @@ public class Md5Checksum {
 
     private static byte[] md5ChecksumBytesOf(final String filename) {
         try (InputStream fis = new FileInputStream(filename)) {
-            byte[] buffer = new byte[1024];
-            MessageDigest complete = MessageDigest.getInstance("MD5");
+            final byte[] buffer = new byte[1024];
+            final MessageDigest complete = MessageDigest.getInstance("MD5");
             int numRead;
 
             do {

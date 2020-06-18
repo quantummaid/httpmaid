@@ -75,7 +75,7 @@ public final class TomcatDeployer implements RemoteSpecsDeployer, PortDeployer {
         return localhostHttpAndWebsocketDeployment(port);
     }
 
-    private Tomcat deployTomcatOnPort(int port) {
+    private Tomcat deployTomcatOnPort(final int port) {
         tomcat = new Tomcat();
         tomcat.setPort(port);
 

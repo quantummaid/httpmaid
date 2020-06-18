@@ -34,6 +34,8 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RestApiInformation {
+    private static final int HTTPS_PORT = 443;
+
     private final String apiId;
     private final String stageName;
     private final String region;
@@ -53,6 +55,6 @@ public final class RestApiInformation {
     }
 
     public ApiBaseUrl baseUrl() {
-        return apiBaseUrl("https", host(), 443, basePath());
+        return apiBaseUrl("https", host(), HTTPS_PORT, basePath());
     }
 }

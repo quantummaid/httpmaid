@@ -34,6 +34,8 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WebsocketApiInformation {
+    private static final int HTTPS_PORT = 443;
+
     private final String apiId;
     private final String region;
     private final String stageName;
@@ -57,6 +59,6 @@ public final class WebsocketApiInformation {
     }
 
     public ApiBaseUrl baseUrl() {
-        return apiBaseUrl("wss", host(), 443, basePath());
+        return apiBaseUrl("wss", host(), HTTPS_PORT, basePath());
     }
 }

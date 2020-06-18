@@ -75,19 +75,6 @@ public final class FakeHttpLambda implements AutoCloseable {
         server.stop(0);
     }
 
-    // event = {version=2.0,
-    // routeKey=$default,
-    // rawPath=/jsonResponse,
-    // rawQueryString=,
-    // headers={accept=text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8, content-length=0,
-    // content-type=application/json,
-    // host=hvckksyipg.execute-api.eu-central-1.amazonaws.com,
-    // x-amzn-trace-id=Root=1-5eea0cc6-b679a8383b6c2508c9873288,
-    // x-forwarded-for=79.112.11.227,
-    // x-forwarded-port=443,
-    // x-forwarded-proto=https},
-    // requestContext={accountId=712767472906, apiId=hvckksyipg, domainName=hvckksyipg.execute-api.eu-central-1.amazonaws.com, domainPrefix=hvckksyipg,
-    // http={method=GET, path=/jsonResponse, protocol=HTTP/1.1, sourceIp=79.112.11.227, userAgent=}, requestId=ORbvFg5qliAEJfw=, routeKey=$default, stage=$default, time=17/Jun/2020:12:29:58 +0000, timeEpoch=1592396998821}, isBase64Encoded=false}
     private static Map<String, Object> mapRequestToEvent(final HttpExchange exchange) {
         final Map<String, Object> event = new HashMap<>();
         event.put("version", "2.0");
@@ -122,6 +109,7 @@ public final class FakeHttpLambda implements AutoCloseable {
         return event;
     }
 
+    @SuppressWarnings("unchecked")
     private static void mapEventToResponse(final Map<String, Object> event,
                                            final HttpExchange exchange) throws IOException {
         final Headers responseHeaders = exchange.getResponseHeaders();

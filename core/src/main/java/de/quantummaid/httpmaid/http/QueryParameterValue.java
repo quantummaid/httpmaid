@@ -31,15 +31,15 @@ import static java.util.Optional.ofNullable;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class QueryParameterValue {
+public final class QueryParameterValue {
     private final String value;
 
-    static QueryParameterValue queryParameterValue(final String value) {
+    public static QueryParameterValue queryParameterValue(final String value) {
         final String realValue = ofNullable(value).orElse("");
         return new QueryParameterValue(realValue);
     }
 
-    String stringValue() {
+    public String stringValue() {
         return value;
     }
 }

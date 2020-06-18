@@ -21,11 +21,10 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.Headers;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.MultipartElement;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
@@ -82,18 +81,20 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
     public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
                                           final Map<String, List<String>> queryParameters,
                                           final Map<String, List<String>> headers) {
-        ApiBaseUrl url = deployment.webSocketBaseUrl()
+        final ApiBaseUrl url = deployment.webSocketBaseUrl()
                 .orElseThrow(() -> new UnsupportedOperationException("Not a websocket deployment " + toString()));
         final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(url.toUrlString(), responseHandler, headers, queryParameters);
         return wrappedWebsocket(client::send, client);
     }
 
     @Override
-    public HttpClientResponse issueRequestWithoutBody(HttpClientRequest request) {
-        return issueRequest(request, req -> {});
+    public HttpClientResponse issueRequestWithoutBody(final HttpClientRequest request) {
+        return issueRequest(request, req -> {
+        });
     }
 
-    private HttpClientResponse issueRequest(HttpClientRequest request, Consumer<HttpEntityEnclosingRequest> bodyAppender) {
+    private HttpClientResponse issueRequest(final HttpClientRequest request,
+                                            final Consumer<HttpEntityEnclosingRequest> bodyAppender) {
         final ApiBaseUrl baseUrl = deployment.httpBaseUrl()
                 .orElseThrow(() -> new UnsupportedOperationException("Not an http deployment " + toString()));
         final String url = appendPathToUrl(baseUrl.toUrlString(), request.path);
@@ -130,20 +131,19 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
         }
     }
 
-    private String buildUri(HttpClientRequest request, String url) {
+    private String buildUri(final HttpClientRequest request, final String url) {
         try {
             final URIBuilder uriBuilder = new URIBuilder(url);
             request.queryStringParameters.forEach(
                     parameter -> uriBuilder.addParameter(parameter.name(), parameter.value()));
-            final String uri = uriBuilder.build().toASCIIString();
-            return uri;
+            return uriBuilder.build().toASCIIString();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public HttpClientResponse issueRequestWithStringBody(HttpClientRequest request, String body) {
+    public HttpClientResponse issueRequestWithStringBody(final HttpClientRequest request, final String body) {
         return issueRequest(request, req -> {
             try {
                 req.setEntity(new StringEntity(body));
@@ -153,8 +153,10 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
         });
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public HttpClientResponse issueRequestWithMultipartBody(HttpClientRequest request, List<MultipartElement> parts) {
+    public HttpClientResponse issueRequestWithMultipartBody(final HttpClientRequest request,
+                                                            final List<MultipartElement> parts) {
         return issueRequest(request, builder -> {
             final MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder
                     .create().setBoundary(MULTIPART_BOUNDARY);

@@ -30,8 +30,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.http.HeaderName.headerName;
+import static de.quantummaid.httpmaid.http.HttpRequestException.httpHandlerException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.util.Collections.unmodifiableList;
 
 @ToString
 @EqualsAndHashCode
@@ -59,15 +62,20 @@ public final class Headers {
             return Optional.empty();
         }
         if (values.size() > 1) {
-            throw new UnsupportedOperationException("tilt"); // TODO
-            // more that one exception
+            final String joinedValues = join(", ", values);
+            throw httpHandlerException(format("Expecting header '%s' to only have one value but got [%s]",
+                    name, joinedValues));
         }
         return Optional.of(values.get(0));
     }
 
     public String header(final String name) {
         return optionalHeader(name)
-                .orElseThrow(() -> new IllegalArgumentException(format("No header with name %s", name)));
+                .orElseThrow(() -> httpHandlerException(format("No header with name '%s'", name)));
+    }
+
+    public List<Header> asList() {
+        return unmodifiableList(headers);
     }
 
     public Map<String, List<String>> asMap() {

@@ -84,7 +84,7 @@ public final class Then {
         final String normalizedKey = key.toLowerCase();
         final String expectedValue = rawValue;
         final List<String> actualValue = headers.get(normalizedKey);
-        assertThat("there is one and only one header by that name",  actualValue.size(), is(1));
+        assertThat("there is one and only one header by that name", actualValue.size(), is(1));
         assertThat("the header by that name has a value matching exactly our expected value",
                 actualValue.get(0), is(expectedValue));
         return this;

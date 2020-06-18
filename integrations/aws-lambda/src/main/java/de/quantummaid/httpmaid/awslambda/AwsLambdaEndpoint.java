@@ -22,27 +22,17 @@
 package de.quantummaid.httpmaid.awslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.endpoint.RawHttpRequestBuilder;
-import de.quantummaid.httpmaid.http.HeadersBuilder;
-import de.quantummaid.httpmaid.http.QueryParameters;
-import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.net.URLDecoder;
-import java.util.*;
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.*;
-import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
-import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
-import static de.quantummaid.httpmaid.http.Http.Headers.COOKIE;
-import static de.quantummaid.httpmaid.http.Http.Headers.SET_COOKIE;
+import static de.quantummaid.httpmaid.awslambda.HttpApiHandler.handleHttpApiRequest;
+import static de.quantummaid.httpmaid.awslambda.RestApiHandler.handleRestApiRequest;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.stream;
 
 @ToString
 @EqualsAndHashCode
@@ -60,125 +50,13 @@ public final class AwsLambdaEndpoint {
 
         final String version = (String) event.get("version");
         if (version == null) {
-            return handleRestApiRequest(awsLambdaEvent);
+            return handleRestApiRequest(awsLambdaEvent, httpMaid);
         } else if ("2.0".equals(version)) {
-            return handleHttpApiRequest(awsLambdaEvent);
+            return handleHttpApiRequest(awsLambdaEvent, httpMaid);
         } else if ("1.0".equals(version)) {
-            return handleRestApiRequest(awsLambdaEvent);
+            return handleRestApiRequest(awsLambdaEvent, httpMaid);
         } else {
             throw new UnsupportedOperationException("Unable to handle lambda event: " + event);
         }
-    }
-
-    private Map<String, Object> handleHttpApiRequest(final AwsLambdaEvent event) {
-        return httpMaid.handleRequestSynchronously(() -> {
-            final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
-            Map<String, Object> requestContext = event.getMap("requestContext");
-            Map<String, Object> httpInformation = (Map<String, Object>) requestContext.get("http");
-            final String httpRequestMethod = (String) httpInformation.get("method");
-            builder.withMethod(httpRequestMethod);
-            final String path = (String) httpInformation.get("path");
-            builder.withPath(path);
-
-            final Map<String, String> headers = event.getOrDefault("headers", LinkedHashMap::new);
-            final HeadersBuilder headersBuilder = headersBuilder();
-            headers.forEach((key, commaSeparatedValues) -> {
-                final String[] values = commaSeparatedValues.split(",");
-                stream(values).forEach(value -> headersBuilder.withAdditionalHeader(key, value));
-            });
-            final List<String> cookies = event.getOrDefault("cookies", ArrayList::new);
-            cookies.forEach(cookie -> headersBuilder.withAdditionalHeader(COOKIE, cookie));
-            builder.withHeaders(headersBuilder.build());
-
-            final String queryString = event.getAsString("rawQueryString");
-            final QueryParameters queryParameters = QueryParameters.fromQueryString(queryString);
-            builder.withQueryParameters(queryParameters);
-
-            final String body = extractPotentiallyEncodedBody(event);
-            builder.withBody(body);
-
-            return builder.build();
-        }, response -> {
-            final int statusCode = response.status();
-            final Map<String, List<String>> responseHeaders = response.headers();
-            final String responseBody = response.stringBody();
-
-            final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
-            responseMap.put("statusCode", statusCode);
-
-            final List<String> cookies = new ArrayList<>();
-            final Map<String, String> singleHeaders = new LinkedHashMap<>();
-            responseHeaders.forEach((key, values) -> {
-                if (key.equalsIgnoreCase(SET_COOKIE)) {
-                    values.forEach(cookies::add);
-                } else {
-                    final String joinedValues = String.join(",", values);
-                    singleHeaders.put(key, joinedValues);
-                }
-            });
-
-            responseMap.put("headers", singleHeaders);
-            responseMap.put("cookies", cookies);
-            responseMap.put("body", responseBody);
-            return responseMap;
-        });
-    }
-
-    private Map<String, Object> handleRestApiRequest(final AwsLambdaEvent event) {
-        return httpMaid.handleRequestSynchronously(() -> {
-            final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
-            final String httpRequestMethod = event.getAsString(HTTP_METHOD);
-            builder.withMethod(httpRequestMethod);
-
-            final String encodedPath = event.getAsString(PATH);
-            final String path = URLDecoder.decode(encodedPath, UTF_8);
-            builder.withPath(path);
-
-            builder.withPath(path);
-            final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
-            final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
-            headersBuilder.withHeadersMap(headers);
-            builder.withHeaders(headersBuilder.build());
-
-            final Map<String, List<String>> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
-            final QueryParametersBuilder queryParametersBuilder = QueryParameters.builder();
-            queryParameters.forEach(queryParametersBuilder::withParameter);
-            builder.withQueryParameters(queryParametersBuilder.build());
-
-            final String body = extractPotentiallyEncodedBody(event);
-            builder.withBody(body);
-            return builder.build();
-        }, response -> {
-            final int statusCode = response.status();
-            final Map<String, List<String>> responseHeaders = response.headers();
-            final String responseBody = response.stringBody();
-
-            final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
-            responseMap.put("statusCode", statusCode);
-            responseMap.put("multiValueHeaders", responseHeaders);
-            responseMap.put("body", responseBody);
-
-            return responseMap;
-        });
-    }
-
-    private static String extractPotentiallyEncodedBody(final AwsLambdaEvent event) {
-        final String rawBody = event.getAsString(BODY);
-        if (rawBody == null) {
-            return "";
-        }
-        System.out.println(event);
-        final Boolean isBase64Encoded = event.getAsBoolean("isBase64Encoded");
-        if (isBase64Encoded) {
-            return decodeBase64(rawBody);
-        } else {
-            return rawBody;
-        }
-    }
-
-    private static String decodeBase64(final String encoded) {
-        final Base64.Decoder decoder = Base64.getDecoder();
-        final byte[] decoded = decoder.decode(encoded);
-        return new String(decoded);
     }
 }

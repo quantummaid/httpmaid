@@ -37,6 +37,7 @@ import static java.lang.String.format;
 
 @Slf4j
 public final class CloudFormationWaiter {
+    private static final int TIMEOUT_IN_MINUTES = 4;
 
     private CloudFormationWaiter() {
     }
@@ -71,7 +72,7 @@ public final class CloudFormationWaiter {
         final Future<Void> waitFuture = waiter.runAsync(new WaiterParameters<>(request), waiterHandler);
 
         try {
-            waitFuture.get(4, TimeUnit.MINUTES);
+            waitFuture.get(TIMEOUT_IN_MINUTES, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (final ExecutionException | TimeoutException e) {

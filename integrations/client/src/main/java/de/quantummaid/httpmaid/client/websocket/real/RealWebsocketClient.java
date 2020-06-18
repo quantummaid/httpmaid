@@ -86,7 +86,6 @@ public final class RealWebsocketClient implements WebsocketClient {
                     stringJoiner.add(format("%s=%s", encodedName, encodedValue));
                 }));
         final String fullUri = stringJoiner.toString();
-        System.out.println("fullUri = " + fullUri);
         return new URI(fullUri);
     }
 }

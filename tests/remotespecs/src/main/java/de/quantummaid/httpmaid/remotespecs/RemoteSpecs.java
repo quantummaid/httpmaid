@@ -156,11 +156,11 @@ public interface RemoteSpecs {
     }
 
     /**
-     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
-     * Cookie: <cookie-list>
+     * Cookie: cookie-list
      * Cookie: name=value; name2=value2; name3=value3
-     * <cookie-list> A list of name-value pairs in the form of <cookie-name>=<cookie-value>.
+     * cookie-list A list of name-value pairs in the form of cookie-name=cookie-value.
      * Pairs in the list are separated by a semicolon and a space ('; ').
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
      */
     @Test
     default void requestCanContainMultipleCookiesInOneCookieHeader(final TestEnvironment testEnvironment) {
@@ -171,12 +171,12 @@ public interface RemoteSpecs {
     }
 
     /**
-     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
-     * A <cookie-value> can optionally be wrapped in double quotes and include any US-ASCII characters
+     * A cookie-value can optionally be wrapped in double quotes and include any US-ASCII characters
      * excluding control characters, Whitespace, double quotes, comma, semicolon, and backslash.
      * Encoding: Many implementations perform URL encoding on cookie values, however it is not
      * required per the RFC specification. It does help satisfying the requirements about which
-     * characters are allowed for <cookie-value> though.
+     * characters are allowed for cookie-value though.
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
      */
     @Test
     default void responseCanContainMultipleCookies(final TestEnvironment testEnvironment) {

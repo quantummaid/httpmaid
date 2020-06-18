@@ -101,8 +101,7 @@ public final class FakeRestLambda implements AutoCloseable {
     private static void mapEventToResponse(final Map<String, Object> event,
                                            final HttpExchange exchange) throws IOException {
         final Headers responseHeaders = exchange.getResponseHeaders();
-        @SuppressWarnings("unchecked")
-        final Map<String, List<String>> headerMap = (Map<String, List<String>>) ofNullable(event.get("multiValueHeaders")).orElse(emptyMap());
+        @SuppressWarnings("unchecked") final Map<String, List<String>> headerMap = (Map<String, List<String>>) ofNullable(event.get("multiValueHeaders")).orElse(emptyMap());
         responseHeaders.putAll(headerMap);
         final Integer statusCode = (Integer) event.get("statusCode");
         exchange.sendResponseHeaders(statusCode, 0);
@@ -118,7 +117,12 @@ public final class FakeRestLambda implements AutoCloseable {
         for (final String param : query.split("&")) {
             final String[] entry = param.split("=");
             final String key = decode(entry[0]);
-            final String value = (entry.length > 1)? decode(entry[1]) : "";
+            final String value;
+            if (entry.length > 1) {
+                value = decode(entry[1]);
+            } else {
+                value = "";
+            }
             final List<String> values = result.getOrDefault(key, new ArrayList<>());
             values.add(value);
             result.put(key, values);
@@ -126,7 +130,7 @@ public final class FakeRestLambda implements AutoCloseable {
         return result;
     }
 
-    private static String decode(String s) {
+    private static String decode(final String s) {
         final String decoded = URLDecoder.decode(s, UTF_8);
         return decoded;
     }

@@ -29,7 +29,6 @@ import org.junit.jupiter.api.extension.ExtensionContext.Store;
 
 import static de.quantummaid.httpmaid.remotespecs.DummyDeployer.dummyDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.testEnvironment;
-import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
@@ -44,6 +43,7 @@ public final class RemoteSpecsExtension implements ParameterResolver,
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object resolveParameter(final ParameterContext parameterContext,
                                    final ExtensionContext ctx) throws ParameterResolutionException {
@@ -51,7 +51,6 @@ public final class RemoteSpecsExtension implements ParameterResolver,
         final RemoteSpecsDeployment deployment = getDeployment(ctx);
         validateNotNull(deployment, "deployment");
         final Deployer deployer = dummyDeployer(deployment.descriptorFor((Class<? extends RemoteSpecs>) testClass));
-        //final ClientFactory clientFactory = theShittyTestClient();
         final ClientFactory clientFactory = RealHttpMaidClientFactory.theRealHttpMaidClient();
         return testEnvironment(deployer, clientFactory);
     }

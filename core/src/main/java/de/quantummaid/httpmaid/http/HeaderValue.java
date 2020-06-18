@@ -39,7 +39,7 @@ public final class HeaderValue {
         return new HeaderValue(value);
     }
 
-    String stringValue() {
+    public String stringValue() {
         return this.value;
     }
 }

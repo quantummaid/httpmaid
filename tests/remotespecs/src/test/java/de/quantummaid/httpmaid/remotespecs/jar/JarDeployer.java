@@ -79,7 +79,7 @@ public final class JarDeployer implements RemoteSpecsDeployer {
         return remoteSpecsDeployment;
     }
 
-    private Process startProcess(String command) {
+    private Process startProcess(final String command) {
         try {
             log.info("startProcess({})", command);
             process = Runtime.getRuntime().exec(command);

@@ -34,12 +34,13 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpApiInformation {
+    private static final int HTTPS_PORT = 443;
+
     private final String apiId;
     private final String region;
 
     public static HttpApiInformation httpApiInformation(final String apiId,
                                                         final String region) {
-        System.out.println("apiId = " + apiId + ", region = " + region);
         return new HttpApiInformation(apiId, region);
     }
 
@@ -48,6 +49,6 @@ public final class HttpApiInformation {
     }
 
     public ApiBaseUrl baseUrl() {
-        return apiBaseUrl("https", host(), 443, "/");
+        return apiBaseUrl("https", host(), HTTPS_PORT, "/");
     }
 }

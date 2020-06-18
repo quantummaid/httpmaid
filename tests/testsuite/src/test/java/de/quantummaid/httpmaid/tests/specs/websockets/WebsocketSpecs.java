@@ -21,14 +21,10 @@
 
 package de.quantummaid.httpmaid.tests.specs.websockets;
 
-import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.websockets.domain.TestUseCase;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.List;
-import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
