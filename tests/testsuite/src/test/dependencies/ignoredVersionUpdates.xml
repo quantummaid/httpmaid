@@ -6,6 +6,7 @@
         <rule groupId="org.glassfish.tyrus" comparisonMethod="maven">
             <ignoreVersions>
                 <ignoreVersion>2.0.0-M1</ignoreVersion>
+                <ignoreVersion>2.0.0-M2</ignoreVersion>
             </ignoreVersions>
         </rule>
         <rule groupId="org.eclipse.jetty" comparisonMethod="maven">
@@ -15,6 +16,7 @@
                 <ignoreVersion>10.0.0.alpha2</ignoreVersion>
                 <ignoreVersion>10.0.0.beta0</ignoreVersion>
                 <ignoreVersion>11.0.0.alpha0</ignoreVersion>
+                <ignoreVersion>11.0.0-alpha0</ignoreVersion>
             </ignoreVersions>
         </rule>
         <rule groupId="com.amazonaws" artifactId="aws-java-sdk-lambda" comparisonMethod="maven">
@@ -40,8 +42,8 @@
                 <ignoreVersion>1.11.785</ignoreVersion>
                 <ignoreVersion>1.11.786</ignoreVersion>
                 <ignoreVersion>1.11.787</ignoreVersion>
-                <ignoreVersion>1.11.789</ignoreVersion>
-                <ignoreVersion>1.11.789</ignoreVersion>
+                <ignoreVersion>1.11.805</ignoreVersion>
+                <ignoreVersion>1.11.805</ignoreVersion>
                 <ignoreVersion>1.11.790</ignoreVersion>
                 <ignoreVersion>1.11.791</ignoreVersion>
                 <ignoreVersion>1.11.792</ignoreVersion>
@@ -77,7 +79,7 @@
                 <ignoreVersion>1.11.785</ignoreVersion>
                 <ignoreVersion>1.11.786</ignoreVersion>
                 <ignoreVersion>1.11.787</ignoreVersion>
-                <ignoreVersion>1.11.789</ignoreVersion>
+                <ignoreVersion>1.11.805</ignoreVersion>
                 <ignoreVersion>1.11.789</ignoreVersion>
                 <ignoreVersion>1.11.790</ignoreVersion>
                 <ignoreVersion>1.11.791</ignoreVersion>

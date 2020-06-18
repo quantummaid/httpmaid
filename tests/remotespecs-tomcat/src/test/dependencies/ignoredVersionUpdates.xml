@@ -5,11 +5,13 @@
     <rules>
         <rule groupId="org.apache.tomcat" comparisonMethod="maven">
             <ignoreVersions>
+                <ignoreVersion>10.0.0-M6</ignoreVersion>
                 <ignoreVersion>10.0.0-M5</ignoreVersion>
                 <ignoreVersion>10.0.0-M4</ignoreVersion>
                 <ignoreVersion>10.0.0-M3</ignoreVersion>
                 <ignoreVersion>10.0.0-M2</ignoreVersion>
                 <ignoreVersion>10.0.0-M1</ignoreVersion>
+                <ignoreVersion>9.0.36</ignoreVersion>
                 <ignoreVersion>9.0.35</ignoreVersion>
                 <ignoreVersion>9.0.34</ignoreVersion>
                 <ignoreVersion>9.0.33</ignoreVersion>
