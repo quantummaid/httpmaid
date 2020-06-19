@@ -95,28 +95,49 @@ Resources:
   HttpMaidHttpApiWithV1Payloads:
     Type: "AWS::ApiGatewayV2::Api"
     Properties:
-      Body:
-        info:
-          version: "1.0"
-          title: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy"
-        paths:
-          "$default":
-            x-amazon-apigateway-any-method:
-              x-amazon-apigateway-integration:
-                httpMethod: POST
-                type: aws_proxy
-                uri: !Sub >-
-                  arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
-                payloadFormatVersion: "1.0"
-              responses: {}
-        openapi: 3.0.1
+      Name: !Sub "${StackIdentifier} RemoteSpecs HTTP Api (Payload Version 1.0) Lambda Proxy"
+      ProtocolType: HTTP
+
+  HttpMaidHttpApiWithV1PayloadsDefaultIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    DependsOn:
+      - HttpMaidHttpApiWithV1Payloads
+    Properties:
+      ApiId: !Ref HttpMaidHttpApiWithV1Payloads
+      IntegrationType: AWS_PROXY
+      PayloadFormatVersion: "1.0"
+      IntegrationUri:
+        !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
+
+  HttpMaidHttpApiWithV1PayloadsDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - HttpMaidHttpApiWithV1Payloads
+      - HttpMaidHttpApiWithV1PayloadsDefaultIntegration
+    Properties:
+      ApiId: !Ref HttpMaidHttpApiWithV1Payloads
+      RouteKey: $default
+      AuthorizationType: NONE
+      Target: !Join ['/', [integrations, !Ref HttpMaidHttpApiWithV1PayloadsDefaultIntegration]]
+
+  HttpMaidHttpApiWithV1PayloadsDeployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+      - HttpMaidHttpApiWithV1Payloads
+      - HttpMaidHttpApiWithV1PayloadsDefaultIntegration
+      - HttpMaidHttpApiWithV1PayloadsDefaultRoute
+    Properties:
+      ApiId: !Ref HttpMaidHttpApiWithV1Payloads
 
   HttpMaidHttpApiWithV1PayloadsApiStage:
     Type: AWS::ApiGatewayV2::Stage
+    DependsOn:
+      - HttpMaidHttpApiWithV1Payloads
+      - HttpMaidHttpApiWithV1PayloadsDeployment
     Properties:
       StageName: $default
       ApiId: !Ref HttpMaidHttpApiWithV1Payloads
-      AutoDeploy: true
+      DeploymentId: !Ref HttpMaidHttpApiWithV1PayloadsDeployment
 
   #####################
   ## REST ApiGateway ##
@@ -183,7 +204,7 @@ Resources:
   ###########################
 
   HttpMaidWebsocketsApi:
-    Type: 'AWS::ApiGatewayV2::Api'
+    Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: !Sub "${StackIdentifier} RemoteSpecs WebSockets Lambda Proxy"
       ProtocolType: WEBSOCKET
@@ -209,8 +230,6 @@ Resources:
       ApiId: !Ref HttpMaidWebsocketsApi
       Description: Integration for builtin $connect route
       IntegrationType: AWS_PROXY
-      # All routes lead to the same Lambda function; it uses the route
-      # provided by API Gateway to determine the right behavior.
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
 
@@ -220,25 +239,19 @@ Resources:
       ApiId: !Ref HttpMaidWebsocketsApi
       RouteKey: $default
       AuthorizationType: NONE
-      # A Lambda proxy response is used for $default messages to immediately inform
-      # the caller that the request was malformed.
-      # See the matching response section following the integration definition.
       RouteResponseSelectionExpression: $default
       Target: !Join ['/', [integrations, !Ref HttpMaidWebsocketsApiDefaultIntegration]]
 
-  # Lambda proxy integratino for $default route
   HttpMaidWebsocketsApiDefaultIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:
       ApiId: !Ref HttpMaidWebsocketsApi
       IntegrationType: AWS_PROXY
-      # All routes lead to the same Lambda function; it uses the route
-      # provided by API Gateway to determine the right behavior.
       IntegrationUri:
         !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StackIdentifier}-Deployment/invocations
 
   HttpMaidWebsocketsApiDefaultResponse:
-    Type: 'AWS::ApiGatewayV2::RouteResponse'
+    Type: AWS::ApiGatewayV2::RouteResponse
     Properties:
       RouteId: !Ref HttpMaidWebsocketsApiDefaultRoute
       ApiId: !Ref HttpMaidWebsocketsApi
@@ -246,10 +259,6 @@ Resources:
 
   HttpMaidWebsocketsApiDeployment:
     Type: AWS::ApiGatewayV2::Deployment
-    # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-deployment.html for
-    # an explanation on why the routes below are listed as explicit dependencies for
-    # the API's deployment in CloudFormation. This feels like a bug/hack; hopefully AWS
-    # fixes it over time.
     DependsOn:
       - HttpMaidWebsocketsApiDefaultRoute
       - HttpMaidWebsocketsApiConnectRoute
