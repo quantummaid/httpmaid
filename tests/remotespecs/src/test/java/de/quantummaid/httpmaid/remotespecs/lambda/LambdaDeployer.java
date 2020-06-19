@@ -35,12 +35,11 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
 import java.io.File;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.connectToCloudFormation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiHandler.loadHttpApiInformation;
@@ -76,9 +75,8 @@ import static java.util.Optional.ofNullable;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LambdaDeployer implements RemoteSpecsDeployer {
-    private static final String SHARED_STACK_PREFIX = "httpmaid-remotespecs";
+    private static final String SHARED_STACK_PREFIX = "remotespecs";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
-    private static final String BUCKET_NAME = "remotespecs";
     private static final String REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE = "/tests/remotespecs";
     private static final String REST_API_NAME = " RemoteSpecs Rest Api Lambda Proxy";
     private static final String HTTP_V2_PAYLOAD_API_NAME = " RemoteSpecs HTTP Api (Payload Version 2.0) Lambda Proxy";
@@ -105,9 +103,8 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     }
 
     private static String sharedStackIdentifier() {
-        final GetCallerIdentityResponse callerIdentity = StsClient.create().getCallerIdentity();
-        final String accountId = callerIdentity.account();
-        return String.format("%s-%s", SHARED_STACK_PREFIX, accountId);
+        final UUID uuid = UUID.randomUUID();
+        return String.format("%s-%s", SHARED_STACK_PREFIX, uuid);
     }
 
     @Override
@@ -164,9 +161,11 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         if (developerMode) {
             return;
         }
-        deleteAllObjectsInBucket(BUCKET_NAME);
+        final String artifactBucketName = stackIdentifier + "-bucket";
+        deleteAllObjectsInBucket(artifactBucketName);
         try (CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
             cloudFormationHandler.deleteStacksStartingWith(stackIdentifier + "-lambda");
+            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier + "-bucket");
         }
     }
 
