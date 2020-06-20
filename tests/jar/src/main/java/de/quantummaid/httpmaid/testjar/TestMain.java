@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
 
 import static de.quantummaid.httpmaid.undertow.UndertowEndpoint.startUndertowEndpoint;
 
+@SuppressWarnings("java:S106")
 public final class TestMain {
 
     private TestMain() {

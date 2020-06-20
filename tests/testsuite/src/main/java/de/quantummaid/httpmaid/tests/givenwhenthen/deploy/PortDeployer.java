@@ -25,11 +25,12 @@ import de.quantummaid.httpmaid.HttpMaid;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool.freePort;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeploymentResult.portDeploymentResult;
 
+@SuppressWarnings("java:S106")
 public interface PortDeployer extends Deployer {
 
     Deployment deploy(int port, HttpMaid httpMaid);
@@ -53,7 +54,7 @@ public interface PortDeployer extends Deployer {
         throw new IllegalStateException(message, lastException);
     }
 
-    static <T extends AutoCloseable> PortDeploymentResult<T> tryToDeploy(Function<Integer, T> deployFunction) {
+    static <T extends AutoCloseable> PortDeploymentResult<T> tryToDeploy(final IntFunction<T> deployFunction) {
         final List<Exception> exceptions = new LinkedList<>();
         for (int i = 0; i < 3; ++i) {
             final int port = freePort();

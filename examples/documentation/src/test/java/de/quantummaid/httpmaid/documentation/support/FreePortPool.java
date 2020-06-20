@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings("java:S106")
 public final class FreePortPool {
     private static final int START_PORT = 9000;
     private static final int HIGHEST_PORT = 65535;

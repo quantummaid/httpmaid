@@ -42,18 +42,19 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest.FakeRes
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool.freePort;
 import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeAwsDeployer implements PortDeployer {
+public final class FakeRestApiGatewayDeployer implements PortDeployer {
     private FakeRestLambda currentRestLambda;
     private FakeWebsocketLambda currentWebsocketLambda;
 
-    public static Deployer fakeAwsDeployer() {
-        return new FakeAwsDeployer();
+    public static Deployer fakeRestApiGatewayDeployer() {
+        return new FakeRestApiGatewayDeployer();
     }
 
     @Override
@@ -86,12 +87,13 @@ public final class FakeAwsDeployer implements PortDeployer {
 
     @Override
     public String toString() {
-        return "fakeawslambda";
+        return "apiGatewayRest";
     }
 
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(
+                theShittyTestClient(),
                 theRealHttpMaidClient(),
                 theRealHttpMaidClientWithConnectionReuse()
         );

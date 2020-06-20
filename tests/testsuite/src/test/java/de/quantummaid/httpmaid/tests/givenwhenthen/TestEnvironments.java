@@ -28,7 +28,8 @@ import java.util.List;
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployers;
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployersWithOnlyShittyClient;
 import static de.quantummaid.httpmaid.tests.deployers.bypassed.BypassedDeployer.bypassedDeployer;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeAwsDeployer.fakeAwsDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadDeployer.fakeHttpApiGatewayV2PayloadDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayDeployer.fakeRestApiGatewayDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jsr356ontyrus.Jsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.undertow.UndertowDeployer.undertowDeployer;
@@ -48,7 +49,8 @@ public final class TestEnvironments {
     public static List<TestEnvironment> websocketEnvironments() {
         final List<Deployer> deployers = List.of(
                 bypassedDeployer(),
-                fakeAwsDeployer(),
+                fakeRestApiGatewayDeployer(),
+                fakeHttpApiGatewayV2PayloadDeployer(),
                 programmaticJsr356OnTyrusDeployer(),
                 jeeOnUndertowDeployer(),
                 undertowDeployer()

@@ -44,7 +44,7 @@ public final class RestoreWebsocketContextInformationProcessor implements Proces
 
     @Override
     public void apply(final MetaData metaData) {
-        final Boolean isWebsocketMessage = metaData.getOptional(REQUEST_TYPE)
+        final boolean isWebsocketMessage = metaData.getOptional(REQUEST_TYPE)
                 .map(WEBSOCKET_MESSAGE::equals)
                 .orElse(false);
         if (isWebsocketMessage) {

@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 
+@SuppressWarnings("java:S1192")
 public final class HttpMaidFactory {
 
     private HttpMaidFactory() {

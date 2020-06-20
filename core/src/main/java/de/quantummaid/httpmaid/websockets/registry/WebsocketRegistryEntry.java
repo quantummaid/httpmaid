@@ -49,11 +49,11 @@ public final class WebsocketRegistryEntry {
     private final ContentType contentType;
     private final QueryParameters queryParameters;
 
-    private static WebsocketRegistryEntry websocketRegistryEntry(final ConnectionInformation connectionInformation,
-                                                                 final WebsocketSenderId senderId,
-                                                                 final Headers headers,
-                                                                 final ContentType contentType,
-                                                                 final QueryParameters queryParameters) {
+    public static WebsocketRegistryEntry websocketRegistryEntry(final ConnectionInformation connectionInformation,
+                                                                final WebsocketSenderId senderId,
+                                                                final Headers headers,
+                                                                final ContentType contentType,
+                                                                final QueryParameters queryParameters) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(senderId, "senderId");
         validateNotNull(headers, "headers");

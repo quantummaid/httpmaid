@@ -36,6 +36,7 @@ public final class ApiGatewayUtils {
     public static void addBodyToEvent(final InputStream bodyStream, final Map<String, Object> event) {
         final String body = inputStreamToString(bodyStream);
         if (body.isEmpty()) {
+            event.put("body", null);
             event.put("isBase64Encoded", false);
         } else {
             final String encodedBody = encodeBase64(body);

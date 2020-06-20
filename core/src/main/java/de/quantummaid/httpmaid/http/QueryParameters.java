@@ -75,8 +75,7 @@ public final class QueryParameters {
     }
 
     private static String decode(final String s) {
-        final String decoded = URLDecoder.decode(s, UTF_8);
-        return decoded;
+        return URLDecoder.decode(s, UTF_8);
     }
 
     public String parameter(final String name) {

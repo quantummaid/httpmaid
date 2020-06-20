@@ -103,7 +103,8 @@ public final class FakeHttpLambda implements AutoCloseable {
         event.put("headers", headers);
         event.put("cookies", cookies);
 
-        event.put("rawQueryString", requestURI.getRawQuery());
+        final String rawQuery = Optional.ofNullable(requestURI.getRawQuery()).orElse("");
+        event.put("rawQueryString", rawQuery);
 
         addBodyToEvent(exchange.getRequestBody(), event);
         return event;

@@ -42,6 +42,7 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.httpapi.Fake
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory.theShittyTestClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool.freePort;
 import static java.util.Arrays.asList;
@@ -92,6 +93,7 @@ public final class FakeHttpApiGatewayV2PayloadDeployer implements PortDeployer {
     @Override
     public List<ClientFactory> supportedClients() {
         return asList(
+                theShittyTestClient(),
                 theRealHttpMaidClient(),
                 theRealHttpMaidClientWithConnectionReuse()
         );

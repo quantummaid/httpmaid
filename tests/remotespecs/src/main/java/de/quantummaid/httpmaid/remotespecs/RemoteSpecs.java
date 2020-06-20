@@ -106,9 +106,6 @@ public interface RemoteSpecs {
                                 "otherparam", List.of("othervalue")));
     }
 
-    // TODO header with comma
-    // TODO cookies with more information (lifetime, etc.)
-
     @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()

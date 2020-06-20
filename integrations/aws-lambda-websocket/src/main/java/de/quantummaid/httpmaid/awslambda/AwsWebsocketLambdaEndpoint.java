@@ -43,6 +43,7 @@ import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformatio
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 
 @ToString
@@ -66,23 +67,23 @@ public final class AwsWebsocketLambdaEndpoint {
     }
 
     private Map<String, Object> handleWebsocketRequest(final AwsLambdaEvent event) {
-        final String eventType = event.getFromContext("eventType");
-        final String connectionId = event.getFromContext("connectionId");
-        final String stage = event.getFromContext("stage");
-        final String apiId = event.getFromContext("apiId");
-        final String domainName = event.getFromContext("domainName");
+        final AwsLambdaEvent requestContext = event.getMap("requestContext");
+        final String eventType = requestContext.getAsString("eventType");
+        final String connectionId = requestContext.getAsString("connectionId");
+        final String stage = requestContext.getAsString("stage");
+        final String apiId = requestContext.getAsString("apiId");
+        final String domainName = requestContext.getAsString("domainName");
         final String region = extractRegionFromDomain(domainName);
         final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
         if (CONNECT_EVENT_TYPE.equals(eventType)) {
             handleConnect(event, connectionInformation);
             return emptyMap();
         } else if (DISCONNECT_EVENT_TYPE.equals(eventType)) {
-            httpMaid.handleWebsocketDisconnect();
             return emptyMap();
         } else if (MESSAGE_EVENT_TYPE.equals(eventType)) {
             return handleMessage(event, connectionInformation);
         } else {
-            throw new UnsupportedOperationException(String.format("Unsupported lambda event type '%s' with event '%s'", eventType, event));
+            throw new UnsupportedOperationException(format("Unsupported lambda event type '%s' with event '%s'", eventType, event));
         }
     }
 
@@ -106,7 +107,7 @@ public final class AwsWebsocketLambdaEndpoint {
     }
 
     private Map<String, Object> handleMessage(final AwsLambdaEvent event,
-                                                       final ConnectionInformation connectionInformation) {
+                                              final ConnectionInformation connectionInformation) {
         return httpMaid.handleRequestSynchronously(() -> {
             final String body = event.getAsString("body");
             return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body);

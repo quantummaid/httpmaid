@@ -21,17 +21,33 @@
 
 package de.quantummaid.httpmaid.awslambda;
 
-public final class EmptyLambdaEventException extends IllegalArgumentException {
+import java.util.Map;
 
-    private EmptyLambdaEventException(final String message) {
+public final class LambdaEventException extends IllegalArgumentException {
+
+    private LambdaEventException(final String message) {
         super(message);
     }
 
-    public static EmptyLambdaEventException emptyLambdaEventException() {
+    public static LambdaEventException emptyLambdaEventException() {
         final String message = "Lambda event must not be empty. " +
                 "Please check the way this lambda has been deployed. " +
                 "If it is an HTTP lambda, make sure it is integrated in API Gateway " +
                 "as type 'LAMBDA_PROXY' (not 'LAMBDA').";
-        return new EmptyLambdaEventException(message);
+        return new LambdaEventException(message);
+    }
+
+    public static LambdaEventException unknownKeyException(final String key, final Map<String, Object> map) {
+        final String message = String.format("Can't find key '%s' in lambda event %s", key, map);
+        return new LambdaEventException(message);
+    }
+
+    public static LambdaEventException wrongTypeException(final String key,
+                                                          final Class<?> expectedType,
+                                                          final Object actualValue,
+                                                          final Map<String, Object> event) {
+        final String message = String.format("Expected lambda event field '%s' to be of type '%s' but was '%s'. Whole event: %s",
+                key, expectedType.getSimpleName(), actualValue, event);
+        return new LambdaEventException(message);
     }
 }

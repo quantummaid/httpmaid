@@ -44,16 +44,15 @@ public final class HttpApiHandler {
     private HttpApiHandler() {
     }
 
-    @SuppressWarnings("unchecked")
     static Map<String, Object> handleHttpApiRequest(final AwsLambdaEvent event,
                                                     final HttpMaid httpMaid) {
         return httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
-            final Map<String, Object> requestContext = event.getMap("requestContext");
-            final Map<String, Object> httpInformation = (Map<String, Object>) requestContext.get("http");
-            final String httpRequestMethod = (String) httpInformation.get("method");
+            final AwsLambdaEvent requestContext = event.getMap("requestContext");
+            final AwsLambdaEvent httpInformation = requestContext.getMap("http");
+            final String httpRequestMethod = httpInformation.getAsString("method");
             builder.withMethod(httpRequestMethod);
-            final String path = (String) httpInformation.get("path");
+            final String path = httpInformation.getAsString("path");
             builder.withPath(path);
 
             final Map<String, String> headers = event.getOrDefault("headers", LinkedHashMap::new);

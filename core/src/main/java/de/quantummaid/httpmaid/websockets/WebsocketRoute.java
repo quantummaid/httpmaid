@@ -44,7 +44,7 @@ public final class WebsocketRoute implements GenerationCondition {
 
     @Override
     public boolean generate(final MetaData metaData) {
-        final Boolean websocket = metaData.getOptional(REQUEST_TYPE)
+        final boolean websocket = metaData.getOptional(REQUEST_TYPE)
                 .map(WEBSOCKET_MESSAGE::equals)
                 .orElse(false);
         if (!websocket) {

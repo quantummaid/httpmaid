@@ -81,9 +81,8 @@ public final class UndertowHandler implements HttpHandler {
             httpServerExchange.setStatusCode(status);
 
             final HeaderMap responseHeaders = httpServerExchange.getResponseHeaders();
-            response.headers().forEach((name, values) -> {
-                responseHeaders.putAll(HttpString.tryFromString(name), values);
-            });
+            response.headers().forEach((name, values) ->
+                    responseHeaders.putAll(HttpString.tryFromString(name), values));
 
             final OutputStream outputStream = httpServerExchange.getOutputStream();
             response.streamBodyToOutputStream(outputStream);

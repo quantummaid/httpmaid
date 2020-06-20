@@ -144,8 +144,8 @@ public final class Then {
             final JSONObject actual = new JSONObject(actualJsonMap);
             final JSONObject expected = new JSONObject(expectedJsonMap);
             JSONAssert.assertEquals(expected, actual, true);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new UnsupportedOperationException(e);
         } catch (AssertionError e) {
             assertThat(String.format("JSONAssert.assertEquals() failed: %s", e.getMessage()),
                     actualResponseBody, is(expectedJsonMap));

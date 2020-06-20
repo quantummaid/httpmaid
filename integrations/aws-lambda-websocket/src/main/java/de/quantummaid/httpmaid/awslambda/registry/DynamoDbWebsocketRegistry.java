@@ -27,7 +27,6 @@ import de.quantummaid.httpmaid.http.Header;
 import de.quantummaid.httpmaid.http.QueryParameter;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
-import de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
@@ -50,22 +49,24 @@ import static de.quantummaid.httpmaid.http.QueryParameter.queryParameter;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
-import static de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry.inMemoryRegistry;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.restoreFromStrings;
 import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S1192")
 public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
     private static final String TABLE_NAME = "WebsocketsTest";
     private final Repository repository;
-    private final InMemoryRegistry inMemoryRegistry;
+
+    public static DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry(final Repository repository) {
+        return new DynamoDbWebsocketRegistry(repository);
+    }
 
     public static DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry() {
         final Repository repository = dynamoDbRepository(TABLE_NAME, "id");
-        final InMemoryRegistry inMemoryRegistry = inMemoryRegistry();
-        return new DynamoDbWebsocketRegistry(repository, inMemoryRegistry);
+        return dynamoDbWebsocketRegistry(repository);
     }
 
     @Override

@@ -139,7 +139,6 @@ public final class HttpRequest {
     public SerializingSender<Object> websockets() {
         final WebsocketSenders websocketSenders = metaData.get(WEBSOCKET_SENDERS);
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
-        final SerializingSender<Object> serializingSender = serializingSender(websocketRegistry, websocketSenders);
-        return serializingSender;
+        return serializingSender(websocketRegistry, websocketSenders);
     }
 }
