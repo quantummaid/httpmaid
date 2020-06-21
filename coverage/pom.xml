@@ -128,6 +128,11 @@
             <artifactId>remotespecs-instance</artifactId>
             <version>0.9.68</version>
         </dependency>
+        <dependency>
+            <groupId>de.quantummaid.httpmaid.tests</groupId>
+            <artifactId>websocketregistry</artifactId>
+            <version>0.9.68</version>
+        </dependency>
     </dependencies>
 
     <build>

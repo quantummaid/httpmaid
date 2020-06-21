@@ -19,47 +19,36 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.unittests.websocketregistry;
+package de.quantummaid.httpmaid.websocketregistryspecs.testsupport;
 
-import de.quantummaid.httpmaid.awslambda.repository.Repository;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class InMemoryRepository implements Repository {
-    private final Map<String, Map<String, Object>> map;
+public final class WebsocketRegistryDeployment {
+    private final WebsocketRegistry websocketRegistry;
+    private final Runnable closer;
 
-    public static Repository inMemoryRepository() {
-        return new InMemoryRepository(new LinkedHashMap<>());
+    public static WebsocketRegistryDeployment websocketRegistryDeployment(final WebsocketRegistry websocketRegistry,
+                                                                          final Runnable closer) {
+        return new WebsocketRegistryDeployment(websocketRegistry, closer);
     }
 
-    @Override
-    public void store(final String key, final Map<String, Object> value) {
-        map.put(key, value);
+    public static WebsocketRegistryDeployment websocketRegistryDeployment(final WebsocketRegistry websocketRegistry) {
+        return new WebsocketRegistryDeployment(websocketRegistry, () -> {
+        });
     }
 
-    @Override
-    public void delete(final String key) {
-        map.remove(key);
+    public WebsocketRegistry websocketRegistry() {
+        return websocketRegistry;
     }
 
-    @Override
-    public Map<String, Object> load(final String key) {
-        return map.get(key);
-    }
-
-    @Override
-    public List<Map<String, Object>> loadAll() {
-        return new ArrayList<>(map.values());
-    }
-
-    @Override
     public void close() {
-        // do nothing
+        closer.run();
     }
 }

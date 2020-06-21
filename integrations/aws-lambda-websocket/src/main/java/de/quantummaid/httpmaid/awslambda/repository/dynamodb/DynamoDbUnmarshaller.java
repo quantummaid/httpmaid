@@ -26,25 +26,27 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
+
 public final class DynamoDbUnmarshaller {
 
     private DynamoDbUnmarshaller() {
     }
 
-    public static Map<String, Object> unmarshallMap(final Map<String, AttributeValue> input) {
+    public static Map<String, Object> unmarshalMap(final Map<String, AttributeValue> input) {
         final Map<String, Object> result = new HashMap<>(input.size());
         input.keySet().forEach(key -> {
             final AttributeValue attributeValue = input.get(key);
-            final Object value = multiplex(attributeValue);
+            final Object value = unmarshal(attributeValue);
             result.put(key, value);
         });
         return result;
     }
 
-    private static Object multiplex(final AttributeValue attributeValue) {
+    private static Object unmarshal(final AttributeValue attributeValue) {
         if (attributeValue.hasM()) {
             final Map<String, AttributeValue> map = attributeValue.m();
-            return unmarshallMap(map);
+            return unmarshalMap(map);
         }
         final Boolean nul = attributeValue.nul();
         if (nul != null && nul) {
@@ -53,6 +55,11 @@ public final class DynamoDbUnmarshaller {
         if (attributeValue.s() != null) {
             return attributeValue.s();
         }
-        throw new UnsupportedOperationException();
+        if (attributeValue.l() != null) {
+            return attributeValue.l().stream()
+                    .map(DynamoDbUnmarshaller::unmarshal)
+                    .collect(toList());
+        }
+        throw new UnsupportedOperationException("Unable to unmarshal from: " + attributeValue);
     }
 }

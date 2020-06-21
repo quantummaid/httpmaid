@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs;
+package de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory;
 
 import java.io.File;
 

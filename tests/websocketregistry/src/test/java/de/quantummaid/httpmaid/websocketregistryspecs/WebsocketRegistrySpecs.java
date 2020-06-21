@@ -19,9 +19,9 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.unittests.websocketregistry;
+package de.quantummaid.httpmaid.websocketregistryspecs;
 
-import de.quantummaid.httpmaid.awslambda.repository.Repository;
+import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryDeployment;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
@@ -29,32 +29,23 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
-import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.http.Headers.headers;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
-import static de.quantummaid.httpmaid.tests.unittests.websocketregistry.InMemoryRepository.inMemoryRepository;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.websocketRegistryEntry;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public final class WebsocketRegistrySpecs {
+public interface WebsocketRegistrySpecs {
 
-    private static WebsocketRegistry websocketRegistry() {
-        final Repository repository = inMemoryRepository();
-        return dynamoDbWebsocketRegistry(repository);
-    }
+    WebsocketRegistryDeployment websocketRegistry();
 
-    private static ConnectionInformation connectionInformation() {
-        return awsWebsocketConnectionInformation("a", "b", "c", "d");
-    }
+    ConnectionInformation connectionInformation();
 
     @Test
-    public void individualConnectionCanBeQueried() {
-        final WebsocketRegistry websocketRegistry = websocketRegistry();
+    default void individualConnectionCanBeQueried(final WebsocketRegistry websocketRegistry) {
         final ConnectionInformation connectionInformation = connectionInformation();
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
@@ -69,8 +60,7 @@ public final class WebsocketRegistrySpecs {
     }
 
     @Test
-    public void allConnectionsCanBeQueried() {
-        final WebsocketRegistry websocketRegistry = websocketRegistry();
+    default void allConnectionsCanBeQueried(final WebsocketRegistry websocketRegistry) {
         final ConnectionInformation connectionInformation = connectionInformation();
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,

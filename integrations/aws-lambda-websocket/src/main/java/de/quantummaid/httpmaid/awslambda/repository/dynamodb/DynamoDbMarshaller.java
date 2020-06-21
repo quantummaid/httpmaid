@@ -24,7 +24,10 @@ package de.quantummaid.httpmaid.awslambda.repository.dynamodb;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 public final class DynamoDbMarshaller {
 
@@ -51,7 +54,10 @@ public final class DynamoDbMarshaller {
         if (object instanceof Map) {
             return marshalMap((Map<String, Object>) object);
         }
-        throw new UnsupportedOperationException();
+        if (object instanceof List) {
+            return marshalList((List<Object>) object);
+        }
+        throw new UnsupportedOperationException("Unable to marshal object of type: " + object.getClass().getSimpleName());
     }
 
     private static AttributeValue marshalString(final String string) {
@@ -64,6 +70,15 @@ public final class DynamoDbMarshaller {
         final Map<String, AttributeValue> attributeValueMap = marshalTopLevelMap(map);
         return AttributeValue.builder()
                 .m(attributeValueMap)
+                .build();
+    }
+
+    private static AttributeValue marshalList(final List<Object> list) {
+        final List<AttributeValue> attributeValues = list.stream()
+                .map(DynamoDbMarshaller::marshal)
+                .collect(toList());
+        return AttributeValue.builder()
+                .l(attributeValues)
                 .build();
     }
 
