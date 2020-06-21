@@ -21,6 +21,9 @@
 
 package de.quantummaid.httpmaid.websocketregistryspecs;
 
+import de.quantummaid.httpmaid.http.Header;
+import de.quantummaid.httpmaid.http.QueryParameter;
+import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryDeployment;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -29,9 +32,14 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static de.quantummaid.httpmaid.http.Header.header;
+import static de.quantummaid.httpmaid.http.HeaderName.headerName;
+import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
 import static de.quantummaid.httpmaid.http.Headers.headers;
+import static de.quantummaid.httpmaid.http.QueryParameter.queryParameter;
+import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
+import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
-import static de.quantummaid.httpmaid.http.headers.ContentType.json;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.websocketRegistryEntry;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 import static java.util.Collections.emptyList;
@@ -50,13 +58,31 @@ public interface WebsocketRegistrySpecs {
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
                 websocketSenderId("foo"),
-                headers(emptyList()),
-                json(),
-                queryParameters(emptyList())
+                headers(List.of(header(headerName("header-name"), headerValue("header-value")))),
+                ContentType.json(),
+                queryParameters(List.of(
+                        queryParameter(queryParameterName("query-name"),
+                                queryParameterValue("query-value"))
+                        )
+                )
         );
         websocketRegistry.addConnection(entry);
         final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
         assertThat(queriedEntry.getSenderId().asString(), is("foo"));
+
+        assertThat(queriedEntry.contentType(), is(ContentType.json()));
+
+        final List<Header> headerList = queriedEntry.headers().asList();
+        assertThat(headerList.size(), is(1));
+        final Header header = headerList.get(0);
+        assertThat(header.name().stringValue(), is("header-name"));
+        assertThat(header.value().stringValue(), is("header-value"));
+
+        final List<QueryParameter> queryParameterList = queriedEntry.queryParameters().asList();
+        assertThat(queryParameterList.size(), is(1));
+        final QueryParameter queryParameter = queryParameterList.get(0);
+        assertThat(queryParameter.name().stringValue(), is("query-name"));
+        assertThat(queryParameter.value().stringValue(), is("query-value"));
     }
 
     @Test
@@ -66,7 +92,7 @@ public interface WebsocketRegistrySpecs {
                 connectionInformation,
                 websocketSenderId("foo"),
                 headers(emptyList()),
-                json(),
+                ContentType.json(),
                 queryParameters(emptyList())
         );
         websocketRegistry.addConnection(entry);
