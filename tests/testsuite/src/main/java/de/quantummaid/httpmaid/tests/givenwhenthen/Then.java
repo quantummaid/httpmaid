@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import com.google.gson.Gson;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -160,5 +161,14 @@ public final class Then {
 
     public Then aWebsocketMessageHasBeenReceivedWithContent(final String content) {
         return theCheckpointHasBeenVisited(content);
+    }
+
+    public Then aWebsocketMessageHasBeenReceivedWithJsonContent(final Map<String, Object> content) {
+        final boolean visited = testData.getCheckpoints().checkpointHasBeenVisited(value -> {
+            final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
+            return content.equals(actual);
+        });
+        assertThat(visited, is(true));
+        return this;
     }
 }

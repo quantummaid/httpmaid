@@ -50,7 +50,6 @@ public final class WebsocketQueryParameterSpecs {
                 .aWebsocketMessageHasBeenReceivedWithContent("value+1 %ü");
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource(WEBSOCKET_ENVIRONMENTS)
     public void websocketsAccessMultiValuedQueryStringParameterInExplodedForm(final TestEnvironment testEnvironment) {
@@ -68,6 +67,9 @@ public final class WebsocketQueryParameterSpecs {
                 )
         ), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("{\"otherparam\":[\"othervalue\"],\"param1\":[\"value1\",\"value2\"]}");
+                .aWebsocketMessageHasBeenReceivedWithJsonContent(Map.of(
+                        "otherparam", List.of("othervalue"),
+                        "param1", List.of("value1", "value2")
+                ));
     }
 }

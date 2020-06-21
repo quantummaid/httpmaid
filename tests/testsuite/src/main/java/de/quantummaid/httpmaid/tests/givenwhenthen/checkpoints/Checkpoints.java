@@ -28,6 +28,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
 
@@ -45,11 +46,15 @@ public final class Checkpoints {
         checkpoints.add(checkpoint);
     }
 
-    private synchronized boolean hasCheckpointBeenVisited(final String checkpoint) {
-        return checkpoints.contains(checkpoint);
+    private synchronized boolean hasCheckpointBeenVisited(final Predicate<String> checker) {
+        return checkpoints.stream().anyMatch(checker);
     }
 
     public boolean checkpointHasBeenVisited(final String checkpoint) {
-        return pollWithTimeout(() -> hasCheckpointBeenVisited(checkpoint));
+        return checkpointHasBeenVisited(checkpoint::equals);
+    }
+
+    public boolean checkpointHasBeenVisited(final Predicate<String> checker) {
+        return pollWithTimeout(() -> hasCheckpointBeenVisited(checker));
     }
 }

@@ -26,7 +26,6 @@ import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.http.PathParameters;
 import de.quantummaid.httpmaid.path.Path;
 import de.quantummaid.httpmaid.path.PathTemplate;
-import de.quantummaid.httpmaid.util.Validators;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -36,30 +35,22 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
-import static de.quantummaid.httpmaid.http.HttpRequestMethod.*;
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
+import static de.quantummaid.httpmaid.util.Validators.validateArrayNeitherNullNorEmptyNorContainsNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Arrays.stream;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathAndMethodGenerationCondition implements GenerationCondition {
-    private static final List<HttpRequestMethod> METHOD_WHITELIST = asList(GET, POST, PUT, DELETE);
-
     private final PathTemplate pathTemplate;
     private final HttpRequestMethod[] methods;
 
     public static PathAndMethodGenerationCondition pathAndMethodEventTypeGenerationCondition(
             final PathTemplate pathTemplate,
             final HttpRequestMethod... methods) {
-        Validators.validateNotNull(pathTemplate, "pathTemplate");
-        Validators.validateArrayNeitherNullNorEmptyNorContainsNull(methods, "methods");
-        stream(methods).forEach(method -> {
-            if (!METHOD_WHITELIST.contains(method)) {
-                throw new IllegalArgumentException(format("Use cases cannot be registered on the %s method.", method.name()));
-            }
-        });
+        validateNotNull(pathTemplate, "pathTemplate");
+        validateArrayNeitherNullNorEmptyNorContainsNull(methods, "methods");
         return new PathAndMethodGenerationCondition(pathTemplate, methods);
     }
 
@@ -70,7 +61,7 @@ public final class PathAndMethodGenerationCondition implements GenerationConditi
 
     @Override
     public boolean isSubsetOf(final GenerationCondition other) {
-        Validators.validateNotNull(other, "other");
+        validateNotNull(other, "other");
         return equals(other);
     }
 

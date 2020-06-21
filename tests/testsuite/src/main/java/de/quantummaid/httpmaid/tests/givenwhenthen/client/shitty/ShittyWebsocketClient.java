@@ -48,7 +48,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings("java:S2095")
+@SuppressWarnings({"java:S2095", "java:S112"})
 public final class ShittyWebsocketClient extends Endpoint implements MessageHandler.Whole<String>, Closeable {
     private final Consumer<String> responseHandler;
     private final CountDownLatch connectLatch = new CountDownLatch(1);
@@ -79,10 +79,10 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
             }
             return shittyWebsocketClient;
         } catch (final URISyntaxException | IOException | DeploymentException e) {
-            throw new UnsupportedOperationException(format("Exception during connect to %s", fullUri), e);
+            throw new RuntimeException(format("Exception during connect to %s", fullUri), e);
         } catch (final InterruptedException e) {
             currentThread().interrupt();
-            throw new UnsupportedOperationException(format("Interrupted during wait for connect to %s", fullUri));
+            throw new RuntimeException(format("Interrupted during wait for connect to %s", fullUri));
         }
     }
 

@@ -31,6 +31,7 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static de.quantummaid.httpmaid.http.Header.header;
 import static de.quantummaid.httpmaid.http.HeaderName.headerName;
@@ -100,5 +101,23 @@ public interface WebsocketRegistrySpecs {
         assertThat(connections.size(), is(1));
         final WebsocketRegistryEntry queriedEntry = connections.get(0);
         assertThat(queriedEntry.getSenderId().asString(), is("foo"));
+    }
+
+    @Test
+    default void contentTypeOfConnectionCanBeEmpty(final WebsocketRegistry websocketRegistry) {
+        final ConnectionInformation connectionInformation = connectionInformation();
+        final WebsocketRegistryEntry entry = websocketRegistryEntry(
+                connectionInformation,
+                websocketSenderId("foo"),
+                headers(List.of()),
+                ContentType.fromString(Optional.empty()),
+                queryParameters(List.of()
+                )
+        );
+        websocketRegistry.addConnection(entry);
+        final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
+        assertThat(queriedEntry.getSenderId().asString(), is("foo"));
+
+        assertThat(queriedEntry.contentType(), is(ContentType.fromString(Optional.empty())));
     }
 }
