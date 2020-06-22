@@ -19,16 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambda;
+package de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory;
 
-public final class AwsLambdaEventKeys {
-    public static final String REQUEST_CONTEXT = "requestContext";
-    public static final String HTTP_METHOD = "httpMethod";
-    public static final String PATH = "path";
-    public static final String MULTIVALUE_HEADERS = "multiValueHeaders";
-    public static final String QUERY_STRING_PARAMETERS = "multiValueQueryStringParameters";
-    public static final String BODY = "body";
-
-    private AwsLambdaEventKeys() {
+public class BaseDirectoryNotFoundException extends RuntimeException {
+    public BaseDirectoryNotFoundException(final String file) {
+        super(file);
     }
 }

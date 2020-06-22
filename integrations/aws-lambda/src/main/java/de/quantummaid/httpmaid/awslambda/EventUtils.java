@@ -22,26 +22,32 @@
 package de.quantummaid.httpmaid.awslambda;
 
 import java.util.Base64;
+import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.BODY;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-final class EventUtils {
+public final class EventUtils {
 
     private EventUtils() {
     }
 
+    @SuppressWarnings("unchecked")
+    public static boolean isWebSocketRequest(final Map<String, Object> event) {
+        final Map<String, Object> context = (Map<String, Object>) event.get("requestContext");
+        return context.containsKey("connectionId");
+    }
+
     static String extractPotentiallyEncodedBody(final AwsLambdaEvent event) {
-        final String rawBody = event.getAsString(BODY);
-        if (rawBody == null) {
-            return "";
-        }
-        final Boolean isBase64Encoded = event.getAsBoolean("isBase64Encoded");
-        if (isBase64Encoded) {
-            return decodeBase64(rawBody);
-        } else {
-            return rawBody;
-        }
+        return event.getAsOptionalString("body")
+                .map(rawBody -> {
+                    final boolean isBase64Encoded = event.getAsBoolean("isBase64Encoded");
+                    if (isBase64Encoded) {
+                        return decodeBase64(rawBody);
+                    } else {
+                        return rawBody;
+                    }
+                })
+                .orElse("");
     }
 
     private static String decodeBase64(final String encoded) {

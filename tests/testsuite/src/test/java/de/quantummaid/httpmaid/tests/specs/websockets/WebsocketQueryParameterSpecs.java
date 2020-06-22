@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.tests.specs.websockets;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -31,12 +30,12 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT;
 
 public final class WebsocketQueryParameterSpecs {
 
-    @Disabled
     @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    @MethodSource(WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT)
     public void websocketsAccessQueryParameters(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid()
                 .websocket("handler", (request, response) -> {
@@ -50,7 +49,6 @@ public final class WebsocketQueryParameterSpecs {
                 .aWebsocketMessageHasBeenReceivedWithContent("value+1 %ü");
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource(WEBSOCKET_ENVIRONMENTS)
     public void websocketsAccessMultiValuedQueryStringParameterInExplodedForm(final TestEnvironment testEnvironment) {
@@ -68,6 +66,9 @@ public final class WebsocketQueryParameterSpecs {
                 )
         ), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("{\"otherparam\":[\"othervalue\"],\"param1\":[\"value1\",\"value2\"]}");
+                .aWebsocketMessageHasBeenReceivedWithJsonContent(Map.of(
+                        "otherparam", List.of("othervalue"),
+                        "param1", List.of("value1", "value2")
+                ));
     }
 }

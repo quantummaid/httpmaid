@@ -25,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S1192")
 public enum ApiBaseUrlProtocol {
     HTTP("http", "http"),
     HTTPS("https", "https"),

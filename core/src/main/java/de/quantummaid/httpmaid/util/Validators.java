@@ -35,17 +35,18 @@ public final class Validators {
     }
 
     public static void validateNotNullNorEmpty(final String value, final String name) {
-        if (value == null || value.trim().isEmpty()) {
+        validateNotNull(value, name);
+        if (value.trim().isEmpty()) {
             throw customTypeValidationException(name + " must not be empty");
         }
     }
 
     public static <T> void validateArrayNeitherNullNorEmptyNorContainsNull(final T[] array, final String name) {
         validateNotNull(array, name);
-        if(array.length == 0) {
+        if (array.length == 0) {
             throw customTypeValidationException(name + " must not be empty");
         }
-        for(int i = 0; i < array.length; ++i) {
+        for (int i = 0; i < array.length; ++i) {
             validateNotNull(array[i], name + "[" + i + "]");
         }
     }

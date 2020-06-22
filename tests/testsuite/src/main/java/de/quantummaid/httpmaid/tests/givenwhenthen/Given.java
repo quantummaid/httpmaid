@@ -35,6 +35,7 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.TestData.testData;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints.checkpoints;
 
 @RequiredArgsConstructor
+@SuppressWarnings("java:S1181")
 public final class Given {
     private final HttpMaidSupplier httpMaidSupplier;
     private final Deployer deployer;

@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import static java.lang.Thread.currentThread;
 
@@ -32,9 +32,9 @@ public final class Poller {
     private Poller() {
     }
 
-    public static boolean pollWithTimeout(final Supplier<Boolean> condition) {
+    public static boolean pollWithTimeout(final BooleanSupplier condition) {
         for (int i = 0; i < WAIT_TIME; ++i) {
-            final Boolean conditionHasBeenFullfilled = condition.get();
+            final boolean conditionHasBeenFullfilled = condition.getAsBoolean();
             if (conditionHasBeenFullfilled) {
                 return true;
             }

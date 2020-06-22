@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda;
 
-import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory.BaseDirectoryFinder;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;

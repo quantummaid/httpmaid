@@ -19,19 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambda;
+package de.quantummaid.httpmaid.websocketregistryspecs.localdynamodb;
 
-public final class EmptyLambdaEventException extends IllegalArgumentException {
+public final class LocalDynamoDbException extends RuntimeException {
 
-    private EmptyLambdaEventException(final String message) {
-        super(message);
+    private LocalDynamoDbException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
-    public static EmptyLambdaEventException emptyLambdaEventException() {
-        final String message = "Lambda event must not be empty. " +
-                "Please check the way this lambda has been deployed. " +
-                "If it is an HTTP lambda, make sure it is integrated in API Gateway " +
-                "as type 'LAMBDA_PROXY' (not 'LAMBDA').";
-        return new EmptyLambdaEventException(message);
+    public static LocalDynamoDbException localDynamoDbException(final String message, final Throwable cause) {
+        return new LocalDynamoDbException(message, cause);
     }
 }

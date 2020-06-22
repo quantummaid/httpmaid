@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import com.google.gson.Gson;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -144,8 +145,8 @@ public final class Then {
             final JSONObject actual = new JSONObject(actualJsonMap);
             final JSONObject expected = new JSONObject(expectedJsonMap);
             JSONAssert.assertEquals(expected, actual, true);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new UnsupportedOperationException(e);
         } catch (AssertionError e) {
             assertThat(String.format("JSONAssert.assertEquals() failed: %s", e.getMessage()),
                     actualResponseBody, is(expectedJsonMap));
@@ -160,5 +161,14 @@ public final class Then {
 
     public Then aWebsocketMessageHasBeenReceivedWithContent(final String content) {
         return theCheckpointHasBeenVisited(content);
+    }
+
+    public Then aWebsocketMessageHasBeenReceivedWithJsonContent(final Map<String, Object> content) {
+        final boolean visited = testData.getCheckpoints().checkpointHasBeenVisited(value -> {
+            final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
+            return content.equals(actual);
+        });
+        assertThat(visited, is(true));
+        return this;
     }
 }

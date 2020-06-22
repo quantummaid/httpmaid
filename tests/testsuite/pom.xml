@@ -41,7 +41,8 @@
             ${project.basedir}/src/test/spotbugs/spotbugs-exclude.xml
         </spotbugs.excludeFilterFile>
         <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
-        <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
@@ -168,7 +169,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-lambda</artifactId>
-            <version>1.11.806</version>
+            <version>1.11.807</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -185,7 +186,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.11.806</version>
+            <version>1.11.807</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -226,7 +227,6 @@
             <version>9.4.30.v20200611</version>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>

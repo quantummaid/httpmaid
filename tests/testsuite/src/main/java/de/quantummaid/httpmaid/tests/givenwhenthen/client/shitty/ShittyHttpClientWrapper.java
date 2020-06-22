@@ -51,6 +51,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.URISyntaxException;
@@ -127,7 +128,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
             final String responseBody = inputStreamToString(response.getEntity().getContent());
             return httpClientResponse(statusCode, responseHeaders, responseBody);
         } catch (final IOException | HttpException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -137,8 +138,8 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
             request.queryStringParameters.forEach(
                     parameter -> uriBuilder.addParameter(parameter.name(), parameter.value()));
             return uriBuilder.build().toASCIIString();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+        } catch (final URISyntaxException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
@@ -148,7 +149,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
             try {
                 req.setEntity(new StringEntity(body));
             } catch (final UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+                throw new IllegalArgumentException(e);
             }
         });
     }
@@ -170,7 +171,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                         final StringBody stringBody = new StringBody(part.content());
                         multipartEntityBuilder.addPart(new FormBodyPart(part.controlName(), stringBody));
                     } catch (UnsupportedEncodingException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalArgumentException(e);
                     }
                 }
             }
@@ -216,11 +217,12 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
                     "TLS_DHE_DSS_WITH_AES_256_CBC_SHA"});
             return socket;
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
     @Override
     public void close() {
+        // nothing to do
     }
 }

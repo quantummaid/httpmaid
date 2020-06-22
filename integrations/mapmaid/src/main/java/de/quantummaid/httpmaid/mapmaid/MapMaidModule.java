@@ -47,7 +47,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.RECIPES;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidMarshallingMapper.mapMaidMarshallingMapper;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidValidationExceptionMapper.mapMaidValidationExceptionMapper;
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.UseCaseClassScanner.addAllReferencedClassesIn;
@@ -106,7 +105,8 @@ public final class MapMaidModule implements ChainModule {
             final Map<ResolvedType, MethodParameterDeserializationWrapper> deserializationWrappers =
                     addAllReferencedClassesIn(useCaseMethods, mapMaidBuilder);
 
-            dependencyRegistry.getMetaData().getOptional(RECIPES).ifPresent(recipes -> recipes.forEach(mapMaidBuilder::usingRecipe));
+            dependencyRegistry.getMetaData().getOptional(MapMaidConfigurators.RECIPES)
+                    .ifPresent(recipes -> recipes.forEach(mapMaidBuilder::usingRecipe));
             final MapMaid mapMaid = mapMaidBuilder.build();
 
             final Map<ResolvedType, UseCaseParamaterProvider> parameterProviders = new HashMap<>();

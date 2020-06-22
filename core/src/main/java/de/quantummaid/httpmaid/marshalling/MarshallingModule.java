@@ -112,15 +112,11 @@ public final class MarshallingModule implements ChainModule {
             final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
             final Unmarshaller unmarshaller;
             if (contentType.isEmpty()) {
-                final HttpRequest request = httpRequest(metaData);
-                final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
-                unmarshaller = unmarshallers.get(defaultContentType);
+                unmarshaller = defaultUnmarshaller(metaData);
             } else if (unmarshallers.containsKey(contentType)) {
                 unmarshaller = unmarshallers.get(contentType);
             } else if (!throwExceptionIfNoMarshallerFound) {
-                final HttpRequest request = httpRequest(metaData);
-                final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
-                unmarshaller = unmarshallers.get(defaultContentType);
+                unmarshaller = defaultUnmarshaller(metaData);
             } else {
                 throw unsupportedContentTypeException(contentType, unmarshallers.keySet());
             }
@@ -133,6 +129,12 @@ public final class MarshallingModule implements ChainModule {
                 }
             }
         });
+    }
+
+    private Unmarshaller defaultUnmarshaller(final MetaData metaData) {
+        final HttpRequest request = httpRequest(metaData);
+        final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
+        return unmarshallers.get(defaultContentType);
     }
 
     private void processMarshalling(final MetaData metaData) {

@@ -33,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbMarshaller.marshalTopLevelMap;
-import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbUnmarshaller.unmarshallMap;
+import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbUnmarshaller.unmarshalMap;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toList;
 
 @ToString
@@ -45,10 +46,19 @@ public final class DynamoDbRepository implements Repository {
     private final String tableName;
     private final String primaryKey;
 
+    public static DynamoDbRepository dynamoDbRepository(final DynamoDbClient dynamoDbClient,
+                                                        final String tableName,
+                                                        final String primaryKey) {
+        validateNotNull(dynamoDbClient, "dynamoDbClient");
+        validateNotNull(tableName, "tableName");
+        validateNotNull(primaryKey, "primaryKey");
+        return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey);
+    }
+
     public static DynamoDbRepository dynamoDbRepository(final String tableName,
                                                         final String primaryKey) {
         final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
-        return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey);
+        return dynamoDbRepository(dynamoDbClient, tableName, primaryKey);
     }
 
     @Override
@@ -91,8 +101,8 @@ public final class DynamoDbRepository implements Repository {
                 .build();
         final GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
         final Map<String, AttributeValue> responseItem = getItemResponse.item();
-        final Map<String, Object> marshalled = unmarshallMap(responseItem);
-        return (Map<String, Object>) marshalled.get("value");
+        final Map<String, Object> marshalled = unmarshalMap(responseItem);
+        return (Map<String, Object>) marshalled.get(VALUE_IDENTIFIER);
     }
 
     @SuppressWarnings("unchecked")
@@ -103,7 +113,7 @@ public final class DynamoDbRepository implements Repository {
                 .build();
         final ScanResponse scan = dynamoDbClient.scan(scanRequest);
         return scan.items().stream()
-                .map(DynamoDbUnmarshaller::unmarshallMap)
+                .map(DynamoDbUnmarshaller::unmarshalMap)
                 .map(map -> map.get(VALUE_IDENTIFIER))
                 .map(object -> (Map<String, Object>) object)
                 .collect(toList());

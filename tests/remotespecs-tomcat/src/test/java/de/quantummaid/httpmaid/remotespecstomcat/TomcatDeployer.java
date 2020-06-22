@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.remotespecstomcat;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.remotespecs.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory.BaseDirectoryFinder;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;

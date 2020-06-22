@@ -60,8 +60,8 @@ public final class RawClientResponse {
     }
 
     public Optional<String> header(final String key) {
-        final Optional<String> result = ofNullable(headers.get(key)).flatMap(values -> values.stream().findFirst());
-        return result;
+        return ofNullable(headers.get(key))
+                .flatMap(values -> values.stream().findFirst());
     }
 
     public Optional<String> contentType() {

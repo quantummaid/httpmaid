@@ -27,11 +27,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.REQUEST_CONTEXT;
-import static de.quantummaid.httpmaid.awslambda.EmptyLambdaEventException.emptyLambdaEventException;
-import static java.util.Objects.requireNonNullElse;
+import static de.quantummaid.httpmaid.awslambda.LambdaEventException.*;
 import static java.util.Objects.requireNonNullElseGet;
 
 @ToString
@@ -39,29 +38,24 @@ import static java.util.Objects.requireNonNullElseGet;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AwsLambdaEvent {
     private final Map<String, Object> event;
-    private final Map<String, Object> requestContext;
 
-    @SuppressWarnings("unchecked")
     public static AwsLambdaEvent awsLambdaEvent(final Map<String, Object> event) {
         if (event.isEmpty()) {
             throw emptyLambdaEventException();
         }
-        final Map<String, Object> requestContext = (Map<String, Object>) event.get(REQUEST_CONTEXT);
-        return new AwsLambdaEvent(event, requestContext);
+        return new AwsLambdaEvent(event);
+    }
+
+    public Optional<String> getAsOptionalString(final String key) {
+        return getAsOptional(key, String.class);
     }
 
     public String getAsString(final String key) {
-        return (String) event.get(key);
+        return getAs(key, String.class);
     }
 
     public Boolean getAsBoolean(final String key) {
-        return (Boolean) event.get(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getOrDefault(final String key, final T alternative) {
-        final T value = (T) event.get(key);
-        return requireNonNullElse(value, alternative);
+        return getAs(key, Boolean.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -71,21 +65,34 @@ public final class AwsLambdaEvent {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getMap(final String key) {
-        return (Map<String, Object>) event.get(key);
+    public AwsLambdaEvent getMap(final String key) {
+        final Map<String, Object> map = getAs(key, Map.class);
+        return new AwsLambdaEvent(map);
     }
 
-    public String getFromContext(final String key) {
-        return (String) requestContext.get(key);
+    private <T> Optional<T> getAsOptional(final String key, final Class<T> type) {
+        final Object value = event.get(key);
+        if (value == null) {
+            return Optional.empty();
+        }
+        return Optional.of(castSafely(key, value, type));
     }
 
-    public boolean isWebSocketRequest() {
-        return isWebSocketRequest(event);
+    private <T> T getAs(final String key, final Class<T> type) {
+        if (!event.containsKey(key)) {
+            throw unknownKeyException(key, event);
+        }
+        final Object value = event.get(key);
+        return castSafely(key, value, type);
     }
 
     @SuppressWarnings("unchecked")
-    public static boolean isWebSocketRequest(final Map<String, Object> event) {
-        final Map<String, Object> context = (Map<String, Object>) event.get(REQUEST_CONTEXT);
-        return context.containsKey("connectionId");
+    private <T> T castSafely(final String key,
+                             final Object value,
+                             final Class<T> type) {
+        if (!type.isInstance(value)) {
+            throw wrongTypeException(key, type, value, event);
+        }
+        return (T) value;
     }
 }

@@ -32,3 +32,5 @@
 .envrc
 
 target/
+
+native-libs/

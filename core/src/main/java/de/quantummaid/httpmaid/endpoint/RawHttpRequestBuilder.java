@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequest;
+import static de.quantummaid.httpmaid.http.QueryParameters.fromQueryString;
 import static de.quantummaid.httpmaid.util.streams.Streams.stringToInputStream;
 
 @ToString
@@ -74,8 +75,7 @@ public final class RawHttpRequestBuilder {
     }
 
     public RawHttpRequestBuilder withQueryString(final String encodedQueryParameters) {
-        final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
-        return withQueryParameters(queryParameters);
+        return withQueryParameters(fromQueryString(encodedQueryParameters));
     }
 
     public RawHttpRequestBuilder withQueryParameters(final QueryParameters queryParameters) {

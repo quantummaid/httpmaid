@@ -30,6 +30,7 @@ import org.glassfish.tyrus.client.ClientManager;
 import javax.websocket.*;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -47,6 +48,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings({"java:S2095", "java:S112"})
 public final class ShittyWebsocketClient extends Endpoint implements MessageHandler.Whole<String>, Closeable {
     private final Consumer<String> responseHandler;
     private final CountDownLatch connectLatch = new CountDownLatch(1);
@@ -58,14 +60,14 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
                                                       final Map<String, List<String>> queryParameters) {
         final String queryParametersTail = buildQueryParametersTail(queryParameters);
         final String fullUri = uri + queryParametersTail;
+        final ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
+        configBuilder.configurator(new ClientEndpointConfig.Configurator() {
+            @Override
+            public void beforeRequest(final Map<String, List<String>> currentHeaders) {
+                headers.forEach(currentHeaders::put);
+            }
+        });
         try {
-            final ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
-            configBuilder.configurator(new ClientEndpointConfig.Configurator() {
-                @Override
-                public void beforeRequest(final Map<String, List<String>> currentHeaders) {
-                    headers.forEach(currentHeaders::put);
-                }
-            });
             final ShittyWebsocketClient shittyWebsocketClient = new ShittyWebsocketClient(responseHandler);
             final ClientEndpointConfig clientEndpointConfig = configBuilder.build();
             final URI uriObject = new URI(fullUri);
@@ -100,7 +102,7 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
         try {
             session.getBasicRemote().sendText(message);
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -115,14 +117,12 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
             queryParametersTail = "";
         } else {
             final StringJoiner joiner = new StringJoiner("&", "?", "");
-            queryParameters.forEach((name, values) -> {
-                values.forEach(value -> {
-                    final String encodedName = URLEncoder.encode(name, UTF_8);
-                    final String encodedValue = URLEncoder.encode(value, UTF_8);
-                    final String parameter = format("%s=%s", encodedName, encodedValue);
-                    joiner.add(parameter);
-                });
-            });
+            queryParameters.forEach((name, values) -> values.forEach(value -> {
+                final String encodedName = URLEncoder.encode(name, UTF_8);
+                final String encodedValue = URLEncoder.encode(value, UTF_8);
+                final String parameter = format("%s=%s", encodedName, encodedValue);
+                joiner.add(parameter);
+            }));
             queryParametersTail = joiner.toString();
         }
         return queryParametersTail;

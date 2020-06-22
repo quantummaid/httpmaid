@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -106,9 +105,6 @@ public interface RemoteSpecs {
                                 "otherparam", List.of("othervalue")));
     }
 
-    // TODO header with comma
-    // TODO cookies with more information (lifetime, etc.)
-
     @Test
     default void handlersCanSetStatusCode(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
@@ -134,7 +130,6 @@ public interface RemoteSpecs {
                 .theResponseBodyWas("");
     }
 
-    @Disabled
     @Test
     default void websocketTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
@@ -144,15 +139,17 @@ public interface RemoteSpecs {
     }
 
     @Test
-    @Disabled
     default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
-        testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnected()
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
-                .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
-                .theStatusCodeWas(200)
-                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+        final String runBroadcastSpecs = System.getProperty("runBroadcastSpecs");
+        if ("true".equals(runBroadcastSpecs)) {
+            testEnvironment.givenTheStaticallyDeployedTestInstance()
+                    .when().aWebsocketIsConnected()
+                    .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                    .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                    .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
+                    .theStatusCodeWas(200)
+                    .aWebsocketMessageHasBeenReceivedWithContent("foo");
+        }
     }
 
     /**

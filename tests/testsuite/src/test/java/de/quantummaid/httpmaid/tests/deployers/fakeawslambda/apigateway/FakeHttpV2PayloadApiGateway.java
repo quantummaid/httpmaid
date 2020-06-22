@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.httpapi;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -38,17 +38,17 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.*;
 
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ApiGatewayUtils.addBodyToEvent;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.ApiGatewayUtils.addBodyToEvent;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeHttpLambda implements AutoCloseable {
+public final class FakeHttpV2PayloadApiGateway implements AutoCloseable {
     private final HttpServer server;
 
-    public static FakeHttpLambda fakeHttpLambda(final AwsLambdaEndpoint endpoint,
-                                                final int port) {
+    public static FakeHttpV2PayloadApiGateway fakeHttpV2PayloadApiGateway(final AwsLambdaEndpoint endpoint,
+                                                                          final int port) {
         try {
             final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
             final HttpHandler httpHandler = exchange -> {
@@ -64,7 +64,7 @@ public final class FakeHttpLambda implements AutoCloseable {
             server.createContext("/", httpHandler);
             server.setExecutor(null);
             server.start();
-            return new FakeHttpLambda(server);
+            return new FakeHttpV2PayloadApiGateway(server);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
@@ -103,7 +103,8 @@ public final class FakeHttpLambda implements AutoCloseable {
         event.put("headers", headers);
         event.put("cookies", cookies);
 
-        event.put("rawQueryString", requestURI.getRawQuery());
+        final String rawQuery = Optional.ofNullable(requestURI.getRawQuery()).orElse("");
+        event.put("rawQueryString", rawQuery);
 
         addBodyToEvent(exchange.getRequestBody(), event);
         return event;

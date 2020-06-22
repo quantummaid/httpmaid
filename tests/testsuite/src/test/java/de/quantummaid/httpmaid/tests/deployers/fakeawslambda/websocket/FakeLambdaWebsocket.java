@@ -27,9 +27,11 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,12 +79,22 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         final Map<String, Object> event = createEvent("CONNECT");
         final Map<String, List<String>> queryParameters = new HashMap<>();
         final Map<String, List<String>> parameterMap = session.getUpgradeRequest().getParameterMap();
-        parameterMap.forEach((key, value) -> {
-            queryParameters.put(key, value);
-        });
+        parameterMap.forEach(queryParameters::put);
         event.put("multiValueQueryStringParameters", queryParameters);
-        final Map<String, List<String>> headers = session.getUpgradeRequest().getHeaders();
-        event.put("multiValueHeaders", headers);
+        final UpgradeRequest upgradeRequest = session.getUpgradeRequest();
+        final Map<String, List<String>> headers = upgradeRequest.getHeaders();
+        final Map<String, List<String>> normalizedHeaders = new HashMap<>();
+        headers.forEach((name, values) -> {
+            final List<String> normalizedValues;
+            if (values.size() == 1) {
+                final String[] splitValues = values.get(0).split(", ");
+                normalizedValues = Arrays.asList(splitValues);
+            } else {
+                normalizedValues = values;
+            }
+            normalizedHeaders.put(name, normalizedValues);
+        });
+        event.put("multiValueHeaders", normalizedHeaders);
         endpoint.delegate(event);
     }
 

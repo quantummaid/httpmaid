@@ -43,6 +43,7 @@
         <module>lambda</module>
         <module>remotespecs</module>
         <module>remotespecs-tomcat</module>
+        <module>websocketregistry</module>
     </modules>
 
     <properties>

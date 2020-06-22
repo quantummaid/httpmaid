@@ -39,20 +39,20 @@ public final class RemoteSpecsExtension implements ParameterResolver,
 
     @Override
     public boolean supportsParameter(final ParameterContext parameterContext,
-                                     final ExtensionContext extensionContext) throws ParameterResolutionException {
+                                     final ExtensionContext extensionContext) {
         return true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Object resolveParameter(final ParameterContext parameterContext,
-                                   final ExtensionContext ctx) throws ParameterResolutionException {
+                                   final ExtensionContext ctx) {
         final Class<?> testClass = ctx.getRequiredTestClass();
         final RemoteSpecsDeployment deployment = getDeployment(ctx);
         validateNotNull(deployment, "deployment");
-        final Deployer deployer = dummyDeployer(deployment.descriptorFor((Class<? extends RemoteSpecs>) testClass));
+        final Deployer dummyDeployer = dummyDeployer(deployment.descriptorFor((Class<? extends RemoteSpecs>) testClass));
         final ClientFactory clientFactory = RealHttpMaidClientFactory.theRealHttpMaidClient();
-        return testEnvironment(deployer, clientFactory);
+        return testEnvironment(dummyDeployer, clientFactory);
     }
 
     @Override
@@ -74,8 +74,7 @@ public final class RemoteSpecsExtension implements ParameterResolver,
 
     private RemoteSpecsDeployment getDeployment(final ExtensionContext ctx) {
         final Store store = ctx.getRoot().getStore(GLOBAL);
-        final RemoteSpecsDeployment deployment = store.get(deployer.getClass().getName(), RemoteSpecsDeployment.class);
-        return deployment;
+        return store.get(deployer.getClass().getName(), RemoteSpecsDeployment.class);
     }
 
     private void putDeployment(final ExtensionContext ctx, final RemoteSpecsDeployment deployment) {

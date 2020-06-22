@@ -19,23 +19,36 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.backchannel;
+package de.quantummaid.httpmaid.websocketregistryspecs.testsupport;
 
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class WebsocketMessageToSend {
-    private final String message;
+public final class WebsocketRegistryDeployment {
+    private final WebsocketRegistry websocketRegistry;
+    private final Runnable closer;
 
-    public static WebsocketMessageToSend websocketMessageToSend(final String message) {
-        validateNotNull(message, "message");
-        return new WebsocketMessageToSend(message);
+    public static WebsocketRegistryDeployment websocketRegistryDeployment(final WebsocketRegistry websocketRegistry,
+                                                                          final Runnable closer) {
+        return new WebsocketRegistryDeployment(websocketRegistry, closer);
+    }
+
+    public static WebsocketRegistryDeployment websocketRegistryDeployment(final WebsocketRegistry websocketRegistry) {
+        return new WebsocketRegistryDeployment(websocketRegistry, () -> {
+        });
+    }
+
+    public WebsocketRegistry websocketRegistry() {
+        return websocketRegistry;
+    }
+
+    public void close() {
+        closer.run();
     }
 }

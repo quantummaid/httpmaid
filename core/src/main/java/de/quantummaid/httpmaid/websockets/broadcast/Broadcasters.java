@@ -41,6 +41,7 @@ import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCK
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S1845")
 public final class Broadcasters {
     public static final MetaDataKey<Broadcasters> BROADCASTERS = metaDataKey("BROADCASTERS");
 

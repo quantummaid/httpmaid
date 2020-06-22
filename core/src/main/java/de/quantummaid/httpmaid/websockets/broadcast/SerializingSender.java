@@ -33,6 +33,7 @@ import lombok.ToString;
 
 import java.util.List;
 
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.broadcast.RecipientDeterminator.all;
 
 @ToString
@@ -51,11 +52,9 @@ public final class SerializingSender<T> {
         sendToAllThat(message, all());
     }
 
-    public void sendToAllAuthenticatedAs(final T message, final Object authenticationInformation) {
-        throw new UnsupportedOperationException();
-    }
-
     public void sendToAllThat(final T message, final RecipientDeterminator recipientDeterminator) {
+        validateNotNull(message, "message");
+        validateNotNull(recipientDeterminator, "recipientDeterminator");
         final List<WebsocketRegistryEntry> connections = websocketRegistry.connections();
         connections.forEach(connection -> {
             final WebsocketSenderId websocketSenderId = connection.senderId();

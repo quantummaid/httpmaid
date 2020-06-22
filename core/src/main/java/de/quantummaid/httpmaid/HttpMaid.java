@@ -92,9 +92,6 @@ public final class HttpMaid implements AutoCloseable {
         });
     }
 
-    public void handleWebsocketDisconnect() {
-    }
-
     public void addWebsocketSender(final WebsocketSenderId websocketSenderId,
                                    final WebsocketSender<?> websocketSender) {
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);

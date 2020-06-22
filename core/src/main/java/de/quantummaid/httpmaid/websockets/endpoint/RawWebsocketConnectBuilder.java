@@ -68,8 +68,7 @@ public final class RawWebsocketConnectBuilder {
     }
 
     public RawWebsocketConnectBuilder withEncodedQueryString(final String encodedQueryParameters) {
-        final QueryParameters queryParameters = QueryParameters.fromQueryString(encodedQueryParameters);
-        return withQueryParameters(queryParameters);
+        return withQueryParameters(QueryParameters.fromQueryString(encodedQueryParameters));
     }
 
     private RawWebsocketConnectBuilder withQueryParameters(final QueryParameters queryParameters) {

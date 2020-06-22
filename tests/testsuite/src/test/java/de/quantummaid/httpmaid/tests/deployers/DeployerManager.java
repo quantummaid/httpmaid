@@ -30,7 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.tests.deployers.bypassed.BypassedDeployer.bypassedDeployer;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeAwsDeployer.fakeAwsDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV1PayloadDeployer.fakeHttpApiGatewayV1PayloadDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayDeployer.fakeRestApiGatewayDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadDeployer.fakeHttpApiGatewayV2PayloadDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jetty.JettyDeployer.jettyDeployer;
@@ -46,8 +47,9 @@ public final class DeployerManager {
             jettyDeployer(),
             pureJavaDeployer(),
             servletOnJettyDeployer(),
-            fakeAwsDeployer(),
+            fakeRestApiGatewayDeployer(),
             fakeHttpApiGatewayV2PayloadDeployer(),
+            fakeHttpApiGatewayV1PayloadDeployer(),
             bypassedDeployer(),
             jeeOnUndertowDeployer(),
             undertowDeployer()

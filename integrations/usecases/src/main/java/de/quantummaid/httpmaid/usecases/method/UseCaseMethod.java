@@ -53,10 +53,6 @@ public final class UseCaseMethod {
     public static UseCaseMethod useCaseMethodOf(final ResolvedType useCase) {
         validateUseCaseClass(useCase);
         final ResolvedMethod method = locateUseCaseMethod((ClassType) useCase);
-        if (method.method().getTypeParameters().length != 0) {
-            throw new IllegalArgumentException(format("use case method '%s' in class '%s' must not declare any " +
-                            "ype variables", method.describe(), useCase.simpleDescription()));
-        }
         final Parameters parameters = Parameters.parametersOf(method);
         return new UseCaseMethod(useCase, method, parameters);
     }

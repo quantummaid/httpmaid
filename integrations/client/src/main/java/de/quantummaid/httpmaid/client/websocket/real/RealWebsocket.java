@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -40,6 +41,7 @@ import static java.lang.Thread.currentThread;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public final class RealWebsocket implements Websocket, WebSocketListener {
     private final CountDownLatch connectLatch = new CountDownLatch(1);
     private final WebsocketMessageHandler messageHandler;
@@ -81,15 +83,17 @@ public final class RealWebsocket implements Websocket, WebSocketListener {
 
     @Override
     public void onWebSocketClose(final int statusCode, final String reason) {
+        // not used
     }
 
     @Override
     public void onWebSocketBinary(final byte[] bytes, final int i, final int i1) {
+        throw new UnsupportedOperationException("Binary websocket messages are not supported.");
     }
 
     @Override
     public void onWebSocketError(final Throwable throwable) {
-        throwable.printStackTrace();
+        log.error("Websocket error", throwable);
     }
 
     @Override
