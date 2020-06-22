@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.testlambda;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.websockets.WebsocketsModule;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -33,17 +32,12 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
-import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
-import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
 
 @ToString
 @EqualsAndHashCode
 public final class TestLambda {
-    private static final HttpMaid HTTP_MAID = httpMaid(httpMaidBuilder ->
-            httpMaidBuilder.configured(configuratorForType(
-                    WebsocketsModule.class,
-                    websocketsModule -> websocketsModule.setWebsocketRegistry(dynamoDbWebsocketRegistry()))));
+    private static final HttpMaid HTTP_MAID = httpMaid();
 
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
     private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
