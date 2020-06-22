@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public final class TestEnvironments {
     private static final String PACKAGE = "de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments#";
     public static final String ALL_ENVIRONMENTS = PACKAGE + "allEnvironments";
     public static final String WEBSOCKET_ENVIRONMENTS = PACKAGE + "websocketEnvironments";
+    public static final String WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT = PACKAGE + "websocketEnvironmentsWithoutShittyClient";
     public static final String ENVIRONMENTS_WITH_ALL_CAPABILITIES = PACKAGE + "environmentsWithAllCapabilities";
     public static final String ONLY_SHITTY_CLIENT = PACKAGE + "onlyShittyClient";
 
@@ -59,6 +61,23 @@ public final class TestEnvironments {
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()
+                        .map(client -> testEnvironment(deployer, client)))
+                .collect(toList());
+    }
+
+    public static List<TestEnvironment> websocketEnvironmentsWithoutShittyClient() {
+        final List<Deployer> deployers = List.of(
+                bypassedDeployer(),
+                fakeRestApiGatewayDeployer(),
+                fakeHttpApiGatewayV2PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadDeployer(),
+                programmaticJsr356OnTyrusDeployer(),
+                jeeOnUndertowDeployer(),
+                undertowDeployer()
+        );
+        return deployers.stream()
+                .flatMap(deployer -> deployer.supportedClients().stream()
+                        .filter(clientFactory -> !clientFactory.getClass().equals(ShittyClientFactory.class))
                         .map(client -> testEnvironment(deployer, client)))
                 .collect(toList());
     }
