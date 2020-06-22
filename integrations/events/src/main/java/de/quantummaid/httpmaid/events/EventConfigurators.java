@@ -42,6 +42,7 @@ import static de.quantummaid.httpmaid.events.enriching.enrichers.RequiredAuthent
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
+@SuppressWarnings("java:S1905")
 public final class EventConfigurators {
 
     private EventConfigurators() {

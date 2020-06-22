@@ -223,5 +223,6 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
 
     @Override
     public void close() {
+        // nothing to do
     }
 }

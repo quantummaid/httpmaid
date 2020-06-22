@@ -28,16 +28,14 @@ import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.*;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.QUERY_STRING_PARAMETERS;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.extractPotentiallyEncodedBody;
 import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class RestApiHandler {
 
@@ -48,20 +46,20 @@ public final class RestApiHandler {
                                                     final HttpMaid httpMaid) {
         return httpMaid.handleRequestSynchronously(() -> {
             final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
-            final String httpRequestMethod = event.getAsString(HTTP_METHOD);
+            final String httpRequestMethod = event.getAsString("httpMethod");
             builder.withMethod(httpRequestMethod);
 
-            final String encodedPath = event.getAsString(PATH);
-            final String path = URLDecoder.decode(encodedPath, UTF_8);
+            final String encodedPath = event.getAsString("path");
+            final String path = URLDecoder.decode(encodedPath, StandardCharsets.UTF_8);
             builder.withPath(path);
 
             builder.withPath(path);
-            final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
+            final Map<String, List<String>> headers = event.getOrDefault("multiValueHeaders", HashMap::new);
             final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
             headersBuilder.withHeadersMap(headers);
             builder.withHeaders(headersBuilder.build());
 
-            final Map<String, List<String>> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
+            final Map<String, List<String>> queryParameters = event.getOrDefault("multiValueQueryStringParameters", HashMap::new);
             final QueryParametersBuilder queryParametersBuilder = QueryParameters.builder();
             queryParameters.forEach(queryParametersBuilder::withParameter);
             builder.withQueryParameters(queryParametersBuilder.build());

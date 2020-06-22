@@ -24,12 +24,12 @@ package de.quantummaid.httpmaid.events.processors;
 import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.generator.Generators;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.events.EventModule.EVENT_TYPE;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -47,6 +47,6 @@ public class DetermineEventProcessor implements Processor {
     @Override
     public void apply(final MetaData metaData) {
         generators.generate(metaData)
-                .ifPresent(eventType -> metaData.set(EVENT_TYPE, eventType));
+                .ifPresent(eventType -> metaData.set(EventModule.EVENT_TYPE, eventType));
     }
 }

@@ -28,6 +28,7 @@ import java.util.List;
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployers;
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployersWithOnlyShittyClient;
 import static de.quantummaid.httpmaid.tests.deployers.bypassed.BypassedDeployer.bypassedDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV1PayloadDeployer.fakeHttpApiGatewayV1PayloadDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadDeployer.fakeHttpApiGatewayV2PayloadDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayDeployer.fakeRestApiGatewayDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
@@ -51,6 +52,7 @@ public final class TestEnvironments {
                 bypassedDeployer(),
                 fakeRestApiGatewayDeployer(),
                 fakeHttpApiGatewayV2PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadDeployer(),
                 programmaticJsr356OnTyrusDeployer(),
                 jeeOnUndertowDeployer(),
                 undertowDeployer()

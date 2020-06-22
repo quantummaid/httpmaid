@@ -102,7 +102,7 @@ public final class DynamoDbRepository implements Repository {
         final GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
         final Map<String, AttributeValue> responseItem = getItemResponse.item();
         final Map<String, Object> marshalled = unmarshalMap(responseItem);
-        return (Map<String, Object>) marshalled.get("value");
+        return (Map<String, Object>) marshalled.get(VALUE_IDENTIFIER);
     }
 
     @SuppressWarnings("unchecked")

@@ -19,71 +19,62 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.rest;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.util.streams.Streams;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ApiGatewayUtils.addBodyToEvent;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeRestLambda implements AutoCloseable {
-    private final HttpServer server;
+public final class ApiGatewayUtils {
 
-    public static FakeRestLambda fakeRestLambda(final AwsLambdaEndpoint endpoint,
-                                                final int port) {
-        try {
-            final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            final HttpHandler httpHandler = exchange -> {
-                try {
-                    final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
-                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
-                    mapEventToResponse(responseEvent, exchange);
-                } catch (final Exception e) {
-                    e.printStackTrace(System.err);
-                    throw e;
-                }
-            };
-            server.createContext("/", httpHandler);
-            server.setExecutor(null);
-            server.start();
-            return new FakeRestLambda(server);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
+    private ApiGatewayUtils() {
+    }
+
+    public static void addBodyToEvent(final InputStream bodyStream, final Map<String, Object> event) {
+        final String body = inputStreamToString(bodyStream);
+        if (body.isEmpty()) {
+            event.put("body", null);
+            event.put("isBase64Encoded", false);
+        } else {
+            final String encodedBody = encodeBase64(body);
+            event.put("body", encodedBody);
+            event.put("isBase64Encoded", true);
         }
     }
 
-    @Override
-    public void close() {
-        server.stop(0);
+    private static String encodeBase64(final String unencoded) {
+        final Base64.Encoder encoder = Base64.getEncoder();
+        final byte[] bytes = encoder.encode(unencoded.getBytes(UTF_8));
+        return new String(bytes, UTF_8);
     }
 
-    private static Map<String, Object> mapRequestToEvent(final HttpExchange exchange) {
+    public static Map<String, Object> mapRequestToHttpApiV1PayloadEvent(final HttpExchange exchange) {
         final Map<String, Object> event = new HashMap<>();
+        event.put("version", "1.0");
+        mapRequestToEvent(exchange, event);
+        return event;
+    }
+
+    public static Map<String, Object> mapRequestToRestApiEvent(final HttpExchange exchange) {
+        final Map<String, Object> event = new HashMap<>();
+        mapRequestToEvent(exchange, event);
+        return event;
+    }
+
+    private static void mapRequestToEvent(final HttpExchange exchange,
+                                          final Map<String, Object> event) {
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
         event.put("path", path);
@@ -95,11 +86,10 @@ public final class FakeRestLambda implements AutoCloseable {
         final Map<String, List<String>> headers = new HashMap<>();
         exchange.getRequestHeaders().forEach(headers::put);
         event.put("multiValueHeaders", headers);
-        return event;
     }
 
-    private static void mapEventToResponse(final Map<String, Object> event,
-                                           final HttpExchange exchange) throws IOException {
+    public static void mapRestApiEventToResponse(final Map<String, Object> event,
+                                                 final HttpExchange exchange) throws IOException {
         final Headers responseHeaders = exchange.getResponseHeaders();
         @SuppressWarnings("unchecked") final Map<String, List<String>> headerMap = (Map<String, List<String>>) ofNullable(event.get("multiValueHeaders")).orElse(emptyMap());
         responseHeaders.putAll(headerMap);
@@ -131,7 +121,6 @@ public final class FakeRestLambda implements AutoCloseable {
     }
 
     private static String decode(final String s) {
-        final String decoded = URLDecoder.decode(s, UTF_8);
-        return decoded;
+        return URLDecoder.decode(s, UTF_8);
     }
 }

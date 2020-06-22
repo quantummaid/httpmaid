@@ -83,10 +83,12 @@ public final class RealWebsocket implements Websocket, WebSocketListener {
 
     @Override
     public void onWebSocketClose(final int statusCode, final String reason) {
+        // not used
     }
 
     @Override
     public void onWebSocketBinary(final byte[] bytes, final int i, final int i1) {
+        throw new UnsupportedOperationException("Binary websocket messages are not supported.");
     }
 
     @Override

@@ -24,7 +24,7 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.httpapi.FakeHttpLambda;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.FakeHttpV2PayloadApiGateway;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
@@ -38,7 +38,7 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.httpapi.FakeHttpLambda.fakeHttpLambda;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.FakeHttpV2PayloadApiGateway.fakeHttpV2PayloadApiGateway;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
@@ -50,7 +50,7 @@ import static java.util.Arrays.asList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeHttpApiGatewayV2PayloadDeployer implements PortDeployer {
-    private FakeHttpLambda currentHttpGateway;
+    private FakeHttpV2PayloadApiGateway currentHttpGateway;
     private FakeWebsocketLambda currentWebsocketGateway;
 
     public static Deployer fakeHttpApiGatewayV2PayloadDeployer() {
@@ -61,7 +61,7 @@ public final class FakeHttpApiGatewayV2PayloadDeployer implements PortDeployer {
     public Deployment deploy(final int port, final HttpMaid httpMaid) {
         final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
         final AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpoint = awsWebsocketLambdaEndpointFor(httpMaid);
-        currentHttpGateway = fakeHttpLambda(awsLambdaEndpoint, port);
+        currentHttpGateway = fakeHttpV2PayloadApiGateway(awsLambdaEndpoint, port);
         final int websocketsPort = freePort();
         currentWebsocketGateway = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort);
         return localhostHttpAndWebsocketDeployment(port, websocketsPort);

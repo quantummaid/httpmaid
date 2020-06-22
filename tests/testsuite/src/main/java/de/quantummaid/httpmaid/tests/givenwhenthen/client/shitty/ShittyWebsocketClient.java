@@ -117,14 +117,12 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
             queryParametersTail = "";
         } else {
             final StringJoiner joiner = new StringJoiner("&", "?", "");
-            queryParameters.forEach((name, values) -> {
-                values.forEach(value -> {
-                    final String encodedName = URLEncoder.encode(name, UTF_8);
-                    final String encodedValue = URLEncoder.encode(value, UTF_8);
-                    final String parameter = format("%s=%s", encodedName, encodedValue);
-                    joiner.add(parameter);
-                });
-            });
+            queryParameters.forEach((name, values) -> values.forEach(value -> {
+                final String encodedName = URLEncoder.encode(name, UTF_8);
+                final String encodedValue = URLEncoder.encode(value, UTF_8);
+                final String parameter = format("%s=%s", encodedName, encodedValue);
+                joiner.add(parameter);
+            }));
             queryParametersTail = joiner.toString();
         }
         return queryParametersTail;

@@ -37,10 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.MULTIVALUE_HEADERS;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.QUERY_STRING_PARAMETERS;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
 import static java.lang.String.format;
@@ -91,12 +88,12 @@ public final class AwsWebsocketLambdaEndpoint {
                                final AwsWebsocketConnectionInformation connectionInformation) {
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
-            builder.withConnectionInformation(AWS_WEBSOCKET_SENDER, connectionInformation);
+            builder.withConnectionInformation(AwsWebsocketSender.AWS_WEBSOCKET_SENDER, connectionInformation);
 
-            final Map<String, List<String>> queryParameters = event.getOrDefault(QUERY_STRING_PARAMETERS, HashMap::new);
+            final Map<String, List<String>> queryParameters = event.getOrDefault("multiValueQueryStringParameters", HashMap::new);
             builder.withQueryParameterMap(queryParameters);
 
-            final Map<String, List<String>> headers = event.getOrDefault(MULTIVALUE_HEADERS, HashMap::new);
+            final Map<String, List<String>> headers = event.getOrDefault("multiValueHeaders", HashMap::new);
             final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
             headersBuilder.withHeadersMap(headers);
             builder.withHeaders(headersBuilder.build());

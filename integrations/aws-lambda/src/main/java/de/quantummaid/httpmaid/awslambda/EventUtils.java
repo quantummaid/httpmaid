@@ -24,8 +24,6 @@ package de.quantummaid.httpmaid.awslambda;
 import java.util.Base64;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.BODY;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEventKeys.REQUEST_CONTEXT;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class EventUtils {
@@ -35,12 +33,12 @@ public final class EventUtils {
 
     @SuppressWarnings("unchecked")
     public static boolean isWebSocketRequest(final Map<String, Object> event) {
-        final Map<String, Object> context = (Map<String, Object>) event.get(REQUEST_CONTEXT);
+        final Map<String, Object> context = (Map<String, Object>) event.get("requestContext");
         return context.containsKey("connectionId");
     }
 
     static String extractPotentiallyEncodedBody(final AwsLambdaEvent event) {
-        return event.getAsOptionalString(BODY)
+        return event.getAsOptionalString("body")
                 .map(rawBody -> {
                     final boolean isBase64Encoded = event.getAsBoolean("isBase64Encoded");
                     if (isBase64Encoded) {

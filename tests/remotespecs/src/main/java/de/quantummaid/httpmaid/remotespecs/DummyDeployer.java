@@ -51,6 +51,7 @@ public final class DummyDeployer implements Deployer {
 
     @Override
     public void cleanUp() {
+        // nothing to do
     }
 
     @Override
