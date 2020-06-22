@@ -92,7 +92,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.63</version>
+            <version>0.9.64</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
