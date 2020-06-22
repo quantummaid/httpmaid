@@ -30,63 +30,63 @@ import de.quantummaid.httpmaid.http.HttpRequestMethod;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
-public interface HttpConfiguration {
+public interface HttpConfiguration<T> {
 
-    default HttpMaidBuilder get(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
+    default T get(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
                 .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.GET);
     }
 
-    default HttpMaidBuilder get(final String url, final HttpHandler handler, final PerRouteConfigurator... perRouteConfigurators) {
+    default T get(final String url, final HttpHandler handler, final PerRouteConfigurator... perRouteConfigurators) {
         return get(url, (Object) handler, perRouteConfigurators);
     }
 
-    default HttpMaidBuilder post(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
+    default T post(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
                 .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.POST);
     }
 
-    default HttpMaidBuilder post(final String url, final HttpHandler handler) {
+    default T post(final String url, final HttpHandler handler) {
         return post(url, (Object) handler);
     }
 
-    default HttpMaidBuilder put(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
+    default T put(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
                 .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.PUT);
     }
 
-    default HttpMaidBuilder put(final String url, final HttpHandler handler) {
+    default T put(final String url, final HttpHandler handler) {
         return put(url, (Object) handler);
     }
 
-    default HttpMaidBuilder delete(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
+    default T delete(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         return this
                 .serving(handler, perRouteConfigurators)
                 .forRequestPath(url)
                 .andRequestMethod(HttpRequestMethod.DELETE);
     }
 
-    default HttpMaidBuilder delete(final String url, final HttpHandler handler) {
+    default T delete(final String url, final HttpHandler handler) {
         return delete(url, (Object) handler);
     }
 
-    default ConditionStage<HttpMaidBuilder> serving(final Handler handler) {
+    default ConditionStage<T> serving(final Handler handler) {
         return serving((Object) handler);
     }
 
-    ConditionStage<HttpMaidBuilder> serving(Object handler, PerRouteConfigurator... perRouteConfigurators);
+    ConditionStage<T> serving(Object handler, PerRouteConfigurator... perRouteConfigurators);
 
-    default HttpMaidBuilder configured(final ConfiguratorBuilder configuratorBuilder) {
+    default T configured(final ConfiguratorBuilder configuratorBuilder) {
         validateNotNull(configuratorBuilder, "configuratorBuilder");
         final Configurator configurator = configuratorBuilder.build();
         return configured(configurator);
     }
 
-    HttpMaidBuilder configured(Configurator configurator);
+    T configured(Configurator configurator);
 }

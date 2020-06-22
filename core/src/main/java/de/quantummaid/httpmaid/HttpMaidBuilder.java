@@ -55,7 +55,7 @@ import static java.util.Arrays.asList;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HttpMaidBuilder implements HttpConfiguration {
+public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder> {
     private boolean autodetectionOfModules = true;
     private boolean performStartupChecks = true;
     private final CoreModule coreModule;
