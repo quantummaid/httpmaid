@@ -24,12 +24,9 @@ package de.quantummaid.httpmaid;
 import de.quantummaid.httpmaid.chains.ChainRegistry;
 import de.quantummaid.httpmaid.chains.ChainRegistryBuilder;
 import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.chains.ConfiguratorBuilder;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.generator.builder.ConditionStage;
-import de.quantummaid.httpmaid.handler.Handler;
 import de.quantummaid.httpmaid.handler.http.HttpHandler;
-import de.quantummaid.httpmaid.http.HttpRequestMethod;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.websockets.broadcast.BroadcasterFactory;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
@@ -58,7 +55,7 @@ import static java.util.Arrays.asList;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HttpMaidBuilder {
+public final class HttpMaidBuilder implements HttpConfiguration {
     private boolean autodetectionOfModules = true;
     private boolean performStartupChecks = true;
     private final CoreModule coreModule;
@@ -79,54 +76,7 @@ public final class HttpMaidBuilder {
         return this;
     }
 
-    public HttpMaidBuilder get(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
-        return this
-                .serving(handler, perRouteConfigurators)
-                .forRequestPath(url)
-                .andRequestMethod(HttpRequestMethod.GET);
-    }
-
-    public HttpMaidBuilder get(final String url, final HttpHandler handler, final PerRouteConfigurator... perRouteConfigurators) {
-        return get(url, (Object) handler, perRouteConfigurators);
-    }
-
-    public HttpMaidBuilder post(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
-        return this
-                .serving(handler, perRouteConfigurators)
-                .forRequestPath(url)
-                .andRequestMethod(HttpRequestMethod.POST);
-    }
-
-    public HttpMaidBuilder post(final String url, final HttpHandler handler) {
-        return post(url, (Object) handler);
-    }
-
-    public HttpMaidBuilder put(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
-        return this
-                .serving(handler, perRouteConfigurators)
-                .forRequestPath(url)
-                .andRequestMethod(HttpRequestMethod.PUT);
-    }
-
-    public HttpMaidBuilder put(final String url, final HttpHandler handler) {
-        return put(url, (Object) handler);
-    }
-
-    public HttpMaidBuilder delete(final String url, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
-        return this
-                .serving(handler, perRouteConfigurators)
-                .forRequestPath(url)
-                .andRequestMethod(HttpRequestMethod.DELETE);
-    }
-
-    public HttpMaidBuilder delete(final String url, final HttpHandler handler) {
-        return delete(url, (Object) handler);
-    }
-
-    public ConditionStage<HttpMaidBuilder> serving(final Handler handler) {
-        return serving((Object) handler);
-    }
-
+    @Override
     public ConditionStage<HttpMaidBuilder> serving(final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         validateNotNull(handler, "handler");
         return condition -> {
@@ -153,12 +103,7 @@ public final class HttpMaidBuilder {
         return this;
     }
 
-    public HttpMaidBuilder configured(final ConfiguratorBuilder configuratorBuilder) {
-        validateNotNull(configuratorBuilder, "configuratorBuilder");
-        final Configurator configurator = configuratorBuilder.build();
-        return configured(configurator);
-    }
-
+    @Override
     public HttpMaidBuilder configured(final Configurator configurator) {
         validateNotNull(configurator, "configurator");
         configurators.add(configurator);
