@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.69</version>
+        <version>0.9.70</version>
     </parent>
 
     <artifactId>remotespecs-instance</artifactId>
@@ -45,17 +45,17 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid</groupId>
             <artifactId>core</artifactId>
-            <version>0.9.69</version>
+            <version>0.9.70</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-mapmaid</artifactId>
-            <version>0.9.69</version>
+            <version>0.9.70</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.64</version>
+            <version>0.9.65</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
