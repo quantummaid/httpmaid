@@ -26,20 +26,26 @@ import java.util.function.BooleanSupplier;
 import static java.lang.Thread.currentThread;
 
 public final class Poller {
-    private static final int WAIT_TIME = 60 * 1000;
+    private static final int NUMBER_OF_TRIES = 60 * 1000;
     private static final int SLEEP_TIME = 1;
 
     private Poller() {
     }
 
     public static boolean pollWithTimeout(final BooleanSupplier condition) {
-        for (int i = 0; i < WAIT_TIME; ++i) {
+        return pollWithTimeout(NUMBER_OF_TRIES, SLEEP_TIME, condition);
+    }
+
+    public static boolean pollWithTimeout(final int maxNumberOfTries,
+                                          final int sleepTimeInMilliseconds,
+                                          final BooleanSupplier condition) {
+        for (int i = 0; i < maxNumberOfTries; ++i) {
             final boolean conditionHasBeenFullfilled = condition.getAsBoolean();
             if (conditionHasBeenFullfilled) {
                 return true;
             }
             try {
-                Thread.sleep(SLEEP_TIME);
+                Thread.sleep(sleepTimeInMilliseconds);
             } catch (final InterruptedException e) {
                 currentThread().interrupt();
             }

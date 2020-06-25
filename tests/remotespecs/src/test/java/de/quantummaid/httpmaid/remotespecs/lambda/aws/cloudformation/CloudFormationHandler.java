@@ -21,37 +21,37 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation;
 
-import com.amazonaws.services.cloudformation.AmazonCloudFormation;
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
-import com.amazonaws.services.cloudformation.model.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.cloudformation.CloudFormationClient;
+import software.amazon.awssdk.services.cloudformation.model.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.*;
 import static java.lang.String.format;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_COMPLETE;
+import static software.amazon.awssdk.services.cloudformation.model.StackStatus.UPDATE_COMPLETE;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public final class CloudFormationHandler implements AutoCloseable {
-    private final AmazonCloudFormation amazonCloudFormation;
+    private final CloudFormationClient cloudFormationClient;
 
     public static CloudFormationHandler connectToCloudFormation() {
-        final AmazonCloudFormation amazonCloudFormation = AmazonCloudFormationClientBuilder.defaultClient();
-        return new CloudFormationHandler(amazonCloudFormation);
+        final CloudFormationClient cloudFormationClient = CloudFormationClient.create();
+        return new CloudFormationHandler(cloudFormationClient);
     }
 
     public void createOrUpdateStack(final String stackName,
@@ -70,22 +70,23 @@ public final class CloudFormationHandler implements AutoCloseable {
                             final Map<String, String> stackParameters) {
         log.info("Creating stack {}...", stackIdentifier);
         final String templateBody = fileToString(pathToTemplate);
-        final CreateStackRequest createStackRequest = new CreateStackRequest();
-        createStackRequest.setStackName(stackIdentifier);
-        createStackRequest.setCapabilities(List.of("CAPABILITY_NAMED_IAM"));
-        createStackRequest.setTemplateBody(templateBody);
-        createStackRequest.setParameters(
-                stackParameters.entrySet().stream().map(
-                        kv -> {
-                            final Parameter param = new Parameter();
-                            param.setParameterKey(kv.getKey());
-                            param.setParameterValue(kv.getValue());
-                            return param;
-                        }).collect(Collectors.toList())
-        );
 
-        amazonCloudFormation.createStack(createStackRequest);
-        waitForStackCreation(stackIdentifier, amazonCloudFormation);
+        final CreateStackRequest createStackRequest = CreateStackRequest.builder()
+                .stackName(stackIdentifier)
+                .capabilities(Capability.CAPABILITY_NAMED_IAM)
+                .templateBody(templateBody)
+                .parameters(stackParameters.entrySet()
+                        .stream()
+                        .map(
+                                kv -> Parameter.builder()
+                                        .parameterKey(kv.getKey())
+                                        .parameterValue(kv.getValue())
+                                        .build()).collect(Collectors.toList()
+                        ))
+                .build();
+        cloudFormationClient.createStack(createStackRequest);
+
+        waitForStackCreation(stackIdentifier, cloudFormationClient);
         log.info("Created stack {}.", stackIdentifier);
     }
 
@@ -94,23 +95,20 @@ public final class CloudFormationHandler implements AutoCloseable {
                             final Map<String, String> stackParameters) {
         log.info("Updating stack {}...", stackIdentifier);
         final String templateBody = fileToString(pathToTemplate);
-        final UpdateStackRequest updateStackRequest = new UpdateStackRequest();
-        updateStackRequest.setStackName(stackIdentifier);
-        updateStackRequest.setCapabilities(List.of("CAPABILITY_NAMED_IAM"));
-        updateStackRequest.setTemplateBody(templateBody);
-        updateStackRequest.setParameters(
-                stackParameters.entrySet().stream().map(
-                        kv -> {
-                            final Parameter param = new Parameter();
-                            param.setParameterKey(kv.getKey());
-                            param.setParameterValue(kv.getValue());
-                            return param;
-                        }).collect(Collectors.toList())
-        );
+        final UpdateStackRequest updateStackRequest = UpdateStackRequest.builder()
+                .stackName(stackIdentifier)
+                .capabilities(Capability.CAPABILITY_NAMED_IAM)
+                .templateBody(templateBody)
+                .parameters(stackParameters.entrySet().stream().map(
+                        kv -> Parameter.builder()
+                                .parameterKey(kv.getKey())
+                                .parameterValue(kv.getValue())
+                                .build()).collect(Collectors.toList()))
+                .build();
 
         try {
-            amazonCloudFormation.updateStack(updateStackRequest);
-        } catch (final AmazonCloudFormationException e) {
+            cloudFormationClient.updateStack(updateStackRequest);
+        } catch (final CloudFormationException e) {
             final String message = e.getMessage();
             if (message.contains("No updates are to be performed.")) {
                 log.info("Stack {} was already up to date.", stackIdentifier);
@@ -120,27 +118,28 @@ public final class CloudFormationHandler implements AutoCloseable {
                         format("Exception thrown during update of stack %s", stackIdentifier), e);
             }
         }
-        waitForStackUpdate(stackIdentifier, amazonCloudFormation);
+        waitForStackUpdate(stackIdentifier, cloudFormationClient);
         log.info("Updated stack {}.", stackIdentifier);
     }
 
     public void deleteStacksStartingWith(final String stackPrefix) {
-        final ListStacksResult listStacksResult = amazonCloudFormation.listStacks();
-        listStacksResult.getStackSummaries().stream()
-                .filter(stack -> stack.getStackStatus().equals("CREATE_COMPLETE"))
-                .filter(stack -> stack.getStackName().startsWith(stackPrefix))
-                .forEach(stack -> {
-                    final String stackName = stack.getStackName();
-                    deleteStack(stackName);
-                });
+        final ListStacksResponse listStacksResponse = cloudFormationClient.listStacks();
+        listStacksResponse.stackSummaries().stream()
+                .filter(stack ->
+                        stack.stackStatus().equals(CREATE_COMPLETE) ||
+                                stack.stackStatus().equals(UPDATE_COMPLETE))
+                .map(StackSummary::stackName)
+                .filter(stackName -> stackName.startsWith(stackPrefix))
+                .forEach(this::deleteStack);
     }
 
     private void deleteStack(final String stackIdentifier) {
         log.info("Deleting stack {}...", stackIdentifier);
-        final DeleteStackRequest deleteStackRequest = new DeleteStackRequest();
-        deleteStackRequest.setStackName(stackIdentifier);
-        amazonCloudFormation.deleteStack(deleteStackRequest);
-        waitForStackDeletion(stackIdentifier, amazonCloudFormation);
+        final DeleteStackRequest deleteStackRequest = DeleteStackRequest.builder()
+                .stackName(stackIdentifier)
+                .build();
+        cloudFormationClient.deleteStack(deleteStackRequest);
+        waitForStackDeletion(stackIdentifier, cloudFormationClient);
         log.info("Deleted stack {}.", stackIdentifier);
     }
 
@@ -156,6 +155,6 @@ public final class CloudFormationHandler implements AutoCloseable {
 
     @Override
     public void close() {
-        amazonCloudFormation.shutdown();
+        cloudFormationClient.close();
     }
 }

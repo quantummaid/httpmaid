@@ -21,64 +21,90 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation;
 
-import com.amazonaws.services.cloudformation.AmazonCloudFormation;
-import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
-import com.amazonaws.waiters.Waiter;
-import com.amazonaws.waiters.WaiterParameters;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.cloudformation.CloudFormationClient;
+import software.amazon.awssdk.services.cloudformation.model.DescribeStacksResponse;
+import software.amazon.awssdk.services.cloudformation.model.Stack;
+import software.amazon.awssdk.services.cloudformation.model.StackStatus;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.SynchronousWaiterHandler.synchronousWaiterHandler;
-import static java.lang.String.format;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public final class CloudFormationWaiter {
-    private static final int TIMEOUT_IN_MINUTES = 4;
+    private static final int MAX_NUMBER_OF_TRIES = 50;
+    private static final int SLEEP_TIME_IN_MILLISECONDS = 5000;
 
     private CloudFormationWaiter() {
     }
 
     public static void waitForStackUpdate(final String stackIdentifier,
-                                          final AmazonCloudFormation amazonCloudFormation) {
-        final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackUpdateComplete();
-        final String description = format("update of stack '%s'", stackIdentifier);
-        wait(waiter, stackIdentifier, description);
+                                          final CloudFormationClient cloudFormationClient) {
+        waitForStatus(stackIdentifier, cloudFormationClient, StackStatus.UPDATE_COMPLETE);
     }
 
     public static void waitForStackCreation(final String stackIdentifier,
-                                            final AmazonCloudFormation amazonCloudFormation) {
-        final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackCreateComplete();
-        final String description = format("creation of stack '%s'", stackIdentifier);
-        wait(waiter, stackIdentifier, description);
+                                            final CloudFormationClient cloudFormationClient) {
+        waitForStatus(stackIdentifier, cloudFormationClient, StackStatus.CREATE_COMPLETE);
     }
 
     public static void waitForStackDeletion(final String stackIdentifier,
-                                            final AmazonCloudFormation amazonCloudFormation) {
-        final Waiter<DescribeStacksRequest> waiter = amazonCloudFormation.waiters().stackDeleteComplete();
-        final String description = format("deletion of stack '%s'", stackIdentifier);
-        wait(waiter, stackIdentifier, description);
+                                            final CloudFormationClient cloudFormationClient) {
+        waitFor(stackIdentifier, cloudFormationClient, stack -> stack
+                .map(Stack::stackStatus)
+                .map(stackStatus -> {
+                    log.info("Waiting for stack {} to be deleted but it still exists in status {}",
+                            stackIdentifier, stackStatus);
+                    return false;
+                })
+                .orElse(true));
     }
 
-    private static void wait(final Waiter<DescribeStacksRequest> waiter,
-                             final String stackIdentifier,
-                             final String description) {
-        log.info("Waiting for {}...", description);
-        final DescribeStacksRequest request = new DescribeStacksRequest().withStackName(stackIdentifier);
-        final SynchronousWaiterHandler waiterHandler = synchronousWaiterHandler(description);
-        final Future<Void> waitFuture = waiter.runAsync(new WaiterParameters<>(request), waiterHandler);
+    private static void waitForStatus(final String stackIdentifier,
+                                      final CloudFormationClient cloudFormationClient,
+                                      final StackStatus expectedStatus) {
+        waitFor(stackIdentifier, cloudFormationClient, stack -> stack
+                .map(Stack::stackStatus)
+                .map(stackStatus -> {
+                    final boolean equals = expectedStatus.equals(stackStatus);
+                    if (!equals) {
+                        log.info("Waiting for stack {} to become {} but was {}",
+                                stackIdentifier, expectedStatus, stackStatus);
+                    }
+                    return equals;
+                })
+                .orElseGet(() -> {
+                    log.info("Did not find stack {}", stackIdentifier);
+                    return false;
+                })
+        );
+    }
 
-        try {
-            waitFuture.get(TIMEOUT_IN_MINUTES, TimeUnit.MINUTES);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (final ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
+    private static void waitFor(final String stackIdentifier,
+                                final CloudFormationClient cloudFormationClient,
+                                final Predicate<Optional<Stack>> condition) {
+        pollWithTimeout(MAX_NUMBER_OF_TRIES, SLEEP_TIME_IN_MILLISECONDS,
+                () -> conditionReached(stackIdentifier, cloudFormationClient, condition));
+    }
+
+    private static boolean conditionReached(final String stackIdentifier,
+                                            final CloudFormationClient cloudFormationClient,
+                                            final Predicate<Optional<Stack>> condidtion) {
+        final DescribeStacksResponse describeStacksResponse = cloudFormationClient.describeStacks();
+
+        final List<Stack> stacks = describeStacksResponse.stacks().stream()
+                .filter(stack -> stackIdentifier.equals(stack.stackName()))
+                .collect(toList());
+        final Optional<Stack> stack;
+        if (stacks.isEmpty()) {
+            stack = Optional.empty();
+        } else {
+            stack = Optional.of(stacks.get(0));
         }
-        waiterHandler.verifySuccessful();
-        log.info("Successfully waited for {}.", description);
+        return condidtion.test(stack);
     }
 }
