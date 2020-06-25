@@ -21,16 +21,11 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.File;
-
-import static com.amazonaws.services.s3.AmazonS3ClientBuilder.defaultClient;
 
 @Slf4j
 public final class S3Handler {
@@ -41,35 +36,31 @@ public final class S3Handler {
     public static String uploadToS3Bucket(final String bucketName,
                                           final File file) {
         final String key = keyFromFile(file);
-        final AmazonS3 amazonS3 = defaultClient();
-        try {
+        try (S3Client s3Client = S3Client.create()) {
             log.info("Uploading {} to S3 object {}/{}...", file, bucketName, key);
-            if (!fileNeedsUploading(bucketName, key, amazonS3)) {
+            if (!fileNeedsUploading(bucketName, key, s3Client)) {
                 log.info("S3 object with matching MD5 already present, skipping upload.");
             } else {
                 log.info("S3 object not already present, uploading...");
-                final PutObjectRequest request = new PutObjectRequest(bucketName, key, file);
-                amazonS3.putObject(request);
+                s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .build(), file.toPath());
                 log.info("Uploaded {} to S3 object {}/{}.", file, bucketName, key);
             }
             return key;
-        } finally {
-            amazonS3.shutdown();
         }
     }
 
     private static boolean fileNeedsUploading(final String bucketName,
                                               final String key,
-                                              final AmazonS3 amazonS3) {
-        try {
-            amazonS3.getObjectMetadata(bucketName, key);
-            return true;
-        } catch (final AmazonS3Exception e) {
-            if (!e.getMessage().startsWith("Not Found")) {
-                throw e;
-            }
-            return true;
-        }
+                                              final S3Client s3Client) {
+        final ListObjectsResponse objectsResponse = s3Client.listObjects(ListObjectsRequest.builder()
+                .bucket(bucketName)
+                .build());
+        return objectsResponse.contents().stream()
+                .map(S3Object::key)
+                .noneMatch(key::equals);
     }
 
     private static String keyFromFile(final File file) {
@@ -78,24 +69,25 @@ public final class S3Handler {
     }
 
     public static void deleteAllObjectsInBucket(final String bucketName) {
-        final AmazonS3 amazonS3 = defaultClient();
-        try {
-            final ObjectListing objectListing = amazonS3.listObjects(bucketName);
-            objectListing.getObjectSummaries().forEach(s3ObjectSummary -> {
-                final String key = s3ObjectSummary.getKey();
-                deleteFromS3Bucket(bucketName, key, amazonS3);
+        try (S3Client s3Client = S3Client.create()) {
+            final ListObjectsResponse listObjectsResponse = s3Client.listObjects(ListObjectsRequest.builder()
+                    .bucket(bucketName)
+                    .build());
+            listObjectsResponse.contents().forEach(s3Object -> {
+                final String key = s3Object.key();
+                deleteFromS3Bucket(bucketName, key, s3Client);
             });
-        } finally {
-            amazonS3.shutdown();
         }
     }
 
     private static void deleteFromS3Bucket(final String bucketName,
                                            final String key,
-                                           final AmazonS3 amazonS3) {
+                                           final S3Client s3Client) {
         log.info("Deleting S3 object {}/{}...", bucketName, key);
-        final DeleteObjectRequest request = new DeleteObjectRequest(bucketName, key);
-        amazonS3.deleteObject(request);
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build());
         log.info("Deleted S3 object {}/{}.", bucketName, key);
     }
 }

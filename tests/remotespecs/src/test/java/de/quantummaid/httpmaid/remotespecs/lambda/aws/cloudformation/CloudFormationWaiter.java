@@ -79,6 +79,6 @@ public final class CloudFormationWaiter {
             throw new RuntimeException(e);
         }
         waiterHandler.verifySuccessful();
-        log.info("Succeesfully waited for {}.", description);
+        log.info("Successfully waited for {}.", description);
     }
 }
