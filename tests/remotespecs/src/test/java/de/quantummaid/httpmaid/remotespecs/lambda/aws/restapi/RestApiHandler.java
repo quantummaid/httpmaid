@@ -21,9 +21,8 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi;
 
-import com.amazonaws.services.apigateway.AmazonApiGateway;
-import com.amazonaws.services.apigateway.AmazonApiGatewayClientBuilder;
-import com.amazonaws.services.apigateway.model.*;
+import software.amazon.awssdk.services.apigateway.ApiGatewayClient;
+import software.amazon.awssdk.services.apigateway.model.*;
 
 public final class RestApiHandler {
 
@@ -31,33 +30,32 @@ public final class RestApiHandler {
     }
 
     public static RestApiInformation loadRestApiInformation(final String apiName, final String region) {
-        final AmazonApiGateway amazonApiGateway = AmazonApiGatewayClientBuilder.defaultClient();
-        try {
-            final String apiId = restApiIdByName(apiName, amazonApiGateway);
-            final String stageName = restApiStageName(apiId, amazonApiGateway);
+        try (ApiGatewayClient apiGatewayClient = ApiGatewayClient.create()) {
+            final String apiId = restApiIdByName(apiName, apiGatewayClient);
+            final String stageName = restApiStageName(apiId, apiGatewayClient);
             return RestApiInformation.restApiInformation(apiId, stageName, region);
-        } finally {
-            amazonApiGateway.shutdown();
         }
     }
 
     private static String restApiIdByName(final String apiName,
-                                          final AmazonApiGateway amazonApiGateway) {
-        final GetRestApisResult restApis = amazonApiGateway.getRestApis(new GetRestApisRequest());
-        final RestApi restApi = restApis.getItems().stream()
-                .filter(api -> apiName.equals(api.getName()))
+                                          final ApiGatewayClient apiGatewayClient) {
+        final GetRestApisResponse restApis = apiGatewayClient.getRestApis();
+        final RestApi restApi = restApis.items().stream()
+                .filter(api -> apiName.equals(api.name()))
                 .findFirst()
                 .orElseThrow();
-        return restApi.getId();
+        return restApi.id();
     }
 
     private static String restApiStageName(final String apiId,
-                                           final AmazonApiGateway amazonApiGateway) {
-        final GetStagesResult stages = amazonApiGateway.getStages(new GetStagesRequest().withRestApiId(apiId));
-        if (stages.getItem().size() != 1) {
+                                           final ApiGatewayClient apiGatewayClient) {
+        final GetStagesResponse stages = apiGatewayClient.getStages(GetStagesRequest.builder()
+                .restApiId(apiId)
+                .build());
+        if (stages.item().size() != 1) {
             throw new UnsupportedOperationException();
         }
-        final Stage restStage = stages.getItem().get(0);
-        return restStage.getStageName();
+        final Stage restStage = stages.item().get(0);
+        return restStage.stageName();
     }
 }
