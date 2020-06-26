@@ -130,28 +130,6 @@ public interface RemoteSpecs {
                 .theResponseBodyWas("");
     }
 
-    @Test
-    default void websocketTest(final TestEnvironment testEnvironment) {
-        testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnected()
-                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
-    }
-
-    @Test
-    default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
-        final String runBroadcastSpecs = System.getProperty("runBroadcastSpecs");
-        if ("true".equals(runBroadcastSpecs)) {
-            testEnvironment.givenTheStaticallyDeployedTestInstance()
-                    .when().aWebsocketIsConnected()
-                    .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                    .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
-                    .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
-                    .theStatusCodeWas(200)
-                    .aWebsocketMessageHasBeenReceivedWithContent("foo");
-        }
-    }
-
     /**
      * Cookie: cookie-list
      * Cookie: name=value; name2=value2; name3=value3
@@ -195,5 +173,35 @@ public interface RemoteSpecs {
                 .theReponseContainsTheHeaderRawValues("Set-Cookie",
                         "cookie1=\"cookie,value,1\"",
                         "cookie2=\"cookie,value,2\"");
+    }
+
+    @Test
+    default void websocketTest(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
+    }
+
+    @Test
+    default void websocketsCanAccessHeaders(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected(Map.of(), Map.of("X-My-Header", List.of("myvalue")))
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"headerhandler\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("myvalue");
+    }
+
+    @Test
+    default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
+        final String runBroadcastSpecs = System.getProperty("runBroadcastSpecs");
+        if ("true".equals(runBroadcastSpecs)) {
+            testEnvironment.givenTheStaticallyDeployedTestInstance()
+                    .when().aWebsocketIsConnected()
+                    .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                    .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                    .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
+                    .theStatusCodeWas(200)
+                    .aWebsocketMessageHasBeenReceivedWithContent("foo");
+        }
     }
 }

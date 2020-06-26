@@ -25,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public final class Checkpoints {
     private final List<String> checkpoints = new ArrayList<>(0);
 
@@ -44,6 +46,7 @@ public final class Checkpoints {
 
     public synchronized void visitCheckpoint(final String checkpoint) {
         checkpoints.add(checkpoint);
+        log.info("Visited checkpoint {}", checkpoint);
     }
 
     private synchronized boolean hasCheckpointBeenVisited(final Predicate<String> checker) {

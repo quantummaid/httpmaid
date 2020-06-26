@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.websockets;
 
 import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
@@ -34,5 +35,10 @@ public final class WebsocketConfigurators {
         validateNotNull(routeSelectionExpression, "routeSelectionExpression");
         return Configurator.configuratorForType(WebsocketsModule.class,
                 websocketsModule -> websocketsModule.setRouteSelectionExpression(routeSelectionExpression));
+    }
+
+    public static Configurator toUseWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
+        return Configurator.configuratorForType(WebsocketsModule.class,
+                websocketsModule -> websocketsModule.setWebsocketRegistry(websocketRegistry));
     }
 }

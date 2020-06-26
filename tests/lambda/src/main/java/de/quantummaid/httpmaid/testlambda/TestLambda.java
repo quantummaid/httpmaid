@@ -24,6 +24,9 @@ package de.quantummaid.httpmaid.testlambda;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
+import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -32,7 +35,9 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
-import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
+import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
+import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
 
 @ToString
 @EqualsAndHashCode
@@ -41,6 +46,14 @@ public final class TestLambda {
 
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
     private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
+
+    private static HttpMaid httpMaid() {
+        final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
+        final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
+        return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
+                .configured(toUseWebsocketRegistry(websocketRegistry)));
+    }
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         if (!isWebSocketRequest(event)) {

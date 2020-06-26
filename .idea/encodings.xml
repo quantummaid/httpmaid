@@ -1,43 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/core" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/core/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/coverage" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/examples" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/examples/documentation" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/all" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/aws-lambda" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/aws-lambda-websocket/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/aws-lambda/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/client" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/client/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/dagger" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/dagger/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/events" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/events/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/guice" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/guice/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/jetty" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/jetty/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/jsr356/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/mapmaid" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/mapmaid/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/multipart" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/multipart/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/servlet" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/servlet/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/undertow/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integrations/usecases" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/integrations/usecases/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tests" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/jar/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/lambda/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/remotespecs-instance/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/remotespecs/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tests/testsuite" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/testsuite/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tests/war/src/main/java" charset="UTF-8" />
   </component>

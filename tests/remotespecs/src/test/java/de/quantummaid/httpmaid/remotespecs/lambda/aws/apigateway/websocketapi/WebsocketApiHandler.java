@@ -19,12 +19,12 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.websocketapi;
 
 import software.amazon.awssdk.services.apigatewayv2.ApiGatewayV2Client;
 import software.amazon.awssdk.services.apigatewayv2.model.*;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation.websocketApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.websocketapi.WebsocketApiInformation.websocketApiInformation;
 
 public final class WebsocketApiHandler {
 
