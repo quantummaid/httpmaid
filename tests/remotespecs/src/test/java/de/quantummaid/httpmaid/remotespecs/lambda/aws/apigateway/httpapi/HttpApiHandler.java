@@ -19,13 +19,13 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.httpapi;
 
 import software.amazon.awssdk.services.apigatewayv2.ApiGatewayV2Client;
 import software.amazon.awssdk.services.apigatewayv2.model.Api;
 import software.amazon.awssdk.services.apigatewayv2.model.GetApisResponse;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiInformation.httpApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.httpapi.HttpApiInformation.httpApiInformation;
 
 public final class HttpApiHandler {
 

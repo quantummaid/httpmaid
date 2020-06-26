@@ -85,6 +85,11 @@ public final class HttpMaidFactory {
 
                 .websocket("handler1", (request, response) -> response.setBody("handler 1"))
                 .websocket("handler2", (request, response) -> response.setBody("handler 2"))
+                .websocket("headerhandler", (request, response) -> {
+                    final String header = request.headers().header("X-My-Header");
+                    response.setBody(header);
+                })
+
                 .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
                 .websocket("check", (request, response) -> response.setBody("websocket has been registered"));
         configurator.accept(builder);

@@ -24,10 +24,10 @@ package de.quantummaid.httpmaid.remotespecs.lambda;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.httpapi.HttpApiInformation;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.restapi.RestApiInformation;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.websocketapi.WebsocketApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler;
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiInformation;
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiInformation;
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory.BaseDirectoryFinder;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
@@ -41,12 +41,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.httpapi.HttpApiHandler.loadHttpApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.restapi.RestApiHandler.loadRestApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.connectToCloudFormation;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.httpapi.HttpApiHandler.loadHttpApiInformation;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi.RestApiHandler.loadRestApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb.DynamoDbHandler.resetTable;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.deleteAllObjectsInBucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
 import static java.util.Optional.ofNullable;
 
@@ -124,6 +125,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
                 Map.of("StackIdentifier", stackIdentifier,
                         "ArtifactBucketName", artifactBucketName,
                         "ArtifactKey", s3Key));
+        resetTable(stackIdentifier);
 
         final Map<Class<? extends RemoteSpecs>, Deployment> deploymentMap = buildDeploymentMap();
 

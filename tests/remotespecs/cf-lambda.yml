@@ -16,6 +16,23 @@ Parameters:
     Description: "S3 Key of the remotespecs lamba jar to deploy"
 
 Resources:
+
+  ##############
+  ## DynamoDB ##
+  ##############
+
+  WebsocketRegistryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref StackIdentifier
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+
   ############
   ## Lambda ##
   ############
@@ -46,7 +63,7 @@ Resources:
                   - 'dynamodb:Query'
                   - 'dynamodb:Scan'
                   - 'dynamodb:UpdateItem'
-                Resource: 'arn:aws:dynamodb:eu-central-1:712767472906:table/WebsocketsTest'
+                Resource: !Join ['', ["arn:aws:dynamodb:", !Sub "${AWS::Region}", ":", !Sub "${AWS::AccountId}", ":table/", !Ref WebsocketRegistryTable]]
                 Effect: Allow
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -80,6 +97,9 @@ Resources:
       Role: !GetAtt FunctionRole.Arn
       Timeout: 20
       Runtime: java11
+      Environment:
+        Variables:
+          WEBSOCKET_REGISTRY_TABLE: !Ref WebsocketRegistryTable
 
   #####################
   ## HTTP ApiGateway ##
@@ -217,13 +237,9 @@ Resources:
       ApiId: !Ref HttpMaidWebsocketsApi
       RouteKey: $connect
       AuthorizationType: NONE
-      # A Lambda proxy response is used for $connect messages to return
-      # success/failure info to the caller.
-      # See the matching response section following the integration definition.
       RouteResponseSelectionExpression: $default
       Target: !Join ['/', [integrations, !Ref HttpMaidWebsocketsApiConnectIntegration]] # See below
 
-  # The Lambda proxy for $connect.
   HttpMaidWebsocketsApiConnectIntegration:
     Type: AWS::ApiGatewayV2::Integration
     Properties:

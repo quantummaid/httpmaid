@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda.aws.restapi;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.restapi;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import lombok.AccessLevel;
