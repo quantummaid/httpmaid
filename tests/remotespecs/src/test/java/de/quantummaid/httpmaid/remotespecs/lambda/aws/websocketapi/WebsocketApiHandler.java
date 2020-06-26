@@ -21,9 +21,8 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi;
 
-import com.amazonaws.services.apigatewayv2.AmazonApiGatewayV2;
-import com.amazonaws.services.apigatewayv2.AmazonApiGatewayV2ClientBuilder;
-import com.amazonaws.services.apigatewayv2.model.*;
+import software.amazon.awssdk.services.apigatewayv2.ApiGatewayV2Client;
+import software.amazon.awssdk.services.apigatewayv2.model.*;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.websocketapi.WebsocketApiInformation.websocketApiInformation;
 
@@ -33,37 +32,35 @@ public final class WebsocketApiHandler {
     }
 
     public static WebsocketApiInformation loadWebsocketApiInformation(final String apiName) {
-        final AmazonApiGatewayV2 amazonApiGatewayV2 = AmazonApiGatewayV2ClientBuilder.defaultClient();
-
-        try {
-            final Api api = apiByName(apiName, amazonApiGatewayV2);
-            final String apiId = api.getApiId();
-            final String endpoint = api.getApiEndpoint();
+        try (ApiGatewayV2Client apiGatewayV2Client = ApiGatewayV2Client.create()) {
+            final Api api = apiByName(apiName, apiGatewayV2Client);
+            final String apiId = api.apiId();
+            final String endpoint = api.apiEndpoint();
             final String region = endpoint.split("\\.")[2];
-            final String stageName = stageNameByApi(api, amazonApiGatewayV2);
+            final String stageName = stageNameByApi(api, apiGatewayV2Client);
             return websocketApiInformation(apiId, region, stageName);
-        } finally {
-            amazonApiGatewayV2.shutdown();
         }
     }
 
     private static Api apiByName(final String apiName,
-                                 final AmazonApiGatewayV2 amazonApiGatewayV2) {
-        final GetApisResult apis = amazonApiGatewayV2.getApis(new GetApisRequest());
-        return apis.getItems().stream()
-                .filter(api -> apiName.equals(api.getName()))
+                                 final ApiGatewayV2Client apiGatewayV2Client) {
+        final GetApisResponse apis = apiGatewayV2Client.getApis();
+        return apis.items().stream()
+                .filter(api -> apiName.equals(api.name()))
                 .findFirst()
                 .orElseThrow();
     }
 
     private static String stageNameByApi(final Api api,
-                                         final AmazonApiGatewayV2 amazonApiGatewayV2) {
-        final String apiId = api.getApiId();
-        final GetStagesResult websocketStages = amazonApiGatewayV2.getStages(new GetStagesRequest().withApiId(apiId));
-        if (websocketStages.getItems().size() != 1) {
+                                         final ApiGatewayV2Client apiGatewayV2Client) {
+        final String apiId = api.apiId();
+        final GetStagesResponse websocketStages = apiGatewayV2Client.getStages(GetStagesRequest.builder()
+                .apiId(apiId)
+                .build());
+        if (websocketStages.items().size() != 1) {
             throw new UnsupportedOperationException();
         }
-        final Stage websocketStage = websocketStages.getItems().get(0);
-        return websocketStage.getStageName();
+        final Stage websocketStage = websocketStages.items().get(0);
+        return websocketStage.stageName();
     }
 }
