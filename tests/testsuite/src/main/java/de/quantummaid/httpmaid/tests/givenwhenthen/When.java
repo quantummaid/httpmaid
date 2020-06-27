@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.RuntimeInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.*;
 import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
@@ -30,6 +32,8 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +75,38 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
         final WrappedWebsocket websocket = testData.getWebsocket();
         ResourcesTracker.addResource(websocket);
         websocket.send(message);
+        return Then.then(testData);
+    }
+
+    @Override
+    public Then theLastWebsocketIsDisconnected() {
+        final WrappedWebsocket websocket = testData.getWebsocket();
+        try {
+            websocket.close();
+        } catch (final IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return Then.then(testData);
+    }
+
+    @Override
+    public Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(final int expectedNumberOfWebsockets) {
+        final int maxNumberOfTries = 60;
+        final int sleepTimeInMilliseconds = 1000;
+        Poller.pollWithTimeout(maxNumberOfTries, sleepTimeInMilliseconds, () -> {
+            theRuntimeDataIsQueried();
+            final RuntimeInformation runtimeInformation = testData.getRuntimeInformation();
+            final int actualNumberOfWebsockets = runtimeInformation.numberOfConnectedWebsockets();
+            return actualNumberOfWebsockets == expectedNumberOfWebsockets;
+        });
+        return Then.then(testData);
+    }
+
+    @Override
+    public Then theRuntimeDataIsQueried() {
+        final HttpMaid httpMaid = testData.getHttpMaid();
+        final RuntimeInformation runtimeInformation = httpMaid.queryRuntimeInformation();
+        testData.setRuntimeInformation(runtimeInformation);
         return Then.then(testData);
     }
 

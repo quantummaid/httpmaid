@@ -19,29 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.builders;
+package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.tests.givenwhenthen.Then;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
-import java.util.Map;
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RuntimeInformation {
+    private final int numberOfConnectedWebsockets;
 
-public interface FirstWhenStage {
-    MethodBuilder aRequestToThePath(String path);
-
-    Then httpMaidIsInitialized();
-
-    default Then aWebsocketIsConnected() {
-        return aWebsocketIsConnected(Map.of(), Map.of());
+    public static RuntimeInformation runtimeInformation(final int numberOfConnectedWebsockets) {
+        return new RuntimeInformation(numberOfConnectedWebsockets);
     }
 
-    Then aWebsocketIsConnected(Map<String, List<String>> queryParameters, Map<String, List<String>> headers);
-
-    Then aWebsocketMessageIsSent(String message);
-
-    Then theLastWebsocketIsDisconnected();
-
-    Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(int expectedNumberOfWebsockets);
-
-    Then theRuntimeDataIsQueried();
+    public int numberOfConnectedWebsockets() {
+        return numberOfConnectedWebsockets;
+    }
 }

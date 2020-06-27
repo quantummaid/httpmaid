@@ -92,6 +92,18 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
         repository.store(key, map);
     }
 
+    @Override
+    public void removeConnection(final ConnectionInformation connectionInformation) {
+        final String key = connectionInformation.uniqueIdentifier();
+        repository.delete(key);
+    }
+
+    @Override
+    public int countConnections() {
+        final List<WebsocketRegistryEntry> connections = connections();
+        return connections.size();
+    }
+
     @SuppressWarnings("unchecked")
     private static WebsocketRegistryEntry deserializeEntry(final Map<String, Object> map) {
         final Map<String, Object> connectionInformationMap = (Map<String, Object>) map.get("connectionInformation");

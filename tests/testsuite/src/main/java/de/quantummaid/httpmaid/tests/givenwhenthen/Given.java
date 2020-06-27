@@ -59,6 +59,7 @@ public final class Given {
             testData.setInitializationException(e);
             return When.when(testData);
         }
+        testData.setHttpMaid(httpMaid);
         final Deployment deployment = deployer.deploy(httpMaid);
         final HttpClientWrapper clientWrapper = clientFactory.createClient(deployment);
         testData.setClientWrapper(clientWrapper);

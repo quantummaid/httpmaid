@@ -30,6 +30,7 @@ import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 public final class WebsocketMetaDataKeys {
     public static final String WEBSOCKET_CONNECT = "WEBSOCKET_CONNECT";
     public static final String WEBSOCKET_MESSAGE = "WEBSOCKET_MESSAGE";
+    public static final String WEBSOCKET_DISCONNECT = "WEBSOCKET_DISCONNECT";
 
     public static final MetaDataKey<WebsocketRegistry> WEBSOCKET_REGISTRY = metaDataKey("WEBSOCKET_REGISTRY");
 

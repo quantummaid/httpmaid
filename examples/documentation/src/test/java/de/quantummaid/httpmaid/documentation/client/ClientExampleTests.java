@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.documentation.client;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.httpmaid.client.SimpleHttpResponseObject;
+import de.quantummaid.httpmaid.documentation.support.FreePortPool;
 import de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import org.junit.jupiter.api.Test;
@@ -37,25 +38,36 @@ import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientBypas
 import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientForTheHost;
 import static de.quantummaid.httpmaid.client.body.multipart.Part.aPartWithTheControlName;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class ClientExampleTests {
 
     @Test
-    public void clientExample() {
-        final HttpMaid httpMaid = anHttpMaid()
-                .get("/foo", (request, response) -> response.setBody("foo"))
-                .post("/placeOrder", (request, response) -> response.setBody("foo"))
-                .post("/upload", (request, response) -> response.setBody("foo"))
-                .build();
-        final PureJavaEndpoint endpoint = PureJavaEndpoint.pureJavaEndpointFor(httpMaid).listeningOnThePort(8080);
-
+    public void clientConfiguration() {
         //Showcase start clientExample
         final HttpMaidClient httpMaidClient = aHttpMaidClientForTheHost("localhost")
                 .withThePort(8080)
                 .viaHttp()
                 .build();
         //Showcase end clientExample
+        assertThat(httpMaidClient, notNullValue());
+    }
+
+    @Test
+    public void clientExample() {
+        final int port = FreePortPool.freePort();
+        final HttpMaid httpMaid = anHttpMaid()
+                .get("/foo", (request, response) -> response.setBody("foo"))
+                .post("/placeOrder", (request, response) -> response.setBody("foo"))
+                .post("/upload", (request, response) -> response.setBody("foo"))
+                .build();
+        final PureJavaEndpoint endpoint = PureJavaEndpoint.pureJavaEndpointFor(httpMaid).listeningOnThePort(port);
+
+        final HttpMaidClient httpMaidClient = aHttpMaidClientForTheHost("localhost")
+                .withThePort(port)
+                .viaHttp()
+                .build();
 
         final InputStream myStream = Streams.stringToInputStream("foo");
         //Showcase start clientUsageExamples

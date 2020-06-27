@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.RuntimeInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
@@ -46,6 +48,12 @@ public final class TestData {
     @Getter
     @Setter
     private WrappedWebsocket websocket;
+    @Getter
+    @Setter
+    private HttpMaid httpMaid;
+    @Getter
+    @Setter
+    private RuntimeInformation runtimeInformation;
 
     public static TestData testData() {
         return new TestData();

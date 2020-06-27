@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import com.google.gson.Gson;
+import de.quantummaid.httpmaid.RuntimeInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -169,6 +170,12 @@ public final class Then {
             return content.equals(actual);
         });
         assertThat(visited, is(true));
+        return this;
+    }
+
+    public Then theQueriedNumberOfWebsocketsIs(final int numberOfWebsockets) {
+        final RuntimeInformation runtimeInformation = testData.getRuntimeInformation();
+        assertThat(runtimeInformation.numberOfConnectedWebsockets(), is(numberOfWebsockets));
         return this;
     }
 }

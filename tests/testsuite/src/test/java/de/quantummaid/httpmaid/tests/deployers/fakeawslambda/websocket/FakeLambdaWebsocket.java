@@ -70,7 +70,8 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
 
     @Override
     public void onWebSocketClose(final int i, final String s) {
-
+        final Map<String, Object> event = createEvent("DISCONNECT");
+        endpoint.delegate(event);
     }
 
     @Override

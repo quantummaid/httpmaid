@@ -27,7 +27,13 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.model.PostToConnectionRequest;
 
+import java.net.URI;
+
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 
 @ToString
@@ -43,7 +49,17 @@ public final class AwsWebsocketSender implements WebsocketSender<AwsWebsocketCon
     @Override
     public void send(final AwsWebsocketConnectionInformation connectionInformation,
                      final String message) {
-        throw new UnsupportedOperationException();
+        validateNotNull(connectionInformation, "connectionInformation");
+        final String endpoint = connectionInformation.toEndpointUrl();
+        try (ApiGatewayManagementApiClient apiGatewayManagementApiClient = ApiGatewayManagementApiClient.builder()
+                .endpointOverride(URI.create(endpoint))
+                .build()) {
+            final String connectionId = connectionInformation.connectionId;
+            apiGatewayManagementApiClient.postToConnection(PostToConnectionRequest.builder()
+                    .connectionId(connectionId)
+                    .data(SdkBytes.fromUtf8String(message))
+                    .build());
+        }
     }
 
     @Override
