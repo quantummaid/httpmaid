@@ -19,48 +19,37 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.websocket.bypass;
+package de.quantummaid.httpmaid.undertow;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.client.websocket.Websocket;
-import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
-import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.xnio.ChannelListener;
+
+import java.nio.channels.Channel;
 
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
-import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.rawWebsocketMessage;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BypassedWebsocket implements Websocket {
+public class CloseListener<T extends Channel> implements ChannelListener<T> {
+    private final ConnectionInformation connectionInformation;
     private final HttpMaid httpMaid;
-    private final WebsocketMessageHandler messageHandler;
-    private final NonSerializableConnectionInformation connectionInformation;
 
-    public static BypassedWebsocket bypassedWebsocket(final HttpMaid httpMaid,
-                                                      final WebsocketMessageHandler messageHandler,
-                                                      final NonSerializableConnectionInformation connectionInformation) {
-        return new BypassedWebsocket(httpMaid, messageHandler, connectionInformation);
-    }
-
-    public void send(final String message) {
-        httpMaid.handleRequest(
-                () -> rawWebsocketMessage(connectionInformation, message),
-                response -> response.optionalStringBody()
-                        .ifPresent(messageHandler::handle)
-        );
+    public static <T extends Channel> CloseListener<T> closeListener(final ConnectionInformation connectionInformation,
+                                                                     final HttpMaid httpMaid) {
+        return new CloseListener<>(connectionInformation, httpMaid);
     }
 
     @Override
-    public void close() {
+    public void handleEvent(final T channel) {
         httpMaid.handleRequest(
                 () -> rawWebsocketDisconnect(connectionInformation),
                 response -> {
-                }
-        );
+                });
     }
 }

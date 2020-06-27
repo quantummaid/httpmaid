@@ -29,4 +29,8 @@ public interface WebsocketRegistry {
     WebsocketRegistryEntry byConnectionInformation(ConnectionInformation connectionInformation);
 
     void addConnection(WebsocketRegistryEntry entry);
+
+    void removeConnection(ConnectionInformation connectionInformation);
+
+    int countConnections();
 }

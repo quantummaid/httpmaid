@@ -38,8 +38,11 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.awsWebsocketSender;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 
@@ -55,6 +58,7 @@ public final class AwsWebsocketLambdaEndpoint {
 
     public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");
+        httpMaid.addWebsocketSender(AWS_WEBSOCKET_SENDER, awsWebsocketSender());
         return new AwsWebsocketLambdaEndpoint(httpMaid);
     }
 
@@ -76,6 +80,7 @@ public final class AwsWebsocketLambdaEndpoint {
             handleConnect(event, connectionInformation);
             return emptyMap();
         } else if (DISCONNECT_EVENT_TYPE.equals(eventType)) {
+            handleDisconnect(connectionInformation);
             return emptyMap();
         } else if (MESSAGE_EVENT_TYPE.equals(eventType)) {
             return handleMessage(event, connectionInformation);
@@ -88,7 +93,7 @@ public final class AwsWebsocketLambdaEndpoint {
                                final AwsWebsocketConnectionInformation connectionInformation) {
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
-            builder.withConnectionInformation(AwsWebsocketSender.AWS_WEBSOCKET_SENDER, connectionInformation);
+            builder.withConnectionInformation(AWS_WEBSOCKET_SENDER, connectionInformation);
 
             final Map<String, List<String>> queryParameters = event.getOrDefault("multiValueQueryStringParameters", HashMap::new);
             builder.withQueryParameterMap(queryParameters);
@@ -100,6 +105,11 @@ public final class AwsWebsocketLambdaEndpoint {
 
             return builder.build();
         }, response -> {
+        });
+    }
+
+    private void handleDisconnect(final AwsWebsocketConnectionInformation connectionInformation) {
+        httpMaid.handleRequest(() -> rawWebsocketDisconnect(connectionInformation), response -> {
         });
     }
 

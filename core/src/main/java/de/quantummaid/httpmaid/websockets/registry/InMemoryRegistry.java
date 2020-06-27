@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
@@ -42,12 +43,12 @@ public final class InMemoryRegistry implements WebsocketRegistry {
     }
 
     @Override
-    public List<WebsocketRegistryEntry> connections() {
-        return entries;
+    public synchronized List<WebsocketRegistryEntry> connections() {
+        return new ArrayList<>(entries);
     }
 
     @Override
-    public WebsocketRegistryEntry byConnectionInformation(final ConnectionInformation connectionInformation) {
+    public synchronized WebsocketRegistryEntry byConnectionInformation(final ConnectionInformation connectionInformation) {
         return entries.stream()
                 .filter(entry -> entry.connectionInformation().equals(connectionInformation))
                 .findFirst()
@@ -55,7 +56,20 @@ public final class InMemoryRegistry implements WebsocketRegistry {
     }
 
     @Override
-    public void addConnection(final WebsocketRegistryEntry entry) {
+    public synchronized void addConnection(final WebsocketRegistryEntry entry) {
         entries.add(entry);
+    }
+
+    @Override
+    public synchronized void removeConnection(final ConnectionInformation connectionInformation) {
+        final List<WebsocketRegistryEntry> entriesToRemove = entries.stream()
+                .filter(entry -> entry.connectionInformation().equals(connectionInformation))
+                .collect(toList());
+        entries.removeAll(entriesToRemove);
+    }
+
+    @Override
+    public int countConnections() {
+        return entries.size();
     }
 }

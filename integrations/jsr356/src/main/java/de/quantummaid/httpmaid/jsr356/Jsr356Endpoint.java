@@ -30,6 +30,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
@@ -37,6 +38,7 @@ import javax.websocket.Session;
 import static de.quantummaid.httpmaid.jsr356.Jsr356MessageHandler.jsr356MessageHandler;
 import static de.quantummaid.httpmaid.jsr356.SenderHelper.sendMessage;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -44,6 +46,7 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.ra
 public class Jsr356Endpoint extends Endpoint {
     private final HttpMaid httpMaid;
     private final Headers headers;
+    private NonSerializableConnectionInformation connectionInformation;
 
     public static Jsr356Endpoint programmaticJsr356Endpoint(final HttpMaid httpMaid,
                                                             final Headers headers) {
@@ -51,8 +54,8 @@ public class Jsr356Endpoint extends Endpoint {
     }
 
     @Override
-    public void onOpen(final Session session, final EndpointConfig config) {
-        final NonSerializableConnectionInformation connectionInformation = message -> sendMessage(session, message);
+    public synchronized void onOpen(final Session session, final EndpointConfig config) {
+        connectionInformation = message -> sendMessage(session, message);
         httpMaid.handleRequest(
                 () -> {
                     final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
@@ -66,5 +69,14 @@ public class Jsr356Endpoint extends Endpoint {
                 }
         );
         session.addMessageHandler(jsr356MessageHandler(connectionInformation, session, httpMaid));
+    }
+
+    @Override
+    public synchronized void onClose(final Session session, final CloseReason closeReason) {
+        httpMaid.handleRequest(
+                () -> rawWebsocketDisconnect(connectionInformation),
+                response -> {
+                }
+        );
     }
 }

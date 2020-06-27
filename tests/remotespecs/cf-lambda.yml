@@ -65,6 +65,14 @@ Resources:
                   - 'dynamodb:UpdateItem'
                 Resource: !Join ['', ["arn:aws:dynamodb:", !Sub "${AWS::Region}", ":", !Sub "${AWS::AccountId}", ":table/", !Ref WebsocketRegistryTable]]
                 Effect: Allow
+        - PolicyName: !Sub "${StackIdentifier}-ExecuteApi"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - 'execute-api:ManageConnections'
+                Resource: "*"
+                Effect: Allow
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

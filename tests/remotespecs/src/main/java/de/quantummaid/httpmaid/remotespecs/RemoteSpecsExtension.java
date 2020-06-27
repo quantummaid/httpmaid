@@ -46,9 +46,9 @@ public final class RemoteSpecsExtension implements ParameterResolver,
     @SuppressWarnings("unchecked")
     @Override
     public Object resolveParameter(final ParameterContext parameterContext,
-                                   final ExtensionContext ctx) {
-        final Class<?> testClass = ctx.getRequiredTestClass();
-        final RemoteSpecsDeployment deployment = getDeployment(ctx);
+                                   final ExtensionContext extensionContext) {
+        final Class<?> testClass = extensionContext.getRequiredTestClass();
+        final RemoteSpecsDeployment deployment = getDeployment(extensionContext);
         validateNotNull(deployment, "deployment");
         final Deployer dummyDeployer = dummyDeployer(deployment.descriptorFor((Class<? extends RemoteSpecs>) testClass));
         final ClientFactory clientFactory = RealHttpMaidClientFactory.theRealHttpMaidClient();
@@ -72,13 +72,14 @@ public final class RemoteSpecsExtension implements ParameterResolver,
         putDeployment(context, deployment);
     }
 
-    private RemoteSpecsDeployment getDeployment(final ExtensionContext ctx) {
-        final Store store = ctx.getRoot().getStore(GLOBAL);
+    private RemoteSpecsDeployment getDeployment(final ExtensionContext context) {
+        final Store store = context.getRoot().getStore(GLOBAL);
         return store.get(deployer.getClass().getName(), RemoteSpecsDeployment.class);
     }
 
-    private void putDeployment(final ExtensionContext ctx, final RemoteSpecsDeployment deployment) {
-        final Store store = ctx.getRoot().getStore(GLOBAL);
+    private void putDeployment(final ExtensionContext context,
+                               final RemoteSpecsDeployment deployment) {
+        final Store store = context.getRoot().getStore(GLOBAL);
         store.put(deployer.getClass().getName(), deployment);
     }
 

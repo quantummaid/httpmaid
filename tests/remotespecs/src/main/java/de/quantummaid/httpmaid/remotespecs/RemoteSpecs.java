@@ -22,11 +22,15 @@
 package de.quantummaid.httpmaid.remotespecs;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.List;
 import java.util.Map;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public interface RemoteSpecs {
 
     RemoteSpecsDeployer provideDeployer();
@@ -175,6 +179,7 @@ public interface RemoteSpecs {
                         "cookie2=\"cookie,value,2\"");
     }
 
+    @Order(1)
     @Test
     default void websocketTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
@@ -183,6 +188,7 @@ public interface RemoteSpecs {
                 .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
     }
 
+    @Order(2)
     @Test
     default void websocketsCanAccessHeaders(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
@@ -191,17 +197,15 @@ public interface RemoteSpecs {
                 .aWebsocketMessageHasBeenReceivedWithContent("myvalue");
     }
 
+    @Order(3)
     @Test
     default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
-        final String runBroadcastSpecs = System.getProperty("runBroadcastSpecs");
-        if ("true".equals(runBroadcastSpecs)) {
-            testEnvironment.givenTheStaticallyDeployedTestInstance()
-                    .when().aWebsocketIsConnected()
-                    .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                    .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
-                    .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
-                    .theStatusCodeWas(200)
-                    .aWebsocketMessageHasBeenReceivedWithContent("foo");
-        }
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
+                .theStatusCodeWas(200)
+                .aWebsocketMessageHasBeenReceivedWithContent("foo");
     }
 }

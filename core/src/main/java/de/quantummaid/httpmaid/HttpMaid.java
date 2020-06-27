@@ -39,6 +39,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
+import static de.quantummaid.httpmaid.RuntimeInformation.runtimeInformation;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
@@ -119,6 +120,12 @@ public final class HttpMaid implements AutoCloseable {
 
     public String dumpChains() {
         return chainRegistry.dump();
+    }
+
+    public RuntimeInformation queryRuntimeInformation() {
+        final WebsocketRegistry websocketRegistry = chainRegistry.getMetaDatum(WEBSOCKET_REGISTRY);
+        final int numberOfConnectedWebsockets = websocketRegistry.countConnections();
+        return runtimeInformation(numberOfConnectedWebsockets);
     }
 
     public static HttpMaidBuilder anHttpMaid() {

@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
@@ -30,6 +31,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -39,6 +41,7 @@ import static de.quantummaid.httpmaid.websockets.broadcast.RecipientDeterminator
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public final class SerializingSender<T> {
     private final WebsocketRegistry websocketRegistry;
     private final WebsocketSenders websocketSenders;
@@ -59,8 +62,13 @@ public final class SerializingSender<T> {
         connections.forEach(connection -> {
             final WebsocketSenderId websocketSenderId = connection.senderId();
             final WebsocketSender<Object> sender = websocketSenders.senderById(websocketSenderId);
-            final Object connectionInformation = connection.connectionInformation();
-            sender.send(connectionInformation, (String) message);
+            final ConnectionInformation connectionInformation = connection.connectionInformation();
+            try {
+                sender.send(connectionInformation, (String) message);
+            } catch (final Exception e) {
+                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, e);
+                websocketRegistry.removeConnection(connectionInformation);
+            }
         });
     }
 }

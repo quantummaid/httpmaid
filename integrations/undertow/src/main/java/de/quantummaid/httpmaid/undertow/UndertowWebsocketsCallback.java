@@ -36,6 +36,7 @@ import lombok.ToString;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.undertow.CloseListener.closeListener;
 import static de.quantummaid.httpmaid.undertow.ReceiveListener.receiveListener;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
 import static io.undertow.websockets.core.WebSockets.sendText;
@@ -64,6 +65,7 @@ public final class UndertowWebsocketsCallback implements WebSocketConnectionCall
             return builder.build();
         }, response -> {
         });
+        channel.getCloseSetter().set(closeListener(connectionInformation, httpMaid));
         channel.getReceiveSetter().set(receiveListener(connectionInformation, httpMaid));
         channel.resumeReceives();
     }

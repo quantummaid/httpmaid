@@ -31,6 +31,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT;
 
 public final class WebsocketHeaderSpecs {
 
@@ -67,7 +68,7 @@ public final class WebsocketHeaderSpecs {
     }
 
     @ParameterizedTest
-    @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    @MethodSource(WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT)
     public void websocketHandlerCanAccessRequestHeaderThatOccursMultipleTimesWithDifferentValues(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
