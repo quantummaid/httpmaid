@@ -16,7 +16,7 @@ just include this dependency:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-all</artifactId>
-    <version>0.9.75</version>
+    <version>0.9.76</version>
 </dependency>
 ```
 This contains anything HttpMaid has to offer, but be aware that it probably adds
@@ -32,7 +32,7 @@ Every HttpMaid configuration needs to include the core module:
 <dependency>
     <groupId>de.quantummaid.httpmaid</groupId>
     <artifactId>core</artifactId>
-    <version>0.9.75</version>
+    <version>0.9.76</version>
 </dependency>
 ```
 It contains the basic HttpMaid builder and the [PureJavaEndpoint](UserGuide.md#Pure Java).
