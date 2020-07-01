@@ -29,6 +29,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
+import de.quantummaid.httpmaid.tests.givenwhenthen.websockets.ManagedWebsocket;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +41,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Headers.emptyHeaders;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest.httpClientRequest;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.websockets.WebsocketStatus.CLOSED;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
@@ -65,22 +67,29 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     public Then aWebsocketIsConnected(final Map<String, List<String>> queryParameters,
                                       final Map<String, List<String>> headers) {
         final Checkpoints checkpoints = testData.getCheckpoints();
-        final WrappedWebsocket websocket = testData.getClientWrapper().openWebsocket(checkpoints::visitCheckpoint, queryParameters, headers);
-        testData.setWebsocket(websocket);
+        final ManagedWebsocket managedWebsocket = ManagedWebsocket.managedWebsocket();
+        final WrappedWebsocket websocket = testData.getClientWrapper().openWebsocket(
+                checkpoints::visitCheckpoint,
+                () -> managedWebsocket.setStatus(CLOSED),
+                queryParameters,
+                headers
+        );
+        managedWebsocket.setWebsocket(websocket);
+        testData.getWebsockets().addWebsocket(managedWebsocket);
+        ResourcesTracker.addResource(websocket);
         return Then.then(testData);
     }
 
     @Override
     public Then aWebsocketMessageIsSent(final String message) {
-        final WrappedWebsocket websocket = testData.getWebsocket();
-        ResourcesTracker.addResource(websocket);
+        final WrappedWebsocket websocket = testData.getWebsockets().latestWebsocket();
         websocket.send(message);
         return Then.then(testData);
     }
 
     @Override
     public Then theLastWebsocketIsDisconnected() {
-        final WrappedWebsocket websocket = testData.getWebsocket();
+        final WrappedWebsocket websocket = testData.getWebsockets().latestWebsocket();
         try {
             websocket.close();
         } catch (final IOException e) {

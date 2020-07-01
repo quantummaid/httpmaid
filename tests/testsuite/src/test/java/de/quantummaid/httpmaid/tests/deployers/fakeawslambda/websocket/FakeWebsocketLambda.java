@@ -42,7 +42,8 @@ public final class FakeWebsocketLambda implements AutoCloseable {
     private final Server server;
 
     public static FakeWebsocketLambda fakeWebsocketLambda(final AwsWebsocketLambdaEndpoint endpoint,
-                                                          final int port) {
+                                                          final int port,
+                                                          final ApiWebsockets apiWebsockets) {
         final Server server = new Server(port);
 
         final HttpConnectionFactory connectionFactory = extractConnectionFactory(server);
@@ -50,7 +51,7 @@ public final class FakeWebsocketLambda implements AutoCloseable {
 
         final ServletHandler servletHandler = new ServletHandler();
         server.setHandler(servletHandler);
-        final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(endpoint));
+        final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(endpoint, apiWebsockets));
         servletHandler.addServletWithMapping(servletHolder, "/*");
         try {
             server.start();

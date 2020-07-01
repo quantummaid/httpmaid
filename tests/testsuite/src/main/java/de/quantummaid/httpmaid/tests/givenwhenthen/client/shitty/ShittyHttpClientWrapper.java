@@ -80,11 +80,18 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
 
     @Override
     public WrappedWebsocket openWebsocket(final Consumer<String> responseHandler,
+                                          final Runnable closeHandler,
                                           final Map<String, List<String>> queryParameters,
                                           final Map<String, List<String>> headers) {
         final ApiBaseUrl url = deployment.webSocketBaseUrl()
                 .orElseThrow(() -> new UnsupportedOperationException("Not a websocket deployment " + toString()));
-        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(url.toUrlString(), responseHandler, headers, queryParameters);
+        final ShittyWebsocketClient client = ShittyWebsocketClient.openWebsocket(
+                url.toUrlString(),
+                responseHandler,
+                closeHandler,
+                headers,
+                queryParameters
+        );
         return wrappedWebsocket(client::send, client);
     }
 

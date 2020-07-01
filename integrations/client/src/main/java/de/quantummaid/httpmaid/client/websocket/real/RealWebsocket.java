@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.client.websocket.real;
 
 import de.quantummaid.httpmaid.client.websocket.Websocket;
+import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -45,12 +46,14 @@ import static java.lang.Thread.currentThread;
 public final class RealWebsocket implements Websocket, WebSocketListener {
     private final CountDownLatch connectLatch = new CountDownLatch(1);
     private final WebsocketMessageHandler messageHandler;
+    private final WebsocketCloseHandler closeHandler;
     private final WebSocketClient client;
     private Session session;
 
     public static RealWebsocket realWebsocket(final WebsocketMessageHandler messageHandler,
+                                              final WebsocketCloseHandler closeHandler,
                                               final WebSocketClient client) {
-        return new RealWebsocket(messageHandler, client);
+        return new RealWebsocket(messageHandler, closeHandler, client);
     }
 
     void awaitConnect() {
@@ -83,7 +86,7 @@ public final class RealWebsocket implements Websocket, WebSocketListener {
 
     @Override
     public void onWebSocketClose(final int statusCode, final String reason) {
-        // not used
+        closeHandler.onClose();
     }
 
     @Override

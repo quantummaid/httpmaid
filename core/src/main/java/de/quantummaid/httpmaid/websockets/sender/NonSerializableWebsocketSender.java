@@ -44,6 +44,10 @@ public final class NonSerializableWebsocketSender implements WebsocketSender<Non
         connectionInformation.send(message);
     }
 
+    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
+        connectionInformation.disconnect();
+    }
+
     @Override
     public WebsocketSenderId senderId() {
         return NON_SERIALIZABLE_WEBSOCKET_SENDER;

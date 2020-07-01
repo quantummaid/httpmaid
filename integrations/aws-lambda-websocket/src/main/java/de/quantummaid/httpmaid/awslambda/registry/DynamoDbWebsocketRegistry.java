@@ -111,7 +111,12 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
         final String stage = (String) connectionInformationMap.get("stage");
         final String apiId = (String) connectionInformationMap.get("apiId");
         final String region = (String) connectionInformationMap.get("region");
-        final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
+        final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(
+                connectionId,
+                stage,
+                apiId,
+                region
+        );
 
         final String senderId = (String) map.get("senderId");
         final List<Map<String, String>> serializedHeaders = (List<Map<String, String>>) map.get("headers");

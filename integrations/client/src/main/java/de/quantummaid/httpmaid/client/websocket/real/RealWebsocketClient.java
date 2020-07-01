@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.client.websocket.real;
 
 import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
+import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -57,6 +58,7 @@ public final class RealWebsocketClient implements WebsocketClient {
 
     @Override
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
+                                   final WebsocketCloseHandler closeHandler,
                                    final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers,
                                    final String path) {
@@ -67,7 +69,7 @@ public final class RealWebsocketClient implements WebsocketClient {
             final URI uriObject = createUri(fullUri, queryParameters);
             final ClientUpgradeRequest request = new ClientUpgradeRequest();
             headers.forEach(request::setHeader);
-            final RealWebsocket realWebsocket = realWebsocket(messageHandler, client);
+            final RealWebsocket realWebsocket = realWebsocket(messageHandler, closeHandler, client);
             client.connect(realWebsocket, uriObject, request);
             realWebsocket.awaitConnect();
             return realWebsocket;

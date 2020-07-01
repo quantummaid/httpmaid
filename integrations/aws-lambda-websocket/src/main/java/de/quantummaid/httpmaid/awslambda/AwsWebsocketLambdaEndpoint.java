@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.awslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
@@ -40,6 +41,7 @@ import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.awsWebsocketSender;
+import static de.quantummaid.httpmaid.awslambda.apigateway.DefaultApiGatewayClientFactory.defaultApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
@@ -58,7 +60,15 @@ public final class AwsWebsocketLambdaEndpoint {
 
     public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(final HttpMaid httpMaid) {
         validateNotNull(httpMaid, "httpMaid");
-        httpMaid.addWebsocketSender(AWS_WEBSOCKET_SENDER, awsWebsocketSender());
+        return awsWebsocketLambdaEndpointFor(httpMaid, defaultApiGatewayClientFactory());
+    }
+
+    public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(
+            final HttpMaid httpMaid,
+            final ApiGatewayClientFactory apiGatewayClientFactory) {
+        validateNotNull(httpMaid, "httpMaid");
+        final AwsWebsocketSender websocketSender = awsWebsocketSender(apiGatewayClientFactory);
+        httpMaid.addWebsocketSender(AWS_WEBSOCKET_SENDER, websocketSender);
         return new AwsWebsocketLambdaEndpoint(httpMaid);
     }
 

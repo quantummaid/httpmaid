@@ -26,8 +26,10 @@ import de.quantummaid.httpmaid.RuntimeInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
+import de.quantummaid.httpmaid.tests.givenwhenthen.websockets.Websockets;
 import lombok.*;
+
+import static de.quantummaid.httpmaid.tests.givenwhenthen.websockets.Websockets.emptyWebsockets;
 
 @ToString
 @EqualsAndHashCode
@@ -46,8 +48,7 @@ public final class TestData {
     @Setter
     private HttpClientWrapper clientWrapper;
     @Getter
-    @Setter
-    private WrappedWebsocket websocket;
+    private final Websockets websockets = emptyWebsockets();
     @Getter
     @Setter
     private HttpMaid httpMaid;

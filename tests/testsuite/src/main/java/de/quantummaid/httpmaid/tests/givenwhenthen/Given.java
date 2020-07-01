@@ -49,6 +49,7 @@ public final class Given {
 
     public FirstWhenStage when() {
         closeAll();
+        deployer.cleanUp();
         final TestData testData = testData();
         final HttpMaid httpMaid;
         final Checkpoints checkpoints = checkpoints();

@@ -29,7 +29,9 @@ import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.http.headers.cookies.Cookies;
 import de.quantummaid.httpmaid.path.Path;
+import de.quantummaid.httpmaid.websockets.Websockets;
 import de.quantummaid.httpmaid.websockets.broadcast.SerializingSender;
+import de.quantummaid.httpmaid.websockets.disconnect.Disconnector;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.*;
@@ -42,6 +44,7 @@ import static de.quantummaid.httpmaid.http.headers.cookies.Cookies.cookiesFromHe
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
 import static de.quantummaid.httpmaid.websockets.broadcast.SerializingSender.serializingSender;
+import static de.quantummaid.httpmaid.websockets.disconnect.Disconnector.disconnector;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 import static java.lang.String.format;
 
@@ -136,9 +139,11 @@ public final class HttpRequest {
                 });
     }
 
-    public SerializingSender<Object> websockets() {
+    public Websockets websockets() {
         final WebsocketSenders websocketSenders = metaData.get(WEBSOCKET_SENDERS);
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
-        return serializingSender(websocketRegistry, websocketSenders);
+        final SerializingSender<Object> sender = serializingSender(websocketRegistry, websocketSenders);
+        final Disconnector disconnector = disconnector(websocketRegistry, websocketSenders);
+        return Websockets.websockets(sender, disconnector);
     }
 }

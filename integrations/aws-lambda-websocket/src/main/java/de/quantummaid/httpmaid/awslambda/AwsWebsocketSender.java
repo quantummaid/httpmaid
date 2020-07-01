@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.awslambda;
 
+import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
@@ -29,11 +30,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.model.DeleteConnectionRequest;
 import software.amazon.awssdk.services.apigatewaymanagementapi.model.PostToConnectionRequest;
 
-import java.net.URI;
-
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 
 @ToString
@@ -42,23 +41,33 @@ import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websoc
 public final class AwsWebsocketSender implements WebsocketSender<AwsWebsocketConnectionInformation> {
     public static final WebsocketSenderId AWS_WEBSOCKET_SENDER = websocketSenderId("AWS_WEBSOCKET_SENDER");
 
-    public static AwsWebsocketSender awsWebsocketSender() {
-        return new AwsWebsocketSender();
+    private final ApiGatewayClientFactory clientFactory;
+
+    public static AwsWebsocketSender awsWebsocketSender(final ApiGatewayClientFactory clientFactory) {
+        return new AwsWebsocketSender(clientFactory);
     }
 
     @Override
     public void send(final AwsWebsocketConnectionInformation connectionInformation,
                      final String message) {
-        validateNotNull(connectionInformation, "connectionInformation");
-        final String endpoint = connectionInformation.toEndpointUrl();
-        try (ApiGatewayManagementApiClient apiGatewayManagementApiClient = ApiGatewayManagementApiClient.builder()
-                .endpointOverride(URI.create(endpoint))
-                .build()) {
+        try (ApiGatewayManagementApiClient apiGatewayManagementApiClient = clientFactory.provide(connectionInformation)) {
             final String connectionId = connectionInformation.connectionId;
-            apiGatewayManagementApiClient.postToConnection(PostToConnectionRequest.builder()
+            final PostToConnectionRequest request = PostToConnectionRequest.builder()
                     .connectionId(connectionId)
                     .data(SdkBytes.fromUtf8String(message))
-                    .build());
+                    .build();
+            apiGatewayManagementApiClient.postToConnection(request);
+        }
+    }
+
+    @Override
+    public void disconnect(final AwsWebsocketConnectionInformation connectionInformation) {
+        try (ApiGatewayManagementApiClient apiGatewayManagementApiClient = clientFactory.provide(connectionInformation)) {
+            final String connectionId = connectionInformation.connectionId;
+            final DeleteConnectionRequest request = DeleteConnectionRequest.builder()
+                    .connectionId(connectionId)
+                    .build();
+            apiGatewayManagementApiClient.deleteConnection(request);
         }
     }
 
