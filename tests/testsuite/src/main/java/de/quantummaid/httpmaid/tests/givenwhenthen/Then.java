@@ -178,4 +178,10 @@ public final class Then {
         assertThat(runtimeInformation.numberOfConnectedWebsockets(), is(numberOfWebsockets));
         return this;
     }
+
+    public Then allWebsocketsHaveBeenClosed() {
+        final boolean allAreClosed = testData.getWebsockets().waitForAllAreClosed();
+        assertThat(allAreClosed, is(true));
+        return this;
+    }
 }

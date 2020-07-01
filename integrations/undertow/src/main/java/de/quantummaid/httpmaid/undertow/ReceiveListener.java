@@ -32,8 +32,6 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static io.undertow.websockets.core.WebSockets.sendText;
-
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -55,7 +53,7 @@ public final class ReceiveListener extends AbstractReceiveListener {
                     return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, messageData);
                 },
                 response -> response.optionalStringBody()
-                        .ifPresent(responseMessage -> sendText(responseMessage, channel, null))
+                        .ifPresent(connectionInformation::send)
         );
     }
 }

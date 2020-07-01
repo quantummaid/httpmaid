@@ -21,52 +21,41 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.Server;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.ApiGatewayUtils.mapRestApiEventToResponse;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.ApiGatewayUtils.mapRequestToRestApiEvent;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.ApiGatewayUtils.mapRestApiEventToResponse;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeRestApiGateway implements AutoCloseable {
-    private final HttpServer server;
+    private final Server server;
 
     public static FakeRestApiGateway fakeRestApiGateway(final AwsLambdaEndpoint endpoint,
                                                         final int port) {
-        try {
-            final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            final HttpHandler httpHandler = exchange -> {
-                try {
-                    final Map<String, Object> requestEvent = mapRequestToRestApiEvent(exchange);
-                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
-                    mapRestApiEventToResponse(responseEvent, exchange);
-                } catch (final Exception e) {
-                    e.printStackTrace(System.err);
-                    throw e;
-                }
-            };
-            server.createContext("/", httpHandler);
-            server.setExecutor(null);
-            server.start();
-            return new FakeRestApiGateway(server);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        final Server server = Server.server(port, exchange -> {
+            try {
+                final Map<String, Object> requestEvent = mapRequestToRestApiEvent(exchange);
+                final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
+                mapRestApiEventToResponse(responseEvent, exchange);
+            } catch (final Exception e) {
+                e.printStackTrace(System.err);
+                throw e;
+            }
+        });
+        return new FakeRestApiGateway(server);
     }
 
     @Override
     public void close() {
-        server.stop(0);
+        server.close();
     }
 }

@@ -28,6 +28,7 @@ import de.quantummaid.httpmaid.client.issuer.real.Protocol;
 import de.quantummaid.httpmaid.client.issuer.real.RealIssuer;
 import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
+import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import de.quantummaid.httpmaid.client.websocket.bypass.BypassingWebsocketClient;
 import de.quantummaid.httpmaid.filtermap.FilterMap;
@@ -122,13 +123,19 @@ public final class HttpMaidClient implements AutoCloseable {
     }
 
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler) {
-        return openWebsocket(messageHandler, Map.of(), Map.of());
+        return openWebsocket(
+                messageHandler, () -> {
+                },
+                Map.of(),
+                Map.of()
+        );
     }
 
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
+                                   final WebsocketCloseHandler closeHandler,
                                    final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers) {
-        return websocketClient.openWebsocket(messageHandler, queryParameters, headers, basePath.render());
+        return websocketClient.openWebsocket(messageHandler, closeHandler, queryParameters, headers, basePath.render());
     }
 
     @Override

@@ -25,4 +25,6 @@ public interface WebsocketSender<T> {
     void send(T connectionInformation, String message);
 
     WebsocketSenderId senderId();
+
+    void disconnect(T connectionInformation);
 }

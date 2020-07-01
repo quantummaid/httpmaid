@@ -19,37 +19,39 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NonSerializableWebsocketSender implements WebsocketSender<NonSerializableConnectionInformation> {
-    public static final WebsocketSenderId NON_SERIALIZABLE_WEBSOCKET_SENDER = websocketSenderId("NON_SERIALIZABLE_WEBSOCKET_SENDER");
+public final class ApiWebsockets {
+    private final Map<String, FakeLambdaWebsocket> apiWebsockets;
 
-    public static NonSerializableWebsocketSender nonSerializableWebsocketSender() {
-        return new NonSerializableWebsocketSender();
+    public static ApiWebsockets apiWebsockets() {
+        return new ApiWebsockets(new LinkedHashMap<>());
     }
 
-    @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
+    public void add(final String connectionId, final FakeLambdaWebsocket websocket) {
+        apiWebsockets.put(connectionId, websocket);
     }
 
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
+    public synchronized void send(final String connectionId,
+                                  final String message) {
+        final FakeLambdaWebsocket websocket = apiWebsockets.get(connectionId);
+        websocket.send(message);
     }
 
-    @Override
-    public WebsocketSenderId senderId() {
-        return NON_SERIALIZABLE_WEBSOCKET_SENDER;
+    public synchronized void disconnect(final String connectionId) {
+        final FakeLambdaWebsocket websocket = apiWebsockets.get(connectionId);
+        websocket.disconnect();
+        apiWebsockets.remove(connectionId);
     }
 }

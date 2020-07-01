@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.handler.http.HttpHandler;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.websockets.broadcast.BroadcasterFactory;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
+import de.quantummaid.httpmaid.websockets.disconnect.DisconnectorFactory;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -96,10 +97,16 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
         return serving(handler).when(condition);
     }
 
-    public <T, U> HttpMaidBuilder broadcast(final Class<T> broadcaster,
-                                            final Class<U> messageType,
-                                            final BroadcasterFactory<T, U> factory) {
+    public <T, U> HttpMaidBuilder broadcastToWebsocketsUsing(final Class<T> broadcaster,
+                                                             final Class<U> messageType,
+                                                             final BroadcasterFactory<T, U> factory) {
         this.broadcasters.addBroadcaster(broadcaster, messageType, factory);
+        return this;
+    }
+
+    public <T> HttpMaidBuilder disconnectWebsocketsUsing(final Class<T> disconnector,
+                                                         final DisconnectorFactory<T> factory) {
+        this.broadcasters.addDisconnector(disconnector, factory);
         return this;
     }
 

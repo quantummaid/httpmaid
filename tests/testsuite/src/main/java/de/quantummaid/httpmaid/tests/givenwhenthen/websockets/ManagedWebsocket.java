@@ -19,16 +19,23 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.websocket;
+package de.quantummaid.httpmaid.tests.givenwhenthen.websockets;
 
-import java.util.List;
-import java.util.Map;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
+import lombok.*;
 
-public interface WebsocketClient {
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ManagedWebsocket {
+    @Getter
+    @Setter
+    private WrappedWebsocket websocket;
+    @Getter
+    @Setter
+    private WebsocketStatus status;
 
-    Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            WebsocketCloseHandler closeHandler,
-                            Map<String, List<String>> queryParameters,
-                            Map<String, List<String>> headers,
-                            String path);
+    public static ManagedWebsocket managedWebsocket() {
+        return new ManagedWebsocket();
+    }
 }

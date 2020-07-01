@@ -19,16 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.websocket;
+package de.quantummaid.httpmaid.websockets;
 
-import java.util.List;
-import java.util.Map;
+import de.quantummaid.httpmaid.websockets.broadcast.SerializingSender;
+import de.quantummaid.httpmaid.websockets.disconnect.Disconnector;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-public interface WebsocketClient {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Websockets {
+    private final SerializingSender<Object> sender;
+    private final Disconnector disconnector;
 
-    Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            WebsocketCloseHandler closeHandler,
-                            Map<String, List<String>> queryParameters,
-                            Map<String, List<String>> headers,
-                            String path);
+    public static Websockets websockets(final SerializingSender<Object> sender,
+                                        final Disconnector disconnector) {
+        return new Websockets(sender, disconnector);
+    }
+
+    public SerializingSender<Object> sender() {
+        return sender;
+    }
+
+    public Disconnector disconnector() {
+        return disconnector;
+    }
 }

@@ -19,37 +19,35 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.client.websocket.bypass;
 
+import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
+import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
-
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NonSerializableWebsocketSender implements WebsocketSender<NonSerializableConnectionInformation> {
-    public static final WebsocketSenderId NON_SERIALIZABLE_WEBSOCKET_SENDER = websocketSenderId("NON_SERIALIZABLE_WEBSOCKET_SENDER");
+public final class BypassedConnectionInformation implements NonSerializableConnectionInformation {
+    private final WebsocketMessageHandler messageHandler;
+    private final WebsocketCloseHandler closeHandler;
 
-    public static NonSerializableWebsocketSender nonSerializableWebsocketSender() {
-        return new NonSerializableWebsocketSender();
+    public static BypassedConnectionInformation bypassedConnectionInformation(final WebsocketMessageHandler messageHandler,
+                                                                              final WebsocketCloseHandler closeHandler) {
+        return new BypassedConnectionInformation(messageHandler, closeHandler);
     }
 
     @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
-    }
-
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
+    public void send(final String message) {
+        messageHandler.handle(message);
     }
 
     @Override
-    public WebsocketSenderId senderId() {
-        return NON_SERIALIZABLE_WEBSOCKET_SENDER;
+    public void disconnect() {
+        closeHandler.onClose();
     }
 }

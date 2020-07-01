@@ -38,8 +38,8 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.undertow.CloseListener.closeListener;
 import static de.quantummaid.httpmaid.undertow.ReceiveListener.receiveListener;
+import static de.quantummaid.httpmaid.undertow.UndertowConnectionInformation.undertowConnectionInformation;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
-import static io.undertow.websockets.core.WebSockets.sendText;
 
 @ToString
 @EqualsAndHashCode
@@ -53,7 +53,7 @@ public final class UndertowWebsocketsCallback implements WebSocketConnectionCall
 
     @Override
     public void onConnect(final WebSocketHttpExchange exchange, final WebSocketChannel channel) {
-        final NonSerializableConnectionInformation connectionInformation = message -> sendText(message, channel, null);
+        final NonSerializableConnectionInformation connectionInformation = undertowConnectionInformation(channel);
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withNonSerializableConnectionInformation(connectionInformation);

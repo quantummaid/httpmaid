@@ -19,16 +19,11 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.websocket;
+package de.quantummaid.httpmaid.tests.specs.websockets.domain;
 
-import java.util.List;
-import java.util.Map;
+public final class DisconnectingUseCase {
 
-public interface WebsocketClient {
-
-    Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            WebsocketCloseHandler closeHandler,
-                            Map<String, List<String>> queryParameters,
-                            Map<String, List<String>> headers,
-                            String path);
+    public void disconnect(final MyDisconnector disconnector) {
+        disconnector.disconnect();
+    }
 }

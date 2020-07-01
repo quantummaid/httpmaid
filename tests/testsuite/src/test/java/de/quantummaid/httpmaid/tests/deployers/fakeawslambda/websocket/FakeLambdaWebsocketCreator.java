@@ -30,6 +30,8 @@ import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 
+import java.util.UUID;
+
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeLambdaWebsocket.fakeLambdaWebsocket;
 
 @ToString
@@ -37,14 +39,19 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocketCreator implements WebSocketCreator {
     private final AwsWebsocketLambdaEndpoint endpoint;
+    private final ApiWebsockets apiWebsockets;
 
-    public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final AwsWebsocketLambdaEndpoint endpoint) {
-        return new FakeLambdaWebsocketCreator(endpoint);
+    public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final AwsWebsocketLambdaEndpoint endpoint,
+                                                                        final ApiWebsockets apiWebsockets) {
+        return new FakeLambdaWebsocketCreator(endpoint, apiWebsockets);
     }
 
     @Override
     public Object createWebSocket(final ServletUpgradeRequest request,
                                   final ServletUpgradeResponse response) {
-        return fakeLambdaWebsocket(endpoint);
+        final String connectionId = UUID.randomUUID().toString();
+        final FakeLambdaWebsocket websocket = fakeLambdaWebsocket(endpoint, connectionId);
+        apiWebsockets.add(connectionId, websocket);
+        return websocket;
     }
 }

@@ -19,16 +19,11 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.websocket;
+package de.quantummaid.httpmaid.awslambda.apigateway;
 
-import java.util.List;
-import java.util.Map;
+import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
 
-public interface WebsocketClient {
-
-    Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            WebsocketCloseHandler closeHandler,
-                            Map<String, List<String>> queryParameters,
-                            Map<String, List<String>> headers,
-                            String path);
+public interface ApiGatewayClientFactory {
+    ApiGatewayManagementApiClient provide(AwsWebsocketConnectionInformation connectionInformation);
 }

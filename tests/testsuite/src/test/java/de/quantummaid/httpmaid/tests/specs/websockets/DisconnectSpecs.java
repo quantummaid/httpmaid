@@ -22,6 +22,8 @@
 package de.quantummaid.httpmaid.tests.specs.websockets;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.specs.websockets.domain.DisconnectingUseCase;
+import de.quantummaid.httpmaid.tests.specs.websockets.domain.MyDisconnector;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -36,7 +38,7 @@ public final class DisconnectSpecs {
     public void disconnectedWebsocketsDoNotCauseProblems(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
-                        .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
+                        .post("/broadcast", (request, response) -> request.websockets().sender().sendToAll("foo"))
                         .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
                         .build()
         )
@@ -76,5 +78,58 @@ public final class DisconnectSpecs {
                 .andWhen().theLastWebsocketIsDisconnected()
                 .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(0)
                 .theQueriedNumberOfWebsocketsIs(0);
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    public void handlersCanDisconnectWebsockets(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .websocket("disconnect", (request, response) -> request.websockets().disconnector().disconnectAll())
+                        .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                        .build()
+        )
+                .when().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(0)
+                .theQueriedNumberOfWebsocketsIs(0)
+
+                .andWhen().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+
+                .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(1)
+                .theQueriedNumberOfWebsocketsIs(1)
+
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"disconnect\" }")
+
+                .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(0)
+                .theQueriedNumberOfWebsocketsIs(0)
+                .allWebsocketsHaveBeenClosed();
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    public void useCasesCanDisconnectWebsockets(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .websocket("disconnect", DisconnectingUseCase.class)
+                        .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                        .disconnectWebsocketsUsing(MyDisconnector.class, sender -> sender::disconnectAll)
+                        .build()
+        )
+                .when().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(0)
+                .theQueriedNumberOfWebsocketsIs(0)
+
+                .andWhen().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+
+                .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(1)
+                .theQueriedNumberOfWebsocketsIs(1)
+
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"disconnect\" }")
+
+                .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(0)
+                .theQueriedNumberOfWebsocketsIs(0)
+                .allWebsocketsHaveBeenClosed();
     }
 }

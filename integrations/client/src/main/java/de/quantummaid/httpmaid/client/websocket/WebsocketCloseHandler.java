@@ -21,14 +21,6 @@
 
 package de.quantummaid.httpmaid.client.websocket;
 
-import java.util.List;
-import java.util.Map;
-
-public interface WebsocketClient {
-
-    Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            WebsocketCloseHandler closeHandler,
-                            Map<String, List<String>> queryParameters,
-                            Map<String, List<String>> headers,
-                            String path);
+public interface WebsocketCloseHandler {
+    void onClose();
 }

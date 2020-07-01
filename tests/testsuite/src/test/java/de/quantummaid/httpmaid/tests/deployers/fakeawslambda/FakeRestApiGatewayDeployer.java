@@ -24,12 +24,13 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.FakeRestApiGateway;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.ApiWebsockets;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.PortDeployer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,10 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGatewayClientFactory.fakeApiGatewayClientFactory;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGatewayManagementServer.start;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.FakeRestApiGateway.fakeRestApiGateway;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.ApiWebsockets.apiWebsockets;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory.theRealHttpMaidClient;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientWithConnectionReuseFactory.theRealHttpMaidClientWithConnectionReuse;
@@ -49,7 +53,8 @@ import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeRestApiGatewayDeployer implements PortDeployer {
+public final class FakeRestApiGatewayDeployer implements Deployer {
+    private FakeApiGatewayManagementServer apiGatewayManagementServer;
     private FakeRestApiGateway currentRestLambda;
     private FakeWebsocketLambda currentWebsocketLambda;
 
@@ -58,17 +63,37 @@ public final class FakeRestApiGatewayDeployer implements PortDeployer {
     }
 
     @Override
-    public Deployment deploy(final int port, final HttpMaid httpMaid) {
+    public Deployment deploy(final HttpMaid httpMaid) {
+        final ApiWebsockets apiWebsockets = apiWebsockets();
+
+        final int apiGatewayManagementServerPort = freePort();
+        apiGatewayManagementServer = start(apiGatewayManagementServerPort, apiWebsockets);
+
         final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
-        final AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpoint = awsWebsocketLambdaEndpointFor(httpMaid);
-        currentRestLambda = fakeRestApiGateway(awsLambdaEndpoint, port);
+        final ApiGatewayClientFactory apiGatewayClientFactory = fakeApiGatewayClientFactory(apiGatewayManagementServerPort);
+        final AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpoint = awsWebsocketLambdaEndpointFor(
+                httpMaid,
+                apiGatewayClientFactory
+        );
+
+        final int httpPort = freePort();
+        currentRestLambda = fakeRestApiGateway(awsLambdaEndpoint, httpPort);
+
         final int websocketsPort = freePort();
-        currentWebsocketLambda = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort);
-        return localhostHttpAndWebsocketDeployment(port, websocketsPort);
+        currentWebsocketLambda = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort, apiWebsockets);
+
+        return localhostHttpAndWebsocketDeployment(httpPort, websocketsPort);
     }
 
     @Override
     public void cleanUp() {
+        if (apiGatewayManagementServer != null) {
+            try {
+                apiGatewayManagementServer.close();
+            } catch (Exception e) {
+                throw new UnsupportedOperationException("Could not stop server", e);
+            }
+        }
         if (currentRestLambda != null) {
             try {
                 currentRestLambda.close();

@@ -23,9 +23,8 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.Server;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -34,7 +33,6 @@ import lombok.ToString;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.*;
 
@@ -45,34 +43,26 @@ import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOu
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeHttpV2PayloadApiGateway implements AutoCloseable {
-    private final HttpServer server;
+    private final Server server;
 
     public static FakeHttpV2PayloadApiGateway fakeHttpV2PayloadApiGateway(final AwsLambdaEndpoint endpoint,
                                                                           final int port) {
-        try {
-            final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-            final HttpHandler httpHandler = exchange -> {
-                try {
-                    final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
-                    final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
-                    mapEventToResponse(responseEvent, exchange);
-                } catch (final Exception e) {
-                    e.printStackTrace(System.err);
-                    throw e;
-                }
-            };
-            server.createContext("/", httpHandler);
-            server.setExecutor(null);
-            server.start();
-            return new FakeHttpV2PayloadApiGateway(server);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        final Server server = Server.server(port, exchange -> {
+            try {
+                final Map<String, Object> requestEvent = mapRequestToEvent(exchange);
+                final Map<String, Object> responseEvent = endpoint.delegate(requestEvent);
+                mapEventToResponse(responseEvent, exchange);
+            } catch (final Exception e) {
+                e.printStackTrace(System.err);
+                throw e;
+            }
+        });
+        return new FakeHttpV2PayloadApiGateway(server);
     }
 
     @Override
     public void close() {
-        server.stop(0);
+        server.close();
     }
 
     private static Map<String, Object> mapRequestToEvent(final HttpExchange exchange) {

@@ -19,37 +19,41 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.undertow;
 
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
+import io.undertow.websockets.core.WebSocketChannel;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
+import java.io.IOException;
+
+import static de.quantummaid.httpmaid.undertow.UndertowEndpointException.undertowEndpointException;
+import static io.undertow.websockets.core.WebSockets.sendText;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NonSerializableWebsocketSender implements WebsocketSender<NonSerializableConnectionInformation> {
-    public static final WebsocketSenderId NON_SERIALIZABLE_WEBSOCKET_SENDER = websocketSenderId("NON_SERIALIZABLE_WEBSOCKET_SENDER");
+public final class UndertowConnectionInformation implements NonSerializableConnectionInformation {
+    private final WebSocketChannel channel;
 
-    public static NonSerializableWebsocketSender nonSerializableWebsocketSender() {
-        return new NonSerializableWebsocketSender();
+    public static UndertowConnectionInformation undertowConnectionInformation(final WebSocketChannel channel) {
+        return new UndertowConnectionInformation(channel);
     }
 
     @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
-    }
-
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
+    public void send(final String message) {
+        sendText(message, channel, null);
     }
 
     @Override
-    public WebsocketSenderId senderId() {
-        return NON_SERIALIZABLE_WEBSOCKET_SENDER;
+    public void disconnect() {
+        try {
+            channel.close();
+        } catch (final IOException e) {
+            throw undertowEndpointException(e);
+        }
     }
 }

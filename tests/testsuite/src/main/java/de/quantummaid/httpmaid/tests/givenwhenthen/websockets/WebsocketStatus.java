@@ -19,37 +19,23 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.tests.givenwhenthen.websockets;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
-
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NonSerializableWebsocketSender implements WebsocketSender<NonSerializableConnectionInformation> {
-    public static final WebsocketSenderId NON_SERIALIZABLE_WEBSOCKET_SENDER = websocketSenderId("NON_SERIALIZABLE_WEBSOCKET_SENDER");
+public final class WebsocketStatus {
+    public static final WebsocketStatus OPEN = WebsocketStatus.websocketStatus("OPEN");
+    public static final WebsocketStatus CLOSED = WebsocketStatus.websocketStatus("CLOSED");
 
-    public static NonSerializableWebsocketSender nonSerializableWebsocketSender() {
-        return new NonSerializableWebsocketSender();
-    }
+    private final String status;
 
-    @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
-    }
-
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
-    }
-
-    @Override
-    public WebsocketSenderId senderId() {
-        return NON_SERIALIZABLE_WEBSOCKET_SENDER;
+    public static WebsocketStatus websocketStatus(final String status) {
+        return new WebsocketStatus(status);
     }
 }

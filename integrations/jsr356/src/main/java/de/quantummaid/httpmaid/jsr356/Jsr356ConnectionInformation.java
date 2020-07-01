@@ -19,37 +19,44 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.jsr356;
 
+import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
+import javax.websocket.Session;
+import java.io.IOException;
+
+import static de.quantummaid.httpmaid.jsr356.Jsr356Exception.jsr356Exception;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NonSerializableWebsocketSender implements WebsocketSender<NonSerializableConnectionInformation> {
-    public static final WebsocketSenderId NON_SERIALIZABLE_WEBSOCKET_SENDER = websocketSenderId("NON_SERIALIZABLE_WEBSOCKET_SENDER");
+public final class Jsr356ConnectionInformation implements NonSerializableConnectionInformation {
+    private final Session session;
 
-    public static NonSerializableWebsocketSender nonSerializableWebsocketSender() {
-        return new NonSerializableWebsocketSender();
+    public static Jsr356ConnectionInformation jsr356ConnectionInformation(final Session session) {
+        return new Jsr356ConnectionInformation(session);
     }
 
     @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
-    }
-
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
+    public void send(final String message) {
+        try {
+            session.getBasicRemote().sendText(message);
+        } catch (final IOException e) {
+            throw jsr356Exception(e);
+        }
     }
 
     @Override
-    public WebsocketSenderId senderId() {
-        return NON_SERIALIZABLE_WEBSOCKET_SENDER;
+    public void disconnect() {
+        try {
+            session.close();
+        } catch (IOException e) {
+            throw jsr356Exception(e);
+        }
     }
 }

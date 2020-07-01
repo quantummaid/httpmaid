@@ -37,13 +37,15 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 public final class FakeLambdaServlet extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
     private final transient AwsWebsocketLambdaEndpoint endpoint;
+    private final transient ApiWebsockets apiWebsockets;
 
-    public static FakeLambdaServlet fakeLambdaServlet(final AwsWebsocketLambdaEndpoint endpoint) {
-        return new FakeLambdaServlet(endpoint);
+    public static FakeLambdaServlet fakeLambdaServlet(final AwsWebsocketLambdaEndpoint endpoint,
+                                                      final ApiWebsockets apiWebsockets) {
+        return new FakeLambdaServlet(endpoint, apiWebsockets);
     }
 
     @Override
     public void configure(final WebSocketServletFactory webSocketServletFactory) {
-        webSocketServletFactory.setCreator(fakeLambdaWebsocketCreator(endpoint));
+        webSocketServletFactory.setCreator(fakeLambdaWebsocketCreator(endpoint, apiWebsockets));
     }
 }

@@ -31,7 +31,6 @@ import lombok.ToString;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
 
-import static de.quantummaid.httpmaid.jsr356.SenderHelper.sendMessage;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.rawWebsocketMessage;
 
 @ToString
@@ -53,7 +52,7 @@ public final class Jsr356MessageHandler implements MessageHandler.Whole<String> 
         httpMaid.handleRequest(
                 () -> rawWebsocketMessage(connectionInformation, message),
                 response -> response.optionalStringBody()
-                        .ifPresent(responseMessage -> sendMessage(session, responseMessage))
+                        .ifPresent(connectionInformation::send)
         );
     }
 }

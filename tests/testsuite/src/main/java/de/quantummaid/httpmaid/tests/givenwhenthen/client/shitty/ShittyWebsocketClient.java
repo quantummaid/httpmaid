@@ -51,11 +51,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @SuppressWarnings({"java:S2095", "java:S112"})
 public final class ShittyWebsocketClient extends Endpoint implements MessageHandler.Whole<String>, Closeable {
     private final Consumer<String> responseHandler;
+    private final Runnable closeHander;
     private final CountDownLatch connectLatch = new CountDownLatch(1);
     private Session session;
 
     public static ShittyWebsocketClient openWebsocket(final String uri,
                                                       final Consumer<String> responseHandler,
+                                                      final Runnable closeHandler,
                                                       final Map<String, List<String>> headers,
                                                       final Map<String, List<String>> queryParameters) {
         final String queryParametersTail = buildQueryParametersTail(queryParameters);
@@ -68,7 +70,7 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
             }
         });
         try {
-            final ShittyWebsocketClient shittyWebsocketClient = new ShittyWebsocketClient(responseHandler);
+            final ShittyWebsocketClient shittyWebsocketClient = new ShittyWebsocketClient(responseHandler, closeHandler);
             final ClientEndpointConfig clientEndpointConfig = configBuilder.build();
             final URI uriObject = new URI(fullUri);
             final ClientManager clientManager = ClientManager.createClient();
@@ -96,6 +98,11 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
     @Override
     public void onMessage(final String message) {
         responseHandler.accept(message);
+    }
+
+    @Override
+    public void onClose(final Session session, final CloseReason closeReason) {
+        closeHander.run();
     }
 
     public synchronized void send(final String message) {

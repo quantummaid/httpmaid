@@ -19,16 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client.websocket;
+package de.quantummaid.httpmaid.undertow;
 
-import java.util.List;
-import java.util.Map;
+public final class UndertowEndpointException extends RuntimeException {
 
-public interface WebsocketClient {
+    private UndertowEndpointException(final Throwable throwable) {
+        super(throwable);
+    }
 
-    Websocket openWebsocket(WebsocketMessageHandler messageHandler,
-                            WebsocketCloseHandler closeHandler,
-                            Map<String, List<String>> queryParameters,
-                            Map<String, List<String>> headers,
-                            String path);
+    public static UndertowEndpointException undertowEndpointException(final Throwable throwable) {
+        return new UndertowEndpointException(throwable);
+    }
 }

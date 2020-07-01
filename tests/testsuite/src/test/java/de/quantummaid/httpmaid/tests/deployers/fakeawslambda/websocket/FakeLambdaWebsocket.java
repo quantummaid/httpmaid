@@ -31,6 +31,7 @@ import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +42,12 @@ import java.util.Map;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocket implements WebSocketListener {
     private final AwsWebsocketLambdaEndpoint endpoint;
+    private final String connectionId;
     private Session session;
 
-    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsWebsocketLambdaEndpoint endpoint) {
-        return new FakeLambdaWebsocket(endpoint);
+    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsWebsocketLambdaEndpoint endpoint,
+                                                          final String connectionId) {
+        return new FakeLambdaWebsocket(endpoint, connectionId);
     }
 
     @Override
@@ -55,11 +58,15 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         final Map<String, Object> responseEvent = endpoint.delegate(event);
         final String body = (String) responseEvent.get("body");
         if (body != null) {
-            try {
-                session.getRemote().sendString(body);
-            } catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
+            send(body);
+        }
+    }
+
+    public void send(final String message) {
+        try {
+            session.getRemote().sendString(message);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -103,10 +110,18 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
     public void onWebSocketError(final Throwable throwable) {
     }
 
-    private static Map<String, Object> createEvent(final String eventType) {
+    public void disconnect() {
+        try {
+            session.disconnect();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private Map<String, Object> createEvent(final String eventType) {
         final Map<String, Object> requestContext = new HashMap<>();
         requestContext.put("eventType", eventType);
-        requestContext.put("connectionId", "fake-id");
+        requestContext.put("connectionId", connectionId);
         requestContext.put("stage", "fake");
         requestContext.put("apiId", "fake");
         requestContext.put("domainName", "fake.execute-api.fake-1.amazonaws.com");

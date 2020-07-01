@@ -35,8 +35,8 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
+import static de.quantummaid.httpmaid.jsr356.Jsr356ConnectionInformation.jsr356ConnectionInformation;
 import static de.quantummaid.httpmaid.jsr356.Jsr356MessageHandler.jsr356MessageHandler;
-import static de.quantummaid.httpmaid.jsr356.SenderHelper.sendMessage;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
 
@@ -55,7 +55,7 @@ public class Jsr356Endpoint extends Endpoint {
 
     @Override
     public synchronized void onOpen(final Session session, final EndpointConfig config) {
-        connectionInformation = message -> sendMessage(session, message);
+        connectionInformation = jsr356ConnectionInformation(session);
         httpMaid.handleRequest(
                 () -> {
                     final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();

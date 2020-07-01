@@ -19,37 +19,44 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.tests.givenwhenthen.websockets;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.Poller;
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
+import java.util.ArrayList;
+import java.util.List;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NonSerializableWebsocketSender implements WebsocketSender<NonSerializableConnectionInformation> {
-    public static final WebsocketSenderId NON_SERIALIZABLE_WEBSOCKET_SENDER = websocketSenderId("NON_SERIALIZABLE_WEBSOCKET_SENDER");
+public final class Websockets {
+    private final List<ManagedWebsocket> websockets;
 
-    public static NonSerializableWebsocketSender nonSerializableWebsocketSender() {
-        return new NonSerializableWebsocketSender();
+    public static Websockets emptyWebsockets() {
+        return new Websockets(new ArrayList<>());
     }
 
-    @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
+    public void addWebsocket(final ManagedWebsocket websocket) {
+        websockets.add(websocket);
     }
 
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
+    public WrappedWebsocket latestWebsocket() {
+        final int index = websockets.size() - 1;
+        return websockets.get(index).getWebsocket();
     }
 
-    @Override
-    public WebsocketSenderId senderId() {
-        return NON_SERIALIZABLE_WEBSOCKET_SENDER;
+    public boolean allAreClosed() {
+        return websockets.stream()
+                .map(ManagedWebsocket::getStatus)
+                .allMatch(WebsocketStatus.CLOSED::equals);
+    }
+
+    public boolean waitForAllAreClosed() {
+        return Poller.pollWithTimeout(this::allAreClosed);
     }
 }

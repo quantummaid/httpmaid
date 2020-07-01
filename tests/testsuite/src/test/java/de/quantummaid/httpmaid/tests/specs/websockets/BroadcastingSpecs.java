@@ -37,7 +37,7 @@ public final class BroadcastingSpecs {
     public void handlersCanBroadcast(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
-                        .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
+                        .post("/broadcast", (request, response) -> request.websockets().sender().sendToAll("foo"))
                         .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
                         .build()
         )
@@ -56,7 +56,7 @@ public final class BroadcastingSpecs {
                 anHttpMaid()
                         .post("/broadcast", BroadcastingUseCase.class)
                         .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
-                        .broadcast(MyBroadcaster.class, String.class, sender -> sender::sendToAll)
+                        .broadcastToWebsocketsUsing(MyBroadcaster.class, String.class, sender -> sender::sendToAll)
                         .build()
         )
                 .when().aWebsocketIsConnected()

@@ -90,8 +90,9 @@ public final class HttpMaidFactory {
                     response.setBody(header);
                 })
 
-                .post("/broadcast", (request, response) -> request.websockets().sendToAll("foo"))
-                .websocket("check", (request, response) -> response.setBody("websocket has been registered"));
+                .post("/broadcast", (request, response) -> request.websockets().sender().sendToAll("foo"))
+                .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                .websocket("disconnect", (request, response) -> request.websockets().disconnector().disconnectAll());
         configurator.accept(builder);
         return builder.build();
     }
