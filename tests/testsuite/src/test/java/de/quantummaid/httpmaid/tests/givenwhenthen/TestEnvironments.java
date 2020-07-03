@@ -84,17 +84,21 @@ public final class TestEnvironments {
 
     public static List<TestEnvironment> environmentsWithAllCapabilities() {
         final List<Deployer> deployers = List.of(
-                bypassedDeployer(),
-                fakeRestApiGatewayDeployer(),
-                fakeHttpApiGatewayV2PayloadDeployer(),
+                //bypassedDeployer(),
+                //fakeRestApiGatewayDeployer(),
+                //fakeHttpApiGatewayV2PayloadDeployer(),
                 fakeHttpApiGatewayV1PayloadDeployer(),
-                jeeOnUndertowDeployer(),
-                undertowDeployer()
+                jeeOnUndertowDeployer()//,
+                //undertowDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()
+                        .filter(clientFactory -> !clientFactory.toString().equals("httpmaidclientwithreuse"))
+                        .filter(clientFactory -> !clientFactory.toString().equals("httpmaidclient"))
                         .map(client -> testEnvironment(deployer, client)))
                 .collect(toList());
+        //.flatMap(deployer -> deployer.supportedClients().stream()
+        //        .map(client -> testEnvironment(deployer, client)))
     }
 
     public static List<TestEnvironment> allEnvironments() {

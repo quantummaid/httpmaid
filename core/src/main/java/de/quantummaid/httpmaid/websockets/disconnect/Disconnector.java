@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.disconnect;
 
-import de.quantummaid.httpmaid.websockets.broadcast.RecipientDeterminator;
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.broadcast.RecipientDeterminator.all;
+import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.websocketCriteria;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
@@ -49,12 +49,12 @@ public final class Disconnector {
     }
 
     public void disconnectAll() {
-        disconnectAllThat(all());
+        disconnectAllThat(websocketCriteria());
     }
 
-    public void disconnectAllThat(final RecipientDeterminator recipientDeterminator) {
-        validateNotNull(recipientDeterminator, "recipientDeterminator");
-        final List<WebsocketRegistryEntry> connections = websocketRegistry.connections();
+    public void disconnectAllThat(final WebsocketCriteria criteria) {
+        validateNotNull(criteria, "criteria");
+        final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(criteria);
         connections.forEach(connection -> {
             final WebsocketSenderId websocketSenderId = connection.senderId();
             final WebsocketSender<Object> sender = websocketSenders.senderById(websocketSenderId);

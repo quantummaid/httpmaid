@@ -41,7 +41,7 @@ public interface FirstWhenStage {
 
     Then theLastWebsocketIsDisconnected();
 
-    Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(int expectedNumberOfWebsockets);
+    Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(long expectedNumberOfWebsockets);
 
     Then theRuntimeDataIsQueried();
 }

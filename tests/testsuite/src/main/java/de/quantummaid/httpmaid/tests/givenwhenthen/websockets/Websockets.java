@@ -56,6 +56,10 @@ public final class Websockets {
                 .allMatch(WebsocketStatus.CLOSED::equals);
     }
 
+    public List<ManagedWebsocket> all() {
+        return websockets;
+    }
+
     public boolean waitForAllAreClosed() {
         return Poller.pollWithTimeout(this::allAreClosed);
     }

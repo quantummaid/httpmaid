@@ -24,6 +24,12 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.websockets;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -34,8 +40,25 @@ public final class ManagedWebsocket {
     @Getter
     @Setter
     private WebsocketStatus status;
+    private final List<String> receivedMessages = new ArrayList<>();
 
     public static ManagedWebsocket managedWebsocket() {
         return new ManagedWebsocket();
+    }
+
+    public synchronized void addMessage(final String message) {
+        receivedMessages.add(message);
+    }
+
+    public boolean waitAndCheckForMessageReceived(final String message) {
+        return waitAndCheckForMessageReceived(message::equals);
+    }
+
+    public boolean waitAndCheckForMessageReceived(final Predicate<String> checker) {
+        return pollWithTimeout(() -> hasReceivedMessage(checker));
+    }
+
+    public synchronized boolean hasReceivedMessage(final Predicate<String> checker) {
+        return receivedMessages.stream().anyMatch(checker);
     }
 }

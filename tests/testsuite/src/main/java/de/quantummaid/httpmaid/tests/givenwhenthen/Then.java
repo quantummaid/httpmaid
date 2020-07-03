@@ -160,11 +160,27 @@ public final class Then {
         return this;
     }
 
-    public Then aWebsocketMessageHasBeenReceivedWithContent(final String content) {
-        return theCheckpointHasBeenVisited(content);
+    public Then allWebsocketsHaveReceivedTheMessage(final String content) {
+        testData.getWebsockets().all().forEach(websocket -> {
+            final boolean received = websocket.waitAndCheckForMessageReceived(content);
+            assertThat(received, is(true));
+        });
+        return this;
     }
 
-    public Then aWebsocketMessageHasBeenReceivedWithJsonContent(final Map<String, Object> content) {
+    public Then oneWebsocketHasReceivedTheMessage(final String content) {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+        }
+        final long count = testData.getWebsockets().all().stream()
+                .filter(websocket -> websocket.hasReceivedMessage(content::equals))
+                .count();
+        assertThat(count, is(1L));
+        return this;
+    }
+
+    public Then allWebsocketsHaveReceivedTheJsonMessage(final Map<String, Object> content) {
         final boolean visited = testData.getCheckpoints().checkpointHasBeenVisited(value -> {
             final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
             return content.equals(actual);
