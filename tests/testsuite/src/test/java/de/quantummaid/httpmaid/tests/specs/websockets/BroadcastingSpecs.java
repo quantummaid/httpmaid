@@ -60,7 +60,6 @@ public final class BroadcastingSpecs {
                 anHttpMaid()
                         .post("/broadcast/<message>", (request, response) -> {
                             final String message = request.pathParameters().getPathParameter("message");
-                            System.out.println("message = " + message);
                             request.websockets().sender().sendToAll(message);
                         })
                         .websocket("check", (request, response) -> response.setBody("websocket has been registered"))

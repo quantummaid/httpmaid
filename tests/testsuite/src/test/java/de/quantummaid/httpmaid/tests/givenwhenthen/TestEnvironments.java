@@ -84,12 +84,12 @@ public final class TestEnvironments {
 
     public static List<TestEnvironment> environmentsWithAllCapabilities() {
         final List<Deployer> deployers = List.of(
-                //bypassedDeployer(),
-                //fakeRestApiGatewayDeployer(),
-                //fakeHttpApiGatewayV2PayloadDeployer(),
-                fakeHttpApiGatewayV1PayloadDeployer(),
-                jeeOnUndertowDeployer()//,
-                //undertowDeployer()
+                jeeOnUndertowDeployer(),
+                undertowDeployer(),
+                bypassedDeployer(),
+                fakeRestApiGatewayDeployer(),
+                fakeHttpApiGatewayV2PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()

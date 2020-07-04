@@ -31,6 +31,8 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -57,7 +59,13 @@ public final class Websockets {
     }
 
     public List<ManagedWebsocket> all() {
-        return websockets;
+        return new ArrayList<>(websockets);
+    }
+
+    public List<ManagedWebsocket> allActive() {
+        return websockets.stream()
+                .filter(websocket -> websocket.getStatus() == WebsocketStatus.OPEN)
+                .collect(toList());
     }
 
     public boolean waitForAllAreClosed() {
