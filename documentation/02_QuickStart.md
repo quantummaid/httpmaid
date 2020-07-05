@@ -7,7 +7,7 @@ Add the following dependency to your `pom.xml` file:
 <dependency>
     <groupId>de.quantummaid.httpmaid</groupId>
     <artifactId>core</artifactId>
-    <version>0.9.76</version>
+    <version>0.9.77</version>
 </dependency>
 ```
 
