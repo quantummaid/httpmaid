@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.awslambda.repository.Repository;
 import de.quantummaid.httpmaid.http.Header;
 import de.quantummaid.httpmaid.http.QueryParameter;
 import de.quantummaid.httpmaid.http.headers.ContentType;
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
@@ -57,23 +59,22 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("java:S1192")
 public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
-    private static final String TABLE_NAME = "WebsocketsTest";
     private final Repository repository;
 
     public static DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry(final Repository repository) {
         return new DynamoDbWebsocketRegistry(repository);
     }
 
-    public static DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry() {
-        final Repository repository = dynamoDbRepository(TABLE_NAME, "id");
+    public static DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry(final String tableName,
+                                                                      final String primaryKey) {
+        final Repository repository = dynamoDbRepository(tableName, primaryKey);
         return dynamoDbWebsocketRegistry(repository);
     }
 
     @Override
-    public List<WebsocketRegistryEntry> connections() {
-        final List<Map<String, Object>> maps = repository.loadAll();
-        return maps.stream()
-                .map(DynamoDbWebsocketRegistry::deserializeEntry)
+    public List<WebsocketRegistryEntry> connections(final WebsocketCriteria criteria) {
+        return allEntries()
+                .filter(criteria::filter)
                 .collect(toList());
     }
 
@@ -99,9 +100,14 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
     }
 
     @Override
-    public int countConnections() {
-        final List<WebsocketRegistryEntry> connections = connections();
-        return connections.size();
+    public long countConnections() {
+        return allEntries().count();
+    }
+
+    private Stream<WebsocketRegistryEntry> allEntries() {
+        final List<Map<String, Object>> maps = repository.loadAll();
+        return maps.stream()
+                .map(DynamoDbWebsocketRegistry::deserializeEntry);
     }
 
     @SuppressWarnings("unchecked")

@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.registry;
 
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +44,10 @@ public final class InMemoryRegistry implements WebsocketRegistry {
     }
 
     @Override
-    public synchronized List<WebsocketRegistryEntry> connections() {
-        return new ArrayList<>(entries);
+    public synchronized List<WebsocketRegistryEntry> connections(final WebsocketCriteria criteria) {
+        return entries.stream()
+                .filter(criteria::filter)
+                .collect(toList());
     }
 
     @Override
@@ -69,7 +72,7 @@ public final class InMemoryRegistry implements WebsocketRegistry {
     }
 
     @Override
-    public int countConnections() {
+    public long countConnections() {
         return entries.size();
     }
 }

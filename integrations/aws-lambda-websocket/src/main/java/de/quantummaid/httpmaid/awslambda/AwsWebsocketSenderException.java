@@ -19,17 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.sender;
+package de.quantummaid.httpmaid.awslambda;
 
-import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
+public final class AwsWebsocketSenderException extends RuntimeException {
 
-import java.util.List;
-import java.util.function.BiConsumer;
+    private AwsWebsocketSenderException(final Throwable cause) {
+        super(cause);
+    }
 
-public interface WebsocketSender<T extends ConnectionInformation> {
-    void send(String message, List<T> connectionInformations, BiConsumer<T, Throwable> onException);
-
-    WebsocketSenderId senderId();
-
-    void disconnect(List<T> connectionInformations, BiConsumer<T, Throwable> onException);
+    public static AwsWebsocketSenderException awsWebsocketSenderException(final Throwable cause) {
+        return new AwsWebsocketSenderException(cause);
+    }
 }

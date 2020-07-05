@@ -46,7 +46,7 @@ public final class WebsocketQueryParameterSpecs {
         )
                 .when().aWebsocketIsConnected(Map.of("param+1 %ü", List.of("value+1 %ü")), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("value+1 %ü");
+                .allWebsocketsHaveReceivedTheMessage("value+1 %ü");
     }
 
     @ParameterizedTest
@@ -66,7 +66,7 @@ public final class WebsocketQueryParameterSpecs {
                 )
         ), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithJsonContent(Map.of(
+                .allWebsocketsHaveReceivedTheJsonMessage(Map.of(
                         "otherparam", List.of("othervalue"),
                         "param1", List.of("value1", "value2")
                 ));

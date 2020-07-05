@@ -44,17 +44,17 @@ public final class DisconnectSpecs {
         )
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
 
                 .andWhen().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
 
                 .andWhen().theLastWebsocketIsDisconnected()
 
                 .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
                 .theStatusCodeWas(200)
-                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+                .allWebsocketsHaveReceivedTheMessage("foo");
     }
 
     @ParameterizedTest
@@ -70,7 +70,7 @@ public final class DisconnectSpecs {
 
                 .andWhen().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
 
                 .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(1)
                 .theQueriedNumberOfWebsocketsIs(1)
@@ -94,7 +94,7 @@ public final class DisconnectSpecs {
 
                 .andWhen().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
 
                 .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(1)
                 .theQueriedNumberOfWebsocketsIs(1)
@@ -121,7 +121,7 @@ public final class DisconnectSpecs {
 
                 .andWhen().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
 
                 .andWhen().theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(1)
                 .theQueriedNumberOfWebsocketsIs(1)

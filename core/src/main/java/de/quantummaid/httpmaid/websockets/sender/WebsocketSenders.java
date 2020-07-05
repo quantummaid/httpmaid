@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.websockets.sender;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocket
 public final class WebsocketSenders {
     public static final MetaDataKey<WebsocketSenders> WEBSOCKET_SENDERS = metaDataKey("WEBSOCKET_SENDERS");
 
-    private final Map<WebsocketSenderId, WebsocketSender<Object>> senders;
+    private final Map<WebsocketSenderId, WebsocketSender<ConnectionInformation>> senders;
 
     public static WebsocketSenders websocketSenders() {
         final WebsocketSenders websocketSenders = new WebsocketSenders(new ConcurrentHashMap<>());
@@ -51,10 +52,10 @@ public final class WebsocketSenders {
     @SuppressWarnings("unchecked")
     public void addWebsocketSender(final WebsocketSenderId websocketSenderId,
                                    final WebsocketSender<?> websocketSender) {
-        senders.put(websocketSenderId, (WebsocketSender<Object>) websocketSender);
+        senders.put(websocketSenderId, (WebsocketSender<ConnectionInformation>) websocketSender);
     }
 
-    public WebsocketSender<Object> senderById(final WebsocketSenderId id) {
+    public WebsocketSender<ConnectionInformation> senderById(final WebsocketSenderId id) {
         return senders.get(id);
     }
 }

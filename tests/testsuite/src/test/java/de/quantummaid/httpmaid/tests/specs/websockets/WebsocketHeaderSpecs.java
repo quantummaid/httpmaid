@@ -48,7 +48,7 @@ public final class WebsocketHeaderSpecs {
         )
                 .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+                .allWebsocketsHaveReceivedTheMessage("foo");
     }
 
     @ParameterizedTest
@@ -64,7 +64,7 @@ public final class WebsocketHeaderSpecs {
         )
                 .when().aWebsocketIsConnected(Map.of(), Map.of("Content-Type", List.of("application/json")))
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("application/json");
+                .allWebsocketsHaveReceivedTheMessage("application/json");
     }
 
     @ParameterizedTest
@@ -80,6 +80,6 @@ public final class WebsocketHeaderSpecs {
         )
                 .when().aWebsocketIsConnected(Map.of(), Map.of("X-Headername", List.of("value1", "value2")))
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("{\"headers\":[\"value1\",\"value2\"]}");
+                .allWebsocketsHaveReceivedTheMessage("{\"headers\":[\"value1\",\"value2\"]}");
     }
 }

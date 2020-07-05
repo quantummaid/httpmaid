@@ -28,16 +28,28 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
 import software.amazon.awssdk.services.apigatewaymanagementapi.model.DeleteConnectionRequest;
+import software.amazon.awssdk.services.apigatewaymanagementapi.model.DeleteConnectionResponse;
 import software.amazon.awssdk.services.apigatewaymanagementapi.model.PostToConnectionRequest;
+import software.amazon.awssdk.services.apigatewaymanagementapi.model.PostToConnectionResponse;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
+import static de.quantummaid.httpmaid.awslambda.ConnectionFuture.connectionFuture;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public final class AwsWebsocketSender implements WebsocketSender<AwsWebsocketConnectionInformation> {
     public static final WebsocketSenderId AWS_WEBSOCKET_SENDER = websocketSenderId("AWS_WEBSOCKET_SENDER");
 
@@ -48,31 +60,64 @@ public final class AwsWebsocketSender implements WebsocketSender<AwsWebsocketCon
     }
 
     @Override
-    public void send(final AwsWebsocketConnectionInformation connectionInformation,
-                     final String message) {
-        try (ApiGatewayManagementApiClient apiGatewayManagementApiClient = clientFactory.provide(connectionInformation)) {
-            final String connectionId = connectionInformation.connectionId;
-            final PostToConnectionRequest request = PostToConnectionRequest.builder()
-                    .connectionId(connectionId)
-                    .data(SdkBytes.fromUtf8String(message))
-                    .build();
-            apiGatewayManagementApiClient.postToConnection(request);
-        }
+    public void send(final String message,
+                     final List<AwsWebsocketConnectionInformation> connectionInformations,
+                     final BiConsumer<AwsWebsocketConnectionInformation, Throwable> onException) {
+        final Map<String, List<AwsWebsocketConnectionInformation>> groupedByEndpointUrl = connectionInformations.stream()
+                .collect(groupingBy(AwsWebsocketConnectionInformation::toEndpointUrl));
+        groupedByEndpointUrl.forEach((endpointUrl, awsWebsocketConnectionInformations) -> {
+            try (ApiGatewayManagementApiAsyncClient client = clientFactory.provide(endpointUrl)) {
+                final List<ConnectionFuture> futures = awsWebsocketConnectionInformations.stream()
+                        .map(connectionInformation -> {
+                            final String connectionId = connectionInformation.connectionId;
+                            final PostToConnectionRequest request = PostToConnectionRequest.builder()
+                                    .connectionId(connectionId)
+                                    .data(SdkBytes.fromUtf8String(message))
+                                    .build();
+                            final CompletableFuture<PostToConnectionResponse> future = client.postToConnection(request);
+                            return connectionFuture(connectionInformation, future);
+                        })
+                        .collect(toList());
+                waitForAllFutures(futures, onException);
+            }
+        });
     }
 
     @Override
-    public void disconnect(final AwsWebsocketConnectionInformation connectionInformation) {
-        try (ApiGatewayManagementApiClient apiGatewayManagementApiClient = clientFactory.provide(connectionInformation)) {
-            final String connectionId = connectionInformation.connectionId;
-            final DeleteConnectionRequest request = DeleteConnectionRequest.builder()
-                    .connectionId(connectionId)
-                    .build();
-            apiGatewayManagementApiClient.deleteConnection(request);
-        }
+    public void disconnect(final List<AwsWebsocketConnectionInformation> connectionInformations,
+                           final BiConsumer<AwsWebsocketConnectionInformation, Throwable> onException) {
+        final Map<String, List<AwsWebsocketConnectionInformation>> groupedByEndpointUrl = connectionInformations.stream()
+                .collect(groupingBy(AwsWebsocketConnectionInformation::toEndpointUrl));
+        groupedByEndpointUrl.forEach((endpointUrl, awsWebsocketConnectionInformations) -> {
+            try (ApiGatewayManagementApiAsyncClient client = clientFactory.provide(endpointUrl)) {
+                final List<ConnectionFuture> futures = awsWebsocketConnectionInformations.stream()
+                        .map(connectionInformation -> {
+                            final String connectionId = connectionInformation.connectionId;
+                            final DeleteConnectionRequest request = DeleteConnectionRequest.builder()
+                                    .connectionId(connectionId)
+                                    .build();
+                            final CompletableFuture<DeleteConnectionResponse> future = client.deleteConnection(request);
+                            return connectionFuture(connectionInformation, future);
+                        })
+                        .collect(toList());
+                waitForAllFutures(futures, onException);
+            }
+        });
     }
 
     @Override
     public WebsocketSenderId senderId() {
         return AWS_WEBSOCKET_SENDER;
+    }
+
+    private static void waitForAllFutures(final List<ConnectionFuture> futures,
+                                          final BiConsumer<AwsWebsocketConnectionInformation, Throwable> onException) {
+        while (true) {
+            final boolean allDone = futures.stream().allMatch(ConnectionFuture::isDone);
+            if (allDone) {
+                break;
+            }
+        }
+        futures.forEach(future -> future.check(onException));
     }
 }

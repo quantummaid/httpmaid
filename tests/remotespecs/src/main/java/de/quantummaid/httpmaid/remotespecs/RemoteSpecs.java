@@ -180,7 +180,7 @@ public interface RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("handler 2");
+                .allWebsocketsHaveReceivedTheMessage("handler 2");
     }
 
     @Test
@@ -188,7 +188,7 @@ public interface RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnected(Map.of(), Map.of("X-My-Header", List.of("myvalue")))
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"headerhandler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("myvalue");
+                .allWebsocketsHaveReceivedTheMessage("myvalue");
     }
 
     @Test
@@ -196,10 +196,10 @@ public interface RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
                 .theStatusCodeWas(200)
-                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+                .allWebsocketsHaveReceivedTheMessage("foo");
     }
 
     @Test
@@ -207,11 +207,11 @@ public interface RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("websocket has been registered")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"disconnect\" }")
                 .allWebsocketsHaveBeenClosed();
     }

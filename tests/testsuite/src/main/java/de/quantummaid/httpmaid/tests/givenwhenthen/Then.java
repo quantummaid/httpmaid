@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -160,20 +161,36 @@ public final class Then {
         return this;
     }
 
-    public Then aWebsocketMessageHasBeenReceivedWithContent(final String content) {
-        return theCheckpointHasBeenVisited(content);
-    }
-
-    public Then aWebsocketMessageHasBeenReceivedWithJsonContent(final Map<String, Object> content) {
-        final boolean visited = testData.getCheckpoints().checkpointHasBeenVisited(value -> {
-            final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
-            return content.equals(actual);
+    public Then allWebsocketsHaveReceivedTheMessage(final String content) {
+        testData.getWebsockets().allActive().forEach(websocket -> {
+            final boolean received = websocket.waitAndCheckForMessageReceived(content);
+            assertThat(received, is(true));
         });
-        assertThat(visited, is(true));
         return this;
     }
 
-    public Then theQueriedNumberOfWebsocketsIs(final int numberOfWebsockets) {
+    public Then oneWebsocketHasReceivedTheMessage(final String content) {
+        pollWithTimeout(() -> testData.getWebsockets().all().stream()
+                .anyMatch(websocket -> websocket.hasReceivedMessage(content::equals)));
+        final long count = testData.getWebsockets().all().stream()
+                .filter(websocket -> websocket.hasReceivedMessage(content::equals))
+                .count();
+        assertThat(count, is(1L));
+        return this;
+    }
+
+    public Then allWebsocketsHaveReceivedTheJsonMessage(final Map<String, Object> content) {
+        testData.getWebsockets().allActive().forEach(websocket -> {
+            final boolean received = websocket.waitAndCheckForMessageReceived(value -> {
+                final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
+                return content.equals(actual);
+            });
+            assertThat(received, is(true));
+        });
+        return this;
+    }
+
+    public Then theQueriedNumberOfWebsocketsIs(final long numberOfWebsockets) {
         final RuntimeInformation runtimeInformation = testData.getRuntimeInformation();
         assertThat(runtimeInformation.numberOfConnectedWebsockets(), is(numberOfWebsockets));
         return this;

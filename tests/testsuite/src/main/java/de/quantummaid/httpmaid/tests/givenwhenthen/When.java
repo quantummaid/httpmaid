@@ -24,7 +24,6 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.RuntimeInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.*;
-import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
@@ -66,10 +65,9 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     @Override
     public Then aWebsocketIsConnected(final Map<String, List<String>> queryParameters,
                                       final Map<String, List<String>> headers) {
-        final Checkpoints checkpoints = testData.getCheckpoints();
         final ManagedWebsocket managedWebsocket = ManagedWebsocket.managedWebsocket();
         final WrappedWebsocket websocket = testData.getClientWrapper().openWebsocket(
-                checkpoints::visitCheckpoint,
+                managedWebsocket::addMessage,
                 () -> managedWebsocket.setStatus(CLOSED),
                 queryParameters,
                 headers
@@ -99,13 +97,13 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     }
 
     @Override
-    public Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(final int expectedNumberOfWebsockets) {
+    public Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(final long expectedNumberOfWebsockets) {
         final int maxNumberOfTries = 60;
         final int sleepTimeInMilliseconds = 1000;
         Poller.pollWithTimeout(maxNumberOfTries, sleepTimeInMilliseconds, () -> {
             theRuntimeDataIsQueried();
             final RuntimeInformation runtimeInformation = testData.getRuntimeInformation();
-            final int actualNumberOfWebsockets = runtimeInformation.numberOfConnectedWebsockets();
+            final long actualNumberOfWebsockets = runtimeInformation.numberOfConnectedWebsockets();
             return actualNumberOfWebsockets == expectedNumberOfWebsockets;
         });
         return Then.then(testData);

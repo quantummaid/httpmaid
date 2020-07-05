@@ -41,6 +41,7 @@ import static de.quantummaid.httpmaid.http.QueryParameter.queryParameter;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
+import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.websocketCriteria;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.websocketRegistryEntry;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 import static java.util.Collections.emptyList;
@@ -97,7 +98,7 @@ public interface WebsocketRegistrySpecs {
                 queryParameters(emptyList())
         );
         websocketRegistry.addConnection(entry);
-        final List<WebsocketRegistryEntry> connections = websocketRegistry.connections();
+        final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(websocketCriteria());
         assertThat(connections.size(), is(1));
         final WebsocketRegistryEntry queriedEntry = connections.get(0);
         assertThat(queriedEntry.getSenderId().asString(), is("foo"));

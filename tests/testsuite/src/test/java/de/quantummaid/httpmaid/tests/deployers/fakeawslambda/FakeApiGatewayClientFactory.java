@@ -21,11 +21,10 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
 import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
 
 import java.net.URI;
 
@@ -38,9 +37,9 @@ public final class FakeApiGatewayClientFactory implements ApiGatewayClientFactor
     }
 
     @Override
-    public ApiGatewayManagementApiClient provide(final AwsWebsocketConnectionInformation connectionInformation) {
+    public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
         final String uri = String.format("http://localhost:%d/", port);
-        return ApiGatewayManagementApiClient.builder()
+        return ApiGatewayManagementApiAsyncClient.builder()
                 .endpointOverride(URI.create(uri))
                 .build();
     }

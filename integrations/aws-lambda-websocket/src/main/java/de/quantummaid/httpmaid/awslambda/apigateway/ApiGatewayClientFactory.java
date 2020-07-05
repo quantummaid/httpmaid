@@ -21,9 +21,8 @@
 
 package de.quantummaid.httpmaid.awslambda.apigateway;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
 
 public interface ApiGatewayClientFactory {
-    ApiGatewayManagementApiClient provide(AwsWebsocketConnectionInformation connectionInformation);
+    ApiGatewayManagementApiAsyncClient provide(String endpointUrl);
 }

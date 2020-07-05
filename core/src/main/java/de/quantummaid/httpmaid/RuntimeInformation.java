@@ -30,13 +30,13 @@ import lombok.ToString;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RuntimeInformation {
-    private final int numberOfConnectedWebsockets;
+    private final long numberOfConnectedWebsockets;
 
-    public static RuntimeInformation runtimeInformation(final int numberOfConnectedWebsockets) {
+    public static RuntimeInformation runtimeInformation(final long numberOfConnectedWebsockets) {
         return new RuntimeInformation(numberOfConnectedWebsockets);
     }
 
-    public int numberOfConnectedWebsockets() {
+    public long numberOfConnectedWebsockets() {
         return numberOfConnectedWebsockets;
     }
 }

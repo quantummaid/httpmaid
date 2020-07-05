@@ -69,7 +69,7 @@ public final class WebsocketSpecs {
         )
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .aWebsocketMessageHasBeenReceivedWithContent("foo");
+                .allWebsocketsHaveReceivedTheMessage("foo");
     }
 
     @ParameterizedTest
@@ -87,7 +87,7 @@ public final class WebsocketSpecs {
                 "   \"parameter1\": \"foo\",\n" +
                 "   \"parameter2\": \"bar\"\n" +
                 "}")
-                .aWebsocketMessageHasBeenReceivedWithContent("\"foobar\"");
+                .allWebsocketsHaveReceivedTheMessage("\"foobar\"");
     }
 
     @ParameterizedTest
@@ -106,6 +106,6 @@ public final class WebsocketSpecs {
                 "   \"message\": \"handler1\",\n" +
                 "   \"action\": \"handler2\"\n" +
                 "}")
-                .aWebsocketMessageHasBeenReceivedWithContent("correct handler");
+                .allWebsocketsHaveReceivedTheMessage("correct handler");
     }
 }

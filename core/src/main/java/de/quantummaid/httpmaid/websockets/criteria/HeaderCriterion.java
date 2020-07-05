@@ -19,25 +19,33 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambda.apigateway;
+package de.quantummaid.httpmaid.websockets.criteria;
 
+import de.quantummaid.httpmaid.http.HeaderName;
+import de.quantummaid.httpmaid.http.HeaderValue;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
+import lombok.ToString;
 
-import java.net.URI;
+import java.util.List;
 
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DefaultApiGatewayClientFactory implements ApiGatewayClientFactory {
+public final class HeaderCriterion {
+    private final HeaderName name;
+    private final HeaderValue value;
 
-    public static ApiGatewayClientFactory defaultApiGatewayClientFactory() {
-        return new DefaultApiGatewayClientFactory();
+    public static HeaderCriterion headerCriterion(final HeaderName name,
+                                                  final HeaderValue value) {
+        return new HeaderCriterion(name, value);
     }
 
-    @Override
-    public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
-        return ApiGatewayManagementApiAsyncClient.builder()
-                .endpointOverride(URI.create(endpointUrl))
-                .build();
+    public boolean filter(final WebsocketRegistryEntry entry) {
+        final List<String> values = entry.headers()
+                .allValuesFor(name.stringValue());
+        return values.contains(value.stringValue());
     }
 }

@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
@@ -34,9 +35,12 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.broadcast.RecipientDeterminator.all;
+import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.websocketCriteria;
+import static java.util.stream.Collectors.groupingBy;
 
 @ToString
 @EqualsAndHashCode
@@ -52,23 +56,24 @@ public final class SerializingSender<T> {
     }
 
     public void sendToAll(final T message) {
-        sendToAllThat(message, all());
+        sendTo(message, websocketCriteria());
     }
 
-    public void sendToAllThat(final T message, final RecipientDeterminator recipientDeterminator) {
+    public void sendTo(final T message, final WebsocketCriteria criteria) {
         validateNotNull(message, "message");
-        validateNotNull(recipientDeterminator, "recipientDeterminator");
-        final List<WebsocketRegistryEntry> connections = websocketRegistry.connections();
-        connections.forEach(connection -> {
-            final WebsocketSenderId websocketSenderId = connection.senderId();
-            final WebsocketSender<Object> sender = websocketSenders.senderById(websocketSenderId);
-            final ConnectionInformation connectionInformation = connection.connectionInformation();
-            try {
-                sender.send(connectionInformation, (String) message);
-            } catch (final Exception e) {
-                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, e);
+        validateNotNull(criteria, "criteria");
+        final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(criteria);
+        final Map<WebsocketSenderId, List<WebsocketRegistryEntry>> bySenderId = connections.stream()
+                .collect(groupingBy(WebsocketRegistryEntry::getSenderId));
+        bySenderId.forEach((websocketSenderId, websocketRegistryEntries) -> {
+            final List<ConnectionInformation> collectionInformations = websocketRegistryEntries.stream()
+                    .map(WebsocketRegistryEntry::connectionInformation)
+                    .collect(Collectors.toList());
+            final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
+            sender.send((String) message, collectionInformations, (connectionInformation, throwable) -> {
+                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, throwable);
                 websocketRegistry.removeConnection(connectionInformation);
-            }
+            });
         });
     }
 }

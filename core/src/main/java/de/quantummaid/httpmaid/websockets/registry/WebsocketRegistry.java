@@ -21,10 +21,12 @@
 
 package de.quantummaid.httpmaid.websockets.registry;
 
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
+
 import java.util.List;
 
 public interface WebsocketRegistry {
-    List<WebsocketRegistryEntry> connections();
+    List<WebsocketRegistryEntry> connections(WebsocketCriteria criteria);
 
     WebsocketRegistryEntry byConnectionInformation(ConnectionInformation connectionInformation);
 
@@ -32,5 +34,5 @@ public interface WebsocketRegistry {
 
     void removeConnection(ConnectionInformation connectionInformation);
 
-    int countConnections();
+    long countConnections();
 }

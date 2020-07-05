@@ -124,7 +124,7 @@ public final class HttpMaid implements AutoCloseable {
 
     public RuntimeInformation queryRuntimeInformation() {
         final WebsocketRegistry websocketRegistry = chainRegistry.getMetaDatum(WEBSOCKET_REGISTRY);
-        final int numberOfConnectedWebsockets = websocketRegistry.countConnections();
+        final long numberOfConnectedWebsockets = websocketRegistry.countConnections();
         return runtimeInformation(numberOfConnectedWebsockets);
     }
 
