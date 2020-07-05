@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -169,6 +170,8 @@ public final class Then {
     }
 
     public Then oneWebsocketHasReceivedTheMessage(final String content) {
+        pollWithTimeout(() -> testData.getWebsockets().all().stream()
+                .anyMatch(websocket -> websocket.hasReceivedMessage(content::equals)));
         final long count = testData.getWebsockets().all().stream()
                 .filter(websocket -> websocket.hasReceivedMessage(content::equals))
                 .count();

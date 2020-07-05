@@ -35,9 +35,12 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.websocketCriteria;
+import static java.util.stream.Collectors.groupingBy;
 
 @ToString
 @EqualsAndHashCode
@@ -60,16 +63,17 @@ public final class SerializingSender<T> {
         validateNotNull(message, "message");
         validateNotNull(criteria, "criteria");
         final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(criteria);
-        connections.forEach(connection -> {
-            final WebsocketSenderId websocketSenderId = connection.senderId();
-            final WebsocketSender<Object> sender = websocketSenders.senderById(websocketSenderId);
-            final ConnectionInformation connectionInformation = connection.connectionInformation();
-            try {
-                sender.send(connectionInformation, (String) message);
-            } catch (final Exception e) {
-                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, e);
+        final Map<WebsocketSenderId, List<WebsocketRegistryEntry>> bySenderId = connections.stream()
+                .collect(groupingBy(WebsocketRegistryEntry::getSenderId));
+        bySenderId.forEach((websocketSenderId, websocketRegistryEntries) -> {
+            final List<ConnectionInformation> collectionInformations = websocketRegistryEntries.stream()
+                    .map(WebsocketRegistryEntry::connectionInformation)
+                    .collect(Collectors.toList());
+            final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
+            sender.send((String) message, collectionInformations, (connectionInformation, throwable) -> {
+                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, throwable);
                 websocketRegistry.removeConnection(connectionInformation);
-            }
+            });
         });
     }
 }

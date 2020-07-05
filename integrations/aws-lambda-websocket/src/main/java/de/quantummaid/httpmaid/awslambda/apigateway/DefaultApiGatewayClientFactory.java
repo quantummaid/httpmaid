@@ -21,10 +21,9 @@
 
 package de.quantummaid.httpmaid.awslambda.apigateway;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
 
 import java.net.URI;
 
@@ -36,9 +35,8 @@ public final class DefaultApiGatewayClientFactory implements ApiGatewayClientFac
     }
 
     @Override
-    public ApiGatewayManagementApiClient provide(final AwsWebsocketConnectionInformation connectionInformation) {
-        final String endpointUrl = connectionInformation.toEndpointUrl();
-        return ApiGatewayManagementApiClient.builder()
+    public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
+        return ApiGatewayManagementApiAsyncClient.builder()
                 .endpointOverride(URI.create(endpointUrl))
                 .build();
     }

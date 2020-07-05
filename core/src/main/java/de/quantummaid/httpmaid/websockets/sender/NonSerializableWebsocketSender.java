@@ -26,6 +26,9 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+import java.util.function.BiConsumer;
+
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
 
 @ToString
@@ -39,13 +42,28 @@ public final class NonSerializableWebsocketSender implements WebsocketSender<Non
     }
 
     @Override
-    public void send(final NonSerializableConnectionInformation connectionInformation,
-                     final String message) {
-        connectionInformation.send(message);
+    public void send(final String message,
+                     final List<NonSerializableConnectionInformation> connectionInformations,
+                     final BiConsumer<NonSerializableConnectionInformation, Throwable> onException) {
+        connectionInformations.forEach(connectionInformation -> {
+            try {
+                connectionInformation.send(message);
+            } catch (final Exception e) {
+                onException.accept(connectionInformation, e);
+            }
+        });
     }
 
-    public void disconnect(final NonSerializableConnectionInformation connectionInformation) {
-        connectionInformation.disconnect();
+    @Override
+    public void disconnect(final List<NonSerializableConnectionInformation> connectionInformations,
+                           final BiConsumer<NonSerializableConnectionInformation, Throwable> onException) {
+        connectionInformations.forEach(connectionInformation -> {
+            try {
+                connectionInformation.disconnect();
+            } catch (final Exception e) {
+                onException.accept(connectionInformation, e);
+            }
+        });
     }
 
     @Override

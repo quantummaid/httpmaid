@@ -33,9 +33,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.websocketCriteria;
+import static java.util.stream.Collectors.groupingBy;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
@@ -55,16 +58,16 @@ public final class Disconnector {
     public void disconnectAllThat(final WebsocketCriteria criteria) {
         validateNotNull(criteria, "criteria");
         final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(criteria);
-        connections.forEach(connection -> {
-            final WebsocketSenderId websocketSenderId = connection.senderId();
-            final WebsocketSender<Object> sender = websocketSenders.senderById(websocketSenderId);
-            final ConnectionInformation connectionInformation = connection.connectionInformation();
-            try {
-                sender.disconnect(connectionInformation);
-            } catch (final Exception e) {
-                log.info("Exception when disconnecting websocket {}.", connectionInformation, e);
-            }
-            websocketRegistry.removeConnection(connectionInformation);
+        final Map<WebsocketSenderId, List<WebsocketRegistryEntry>> bySenderId = connections.stream()
+                .collect(groupingBy(WebsocketRegistryEntry::getSenderId));
+        bySenderId.forEach((websocketSenderId, websocketRegistryEntries) -> {
+            final List<ConnectionInformation> collectionInformations = websocketRegistryEntries.stream()
+                    .map(WebsocketRegistryEntry::connectionInformation)
+                    .collect(Collectors.toList());
+            collectionInformations.forEach(websocketRegistry::removeConnection);
+            final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
+            sender.disconnect(collectionInformations, (connectionInformation, throwable) ->
+                    log.info("Exception when disconnecting websocket {}.", connectionInformation, throwable));
         });
     }
 }
