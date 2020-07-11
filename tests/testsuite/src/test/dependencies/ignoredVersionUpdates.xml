@@ -12,6 +12,7 @@
             <ignoreVersions>
                 <ignoreVersion>2.0.0-M1</ignoreVersion>
                 <ignoreVersion>2.0.0-M2</ignoreVersion>
+                <ignoreVersion>2.0.0-M3</ignoreVersion>
             </ignoreVersions>
         </rule>
         <rule groupId="org.eclipse.jetty" comparisonMethod="maven">
