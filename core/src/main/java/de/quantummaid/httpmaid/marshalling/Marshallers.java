@@ -50,6 +50,7 @@ import static java.util.stream.Collectors.toList;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S1845")
 public final class Marshallers {
     public static final MetaDataKey<Marshallers> MARSHALLERS = metaDataKey("MARSHALLERS");
 

@@ -26,6 +26,7 @@ import de.quantummaid.reflectmaid.ResolvedType;
 
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 
+@SuppressWarnings("java:S1214")
 public interface Serializer {
     MetaDataKey<Serializer> SERIALIZER = metaDataKey("SERIALIZER");
 

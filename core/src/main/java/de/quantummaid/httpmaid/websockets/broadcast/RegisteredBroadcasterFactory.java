@@ -30,6 +30,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S1452")
 public final class RegisteredBroadcasterFactory {
     private final BroadcasterFactory<?, Object> factory;
     private final ResolvedType senderType;
