@@ -38,5 +38,5 @@
     <suppress checks="IllegalCatch" files="MarshallingModule"/>
     <suppress checks="TrailingComment" files="Loggers|SecurityConfigurators|Unmarshaller|MarshallingConfigurators|MetaDataKey|ChainRegistry|RawResponseFactory"/>
     <suppress checks="TrailingComment" files="RawResponseHandler|RawRequestExtractor|PureJavaEndpoint"/>
-    <suppress checks="IllegalCatch" files="SerializingSender|Disconnector|NonSerializableWebsocketSender"/>
+    <suppress checks="IllegalCatch" files="SerializingSender|Disconnector|NonSerializableWebsocketSender|UnmarshalProcessor"/>
 </suppressions>

@@ -19,14 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.serializing;
+package de.quantummaid.httpmaid.usecases;
 
-import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.serialization.Serializer;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
+import static de.quantummaid.httpmaid.serialization.Serializer.SERIALIZER;
 
-public interface SerializationAndDeserializationProvider {
-    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
-                                                   List<Class<?>> injectionTypes,
-                                                   List<Class<?>> messageTypes);
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RegisterSerializerProcessor implements Processor {
+    private final Serializer serializer;
+
+    public static RegisterSerializerProcessor registerSerializerProcessor(final Serializer serializer) {
+        return new RegisterSerializerProcessor(serializer);
+    }
+
+    @Override
+    public void apply(final MetaData metaData) {
+        metaData.set(SERIALIZER, serializer);
+    }
 }

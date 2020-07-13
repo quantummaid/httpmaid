@@ -19,28 +19,37 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets;
+package de.quantummaid.httpmaid.marshalling;
 
-import de.quantummaid.httpmaid.websockets.broadcast.NonSerializingSender;
-import de.quantummaid.httpmaid.websockets.disconnect.Disconnector;
+import de.quantummaid.httpmaid.http.headers.ContentType;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Websockets {
-    private final NonSerializingSender sender;
-    private final Disconnector disconnector;
+public final class Unmarshallers {
+    private final Map<ContentType, Unmarshaller> unmarshallers;
 
-    public static Websockets websockets(final NonSerializingSender sender,
-                                        final Disconnector disconnector) {
-        return new Websockets(sender, disconnector);
+    public static Unmarshallers unmarshallers(final Map<ContentType, Unmarshaller> unmarshallers) {
+        return new Unmarshallers(unmarshallers);
     }
 
-    public NonSerializingSender sender() {
-        return sender;
+    public Unmarshaller byContentType(final ContentType contentType) {
+        return unmarshallers.get(contentType);
     }
 
-    public Disconnector disconnector() {
-        return disconnector;
+    public boolean supportsContentType(final ContentType contentType) {
+        return unmarshallers.containsKey(contentType);
+    }
+
+    public List<ContentType> supportedContentTypes() {
+        return new ArrayList<>(unmarshallers.keySet());
     }
 }

@@ -19,14 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.serializing;
+package de.quantummaid.httpmaid.serialization;
 
-import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
+import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.reflectmaid.ResolvedType;
 
-import java.util.List;
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 
-public interface SerializationAndDeserializationProvider {
-    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
-                                                   List<Class<?>> injectionTypes,
-                                                   List<Class<?>> messageTypes);
+public interface Serializer {
+    MetaDataKey<Serializer> SERIALIZER = metaDataKey("SERIALIZER");
+
+    Object serialize(Object object, ResolvedType type);
 }

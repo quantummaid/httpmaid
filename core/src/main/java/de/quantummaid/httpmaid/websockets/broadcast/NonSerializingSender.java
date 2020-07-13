@@ -21,8 +21,6 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
-import de.quantummaid.httpmaid.marshalling.Marshaller;
-import de.quantummaid.httpmaid.serialization.Serializer;
 import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -30,7 +28,6 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
-import de.quantummaid.reflectmaid.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -49,45 +46,31 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
-public final class SerializingSender<T> {
+public final class NonSerializingSender {
     private final WebsocketRegistry websocketRegistry;
     private final WebsocketSenders websocketSenders;
-    private final ResolvedType messageType;
-    private final Marshaller marshaller;
-    private final Serializer serializer;
 
-    public static <T> SerializingSender<T> serializingSender(final WebsocketRegistry websocketRegistry,
-                                                             final WebsocketSenders websocketSenders,
-                                                             final ResolvedType messageType,
-                                                             final Marshaller marshaller,
-                                                             final Serializer serializer) {
-        return new SerializingSender<>(
-                websocketRegistry,
-                websocketSenders,
-                messageType,
-                marshaller,
-                serializer
-        );
+    public static NonSerializingSender nonSerializingSender(final WebsocketRegistry websocketRegistry,
+                                                                   final WebsocketSenders websocketSenders) {
+        return new NonSerializingSender(websocketRegistry, websocketSenders);
     }
 
-    public void sendToAll(final T message) {
+    public void sendToAll(final String message) {
         sendTo(message, websocketCriteria());
     }
 
-    public void sendTo(final T message, final WebsocketCriteria criteria) {
+    public void sendTo(final String message, final WebsocketCriteria criteria) {
         validateNotNull(message, "message");
         validateNotNull(criteria, "criteria");
         final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(criteria);
         final Map<WebsocketSenderId, List<WebsocketRegistryEntry>> bySenderId = connections.stream()
                 .collect(groupingBy(WebsocketRegistryEntry::getSenderId));
         bySenderId.forEach((websocketSenderId, websocketRegistryEntries) -> {
-            final List<ConnectionInformation> connectionInformations = websocketRegistryEntries.stream()
+            final List<ConnectionInformation> collectionInformations = websocketRegistryEntries.stream()
                     .map(WebsocketRegistryEntry::connectionInformation)
                     .collect(toList());
             final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
-            final Object serialized = serializer.serialize(message, messageType);
-            final String marshalled = marshaller.marshall(serialized);
-            sender.send(marshalled, connectionInformations, (connectionInformation, throwable) -> {
+            sender.send(message, collectionInformations, (connectionInformation, throwable) -> {
                 log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, throwable);
                 websocketRegistry.removeConnection(connectionInformation);
             });
