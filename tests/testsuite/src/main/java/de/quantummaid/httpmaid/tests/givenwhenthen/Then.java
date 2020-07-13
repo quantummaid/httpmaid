@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import de.quantummaid.httpmaid.RuntimeInformation;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import lombok.AccessLevel;
@@ -180,13 +181,31 @@ public final class Then {
     }
 
     public Then allWebsocketsHaveReceivedTheJsonMessage(final Map<String, Object> content) {
-        testData.getWebsockets().allActive().forEach(websocket -> {
-            final boolean received = websocket.waitAndCheckForMessageReceived(value -> {
-                final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
-                return content.equals(actual);
-            });
+        testData.getWebsockets().all().forEach(websocket -> {
+            final boolean received = websocket.waitAndCheckForMessageReceived(
+                    value -> {
+                        try {
+                            final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
+                            return content.equals(actual);
+                        } catch (JsonSyntaxException e) {
+                            return false;
+                        }
+                    });
             assertThat(received, is(true));
         });
+        return this;
+    }
+
+    public Then oneWebsocketHasReceivedTheJsonMessage(final Map<String, Object> content) {
+        pollWithTimeout(() -> testData.getWebsockets().all().stream()
+                .anyMatch(websocket -> websocket.waitAndCheckForMessageReceived(value -> {
+                    final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
+                    return content.equals(actual);
+                })));
+        final long count = testData.getWebsockets().all().stream()
+                .filter(websocket -> websocket.hasReceivedMessage(content::equals))
+                .count();
+        assertThat(count, is(1L));
         return this;
     }
 

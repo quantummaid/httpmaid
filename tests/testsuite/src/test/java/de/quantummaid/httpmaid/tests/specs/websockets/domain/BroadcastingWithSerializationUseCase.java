@@ -19,10 +19,12 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.serializing;
+package de.quantummaid.httpmaid.tests.specs.websockets.domain;
 
-import de.quantummaid.reflectmaid.ResolvedType;
+public final class BroadcastingWithSerializationUseCase {
 
-public interface UseCaseReturnValueSerializer {
-    Object serialize(Object returnValue, ResolvedType type);
+    public void broadcast(final MySerializingBroadcaster broadcaster) {
+        final MyMessage myMessage = new MyMessage("a", "b", "c");
+        broadcaster.send(myMessage);
+    }
 }

@@ -30,6 +30,7 @@ import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.eventmaid.serializedmessagebus.SerializedMessageBus;
 import de.quantummaid.eventmaid.usecases.usecaseadapter.LowLevelUseCaseAdapterBuilder;
 import de.quantummaid.eventmaid.usecases.usecaseadapter.UseCaseAdapter;
+import de.quantummaid.httpmaid.HttpMaidChains;
 import de.quantummaid.httpmaid.PerRouteConfigurator;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.events.Event;
@@ -65,6 +66,7 @@ import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
+import static de.quantummaid.httpmaid.usecases.RegisterSerializerProcessor.registerSerializerProcessor;
 import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
 import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEventFactory.singleParameterEventFactory;
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
@@ -151,16 +153,18 @@ public final class UseCasesModule implements ChainModule {
     @Override
     public void register(final ChainExtender extender) {
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
-        final Collection<Class<?>> injectionTypes = broadcasters.injectionTypes();
+        final List<Class<?>> injectionTypes = broadcasters.injectionTypes();
+        final List<Class<?>> messageTypes = broadcasters.messageTypes();
         final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
-        final UseCaseSerializationAndDeserialization serializationAndDeserialization = serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes);
-
+        final UseCaseSerializationAndDeserialization serializationAndDeserialization =
+                serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes, messageTypes);
+        extender.appendProcessor(HttpMaidChains.INIT,
+                registerSerializerProcessor(serializationAndDeserialization.returnValueSerializer()));
         final List<Class<?>> useCaseClasses = useCaseMethods.stream()
                 .map(UseCaseMethod::useCaseClass)
                 .map(ResolvedType::assignableType)
                 .collect(toList());
         final UseCaseInstantiator useCaseInstantiator = useCaseInstantiatorFactory.createInstantiator(useCaseClasses);
-
         final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
         useCaseMethods.forEach(useCaseMethod -> {
             final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
@@ -175,16 +179,12 @@ public final class UseCasesModule implements ChainModule {
             });
             startupChecks.addStartupCheck(() -> useCaseInstantiator.check(fromResolvedType(useCaseClass)));
         });
-
         adapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);
-
         final PredicateMapBuilder<Exception, Mapifier<Exception>> exceptionSerializers = predicateMapBuilder();
         exceptionSerializers.setDefaultValue(defaultExceptionMapifier());
         adapterBuilder.setExceptionSerializers(exceptionSerializers);
-
         final UseCaseAdapter useCaseAdapter = adapterBuilder.build();
         final MessageBus messageBus = extender.getMetaDatum(MESSAGE_BUS);
-
         final SerializedMessageBus serializedMessageBus = useCaseAdapter.attachAndEnhance(messageBus);
         extender.addMetaDatum(SERIALIZED_MESSAGE_BUS, serializedMessageBus);
     }

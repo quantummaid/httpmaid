@@ -22,7 +22,10 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen.websockets;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +33,6 @@ import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
 
-@ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ManagedWebsocket {
     @Getter

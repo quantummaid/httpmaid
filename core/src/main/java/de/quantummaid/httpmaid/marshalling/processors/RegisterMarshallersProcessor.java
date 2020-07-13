@@ -19,14 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.serializing;
+package de.quantummaid.httpmaid.marshalling.processors;
 
-import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
+import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.marshalling.Marshallers;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RegisterMarshallersProcessor implements Processor {
+    private final Marshallers marshallers;
 
-public interface SerializationAndDeserializationProvider {
-    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
-                                                   List<Class<?>> injectionTypes,
-                                                   List<Class<?>> messageTypes);
+    public static RegisterMarshallersProcessor registerDefaultMarshallerProcessor(final Marshallers marshallers) {
+        return new RegisterMarshallersProcessor(marshallers);
+    }
+
+    @Override
+    public void apply(final MetaData metaData) {
+        metaData.set(Marshallers.MARSHALLERS, marshallers);
+    }
 }

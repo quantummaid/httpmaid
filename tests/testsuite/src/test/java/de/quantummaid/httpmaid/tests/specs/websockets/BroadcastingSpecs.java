@@ -22,8 +22,7 @@
 package de.quantummaid.httpmaid.tests.specs.websockets;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
-import de.quantummaid.httpmaid.tests.specs.websockets.domain.BroadcastingUseCase;
-import de.quantummaid.httpmaid.tests.specs.websockets.domain.MyBroadcaster;
+import de.quantummaid.httpmaid.tests.specs.websockets.domain.*;
 import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -130,5 +129,27 @@ public final class BroadcastingSpecs {
                 .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
                 .theStatusCodeWas(200)
                 .allWebsocketsHaveReceivedTheMessage("foo");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ENVIRONMENTS_WITH_ALL_CAPABILITIES)
+    public void useCasesCanBroadcastWithSerialization(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/broadcast", BroadcastingWithSerializationUseCase.class)
+                        .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                        .broadcastToWebsocketsUsing(MySerializingBroadcaster.class, MyMessage.class, sender -> sender::sendToAll)
+                        .build()
+        )
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
+                .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{}").isIssued()
+                .theStatusCodeWas(200)
+                .allWebsocketsHaveReceivedTheJsonMessage(Map.of(
+                        "field1", "a",
+                        "field2", "b",
+                        "field3", "c"
+                ));
     }
 }

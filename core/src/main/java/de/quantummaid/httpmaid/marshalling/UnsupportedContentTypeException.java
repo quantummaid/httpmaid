@@ -35,7 +35,7 @@ public final class UnsupportedContentTypeException extends MarshallingException 
         super(message);
     }
 
-    static UnsupportedContentTypeException unsupportedContentTypeException(
+    public static UnsupportedContentTypeException unsupportedContentTypeException(
             final ContentType contentType,
             final Collection<ContentType> supportedContentTypes) {
         validateNotNull(contentType, "contentType");

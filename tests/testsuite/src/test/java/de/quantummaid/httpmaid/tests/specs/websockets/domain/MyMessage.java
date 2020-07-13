@@ -19,14 +19,17 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.serializing;
+package de.quantummaid.httpmaid.tests.specs.websockets.domain;
 
-import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
-
-public interface SerializationAndDeserializationProvider {
-    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
-                                                   List<Class<?>> injectionTypes,
-                                                   List<Class<?>> messageTypes);
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public final class MyMessage {
+    public final String field1;
+    public final String field2;
+    public final String field3;
 }

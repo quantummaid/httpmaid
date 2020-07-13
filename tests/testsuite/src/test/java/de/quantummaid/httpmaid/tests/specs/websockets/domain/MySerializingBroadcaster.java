@@ -19,14 +19,9 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.serializing;
+package de.quantummaid.httpmaid.tests.specs.websockets.domain;
 
-import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
+public interface MySerializingBroadcaster {
 
-import java.util.List;
-
-public interface SerializationAndDeserializationProvider {
-    UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
-                                                   List<Class<?>> injectionTypes,
-                                                   List<Class<?>> messageTypes);
+    void send(MyMessage message);
 }
