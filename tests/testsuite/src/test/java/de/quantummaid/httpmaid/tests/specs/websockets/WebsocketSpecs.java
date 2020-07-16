@@ -34,6 +34,18 @@ public final class WebsocketSpecs {
 
     @ParameterizedTest
     @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    public void lowLevelWebsocketHandlersCanBeRegisteredAsCatchAll(final TestEnvironment testEnvironment) {
+        testEnvironment.given(checkpoints ->
+                anHttpMaid()
+                        .websocket((request, response) -> checkpoints.visitCheckpoint("test"))
+                        .build())
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("foooo")
+                .theCheckpointHasBeenVisited("test");
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS)
     public void websocketsCanBeReceivedWithLowLevelHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(checkpoints ->
                 anHttpMaid()
@@ -70,6 +82,23 @@ public final class WebsocketSpecs {
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
                 .allWebsocketsHaveReceivedTheMessage("foo");
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    public void usecaseCanBeBoundToCatchAllWebsocket(final TestEnvironment testEnvironment) {
+        testEnvironment.given(checkpoints ->
+                anHttpMaid()
+                        .websocket(TestUseCase.class)
+                        .build()
+        )
+                .when().aWebsocketIsConnected()
+                .andWhen().aWebsocketMessageIsSent("" +
+                "{\n" +
+                "   \"parameter1\": \"foo\",\n" +
+                "   \"parameter2\": \"bar\"\n" +
+                "}")
+                .allWebsocketsHaveReceivedTheMessage("\"foobar\"");
     }
 
     @ParameterizedTest
