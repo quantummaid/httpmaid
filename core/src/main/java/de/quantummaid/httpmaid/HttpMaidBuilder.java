@@ -92,7 +92,6 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
     }
 
     public HttpMaidBuilder websocket(final Object handler) {
-        validateNotNull(handler, "handler");
         final GenerationCondition condition = webSocketCatchAllRoute();
         return serving(handler).when(condition);
     }
@@ -103,7 +102,6 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
 
     public HttpMaidBuilder websocket(final String id, final Object handler) {
         validateNotNull(id, "id");
-        validateNotNull(handler, "handler");
         final GenerationCondition condition = webSocketCategory(id);
         return serving(handler).when(condition);
     }
