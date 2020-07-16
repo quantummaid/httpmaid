@@ -6,8 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.84](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.84/jar) - 2020-07-16
 ### Added
-- Catch-all websocket routes
-- BOM entry for undertow integration 
+- Catch-all websocket routes.
+- BOM entry for undertow integration.
 ### Changed
 - Update dependencies.
 
