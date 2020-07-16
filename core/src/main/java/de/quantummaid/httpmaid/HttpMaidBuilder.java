@@ -44,6 +44,7 @@ import java.util.List;
 import static de.quantummaid.httpmaid.HttpMaid.STARTUP_TIME;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketCatchAllRoute.webSocketCatchAllRoute;
 import static de.quantummaid.httpmaid.websockets.WebsocketRoute.webSocketCategory;
 import static de.quantummaid.httpmaid.websockets.WebsocketsModule.websocketsModule;
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
@@ -84,6 +85,16 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
             coreModule.registerHandler(condition, handler, asList(perRouteConfigurators));
             return this;
         };
+    }
+
+    public HttpMaidBuilder websocket(final HttpHandler handler) {
+        return websocket((Object) handler);
+    }
+
+    public HttpMaidBuilder websocket(final Object handler) {
+        validateNotNull(handler, "handler");
+        final GenerationCondition condition = webSocketCatchAllRoute();
+        return serving(handler).when(condition);
     }
 
     public HttpMaidBuilder websocket(final String id, final HttpHandler handler) {

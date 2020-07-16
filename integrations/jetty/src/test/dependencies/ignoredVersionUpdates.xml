@@ -9,7 +9,9 @@
                 <ignoreVersion>10.0.0.alpha1</ignoreVersion>
                 <ignoreVersion>10.0.0.alpha2</ignoreVersion>
                 <ignoreVersion>10.0.0.beta0</ignoreVersion>
+                <ignoreVersion>10.0.0.beta1</ignoreVersion>
                 <ignoreVersion>11.0.0-alpha0</ignoreVersion>
+                <ignoreVersion>11.0.0.beta1</ignoreVersion>
             </ignoreVersions>
         </rule>
     </rules>
