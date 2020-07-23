@@ -25,7 +25,7 @@ import java.util.List;
 
 public final class UseCaseWithWildcardInParameter {
 
-    public void method(final List<?> list) {
+    public void method(final List<? super String> list) {
         throw new UnsupportedOperationException();
     }
 }
