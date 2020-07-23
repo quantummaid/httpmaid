@@ -25,7 +25,7 @@ import java.util.List;
 
 public final class UseCaseWithWildcardInReturnType {
 
-    public List<?> method() {
+    public List<? super String> method() {
         throw new UnsupportedOperationException();
     }
 }

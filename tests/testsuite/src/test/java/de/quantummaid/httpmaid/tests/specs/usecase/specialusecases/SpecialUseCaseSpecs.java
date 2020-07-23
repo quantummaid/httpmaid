@@ -283,7 +283,7 @@ public final class SpecialUseCaseSpecs {
                         "How it is serialized:\n" +
                         "\tNo serializer available\n" +
                         "Why it needs to be serializable:\n" +
-                        "\t- java.util.List<?> -> because return type of method 'List method()' [public java.util.List<?> " +
+                        "\t- java.util.List<?> -> because return type of method 'List method()' [public java.util.List<? super java.lang.String> " +
                         "de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInReturnType.method()]");
     }
 
@@ -334,7 +334,7 @@ public final class SpecialUseCaseSpecs {
                         "\tNo deserializer available\n" +
                         "Why it needs to be deserializable:\n" +
                         "\t- java.util.List<?> -> because parameter type of method 'void method(List<?> list)' [public void " +
-                        "de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInParameter.method(java.util.List<?>)]");
+                        "de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInParameter.method(java.util.List<? super java.lang.String>)]");
     }
 
     @ParameterizedTest
