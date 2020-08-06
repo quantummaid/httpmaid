@@ -46,12 +46,14 @@ public class TestExecutionLogger implements TestExecutionListener {
 
     private String shortened(final TestIdentifier testIdentifier) {
         final Optional<TestSource> source = testIdentifier.getSource();
-        final TestSource testSource = source.get();
-        final MethodSource methodSource = (MethodSource) testSource;
-        final String className = methodSource.getClassName();
-        final int lastDotIndex = className.lastIndexOf('.');
-        final String shortClassName = className.substring(lastDotIndex + 1);
-        return String.format("%s::%s::%s", shortClassName, methodSource.getMethodName(), testIdentifier.getDisplayName());
+        return source.map(testSource -> {
+            final MethodSource methodSource = (MethodSource) testSource;
+            final String className = methodSource.getClassName();
+            final int lastDotIndex = className.lastIndexOf('.');
+            final String shortClassName = className.substring(lastDotIndex + 1);
+            return String.format("%s::%s::%s", shortClassName, methodSource.getMethodName(), testIdentifier.getDisplayName());
+        })
+                .orElse(testIdentifier.toString());
     }
 
     @Override
