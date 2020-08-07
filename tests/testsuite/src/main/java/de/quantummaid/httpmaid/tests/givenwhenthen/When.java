@@ -74,7 +74,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
         );
         managedWebsocket.setWebsocket(websocket);
         testData.getWebsockets().addWebsocket(managedWebsocket);
-        ResourcesTracker.addResource(websocket);
+        testData.getTestEnvironment().addResourceToBeClosed(websocket);
         return Then.then(testData);
     }
 

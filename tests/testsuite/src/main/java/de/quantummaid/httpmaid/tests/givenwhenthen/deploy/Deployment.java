@@ -29,6 +29,9 @@ import lombok.ToString;
 
 import java.util.Optional;
 
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl.localhostHttpBaseUrl;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl.localhostWebsocketBaseUrl;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,19 +41,19 @@ public final class Deployment {
     private final ApiBaseUrl webSocketBaseUrl;
 
     public static Deployment localhostHttpDeployment(final int httpPort) {
-        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), null);
+        return httpDeployment(localhostHttpBaseUrl(httpPort), null);
     }
 
     public static Deployment localhostWebsocketDeployment(final int websocketPort) {
-        return httpDeployment(null, ApiBaseUrl.localhostWebsocketBaseUrl(websocketPort));
+        return httpDeployment(null, localhostWebsocketBaseUrl(websocketPort));
     }
 
     public static Deployment localhostHttpAndWebsocketDeployment(final int port) {
-        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(port), ApiBaseUrl.localhostWebsocketBaseUrl(port));
+        return httpDeployment(localhostHttpBaseUrl(port), localhostWebsocketBaseUrl(port));
     }
 
     public static Deployment localhostHttpAndWebsocketDeployment(final int httpPort, final int websocketPort) {
-        return httpDeployment(ApiBaseUrl.localhostHttpBaseUrl(httpPort), ApiBaseUrl.localhostWebsocketBaseUrl(websocketPort));
+        return httpDeployment(localhostHttpBaseUrl(httpPort), localhostWebsocketBaseUrl(websocketPort));
     }
 
     public static Deployment httpDeployment(final ApiBaseUrl httpBaseUrl,

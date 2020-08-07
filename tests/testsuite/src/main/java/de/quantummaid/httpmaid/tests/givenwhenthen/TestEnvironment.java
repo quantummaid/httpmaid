@@ -24,21 +24,25 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
+@Slf4j
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class TestEnvironment {
+public final class TestEnvironment implements AutoCloseable {
+    @Getter
     private final Deployer deployer;
+    @Getter
     private final ClientFactory clientFactory;
+    private final List<AutoCloseable> resources = new ArrayList<>();
 
     public static TestEnvironment testEnvironment(final Deployer deployer,
                                                   final ClientFactory clientFactory) {
@@ -48,7 +52,7 @@ public final class TestEnvironment {
     }
 
     public Given given(final HttpMaidSupplier httpMaidSupplier) {
-        return Given.given(httpMaidSupplier, deployer, clientFactory);
+        return Given.given(this, httpMaidSupplier);
     }
 
     public Given given(final Supplier<HttpMaid> httpMaidSupplier) {
@@ -61,5 +65,23 @@ public final class TestEnvironment {
 
     public Given givenTheStaticallyDeployedTestInstance() {
         return given((HttpMaid) null);
+    }
+
+    public void addResourceToBeClosed(final AutoCloseable autoCloseable) {
+        resources.add(autoCloseable);
+    }
+
+    @Override
+    public void close() {
+        closeResource(deployer::cleanUp);
+        resources.forEach(this::closeResource);
+    }
+
+    private void closeResource(final AutoCloseable autoCloseable) {
+        try {
+            autoCloseable.close();
+        } catch (final Exception e) {
+            log.warn("Error closing resource", e);
+        }
     }
 }

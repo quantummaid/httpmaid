@@ -36,6 +36,8 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.websockets.Websockets.
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
     @Getter
+    private final TestEnvironment testEnvironment;
+    @Getter
     @Setter
     private HttpClientResponse response;
     @Getter
@@ -56,7 +58,7 @@ public final class TestData {
     @Setter
     private RuntimeInformation runtimeInformation;
 
-    public static TestData testData() {
-        return new TestData();
+    public static TestData testData(final TestEnvironment testEnvironment) {
+        return new TestData(testEnvironment);
     }
 }

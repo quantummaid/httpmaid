@@ -24,33 +24,26 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.FirstWhenStage;
 import de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints;
-import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientWrapper;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.RequiredArgsConstructor;
 
-import static de.quantummaid.httpmaid.tests.givenwhenthen.ResourcesTracker.closeAll;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestData.testData;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.checkpoints.Checkpoints.checkpoints;
 
 @RequiredArgsConstructor
 @SuppressWarnings("java:S1181")
 public final class Given {
+    private final TestEnvironment testEnvironment;
     private final HttpMaidSupplier httpMaidSupplier;
-    private final Deployer deployer;
-    private final ClientFactory clientFactory;
 
-    public static Given given(final HttpMaidSupplier httpMaidSupplier,
-                              final Deployer deployer,
-                              final ClientFactory clientFactory) {
-        return new Given(httpMaidSupplier, deployer, clientFactory);
+    public static Given given(final TestEnvironment testEnvironment,
+                              final HttpMaidSupplier httpMaidSupplier) {
+        return new Given(testEnvironment, httpMaidSupplier);
     }
 
     public FirstWhenStage when() {
-        closeAll();
-        deployer.cleanUp();
-        final TestData testData = testData();
+        final TestData testData = testData(testEnvironment);
         final HttpMaid httpMaid;
         final Checkpoints checkpoints = checkpoints();
         testData.setCheckpoints(checkpoints);
@@ -61,8 +54,8 @@ public final class Given {
             return When.when(testData);
         }
         testData.setHttpMaid(httpMaid);
-        final Deployment deployment = deployer.deploy(httpMaid);
-        final HttpClientWrapper clientWrapper = clientFactory.createClient(deployment);
+        final Deployment deployment = testEnvironment.getDeployer().deploy(httpMaid);
+        final HttpClientWrapper clientWrapper = testEnvironment.getClientFactory().createClient(deployment);
         testData.setClientWrapper(clientWrapper);
         return When.when(testData);
     }

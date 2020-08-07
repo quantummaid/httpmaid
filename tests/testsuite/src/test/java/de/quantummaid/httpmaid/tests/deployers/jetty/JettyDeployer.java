@@ -38,7 +38,6 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.loca
 import static java.util.Arrays.asList;
 
 public final class JettyDeployer implements PortDeployer {
-
     private JettyEndpoint current;
 
     private JettyDeployer() {
