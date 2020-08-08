@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2020 Richard Hauswald - https://quantummaid.de/.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import lombok.extern.slf4j.Slf4j;
@@ -5,49 +26,24 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
+import java.lang.reflect.Method;
+
 @Slf4j
-public class AutoCloseableResolvedParametersSupportExtension implements InvocationInterceptor {
-    @java.lang.Override
-    public <T> T interceptTestClassConstructor(Invocation<T> invocation, ReflectiveInvocationContext<java.lang.reflect.Constructor<T>> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptTestClassConstructor()"));
-        return invocation.proceed();
-    }
+public final class AutoCloseableResolvedParametersSupportExtension implements InvocationInterceptor {
 
-    @java.lang.Override
-    public void interceptBeforeAllMethod(Invocation<java.lang.Void> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptBeforeAllMethod()"));
-        invocation.proceed();
-    }
-
-    @java.lang.Override
-    public void interceptBeforeEachMethod(Invocation<java.lang.Void> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptBeforeEachMethod()"));
-        invocation.proceed();
-    }
-
-    @java.lang.Override
-    public void interceptTestMethod(Invocation<java.lang.Void> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptTestMethod()"));
-        invocation.proceed();
-    }
-
-    @java.lang.Override
-    public <T> T interceptTestFactoryMethod(Invocation<T> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptTestFactoryMethod()"));
-        return invocation.proceed();
-    }
-
-    @java.lang.Override
-    public void interceptTestTemplateMethod(Invocation<java.lang.Void> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptTestTemplateMethod()"));
+    @Override
+    public void interceptTestTemplateMethod(final Invocation<Void> invocation,
+                                            final ReflectiveInvocationContext<Method> invocationContext,
+                                            final ExtensionContext extensionContext) throws Throwable {
+        log.info("interceptTestTemplateMethod()");
         try {
             invocation.proceed();
         } finally {
-           invocationContext.getArguments().stream()
-                   .filter(it -> it instanceof AutoCloseable)
-                   .forEach(it -> {
-                       safelyClose((AutoCloseable) it);
-                   });
+            invocationContext.getArguments().stream()
+                    .filter(it -> it instanceof AutoCloseable)
+                    .forEach(it -> {
+                        safelyClose((AutoCloseable) it);
+                    });
         }
     }
 
@@ -60,23 +56,5 @@ public class AutoCloseableResolvedParametersSupportExtension implements Invocati
         } catch (Exception e) {
             log.warn("unable to safely close: {} (cause: {})", classSimpleName, e.toString());
         }
-    }
-
-    @java.lang.Override
-    public void interceptDynamicTest(Invocation<java.lang.Void> invocation, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptDynamicTest()"));
-        invocation.proceed();
-    }
-
-    @java.lang.Override
-    public void interceptAfterEachMethod(Invocation<java.lang.Void> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptAfterEachMethod()"));
-        invocation.proceed();
-    }
-
-    @java.lang.Override
-    public void interceptAfterAllMethod(Invocation<java.lang.Void> invocation, ReflectiveInvocationContext<java.lang.reflect.Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        log.info(String.format("interceptAfterAllMethod()"));
-        invocation.proceed();
     }
 }

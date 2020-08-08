@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.givenwhenthen;
 
+import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.shitty.ShittyClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 
@@ -61,6 +62,7 @@ public final class TestEnvironments {
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()
+                        .filter(clientFactory -> clientFactory.getClass().equals(RealHttpMaidClientFactory.class))
                         .map(client -> testEnvironment(deployer, client)))
                 .collect(toList());
     }

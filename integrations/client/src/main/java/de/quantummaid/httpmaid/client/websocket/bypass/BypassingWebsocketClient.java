@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.client.websocket.bypass;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
 import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
+import de.quantummaid.httpmaid.client.websocket.WebsocketErrorHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
@@ -55,6 +56,7 @@ public final class BypassingWebsocketClient implements WebsocketClient {
     @Override
     public BypassedWebsocket openWebsocket(final WebsocketMessageHandler messageHandler,
                                            final WebsocketCloseHandler closeHandler,
+                                           final WebsocketErrorHandler errorHandler,
                                            final Map<String, List<String>> queryParameters,
                                            final Map<String, List<String>> headers,
                                            final String path) {

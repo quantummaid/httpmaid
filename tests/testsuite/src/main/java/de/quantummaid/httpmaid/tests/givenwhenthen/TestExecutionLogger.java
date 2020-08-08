@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.reporting.ReportEntry;
+import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
@@ -47,11 +48,17 @@ public class TestExecutionLogger implements TestExecutionListener {
     private String shortened(final TestIdentifier testIdentifier) {
         final Optional<TestSource> source = testIdentifier.getSource();
         return source.map(testSource -> {
-            final MethodSource methodSource = (MethodSource) testSource;
-            final String className = methodSource.getClassName();
-            final int lastDotIndex = className.lastIndexOf('.');
-            final String shortClassName = className.substring(lastDotIndex + 1);
-            return String.format("%s::%s::%s", shortClassName, methodSource.getMethodName(), testIdentifier.getDisplayName());
+            if (testSource instanceof MethodSource) {
+                final MethodSource methodSource = (MethodSource) testSource;
+                final String className = methodSource.getClassName();
+                final int lastDotIndex = className.lastIndexOf('.');
+                final String shortClassName = className.substring(lastDotIndex + 1);
+                return String.format("%s::%s::%s", shortClassName, methodSource.getMethodName(), testIdentifier.getDisplayName());
+            } else {
+                final ClassSource classSource = (ClassSource) testSource;
+                final String shortClassName = classSource.getJavaClass().getSimpleName();
+                return String.format("%s::%s", shortClassName, testIdentifier.getDisplayName());
+            }
         })
                 .orElse(testIdentifier.toString());
     }

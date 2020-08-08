@@ -53,6 +53,7 @@ public final class Given {
             testData.setInitializationException(e);
             return When.when(testData);
         }
+        testEnvironment.addResourceToBeClosed(httpMaid);
         testData.setHttpMaid(httpMaid);
         final Deployment deployment = testEnvironment.getDeployer().deploy(httpMaid);
         final HttpClientWrapper clientWrapper = testEnvironment.getClientFactory().createClient(deployment);

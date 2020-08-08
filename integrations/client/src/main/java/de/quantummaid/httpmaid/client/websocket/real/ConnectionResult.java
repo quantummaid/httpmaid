@@ -19,23 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client;
+package de.quantummaid.httpmaid.client.websocket.real;
 
-public final class HttpMaidClientException extends RuntimeException {
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-    private HttpMaidClientException(final String message, final Throwable cause) {
-        super(message, cause);
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ConnectionResult {
+    private final Throwable error;
+
+    public static ConnectionResult success() {
+        return new ConnectionResult(null);
     }
 
-    public static HttpMaidClientException httpMaidClientException(final String message) {
-        return new HttpMaidClientException(message, null);
+    public static ConnectionResult error(final Throwable error) {
+        return new ConnectionResult(error);
     }
 
-    public static HttpMaidClientException httpMaidClientException(final Throwable cause) {
-        return new HttpMaidClientException(null, cause);
+    public boolean successful() {
+        return error == null;
     }
 
-    public static HttpMaidClientException httpMaidClientException(final String message, final Throwable cause) {
-        return new HttpMaidClientException(message, cause);
+    public Throwable errorHasOccurred() {
+        return error;
     }
 }

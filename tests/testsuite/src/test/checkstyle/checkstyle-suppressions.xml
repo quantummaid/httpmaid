@@ -25,29 +25,31 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress checks="." files="HttpMaidTestConfigurations.java"/>
-    <suppress checks="LineLength" files="HttpMaidTestConfigurations.java|LowLevelTestSuite.java" />
-    <suppress checks="MethodLength" files="HttpMaidTestConfigurations.java" />
-    <suppress checks="UnnecessaryParentheses" files="HttpMaidTestConfigurations.java" />
-    <suppress checks="MagicNumber" files="HttpMaidTestConfigurations|AwsDeployer|Util|EventsHttpMaidConfiguration" />
-    <suppress checks="VisibilityModifier" files="DataTransferObject.java" />
-    <suppress checks="VisibilityModifier" files="Parameter1.java" />
-    <suppress checks="VisibilityModifier" files="Parameter2.java" />
-    <suppress checks="VisibilityModifier" files="HeadersInResponseReturnValue.java" />
-    <suppress checks="VisibilityModifier" files="SetContentTypeInResponseValue.java" />
-    <suppress checks="VisibilityModifier" files="EventsHttpMaidConfiguration|LowLevelHttpMaidConfiguration" />
-    <suppress checks="ClassDataAbstractionCoupling" files="HttpMaidTestConfigurations.java" />
-    <suppress checks="IllegalSystemOutPrintln" files="AwsDeployer.java" />
-    <suppress checks="Regexp" files="AwsDeployer.java|LambdaStatus.java" />
-    <suppress checks="IllegalCatch" files="ServletDeployer|DeployerManager|JettyDeployer" />
-    <suppress checks="ClassFanOutComplexity|ClassDataAbstractionCoupling" files="ShittyHttpClientWrapper.java" />
-    <suppress checks="MagicNumber|LineLength|IllegalCatch" files=".*Specs" />
-    <suppress checks="Regexp" files="FreePortPool" />
-    <suppress checks="Regexp" files="ResourceDeallocationSpecs" />
-    <suppress checks="MagicNumber|IllegalCatch" files="Deployer" />
-    <suppress checks="IllegalCatch" files="Given" />
-    <suppress checks="FileLength|MethodCount" files="SpecialUseCaseSpecs" />
-    <suppress checks="TrailingComment" files="Poller" />
-    <suppress checks="VisibilityModifier" files="AnnotatedApplicationConfig|ProgrammaticApplicationConfig" />
-    <suppress checks="IllegalCatch" files="FakeWebsocketLambda|ResourcesTracker|FakeRestApiGateway|FakeHttpV1PayloadApiGateway|FakeHttpV2PayloadApiGateway." />
-    <suppress checks="ParameterNumber" files="Deployment" />
+    <suppress checks="LineLength" files="HttpMaidTestConfigurations.java|LowLevelTestSuite.java"/>
+    <suppress checks="MethodLength" files="HttpMaidTestConfigurations.java"/>
+    <suppress checks="UnnecessaryParentheses" files="HttpMaidTestConfigurations.java"/>
+    <suppress checks="MagicNumber" files="HttpMaidTestConfigurations|AwsDeployer|Util|EventsHttpMaidConfiguration"/>
+    <suppress checks="VisibilityModifier" files="DataTransferObject.java"/>
+    <suppress checks="VisibilityModifier" files="Parameter1.java"/>
+    <suppress checks="VisibilityModifier" files="Parameter2.java"/>
+    <suppress checks="VisibilityModifier" files="HeadersInResponseReturnValue.java"/>
+    <suppress checks="VisibilityModifier" files="SetContentTypeInResponseValue.java"/>
+    <suppress checks="VisibilityModifier" files="EventsHttpMaidConfiguration|LowLevelHttpMaidConfiguration"/>
+    <suppress checks="ClassDataAbstractionCoupling" files="HttpMaidTestConfigurations.java"/>
+    <suppress checks="IllegalSystemOutPrintln" files="AwsDeployer.java"/>
+    <suppress checks="Regexp" files="AwsDeployer.java|LambdaStatus.java"/>
+    <suppress checks="IllegalCatch" files="ServletDeployer|DeployerManager|JettyDeployer"/>
+    <suppress checks="ClassFanOutComplexity|ClassDataAbstractionCoupling" files="ShittyHttpClientWrapper.java"/>
+    <suppress checks="MagicNumber|LineLength|IllegalCatch" files=".*Specs"/>
+    <suppress checks="Regexp" files="FreePortPool"/>
+    <suppress checks="Regexp" files="ResourceDeallocationSpecs"/>
+    <suppress checks="MagicNumber|IllegalCatch" files="Deployer"/>
+    <suppress checks="IllegalCatch" files="Given"/>
+    <suppress checks="FileLength|MethodCount" files="SpecialUseCaseSpecs"/>
+    <suppress checks="TrailingComment" files="Poller"/>
+    <suppress checks="VisibilityModifier" files="AnnotatedApplicationConfig|ProgrammaticApplicationConfig"/>
+    <suppress checks="IllegalCatch"
+              files="FakeWebsocketLambda|ResourcesTracker|FakeRestApiGateway|FakeHttpV1PayloadApiGateway|FakeHttpV2PayloadApiGateway."/>
+    <suppress checks="ParameterNumber" files="Deployment"/>
+    <suppress checks="IllegalCatch" files="AutoCloseableResolvedParametersSupportExtension|TestEnvironment"/>
 </suppressions>

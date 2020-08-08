@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.tests.givenwhenthen;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.RuntimeInformation;
+import de.quantummaid.httpmaid.client.HttpMaidClientException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.*;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse;
@@ -31,6 +32,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.client.WrappedWebsocket;
 import de.quantummaid.httpmaid.tests.givenwhenthen.websockets.ManagedWebsocket;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -44,8 +46,11 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.websockets.WebsocketSt
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, HeaderBuilder {
+    private static final int WAIT_TIME_BASE = 1000;
+
     private String method;
     private String path;
     private List<QueryStringParameter> queryStringParameters = new ArrayList<>();
@@ -65,6 +70,36 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     @Override
     public Then aWebsocketIsConnected(final Map<String, List<String>> queryParameters,
                                       final Map<String, List<String>> headers) {
+        final int maxConnectionAttempts = 3;
+        int tryNumber = 0;
+        int waitTime = WAIT_TIME_BASE;
+        while (true) {
+            try {
+                return tryToConnectWebsocket(queryParameters, headers);
+            } catch (final HttpMaidClientException e) {
+                log.warn("connect attempt {} failed", tryNumber, e);
+                if (tryNumber + 1 == maxConnectionAttempts) {
+                    throw new RuntimeException(format("failed %d times to connect, giving up connecting", maxConnectionAttempts), e);
+                } else {
+                    log.warn("retrying in {} ms", waitTime);
+                    sleep(waitTime);
+                    tryNumber = tryNumber + 1;
+                    waitTime = waitTime * 2;
+                }
+            }
+        }
+    }
+
+    private static void sleep(final int waitTime) {
+        try {
+            Thread.sleep(waitTime);
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private Then tryToConnectWebsocket(final Map<String, List<String>> queryParameters,
+                                       final Map<String, List<String>> headers) {
         final ManagedWebsocket managedWebsocket = ManagedWebsocket.managedWebsocket();
         final WrappedWebsocket websocket = testData.getClientWrapper().openWebsocket(
                 managedWebsocket::addMessage,

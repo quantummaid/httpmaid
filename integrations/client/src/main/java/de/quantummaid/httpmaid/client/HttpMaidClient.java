@@ -26,14 +26,12 @@ import de.quantummaid.httpmaid.client.clientbuilder.PortStage;
 import de.quantummaid.httpmaid.client.issuer.Issuer;
 import de.quantummaid.httpmaid.client.issuer.real.Protocol;
 import de.quantummaid.httpmaid.client.issuer.real.RealIssuer;
-import de.quantummaid.httpmaid.client.websocket.Websocket;
-import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
-import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
-import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
+import de.quantummaid.httpmaid.client.websocket.*;
 import de.quantummaid.httpmaid.client.websocket.bypass.BypassingWebsocketClient;
 import de.quantummaid.httpmaid.filtermap.FilterMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +44,7 @@ import static de.quantummaid.httpmaid.client.websocket.real.RealWebsocketClient.
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClient implements AutoCloseable {
     private final Issuer issuer;
@@ -126,6 +125,7 @@ public final class HttpMaidClient implements AutoCloseable {
         return openWebsocket(
                 messageHandler, () -> {
                 },
+                error -> log.warn("exception in client websocket", error),
                 Map.of(),
                 Map.of()
         );
@@ -133,9 +133,15 @@ public final class HttpMaidClient implements AutoCloseable {
 
     public Websocket openWebsocket(final WebsocketMessageHandler messageHandler,
                                    final WebsocketCloseHandler closeHandler,
+                                   final WebsocketErrorHandler errorHandler,
                                    final Map<String, List<String>> queryParameters,
                                    final Map<String, List<String>> headers) {
-        return websocketClient.openWebsocket(messageHandler, closeHandler, queryParameters, headers, basePath.render());
+        return websocketClient.openWebsocket(messageHandler,
+                closeHandler,
+                errorHandler,
+                queryParameters,
+                headers,
+                basePath.render());
     }
 
     @Override
