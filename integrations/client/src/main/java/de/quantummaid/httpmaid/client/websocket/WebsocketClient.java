@@ -28,6 +28,7 @@ public interface WebsocketClient {
 
     Websocket openWebsocket(WebsocketMessageHandler messageHandler,
                             WebsocketCloseHandler closeHandler,
+                            WebsocketErrorHandler errorHandler,
                             Map<String, List<String>> queryParameters,
                             Map<String, List<String>> headers,
                             String path);

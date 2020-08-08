@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.client.websocket.real;
 
 import de.quantummaid.httpmaid.client.websocket.Websocket;
 import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
+import de.quantummaid.httpmaid.client.websocket.WebsocketErrorHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -34,38 +35,38 @@ import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 
 import static de.quantummaid.httpmaid.client.HttpMaidClientException.httpMaidClientException;
-import static java.lang.Thread.currentThread;
+import static de.quantummaid.httpmaid.client.websocket.real.RealWebsocketState.initialWebsocketState;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public final class RealWebsocket implements Websocket, WebSocketListener {
-    private final CountDownLatch connectLatch = new CountDownLatch(1);
+    private final RealWebsocketState websocketState = initialWebsocketState();
     private final WebsocketMessageHandler messageHandler;
     private final WebsocketCloseHandler closeHandler;
+    private final WebsocketErrorHandler errorHandler;
     private final WebSocketClient client;
     private Session session;
 
     public static RealWebsocket realWebsocket(final WebsocketMessageHandler messageHandler,
                                               final WebsocketCloseHandler closeHandler,
+                                              final WebsocketErrorHandler errorHandler,
                                               final WebSocketClient client) {
-        return new RealWebsocket(messageHandler, closeHandler, client);
+        return new RealWebsocket(messageHandler, closeHandler, errorHandler, client);
     }
 
     void awaitConnect() {
-        try {
-            connectLatch.await();
-        } catch (final InterruptedException e) {
-            currentThread().interrupt();
-        }
+        websocketState.awaitConnect();
     }
 
     @Override
     public synchronized void send(final String message) {
+        if (!websocketState.isConnected()) {
+            throw httpMaidClientException("not connected");
+        }
         try {
             session.getRemote().sendString(message);
         } catch (final IOException e) {
@@ -76,7 +77,7 @@ public final class RealWebsocket implements Websocket, WebSocketListener {
     @Override
     public synchronized void onWebSocketConnect(final Session session) {
         this.session = session;
-        connectLatch.countDown();
+        websocketState.setConnected();
     }
 
     @Override
@@ -91,12 +92,16 @@ public final class RealWebsocket implements Websocket, WebSocketListener {
 
     @Override
     public void onWebSocketBinary(final byte[] bytes, final int i, final int i1) {
-        throw new UnsupportedOperationException("Binary websocket messages are not supported.");
+        throw new UnsupportedOperationException("binary websocket messages are not supported.");
     }
 
     @Override
     public void onWebSocketError(final Throwable throwable) {
-        log.error("Websocket error", throwable);
+        if (websocketState.isConnected()) {
+            errorHandler.onError(throwable);
+        } else {
+            websocketState.errorOnConnectOccurred(throwable);
+        }
     }
 
     @Override

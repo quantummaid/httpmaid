@@ -38,6 +38,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import static de.quantummaid.httpmaid.client.HttpMaidClient.aHttpMaidClientBypas
 import static de.quantummaid.httpmaid.client.body.multipart.Part.aPartWithTheControlName;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientResponse.httpClientResponse;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidClientWrapper implements HttpClientWrapper {
     private final HttpMaidClient httpClient;
@@ -138,7 +140,13 @@ public final class HttpMaidClientWrapper implements HttpClientWrapper {
             throw new UnsupportedOperationException("There is no websocket deployment to connect to. " +
                     "Probably the endpoint does not support websockets.");
         }
-        final Websocket websocket = websocketClient.openWebsocket(responseHandler::accept, closeHandler::run, queryParameters, headers);
+        final Websocket websocket = websocketClient.openWebsocket(
+                responseHandler::accept,
+                closeHandler::run,
+                error -> log.warn("exception in client websocket", error),
+                queryParameters,
+                headers
+        );
         return WrappedWebsocket.wrappedWebsocket(websocket::send, websocket);
     }
 

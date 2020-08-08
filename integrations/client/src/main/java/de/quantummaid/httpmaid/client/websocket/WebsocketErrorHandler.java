@@ -19,23 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.client;
+package de.quantummaid.httpmaid.client.websocket;
 
-public final class HttpMaidClientException extends RuntimeException {
-
-    private HttpMaidClientException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public static HttpMaidClientException httpMaidClientException(final String message) {
-        return new HttpMaidClientException(message, null);
-    }
-
-    public static HttpMaidClientException httpMaidClientException(final Throwable cause) {
-        return new HttpMaidClientException(null, cause);
-    }
-
-    public static HttpMaidClientException httpMaidClientException(final String message, final Throwable cause) {
-        return new HttpMaidClientException(message, cause);
-    }
+public interface WebsocketErrorHandler {
+    void onError(Throwable error);
 }
