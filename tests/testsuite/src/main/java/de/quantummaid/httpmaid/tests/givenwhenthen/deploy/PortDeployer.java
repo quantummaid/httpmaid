@@ -47,11 +47,7 @@ public interface PortDeployer extends Deployer {
                 exceptions.add(e);
             }
         }
-        final String message = "Failed three times to use supposedly free port.";
-        System.err.println(message);
-        exceptions.forEach(Throwable::printStackTrace);
-        final Exception lastException = exceptions.get(exceptions.size() - 1);
-        throw new IllegalStateException(message, lastException);
+        throw failDeployment(exceptions);
     }
 
     static <T extends AutoCloseable> PortDeploymentResult<T> tryToDeploy(final IntFunction<T> deployFunction) {
@@ -65,7 +61,11 @@ public interface PortDeployer extends Deployer {
                 exceptions.add(e);
             }
         }
-        final String message = "Failed three times to use supposedly free port.";
+        throw failDeployment(exceptions);
+    }
+
+    static IllegalStateException failDeployment(List<Exception> exceptions) {
+        final String message = "failed three times to use supposedly free port.";
         System.err.println(message);
         exceptions.forEach(Throwable::printStackTrace);
         final Exception lastException = exceptions.get(exceptions.size() - 1);

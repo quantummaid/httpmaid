@@ -196,19 +196,6 @@ public final class Then {
         return this;
     }
 
-    public Then oneWebsocketHasReceivedTheJsonMessage(final Map<String, Object> content) {
-        pollWithTimeout(() -> testData.getWebsockets().all().stream()
-                .anyMatch(websocket -> websocket.waitAndCheckForMessageReceived(value -> {
-                    final Map<?, ?> actual = new Gson().fromJson(value, Map.class);
-                    return content.equals(actual);
-                })));
-        final long count = testData.getWebsockets().all().stream()
-                .filter(websocket -> websocket.hasReceivedMessage(content::equals))
-                .count();
-        assertThat(count, is(1L));
-        return this;
-    }
-
     public Then theQueriedNumberOfWebsocketsIs(final long numberOfWebsockets) {
         final RuntimeInformation runtimeInformation = testData.getRuntimeInformation();
         assertThat(runtimeInformation.numberOfConnectedWebsockets(), is(numberOfWebsockets));

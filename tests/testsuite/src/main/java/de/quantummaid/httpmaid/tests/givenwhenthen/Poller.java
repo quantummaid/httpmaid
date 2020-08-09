@@ -44,12 +44,16 @@ public final class Poller {
             if (conditionHasBeenFullfilled) {
                 return true;
             }
-            try {
-                Thread.sleep(sleepTimeInMilliseconds);
-            } catch (final InterruptedException e) {
-                currentThread().interrupt();
-            }
+            sleep(sleepTimeInMilliseconds);
         }
         return false;
+    }
+
+    public static void sleep(final int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (final InterruptedException e) {
+            currentThread().interrupt();
+        }
     }
 }
