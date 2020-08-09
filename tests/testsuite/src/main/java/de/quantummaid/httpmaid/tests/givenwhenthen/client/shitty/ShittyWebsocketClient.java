@@ -33,17 +33,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -60,8 +57,9 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
                                                       final Runnable closeHandler,
                                                       final Map<String, List<String>> headers,
                                                       final Map<String, List<String>> queryParameters) {
-        final String queryParametersTail = buildQueryParametersTail(queryParameters);
-        final String fullUri = uri + queryParametersTail;
+        if (!queryParameters.isEmpty()) {
+            throw new UnsupportedOperationException("query parameters are not supported in shitty websocket client");
+        }
         final ClientEndpointConfig.Builder configBuilder = ClientEndpointConfig.Builder.create();
         configBuilder.configurator(new ClientEndpointConfig.Configurator() {
             @Override
@@ -72,19 +70,19 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
         try {
             final ShittyWebsocketClient shittyWebsocketClient = new ShittyWebsocketClient(responseHandler, closeHandler);
             final ClientEndpointConfig clientEndpointConfig = configBuilder.build();
-            final URI uriObject = new URI(fullUri);
+            final URI uriObject = new URI(uri);
             final ClientManager clientManager = ClientManager.createClient();
             clientManager.connectToServer(shittyWebsocketClient, clientEndpointConfig, uriObject);
             final boolean success = shittyWebsocketClient.connectLatch.await(1, TimeUnit.MINUTES);
             if (!success) {
-                throw new RuntimeException(format("Timeout during connect to %s", fullUri));
+                throw new RuntimeException(format("Timeout during connect to %s", uri));
             }
             return shittyWebsocketClient;
         } catch (final URISyntaxException | IOException | DeploymentException e) {
-            throw new RuntimeException(format("Exception during connect to %s", fullUri), e);
+            throw new RuntimeException(format("Exception during connect to %s", uri), e);
         } catch (final InterruptedException e) {
             currentThread().interrupt();
-            throw new RuntimeException(format("Interrupted during wait for connect to %s", fullUri));
+            throw new RuntimeException(format("Interrupted during wait for connect to %s", uri));
         }
     }
 
@@ -116,22 +114,5 @@ public final class ShittyWebsocketClient extends Endpoint implements MessageHand
     @Override
     public void close() throws IOException {
         session.close();
-    }
-
-    private static String buildQueryParametersTail(final Map<String, List<String>> queryParameters) {
-        final String queryParametersTail;
-        if (queryParameters.isEmpty()) {
-            queryParametersTail = "";
-        } else {
-            final StringJoiner joiner = new StringJoiner("&", "?", "");
-            queryParameters.forEach((name, values) -> values.forEach(value -> {
-                final String encodedName = URLEncoder.encode(name, UTF_8);
-                final String encodedValue = URLEncoder.encode(value, UTF_8);
-                final String parameter = format("%s=%s", encodedName, encodedValue);
-                joiner.add(parameter);
-            }));
-            queryParametersTail = joiner.toString();
-        }
-        return queryParametersTail;
     }
 }

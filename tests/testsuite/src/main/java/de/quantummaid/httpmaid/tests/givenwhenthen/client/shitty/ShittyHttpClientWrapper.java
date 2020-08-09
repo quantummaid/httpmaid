@@ -44,11 +44,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.protocol.*;
-import org.apache.http.ssl.SSLContexts;
 
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -205,24 +201,7 @@ public final class ShittyHttpClientWrapper implements HttpClientWrapper {
 
     private static Socket createSocket(final ApiBaseUrl baseUrl) {
         try {
-            if (baseUrl.transportProtocol().equals("http")) {
-                return new Socket(baseUrl.hostName, baseUrl.port);
-            }
-            final SSLContext sslcontext = SSLContexts.createSystemDefault();
-            final SocketFactory socketFactory = sslcontext.getSocketFactory();
-
-            final SSLSocket socket = (SSLSocket) socketFactory.createSocket(baseUrl.hostName, baseUrl.port);
-            // Enforce TLS and disable SSL
-            socket.setEnabledProtocols(new String[]{
-                    "TLSv1",
-                    "TLSv1.1",
-                    "TLSv1.2"});
-            // Enforce strong ciphers
-            socket.setEnabledCipherSuites(new String[]{
-                    "TLS_RSA_WITH_AES_256_CBC_SHA",
-                    "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-                    "TLS_DHE_DSS_WITH_AES_256_CBC_SHA"});
-            return socket;
+            return new Socket(baseUrl.hostName, baseUrl.port);
         } catch (final IOException e) {
             throw new UncheckedIOException(e);
         }

@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Headers.emptyHeaders;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.sleep;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest.httpClientRequest;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.websockets.WebsocketStatus.CLOSED;
 import static java.lang.String.format;
@@ -79,7 +80,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
             } catch (final HttpMaidClientException e) {
                 log.warn("connect attempt {} failed", tryNumber, e);
                 if (tryNumber + 1 == maxConnectionAttempts) {
-                    throw new RuntimeException(format("failed %d times to connect, giving up connecting", maxConnectionAttempts), e);
+                    throw new IllegalStateException(format("failed %d times to connect, giving up connecting", maxConnectionAttempts), e);
                 } else {
                     log.warn("retrying in {} ms", waitTime);
                     sleep(waitTime);
@@ -87,14 +88,6 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
                     waitTime = waitTime * 2;
                 }
             }
-        }
-    }
-
-    private static void sleep(final int waitTime) {
-        try {
-            Thread.sleep(waitTime);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 

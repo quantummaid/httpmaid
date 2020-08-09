@@ -121,4 +121,25 @@ public interface WebsocketRegistrySpecs {
 
         assertThat(queriedEntry.contentType(), is(ContentType.fromString(Optional.empty())));
     }
+
+    @Test
+    default void connectionCanBeDeleted(final WebsocketRegistry websocketRegistry) {
+        final ConnectionInformation connectionInformation = connectionInformation();
+        final WebsocketRegistryEntry entry = websocketRegistryEntry(
+                connectionInformation,
+                websocketSenderId("foo"),
+                headers(emptyList()),
+                ContentType.json(),
+                queryParameters(emptyList())
+        );
+        websocketRegistry.addConnection(entry);
+
+        final List<WebsocketRegistryEntry> connectionsBefore = websocketRegistry.connections(websocketCriteria());
+        assertThat(connectionsBefore.size(), is(1));
+
+        websocketRegistry.removeConnection(connectionInformation);
+
+        final List<WebsocketRegistryEntry> connectionsAfter = websocketRegistry.connections(websocketCriteria());
+        assertThat(connectionsAfter.size(), is(0));
+    }
 }
