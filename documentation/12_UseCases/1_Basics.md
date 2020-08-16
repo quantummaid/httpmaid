@@ -64,7 +64,7 @@ In order to do this, you need to add the `httpmaid-usecases` dependency to your 
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-usecases</artifactId>
-    <version>0.9.88</version>
+    <version>0.9.89</version>
 </dependency>
 ```
 
