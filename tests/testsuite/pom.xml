@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.89</version>
+        <version>0.9.90</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.78</version>
+            <version>0.9.79</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
