@@ -22,74 +22,24 @@
 package de.quantummaid.httpmaid.jetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.closing.ClosingAction;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import org.eclipse.jetty.server.ConnectionFactory;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
-import static de.quantummaid.httpmaid.jetty.JettyEndpointException.jettyEndpointException;
 import static de.quantummaid.httpmaid.jetty.JettyHttpMaidWebsocketServlet.jettyHttpMaidWebsocketServlet;
 
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JettyWebsocketEndpoint implements AutoCloseable {
-    private final HttpMaid httpMaid;
+public final class JettyWebsocketEndpoint {
 
-    public static JettyWebsocketEndpoint jettyWebsocketEndpoint(final HttpMaid httpMaid,
-                                                                final int port) {
+    private JettyWebsocketEndpoint() {
+    }
 
-        try {
-            final Server server = new Server(port);
-            final HttpConnectionFactory connectionFactory = extractConnectionFactory(server);
-            connectionFactory.getHttpConfiguration().setFormEncodedMethods();
+    public static JettyEndpoint jettyWebsocketEndpoint(final HttpMaid httpMaid,
+                                                       final int port) {
+        return JettyEndpoint.jettyEndpoint(port, httpMaid, server -> {
             final ServletHandler servletHandler = new ServletHandler();
             server.setHandler(servletHandler);
             final JettyHttpMaidWebsocketServlet servlet = jettyHttpMaidWebsocketServlet(httpMaid);
             final ServletHolder servletHolder = new ServletHolder(servlet);
             servletHandler.addServletWithMapping(servletHolder, "/*");
-            server.start();
-            httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(closeJetty(server));
-            return new JettyWebsocketEndpoint(httpMaid);
-        } catch (final Exception e) {
-            throw jettyEndpointException("Could not create Jetty Endpoint", e);
-        }
-    }
-
-    private static ClosingAction closeJetty(final Server server) {
-        return () -> {
-            try {
-                server.stop();
-                server.destroy();
-            } catch (final Exception e) {
-                throw jettyEndpointException("Could not stop Jetty Endpoint", e);
-            }
-        };
-    }
-
-    @Override
-    public void close() {
-        httpMaid.close();
-    }
-
-    private static HttpConnectionFactory extractConnectionFactory(final Server server) {
-        final Connector[] connectors = server.getConnectors();
-        if (connectors.length != 1) {
-            throw new UnsupportedOperationException("Jetty does not behave as expected");
-        }
-        final Connector connector = connectors[0];
-        final ConnectionFactory connectionFactory = connector.getDefaultConnectionFactory();
-        if (!(connectionFactory instanceof HttpConnectionFactory)) {
-            throw new UnsupportedOperationException("Jetty does not behave as expected");
-        }
-        return (HttpConnectionFactory) connectionFactory;
+        });
     }
 }
