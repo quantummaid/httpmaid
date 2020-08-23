@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.92](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.92/jar) - 2020-08-23
+### Added
+- Jetty websocket endpoint.
+### Changed
+- Update dependencies.
+
 ## [0.9.91](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.91/jar) - 2020-08-18
 ### Changed
 - Update dependencies.

@@ -29,10 +29,10 @@ import de.quantummaid.httpmaid.events.enriching.Injection;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.mapmaid.advancedscanner.deserialization_wrappers.MethodParameterDeserializationWrapper;
 import de.quantummaid.httpmaid.marshalling.MarshallingModule;
+import de.quantummaid.httpmaid.serialization.Serializer;
 import de.quantummaid.httpmaid.usecases.UseCasesModule;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseParamaterProvider;
-import de.quantummaid.httpmaid.serialization.Serializer;
 import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
 import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
@@ -76,13 +76,13 @@ public final class MapMaidModule implements ChainModule {
     }
 
     public void addRequestContentTypeToUnmarshallingTypeMapping(final ContentType contentType,
-                                                                final MarshallingType marshallingType) {
+                                                                final MarshallingType<String> marshallingType) {
 
         mapMaidMarshallingMapper.addRequestContentTypeToUnmarshallingTypeMapping(contentType, marshallingType);
     }
 
     public void addMarshallingTypeToResponseContentTypeMapping(final ContentType contentType,
-                                                               final MarshallingType marshallingType) {
+                                                               final MarshallingType<String> marshallingType) {
         mapMaidMarshallingMapper.addMarshallingTypeToResponseContentTypeMapping(contentType, marshallingType);
     }
 

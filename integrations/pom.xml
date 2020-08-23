@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>httpmaid-parent</artifactId>
-        <version>0.9.91</version>
+        <version>0.9.92</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid</groupId>
@@ -42,6 +42,7 @@
         <module>multipart</module>
         <module>mapmaid</module>
         <module>jetty</module>
+        <module>jetty-websockets</module>
         <module>servlet</module>
         <module>client</module>
         <module>events</module>

@@ -19,10 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.mapmaid;
+package de.quantummaid.httpmaid.jetty;
 
-import de.quantummaid.mapmaid.mapper.marshalling.MarshallingType;
+public final class JettyEndpointException extends RuntimeException {
 
-public interface MarshallerTypeStage<T> {
-    T toTheMarshallerType(MarshallingType marshallingType);
+    private JettyEndpointException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public static JettyEndpointException jettyEndpointException(final String message, final Throwable cause) {
+        return new JettyEndpointException(message, cause);
+    }
 }

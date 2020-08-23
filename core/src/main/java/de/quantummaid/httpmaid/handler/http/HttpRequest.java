@@ -36,6 +36,7 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.*;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -124,7 +125,7 @@ public final class HttpRequest {
 
     public Map<String, Object> bodyMap() {
         return optionalBodyMap()
-                .orElseThrow(() -> new RuntimeException(format("Request does not have a body map.%n%n%s", metaData.prettyPrint())));
+                .orElseGet(Collections::emptyMap);
     }
 
     @SuppressWarnings("unchecked")
