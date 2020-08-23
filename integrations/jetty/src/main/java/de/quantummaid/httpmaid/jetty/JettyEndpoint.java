@@ -30,28 +30,36 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 
+import java.util.function.Consumer;
+
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
 import static de.quantummaid.httpmaid.jetty.JettyEndpointException.jettyEndpointException;
 import static de.quantummaid.httpmaid.jetty.JettyEndpointHandler.jettyEndpointHandler;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class JettyEndpoint implements AutoCloseable {
     private final HttpMaid httpMaid;
 
     public static PortStage jettyEndpointFor(final HttpMaid httpMaid) {
-        return port -> {
-            try {
-                final Server server = new Server(port);
-                final HttpConnectionFactory connectionFactory = extractConnectionFactory(server);
-                connectionFactory.getHttpConfiguration().setFormEncodedMethods();
-                server.setHandler(jettyEndpointHandler(httpMaid));
-                server.start();
-                httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(closeJetty(server));
-            } catch (final Exception e) {
-                throw jettyEndpointException("Could not create Jetty Endpoint", e);
-            }
+        return port -> jettyEndpoint(port,
+                httpMaid,
+                server -> server.setHandler(jettyEndpointHandler(httpMaid)));
+    }
+
+    static JettyEndpoint jettyEndpoint(final int port,
+                                       final HttpMaid httpMaid,
+                                       final Consumer<Server> configuration) {
+        try {
+            final Server server = new Server(port);
+            final HttpConnectionFactory connectionFactory = extractConnectionFactory(server);
+            connectionFactory.getHttpConfiguration().setFormEncodedMethods();
+            configuration.accept(server);
+            server.start();
+            httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(closeJetty(server));
             return new JettyEndpoint(httpMaid);
-        };
+        } catch (final Exception e) {
+            throw jettyEndpointException("Could not create Jetty Endpoint", e);
+        }
     }
 
     private static ClosingAction closeJetty(final Server server) {

@@ -31,6 +31,8 @@ import org.eclipse.jetty.websocket.api.Session;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
+import static de.quantummaid.httpmaid.jetty.JettyEndpointException.jettyEndpointException;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,7 +48,7 @@ public final class JettyConnectionInformation implements NonSerializableConnecti
         try {
             session.getRemote().sendString(message);
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw jettyEndpointException(e);
         }
     }
 

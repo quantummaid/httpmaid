@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.tests.deployers.jettywebsockets;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.jetty.JettyWebsocketEndpoint;
+import de.quantummaid.httpmaid.jetty.JettyEndpoint;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
@@ -38,7 +38,7 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.loca
 import static java.util.Arrays.asList;
 
 public final class JettyWebsocketsDeployer implements PortDeployer {
-    private JettyWebsocketEndpoint current;
+    private JettyEndpoint current;
 
     private JettyWebsocketsDeployer() {
     }
