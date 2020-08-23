@@ -34,6 +34,7 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiG
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadDeployer.fakeHttpApiGatewayV2PayloadDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayDeployer.fakeRestApiGatewayDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jeeonundertow.JeeOnUndertowDeployer.jeeOnUndertowDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.jettywebsockets.JettyWebsocketsDeployer.jettyWebsocketsDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jsr356ontyrus.Jsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.undertow.UndertowDeployer.undertowDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.testEnvironment;
@@ -58,7 +59,8 @@ public final class TestEnvironments {
                 fakeHttpApiGatewayV1PayloadDeployer(),
                 programmaticJsr356OnTyrusDeployer(),
                 jeeOnUndertowDeployer(),
-                undertowDeployer()
+                undertowDeployer(),
+                jettyWebsocketsDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()
@@ -88,6 +90,7 @@ public final class TestEnvironments {
         final List<Deployer> deployers = List.of(
                 jeeOnUndertowDeployer(),
                 undertowDeployer(),
+                jettyWebsocketsDeployer(),
                 bypassedDeployer(),
                 fakeRestApiGatewayDeployer(),
                 fakeHttpApiGatewayV2PayloadDeployer(),

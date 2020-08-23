@@ -20,26 +20,9 @@
   ~ under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>de.quantummaid</groupId>
-        <artifactId>httpmaid-parent</artifactId>
-        <version>0.9.92</version>
-    </parent>
-
-    <groupId>de.quantummaid.httpmaid.examples</groupId>
-    <artifactId>parent</artifactId>
-    <packaging>pom</packaging>
-
-    <name>HttpMaid - Examples - Parent</name>
-
-    <modules>
-        <module>documentation</module>
-    </modules>
-
-    <properties>
-        <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
-    </properties>
-</project>
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <suppress checks="IllegalCatchCheck" files="JettyWebsocketEndpoint" />
+</suppressions>

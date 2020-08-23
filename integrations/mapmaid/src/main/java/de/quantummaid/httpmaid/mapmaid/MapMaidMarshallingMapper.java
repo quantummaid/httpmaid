@@ -47,43 +47,45 @@ import static java.util.Map.of;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class MapMaidMarshallingMapper {
-    private static final Map<MarshallingType, ContentType> DEFAULT_CONTENT_TYPE_MAPPINGS = of(
+    private static final Map<MarshallingType<String>, ContentType> DEFAULT_CONTENT_TYPE_MAPPINGS = of(
             JSON, ContentType.json(),
             MarshallingType.XML, ContentType.xml(),
             MarshallingType.YAML, ContentType.yaml(),
             urlEncoded(), formUrlEncoded()
     );
-    private static final List<MarshallingType> DEFAULT_SUPPORTED_TYPES_FOR_UNMARSHALLING = asList(
+    private static final List<MarshallingType<String>> DEFAULT_SUPPORTED_TYPES_FOR_UNMARSHALLING = asList(
             JSON, MarshallingType.XML, MarshallingType.YAML, urlEncoded());
-    private static final List<MarshallingType> DEFAULT_SUPPORTED_TYPES_FOR_MARSHALLING = asList(
+    private static final List<MarshallingType<String>> DEFAULT_SUPPORTED_TYPES_FOR_MARSHALLING = asList(
             JSON, MarshallingType.XML, MarshallingType.YAML);
 
-    private final Map<ContentType, MarshallingType> contentTypeMappingsForUnmarshalling = new HashMap<>();
-    private final Map<ContentType, MarshallingType> contentTypeMappingsForMarshalling = new HashMap<>();
+    private final Map<ContentType, MarshallingType<String>> contentTypeMappingsForUnmarshalling = new HashMap<>();
+    private final Map<ContentType, MarshallingType<String>> contentTypeMappingsForMarshalling = new HashMap<>();
 
     static MapMaidMarshallingMapper mapMaidMarshallingMapper() {
         return new MapMaidMarshallingMapper();
     }
 
     void addRequestContentTypeToUnmarshallingTypeMapping(final ContentType contentType,
-                                                         final MarshallingType marshallingType) {
+                                                         final MarshallingType<String> marshallingType) {
         validateNotNull(contentType, "contentType");
         validateNotNull(marshallingType, "marshallingType");
         contentTypeMappingsForUnmarshalling.put(contentType, marshallingType);
     }
 
     void addMarshallingTypeToResponseContentTypeMapping(final ContentType contentType,
-                                                        final MarshallingType marshallingType) {
+                                                        final MarshallingType<String> marshallingType) {
         validateNotNull(contentType, "contentType");
         validateNotNull(marshallingType, "marshallingType");
         contentTypeMappingsForMarshalling.put(contentType, marshallingType);
     }
 
+    @SuppressWarnings("unchecked")
     void mapMarshalling(final MapMaid mapMaid, final MarshallingModule marshallingModule) {
-        final Unmarshaller urlEncodedMarshaller = urlEncodedUnmarshaller();
+        final Unmarshaller<String> urlEncodedMarshaller = urlEncodedUnmarshaller();
         marshallingModule.addUnmarshaller(formUrlEncoded(), urlEncodedMarshaller::unmarshal);
 
         mapMaid.deserializer().supportedMarshallingTypes().stream()
+                .map(marshallingType -> (MarshallingType<String>) marshallingType)
                 .filter(marshallingType -> !contentTypeMappingsForUnmarshalling.containsValue(marshallingType))
                 .filter(DEFAULT_SUPPORTED_TYPES_FOR_UNMARSHALLING::contains)
                 .forEach(marshallingType -> {
@@ -95,6 +97,7 @@ final class MapMaidMarshallingMapper {
                 .addUnmarshaller(contentType, input -> mapMaid.deserializer().deserializeToUniversalObject(input, marshallingType)));
 
         mapMaid.serializer().supportedMarshallingTypes().stream()
+                .map(marshallingType -> (MarshallingType<String>) marshallingType)
                 .filter(marshallingType -> !contentTypeMappingsForMarshalling.containsValue(marshallingType))
                 .filter(DEFAULT_SUPPORTED_TYPES_FOR_MARSHALLING::contains)
                 .forEach(marshallingType -> {
