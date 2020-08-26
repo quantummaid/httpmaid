@@ -26,8 +26,8 @@ import de.quantummaid.httpmaid.client.HttpClientRequest;
 import de.quantummaid.httpmaid.client.HttpMaidClient;
 import de.quantummaid.httpmaid.endpoint.purejavaendpoint.PureJavaEndpoint;
 import de.quantummaid.httpmaid.jetty.JettyEndpoint;
+import de.quantummaid.httpmaid.jetty.JettyWebsocketEndpoint;
 import de.quantummaid.httpmaid.servlet.ServletEndpoint;
-import de.quantummaid.httpmaid.undertow.UndertowEndpoint;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -71,9 +71,9 @@ public final class EndpointsExampleTests {
     public void undertowEndpoint() {
         final HttpMaid httpMaid = httpMaid();
         final int port = freePort();
-        //Showcase start undertowEndpoint
-        UndertowEndpoint.startUndertowEndpoint(httpMaid, port);
-        //Showcase end undertowEndpoint
+        //Showcase start jettyWebsocketEndpoint
+        JettyWebsocketEndpoint.jettyWebsocketEndpoint(httpMaid, port);
+        //Showcase end jettyWebsocketEndpoint
         assertForPort(port);
         httpMaid.close();
     }
