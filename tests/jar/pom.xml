@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.92</version>
+        <version>0.9.93</version>
     </parent>
 
     <artifactId>testjar</artifactId>
@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-undertow</artifactId>
+            <artifactId>httpmaid-jetty-websockets</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

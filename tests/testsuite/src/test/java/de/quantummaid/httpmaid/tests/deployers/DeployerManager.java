@@ -38,7 +38,6 @@ import static de.quantummaid.httpmaid.tests.deployers.jetty.JettyDeployer.jettyD
 import static de.quantummaid.httpmaid.tests.deployers.jettywebsockets.JettyWebsocketsDeployer.jettyWebsocketsDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.purejava.PureJavaDeployer.pureJavaDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.servletonjetty.ServletOnJettyDeployer.servletOnJettyDeployer;
-import static de.quantummaid.httpmaid.tests.deployers.undertow.UndertowDeployer.undertowDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.DeployerAndClient.deployerAndClient;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -53,7 +52,6 @@ public final class DeployerManager {
             fakeHttpApiGatewayV1PayloadDeployer(),
             bypassedDeployer(),
             jeeOnUndertowDeployer(),
-            undertowDeployer(),
             jettyWebsocketsDeployer()
     );
 

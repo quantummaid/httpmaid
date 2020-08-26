@@ -34,10 +34,10 @@ import lombok.ToString;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.jetty.JettyWebsocketEndpoint.jettyWebsocketEndpoint;
 import static de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment.remoteSpecsDeployment;
 import static de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory.httpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.localhostHttpAndWebsocketDeployment;
-import static de.quantummaid.httpmaid.undertow.UndertowEndpoint.startUndertowEndpoint;
 
 @ToString
 @EqualsAndHashCode
@@ -52,7 +52,7 @@ public final class JvmDeployer implements RemoteSpecsDeployer {
     public RemoteSpecsDeployment deploy() {
         final HttpMaid realHttpMaid = httpMaid();
         final PortDeploymentResult<AutoCloseable> result =
-                PortDeployer.tryToDeploy(port -> startUndertowEndpoint(realHttpMaid, port));
+                PortDeployer.tryToDeploy(port -> jettyWebsocketEndpoint(realHttpMaid, port));
         final Deployment deployment = localhostHttpAndWebsocketDeployment(result.port);
         final RemoteSpecsDeployment remoteSpecsDeployment =
                 remoteSpecsDeployment(result.cleanup, Map.of(JvmRemoteSpecs.class, deployment));

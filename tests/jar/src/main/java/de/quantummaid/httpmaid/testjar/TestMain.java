@@ -24,7 +24,7 @@ package de.quantummaid.httpmaid.testjar;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
 
-import static de.quantummaid.httpmaid.undertow.UndertowEndpoint.startUndertowEndpoint;
+import static de.quantummaid.httpmaid.jetty.JettyWebsocketEndpoint.jettyWebsocketEndpoint;
 
 @SuppressWarnings("java:S106")
 public final class TestMain {
@@ -38,7 +38,7 @@ public final class TestMain {
         }
         final int port = Integer.parseInt(args[0]);
         final HttpMaid httpMaid = HttpMaidFactory.httpMaid();
-        startUndertowEndpoint(httpMaid, port);
+        jettyWebsocketEndpoint(httpMaid, port);
         System.out.println("\nTestJar ready to be tested.");
     }
 }
