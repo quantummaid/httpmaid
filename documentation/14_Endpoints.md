@@ -16,7 +16,7 @@ Another option is the Jetty endpoint. To use it, add this dependency to your pro
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-jetty</artifactId>
-    <version>0.9.94</version>
+    <version>0.9.95</version>
 </dependency>
 ```
 It can be used like this:
@@ -32,7 +32,7 @@ If you need support for websockets, you this dependency instead:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-jetty-websockets</artifactId>
-    <version>0.9.94</version>
+    <version>0.9.95</version>
 </dependency>
 ```
 You can use it like this:
@@ -50,7 +50,7 @@ In order to do this, you need to add this dependency to your project:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-awslambda</artifactId>
-    <version>0.9.94</version>
+    <version>0.9.95</version>
 </dependency>
 ```
 Afterwards, you can create a class to delegate AWS Lambda events to HttpMaid:
@@ -90,7 +90,7 @@ Just add the following dependency:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-servlet</artifactId>
-    <version>0.9.94</version>
+    <version>0.9.95</version>
 </dependency>
 ```
 
