@@ -2,6 +2,43 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
         <notes><![CDATA[
+   file name: android-json-0.0.20131108.vaadin1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.vaadin\.external\.google/android\-json@.*$</packageUrl>
+        <cpe>cpe:/a:json_project:json</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: mapmaid-minimal-json-0.9.88.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/de\.quantummaid\.mapmaid\.integrations/mapmaid\-minimal\-json@.*$</packageUrl>
+        <cpe>cpe:/a:json_project:json</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: minimal-json-0.9.5.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.eclipsesource\.minimal\-json/minimal\-json@.*$</packageUrl>
+        <cpe>cpe:/a:json_project:json</cpe>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+   file name: aws-json-protocol-2.14.16.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/software\.amazon\.awssdk/aws\-json\-protocol@.*$</packageUrl>
+        <cpe>cpe:/a:json_project:json</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: aws-json-protocol-2.14.16.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/software\.amazon\.awssdk/aws\-json\-protocol@.*$</packageUrl>
+        <cve>CVE-2020-7712</cve>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
    file name: javax.websocket-api-1.1.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/javax\.websocket/javax\.websocket\-api@.*$</packageUrl>
