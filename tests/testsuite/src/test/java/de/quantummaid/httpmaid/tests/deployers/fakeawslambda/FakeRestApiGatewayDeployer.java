@@ -64,6 +64,8 @@ public final class FakeRestApiGatewayDeployer implements Deployer {
 
     @Override
     public Deployment deploy(final HttpMaid httpMaid) {
+        CredentialsFixer.fixCredentials();
+
         final ApiWebsockets apiWebsockets = apiWebsockets();
 
         final int apiGatewayManagementServerPort = freePort();

@@ -55,14 +55,16 @@ public final class StaticFilesSpecs {
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void aFileCanBeServed(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/file", (request, response) -> response.setFileAsBody(BASE_PATH + "/file1"))
-                        .build()
-        )
-                .when().aRequestToThePath("/file").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(200)
-                .theResponseBodyWas("this is file1");
+        for (final FileDescriptor file : CORRECT_FILES) {
+            testEnvironment.given(
+                    anHttpMaid()
+                            .get("/file", (request, response) -> response.setFileAsBody(BASE_PATH + file.path))
+                            .build()
+            )
+                    .when().aRequestToThePath("/file").viaTheGetMethod().withAnEmptyBody().isIssued()
+                    .theStatusCodeWas(200)
+                    .theResponseBodyWas(file.content);
+        }
     }
 
     @ParameterizedTest

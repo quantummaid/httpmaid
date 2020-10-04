@@ -22,6 +22,8 @@
 package de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Optional;
 
 public final class BaseDirectoryFinder {
     private static final String PROJECT_ROOT_ANCHOR_FILENAME = ".projectrootanchor";
@@ -35,17 +37,34 @@ public final class BaseDirectoryFinder {
     }
 
     private static String computeProjectBaseDirectory() {
-        final String location = BaseDirectoryFinder.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        final URL codeSourceUrl = BaseDirectoryFinder.class.getProtectionDomain().getCodeSource().getLocation();
+        final String codeSourceLocation = codeSourceUrl.getFile();
+        final Optional<String> fromCodeSource = computeProjectBaseDirectoryFrom(codeSourceLocation);
+        if (fromCodeSource.isPresent()) {
+            return fromCodeSource.get();
+        }
+        final String currentDirectory = System.getProperty("user.dir");
+        final Optional<String> fromCurrentDirectory = computeProjectBaseDirectoryFrom(currentDirectory);
+        if (fromCurrentDirectory.isPresent()) {
+            return fromCurrentDirectory.get();
+        }
 
-        File currentDirectory = new File(location);
+        throw new BaseDirectoryNotFoundException(
+                String.format("unable to find project root directory (code source URL: %s, current working directory: %s)",
+                        codeSourceUrl, currentDirectory));
+    }
+
+    private static Optional<String> computeProjectBaseDirectoryFrom(final String startDirectory) {
+
+        File currentDirectory = new File(startDirectory);
         while (!anchorFileIn(currentDirectory).exists()) {
             if (isRootDirectory(currentDirectory)) {
-                throw new BaseDirectoryNotFoundException(location);
+                return Optional.empty();
             }
             currentDirectory = parentOf(currentDirectory);
         }
 
-        return currentDirectory.getAbsolutePath();
+        return Optional.of(currentDirectory.getAbsolutePath());
     }
 
     private static File anchorFileIn(final File parent) {

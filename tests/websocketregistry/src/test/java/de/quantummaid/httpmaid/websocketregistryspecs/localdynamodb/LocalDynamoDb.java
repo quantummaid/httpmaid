@@ -31,6 +31,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
 import java.net.URI;
+import java.util.Properties;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory.BaseDirectoryFinder.findProjectBaseDirectory;
 import static de.quantummaid.httpmaid.websocketregistryspecs.localdynamodb.LocalDynamoDbException.localDynamoDbException;
@@ -46,6 +47,14 @@ public final class LocalDynamoDb implements AutoCloseable {
     private final DynamoDbClient client;
 
     public static LocalDynamoDb startLocalDynamoDb(final int port) {
+        final Properties originalProperties = System.getProperties();
+
+        final Properties patchedProperties = new Properties(originalProperties);
+        System.setProperty("aws.region", "egal");
+        System.setProperty("aws.accessKeyId", "egal");
+        System.setProperty("aws.secretAccessKey", "egal");
+        System.setProperties(patchedProperties);
+
         System.setProperty("sqlite4java.library.path", findProjectBaseDirectory() + NATIVE_LIBS_DIRECTORY);
         final String[] localArgs = {"-inMemory", "-port", valueOf(port)};
         try {
@@ -91,6 +100,11 @@ public final class LocalDynamoDb implements AutoCloseable {
             server.stop();
         } catch (final Exception e) {
             throw localDynamoDbException("Exception during closing of local dynamoDb instance", e);
+        }
+        try {
+            client.close();
+        } catch (final Exception e) {
+            throw localDynamoDbException("Exception during closing of local dynamoDb client", e);
         }
     }
 }
