@@ -19,10 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 
-public class BaseDirectoryNotFoundException extends RuntimeException {
-    public BaseDirectoryNotFoundException(final String message) {
-        super(message);
+import java.util.Properties;
+
+public final class CredentialsFixer {
+
+    private CredentialsFixer() {
+    }
+
+    public static void fixCredentials() {
+        final Properties originalProperties = System.getProperties();
+        if (originalProperties.containsKey("aws.region")) {
+            return;
+        }
+        final Properties patchedProperties = new Properties(originalProperties);
+        patchedProperties.setProperty("aws.region", "egal");
+        patchedProperties.setProperty("aws.accessKeyId", "egal");
+        patchedProperties.setProperty("aws.secretAccessKey", "egal");
+        System.setProperties(patchedProperties);
     }
 }

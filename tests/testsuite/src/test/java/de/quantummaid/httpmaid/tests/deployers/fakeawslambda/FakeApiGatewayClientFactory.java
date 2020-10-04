@@ -38,6 +38,7 @@ public final class FakeApiGatewayClientFactory implements ApiGatewayClientFactor
 
     @Override
     public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
+        CredentialsFixer.fixCredentials();
         final String uri = String.format("http://localhost:%d/", port);
         return ApiGatewayManagementApiAsyncClient.builder()
                 .endpointOverride(URI.create(uri))

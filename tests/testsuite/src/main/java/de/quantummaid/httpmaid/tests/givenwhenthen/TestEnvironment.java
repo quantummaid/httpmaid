@@ -52,6 +52,7 @@ public final class TestEnvironment implements AutoCloseable {
     }
 
     public Given given(final HttpMaidSupplier httpMaidSupplier) {
+        deployer.cleanUp();
         return Given.given(this, httpMaidSupplier);
     }
 
