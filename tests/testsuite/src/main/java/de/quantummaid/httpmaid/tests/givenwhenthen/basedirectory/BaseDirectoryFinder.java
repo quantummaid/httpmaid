@@ -39,19 +39,12 @@ public final class BaseDirectoryFinder {
     private static String computeProjectBaseDirectory() {
         final URL codeSourceUrl = BaseDirectoryFinder.class.getProtectionDomain().getCodeSource().getLocation();
         final String codeSourceLocation = codeSourceUrl.getFile();
-        final Optional<String> fromCodeSource = computeProjectBaseDirectoryFrom(codeSourceLocation);
-        if (fromCodeSource.isPresent()) {
-            return fromCodeSource.get();
-        }
         final String currentDirectory = System.getProperty("user.dir");
-        final Optional<String> fromCurrentDirectory = computeProjectBaseDirectoryFrom(currentDirectory);
-        if (fromCurrentDirectory.isPresent()) {
-            return fromCurrentDirectory.get();
-        }
-
-        throw new BaseDirectoryNotFoundException(
-                String.format("unable to find project root directory (code source URL: %s, current working directory: %s)",
-                        codeSourceUrl, currentDirectory));
+        return computeProjectBaseDirectoryFrom(codeSourceLocation)
+                .or(() -> computeProjectBaseDirectoryFrom(currentDirectory))
+                .orElseThrow(() -> new BaseDirectoryNotFoundException(
+                        String.format("unable to find project root directory (code source URL: %s, current working directory: %s)",
+                                codeSourceUrl, currentDirectory)));
     }
 
     private static Optional<String> computeProjectBaseDirectoryFrom(final String startDirectory) {

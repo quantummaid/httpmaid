@@ -43,7 +43,7 @@ In order to use it, the following dependency needs to be added to the project:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-guice</artifactId>
-    <version>0.9.96</version>
+    <version>0.9.97</version>
 </dependency>
 ```
 
@@ -69,7 +69,7 @@ In order to use it, the following dependency needs to be added to the project:
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-dagger</artifactId>
-    <version>0.9.96</version>
+    <version>0.9.97</version>
 </dependency>
 ```
 

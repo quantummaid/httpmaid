@@ -132,4 +132,21 @@ public final class HeaderSpecs {
                 .theStatusCodeWas(501)
                 .theResponseBodyWas("Expecting header 'multiple_values' to only have one value but got [value1, value2, value3]");
     }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void headersCanBeDumpedAsMap(final TestEnvironment testEnvironment) {
+        testEnvironment.given(() ->
+                anHttpMaid()
+                        .get("/", (request, response) -> {
+                            final String asMap = request.headers().asMap().toString();
+                            response.setBody(asMap);
+                        })
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody()
+                .withTheHeader("key", "value").isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyContains("key=[value]");
+    }
 }
