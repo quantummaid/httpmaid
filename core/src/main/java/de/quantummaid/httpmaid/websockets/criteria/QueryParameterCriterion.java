@@ -19,26 +19,33 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.http;
+package de.quantummaid.httpmaid.websockets.criteria;
 
-import de.quantummaid.httpmaid.util.Validators;
+import de.quantummaid.httpmaid.http.QueryParameterName;
+import de.quantummaid.httpmaid.http.QueryParameterValue;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class QueryParameterName {
-    private final String key;
+public final class QueryParameterCriterion {
+    private final QueryParameterName name;
+    private final QueryParameterValue value;
 
-    public static QueryParameterName queryParameterName(final String name) {
-        Validators.validateNotNullNorEmpty(name, "name");
-        return new QueryParameterName(name);
+    public static QueryParameterCriterion queryParameterCriterion(final QueryParameterName name,
+                                                                  final QueryParameterValue value) {
+        return new QueryParameterCriterion(name, value);
     }
 
-    public String stringValue() {
-        return key;
+    public boolean filter(final WebsocketRegistryEntry entry) {
+        final List<String> values = entry.queryParameters()
+                .allValuesFor(name.stringValue());
+        return values.contains(value.stringValue());
     }
 }

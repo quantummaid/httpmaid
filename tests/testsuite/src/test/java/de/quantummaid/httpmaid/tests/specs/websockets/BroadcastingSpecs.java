@@ -32,6 +32,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ENVIRONMENTS_WITH_ALL_CAPABILITIES;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ENVIRONMENTS_WITH_ALL_CAPABILITIES_WITHOUT_SHITTY_CLIENT;
 
 public final class BroadcastingSpecs {
 
@@ -105,6 +106,39 @@ public final class BroadcastingSpecs {
                 .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
 
                 .andWhen().aRequestToThePath("/broadcast_header").viaThePostMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+                .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withAnEmptyBody().isIssued()
+                .theStatusCodeWas(200)
+
+                .allWebsocketsHaveReceivedTheMessage("foo")
+                .oneWebsocketHasReceivedTheMessage("bar");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ENVIRONMENTS_WITH_ALL_CAPABILITIES_WITHOUT_SHITTY_CLIENT)
+    public void handlersCanBroadcastToWebsocketsWithASpecificQueryParameter(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/broadcast", (request, response) -> request.websockets().sender().sendToAll("foo"))
+                        .post("/broadcast_queryparameter", (request, response) -> request.websockets().sender().sendTo("bar",
+                                WebsocketCriteria.websocketCriteria()
+                                        .queryParameter("myparameter", "foo")
+                                )
+                        )
+                        .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                        .build()
+        )
+                .when().aWebsocketIsConnected(Map.of("myparameter", List.of("foo")), Map.of())
+
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .andWhen().aWebsocketIsConnected(Map.of("myparameter", List.of("bar")), Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+                .andWhen().aWebsocketIsConnected(Map.of("myparameter", List.of("bar")), Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
+
+                .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
+
+                .andWhen().aRequestToThePath("/broadcast_queryparameter").viaThePostMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
                 .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(200)
