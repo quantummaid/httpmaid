@@ -44,6 +44,7 @@ public final class TestEnvironments {
     public static final String WEBSOCKET_ENVIRONMENTS = PACKAGE + "websocketEnvironments";
     public static final String WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT = PACKAGE + "websocketEnvironmentsWithoutShittyClient";
     public static final String ENVIRONMENTS_WITH_ALL_CAPABILITIES = PACKAGE + "environmentsWithAllCapabilities";
+    public static final String ENVIRONMENTS_WITH_ALL_CAPABILITIES_WITHOUT_SHITTY_CLIENT = PACKAGE + "environmentsWithAllCapabilitiesWithoutShittyClient";
     public static final String ONLY_SHITTY_CLIENT = PACKAGE + "onlyShittyClient";
 
     private TestEnvironments() {
@@ -80,6 +81,21 @@ public final class TestEnvironments {
                 .collect(toList());
     }
 
+    public static List<TestEnvironment> environmentsWithAllCapabilitiesWithoutShittyClient() {
+        final List<Deployer> deployers = List.of(
+                jettyWebsocketsDeployer(),
+                bypassedDeployer(),
+                fakeRestApiGatewayDeployer(),
+                fakeHttpApiGatewayV2PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadDeployer()
+        );
+        return deployers.stream()
+                .flatMap(deployer -> deployer.supportedClients().stream()
+                        .filter(clientFactory -> clientFactory.toString().equals("httpmaidclient"))
+                        .map(client -> testEnvironment(deployer, client)))
+                .collect(toList());
+    }
+
     public static List<TestEnvironment> environmentsWithAllCapabilities() {
         final List<Deployer> deployers = List.of(
                 jettyWebsocketsDeployer(),
@@ -94,8 +110,6 @@ public final class TestEnvironments {
                         .filter(clientFactory -> !clientFactory.toString().equals("httpmaidclient"))
                         .map(client -> testEnvironment(deployer, client)))
                 .collect(toList());
-        //.flatMap(deployer -> deployer.supportedClients().stream()
-        //        .map(client -> testEnvironment(deployer, client)))
     }
 
     public static List<TestEnvironment> allEnvironments() {

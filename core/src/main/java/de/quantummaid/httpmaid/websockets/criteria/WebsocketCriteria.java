@@ -30,14 +30,21 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.http.HeaderName.headerName;
 import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
+import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
+import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static de.quantummaid.httpmaid.websockets.criteria.HeaderCriterion.headerCriterion;
+import static de.quantummaid.httpmaid.websockets.criteria.QueryParameterCriterion.queryParameterCriterion;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WebsocketCriteria {
     private final List<HeaderCriterion> headerCriteria;
+    private final List<QueryParameterCriterion> queryParameterCriteria;
 
     public static WebsocketCriteria websocketCriteria() {
-        return new WebsocketCriteria(new ArrayList<>());
+        return new WebsocketCriteria(
+                new ArrayList<>(),
+                new ArrayList<>()
+        );
     }
 
     public WebsocketCriteria header(final String name, final String value) {
@@ -46,8 +53,19 @@ public final class WebsocketCriteria {
         return this;
     }
 
+    public WebsocketCriteria queryParameter(final String name, final String value) {
+        final QueryParameterCriterion queryParameterCriterion = queryParameterCriterion(
+                queryParameterName(name), queryParameterValue(value)
+        );
+        queryParameterCriteria.add(queryParameterCriterion);
+        return this;
+    }
+
     public boolean filter(final WebsocketRegistryEntry entry) {
-        return headerCriteria.stream()
+        final boolean headersAreMatched = headerCriteria.stream()
                 .allMatch(headerCriterion -> headerCriterion.filter(entry));
+        final boolean queryParametersAreMatched = queryParameterCriteria.stream()
+                .allMatch(queryParameterCriterion -> queryParameterCriterion.filter(entry));
+        return headersAreMatched && queryParametersAreMatched;
     }
 }
