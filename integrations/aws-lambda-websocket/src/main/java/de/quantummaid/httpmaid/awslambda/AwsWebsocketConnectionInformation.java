@@ -56,6 +56,6 @@ public final class AwsWebsocketConnectionInformation implements ConnectionInform
 
     @Override
     public String uniqueIdentifier() {
-        return toEndpointUrl();
+        return toEndpointUrl() + "/" + connectionId;
     }
 }
