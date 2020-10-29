@@ -36,11 +36,10 @@ import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegist
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
 
 @ExtendWith(WebsocketRegistryTestExtension.class)
-public final class LocalDynamoDbWebsocketRegistrySpecs implements WebsocketRegistrySpecs {
+public final class LocalDynamoDbWebsocketRegistrySpecs {
     private static final String TABLE_NAME = "websocketregistry";
     private static final String PRIMARY_KEY = "id";
 
-    @Override
     public WebsocketRegistryDeployment websocketRegistry() {
         final int port = FreePortPool.freePort();
         final LocalDynamoDb localDynamoDb = LocalDynamoDb.startLocalDynamoDb(port);
@@ -51,7 +50,6 @@ public final class LocalDynamoDbWebsocketRegistrySpecs implements WebsocketRegis
         return WebsocketRegistryDeployment.websocketRegistryDeployment(dynamoDbWebsocketRegistry, localDynamoDb::close);
     }
 
-    @Override
     public ConnectionInformation connectionInformation() {
         return awsWebsocketConnectionInformation("a", "b", "c", "d");
     }
