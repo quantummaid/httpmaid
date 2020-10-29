@@ -29,10 +29,12 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.loadFromMetaData;
 
+@Slf4j
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,6 +48,7 @@ public final class PutWebsocketInRegistryProcessor implements Processor {
     public void apply(final MetaData metaData) {
         final WebsocketRegistryEntry entry = loadFromMetaData(metaData);
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+        log.debug("adding websocket to registry");
         websocketRegistry.addConnection(entry);
     }
 }

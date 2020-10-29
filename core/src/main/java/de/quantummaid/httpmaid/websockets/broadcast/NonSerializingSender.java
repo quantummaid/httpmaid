@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
+import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -49,10 +50,12 @@ import static java.util.stream.Collectors.toList;
 public final class NonSerializingSender {
     private final WebsocketRegistry websocketRegistry;
     private final WebsocketSenders websocketSenders;
+    private final MetaData metaData;
 
     public static NonSerializingSender nonSerializingSender(final WebsocketRegistry websocketRegistry,
-                                                                   final WebsocketSenders websocketSenders) {
-        return new NonSerializingSender(websocketRegistry, websocketSenders);
+                                                            final WebsocketSenders websocketSenders,
+                                                            final MetaData metaData) {
+        return new NonSerializingSender(websocketRegistry, websocketSenders, metaData);
     }
 
     public void sendToAll(final String message) {
@@ -71,7 +74,7 @@ public final class NonSerializingSender {
                     .collect(toList());
             final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
             sender.send(message, collectionInformations, (connectionInformation, throwable) -> {
-                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, throwable);
+                log.info("exception when sending to websocket {} - removing websocket; request metadata: {}", connectionInformation, metaData, throwable);
                 websocketRegistry.removeConnection(connectionInformation);
             });
         });

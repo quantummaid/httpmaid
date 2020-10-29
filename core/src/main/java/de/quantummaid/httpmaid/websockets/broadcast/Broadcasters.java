@@ -109,13 +109,14 @@ public final class Broadcasters {
                             websocketSenders,
                             messageType,
                             marshaller,
-                            serializer
+                            serializer,
+                            metaData
                     );
                     final BroadcasterFactory<?, Object> factory = broadcasterFactory.factory();
                     return factory.createBroadcaster(serializingSender);
                 })
                 .forEach(instances::add);
-        final Disconnector disconnector = disconnector(websocketRegistry, websocketSenders);
+        final Disconnector disconnector = disconnector(websocketRegistry, websocketSenders, metaData);
         disconnectorFactories.values().stream()
                 .map(disconnectorFactory -> disconnectorFactory.createDisconnector(disconnector))
                 .forEach(instances::add);

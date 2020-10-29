@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
+import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.marshalling.Marshaller;
 import de.quantummaid.httpmaid.serialization.Serializer;
 import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
@@ -55,18 +56,21 @@ public final class SerializingSender<T> {
     private final ResolvedType messageType;
     private final Marshaller marshaller;
     private final Serializer serializer;
+    private final MetaData metaData;
 
     public static <T> SerializingSender<T> serializingSender(final WebsocketRegistry websocketRegistry,
                                                              final WebsocketSenders websocketSenders,
                                                              final ResolvedType messageType,
                                                              final Marshaller marshaller,
-                                                             final Serializer serializer) {
+                                                             final Serializer serializer,
+                                                             final MetaData metaData) {
         return new SerializingSender<>(
                 websocketRegistry,
                 websocketSenders,
                 messageType,
                 marshaller,
-                serializer
+                serializer,
+                metaData
         );
     }
 
@@ -88,7 +92,8 @@ public final class SerializingSender<T> {
             final Object serialized = serializer.serialize(message, messageType);
             final String marshalled = marshaller.marshall(serialized);
             sender.send(marshalled, connectionInformations, (connectionInformation, throwable) -> {
-                log.info("Exception when sending to websocket {}. Removing websocket.", connectionInformation, throwable);
+                log.info("exception when sending to websocket {} - removing websocket; request metadata: {}",
+                        connectionInformation, metaData, throwable);
                 websocketRegistry.removeConnection(connectionInformation);
             });
         });

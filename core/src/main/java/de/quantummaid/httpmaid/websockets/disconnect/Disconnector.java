@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.disconnect;
 
+import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -45,10 +46,12 @@ import static java.util.stream.Collectors.groupingBy;
 public final class Disconnector {
     private final WebsocketRegistry websocketRegistry;
     private final WebsocketSenders websocketSenders;
+    private final MetaData metaData;
 
     public static Disconnector disconnector(final WebsocketRegistry websocketRegistry,
-                                            final WebsocketSenders websocketSenders) {
-        return new Disconnector(websocketRegistry, websocketSenders);
+                                            final WebsocketSenders websocketSenders,
+                                            final MetaData metaData) {
+        return new Disconnector(websocketRegistry, websocketSenders, metaData);
     }
 
     public void disconnectAll() {
@@ -61,13 +64,16 @@ public final class Disconnector {
         final Map<WebsocketSenderId, List<WebsocketRegistryEntry>> bySenderId = connections.stream()
                 .collect(groupingBy(WebsocketRegistryEntry::getSenderId));
         bySenderId.forEach((websocketSenderId, websocketRegistryEntries) -> {
-            final List<ConnectionInformation> collectionInformations = websocketRegistryEntries.stream()
+            websocketRegistryEntries.forEach(entry -> {
+                log.info("removing websocket from registry because it has been closed by the server; websocket: {}; request metadata: {}", entry, metaData);
+                websocketRegistry.removeConnection(entry.connectionInformation());
+            });
+            final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
+            final List<ConnectionInformation> connectionInformations = websocketRegistryEntries.stream()
                     .map(WebsocketRegistryEntry::connectionInformation)
                     .collect(Collectors.toList());
-            collectionInformations.forEach(websocketRegistry::removeConnection);
-            final WebsocketSender<ConnectionInformation> sender = websocketSenders.senderById(websocketSenderId);
-            sender.disconnect(collectionInformations, (connectionInformation, throwable) ->
-                    log.info("Exception when disconnecting websocket {}.", connectionInformation, throwable));
+            sender.disconnect(connectionInformations, (connectionInformation, throwable) ->
+                    log.info("exception when disconnecting websocket {}; request metadata: {}.", connectionInformation, metaData, throwable));
         });
     }
 }
