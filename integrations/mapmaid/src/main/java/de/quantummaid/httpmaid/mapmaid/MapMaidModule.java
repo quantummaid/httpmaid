@@ -42,6 +42,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,7 @@ import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdenti
 import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static java.util.Collections.singletonList;
 
+@Slf4j
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -110,8 +112,8 @@ public final class MapMaidModule implements ChainModule {
 
                     dependencyRegistry.getMetaData().getOptional(MapMaidConfigurators.RECIPES)
                             .ifPresent(recipes -> recipes.forEach(mapMaidBuilder::usingRecipe));
-                    final MapMaid mapMaid = mapMaidBuilder.build();
 
+                    final MapMaid mapMaid = buildMapMaid(mapMaidBuilder);
                     final Map<ResolvedType, UseCaseParamaterProvider> parameterProviders = new HashMap<>();
                     deserializationWrappers.forEach((type, wrapper) ->
                             parameterProviders.put(type, event -> {
@@ -139,6 +141,17 @@ public final class MapMaidModule implements ChainModule {
         final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
         coreModule.addExceptionMapper(throwable -> throwable instanceof AggregatedValidationException,
                 mapMaidValidationExceptionMapper(validationErrorStatusCode));
+    }
+
+    private MapMaid buildMapMaid(final MapMaidBuilder builder) {
+        final long startTime = System.currentTimeMillis();
+        final MapMaid mapMaid = builder.build();
+        final long endTime = System.currentTimeMillis();
+        final long time = endTime - startTime;
+        if (log.isInfoEnabled()) {
+            log.info("construction of MapMaid took {}ms", time);
+        }
+        return mapMaid;
     }
 
     @Override

@@ -96,7 +96,7 @@ public final class MetaData {
 
     @Override
     public String toString() {
-        return map.toString();
+        return prettyPrint();
     }
 
     public String prettyPrint() {
