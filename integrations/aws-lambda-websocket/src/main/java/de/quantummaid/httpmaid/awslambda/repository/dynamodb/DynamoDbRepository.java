@@ -119,6 +119,10 @@ public final class DynamoDbRepository implements Repository {
                 .collect(toList());
     }
 
+    public DynamoDbClient dynamoDbClient() {
+        return dynamoDbClient;
+    }
+
     @Override
     public void close() {
         dynamoDbClient.close();

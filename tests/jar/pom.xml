@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.102</version>
+        <version>0.9.103</version>
     </parent>
 
     <artifactId>testjar</artifactId>

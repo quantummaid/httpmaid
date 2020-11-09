@@ -48,4 +48,12 @@ public final class HeaderCriterion {
                 .allValuesFor(name.stringValue());
         return values.contains(value.stringValue());
     }
+
+    public HeaderName name() {
+        return name;
+    }
+
+    public HeaderValue value() {
+        return value;
+    }
 }

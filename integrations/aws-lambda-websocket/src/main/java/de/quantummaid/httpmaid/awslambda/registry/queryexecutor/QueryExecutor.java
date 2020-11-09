@@ -19,15 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websocketregistryspecs.localdynamodb;
+package de.quantummaid.httpmaid.awslambda.registry.queryexecutor;
 
-public final class LocalDynamoDbException extends RuntimeException {
+import de.quantummaid.httpmaid.awslambda.repository.Repository;
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 
-    private LocalDynamoDbException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+import java.util.List;
 
-    public static LocalDynamoDbException localDynamoDbException(final String message, final Throwable cause) {
-        return new LocalDynamoDbException(message, cause);
-    }
+public interface QueryExecutor {
+    List<WebsocketRegistryEntry> connections(WebsocketCriteria criteria,
+                                             Repository repository);
 }

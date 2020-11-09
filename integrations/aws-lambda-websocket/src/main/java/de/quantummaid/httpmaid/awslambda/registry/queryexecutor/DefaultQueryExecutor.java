@@ -19,41 +19,34 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.criteria;
+package de.quantummaid.httpmaid.awslambda.registry.queryexecutor;
 
-import de.quantummaid.httpmaid.http.QueryParameterName;
-import de.quantummaid.httpmaid.http.QueryParameterValue;
+import de.quantummaid.httpmaid.awslambda.registry.EntryDeserializer;
+import de.quantummaid.httpmaid.awslambda.repository.Repository;
+import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
-@ToString
-@EqualsAndHashCode
+import static java.util.stream.Collectors.toList;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class QueryParameterCriterion {
-    private final QueryParameterName name;
-    private final QueryParameterValue value;
+public final class DefaultQueryExecutor implements QueryExecutor {
 
-    public static QueryParameterCriterion queryParameterCriterion(final QueryParameterName name,
-                                                                  final QueryParameterValue value) {
-        return new QueryParameterCriterion(name, value);
+    public static QueryExecutor defaultQueryExecutor() {
+        return new DefaultQueryExecutor();
     }
 
-    public boolean filter(final WebsocketRegistryEntry entry) {
-        final List<String> values = entry.queryParameters()
-                .allValuesFor(name.stringValue());
-        return values.contains(value.stringValue());
-    }
-
-    public QueryParameterName name() {
-        return name;
-    }
-
-    public QueryParameterValue value() {
-        return value;
+    @Override
+    public List<WebsocketRegistryEntry> connections(final WebsocketCriteria criteria,
+                                                    final Repository repository) {
+        final List<Map<String, Object>> maps = repository.loadAll();
+        return maps.stream()
+                .map(EntryDeserializer::deserializeEntry)
+                .filter(criteria::filter)
+                .collect(toList());
     }
 }

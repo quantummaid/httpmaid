@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.102</version>
+        <version>0.9.103</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -174,7 +174,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.33.v20201020</version>
+            <version>9.4.34.v20201102</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -185,7 +185,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.33.v20201020</version>
+            <version>9.4.34.v20201102</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -215,7 +215,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>9.4.33.v20201020</version>
+            <version>9.4.34.v20201102</version>
             <scope>test</scope>
         </dependency>
 
