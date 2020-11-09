@@ -23,31 +23,47 @@ package de.quantummaid.httpmaid.websocketregistryspecs;
 
 import de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
-import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.FreePortPool;
-import de.quantummaid.httpmaid.websocketregistryspecs.localdynamodb.LocalDynamoDb;
+import de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory.BaseDirectoryFinder;
+import de.quantummaid.httpmaid.websocketregistryspecs.remotedynamodb.aws.cloudformation.CloudFormationHandler;
 import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryDeployment;
 import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryTestExtension;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import org.junit.jupiter.api.extension.ExtendWith;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
+import java.util.Map;
+import java.util.UUID;
+
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
 
 @ExtendWith(WebsocketRegistryTestExtension.class)
-public final class LocalDynamoDbWebsocketRegistrySpecs {
-    private static final String TABLE_NAME = "websocketregistry";
+public final class RemoteDynamoDbWebsocketRegistrySpecs implements WebsocketRegistrySpecs {
+    private static final String STACK_PREFIX = "websocketregistryspecs-";
+
+    private static final String CF_TEMPLATE = "/tests/websocketregistry/cf-dynamodb.yml";
     private static final String PRIMARY_KEY = "id";
 
     public WebsocketRegistryDeployment websocketRegistry() {
-        final int port = FreePortPool.freePort();
-        final LocalDynamoDb localDynamoDb = LocalDynamoDb.startLocalDynamoDb(port);
-        localDynamoDb.createTable(TABLE_NAME, PRIMARY_KEY);
-        final DynamoDbClient client = localDynamoDb.client();
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(client, TABLE_NAME, PRIMARY_KEY);
+        final String stackIdentifier = STACK_PREFIX + UUID.randomUUID().toString();
+        try (CloudFormationHandler cloudFormationHandler = CloudFormationHandler.connectToCloudFormation()) {
+            final String projectBaseDirectory = BaseDirectoryFinder.findProjectBaseDirectory();
+            final String cloudformationTemplate = projectBaseDirectory + CF_TEMPLATE;
+            cloudFormationHandler.createStack(stackIdentifier,
+                    cloudformationTemplate,
+                    Map.of("StackIdentifier", stackIdentifier));
+        }
+
+        final DynamoDbClient dynamoDbClient = DynamoDbClient.create();
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, stackIdentifier, PRIMARY_KEY);
         final DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
-        return WebsocketRegistryDeployment.websocketRegistryDeployment(dynamoDbWebsocketRegistry, localDynamoDb::close);
+
+        return WebsocketRegistryDeployment.websocketRegistryDeployment(dynamoDbWebsocketRegistry, () -> {
+            try (CloudFormationHandler cloudFormationHandler = CloudFormationHandler.connectToCloudFormation()) {
+                cloudFormationHandler.deleteStacksStartingWith(STACK_PREFIX);
+            }
+        });
     }
 
     public ConnectionInformation connectionInformation() {

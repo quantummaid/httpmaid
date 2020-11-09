@@ -1,0 +1,21 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "HttpMaid Websocket Specs DynamoDB"
+
+Parameters:
+  StackIdentifier:
+    Type: String
+    Description: "Unique string to identify the stack"
+
+Resources:
+  WebsocketRegistryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref StackIdentifier
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"

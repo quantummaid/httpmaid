@@ -68,4 +68,12 @@ public final class WebsocketCriteria {
                 .allMatch(queryParameterCriterion -> queryParameterCriterion.filter(entry));
         return headersAreMatched && queryParametersAreMatched;
     }
+
+    public List<HeaderCriterion> headerCriteria() {
+        return headerCriteria;
+    }
+
+    public List<QueryParameterCriterion> queryParameterCriteria() {
+        return queryParameterCriteria;
+    }
 }
