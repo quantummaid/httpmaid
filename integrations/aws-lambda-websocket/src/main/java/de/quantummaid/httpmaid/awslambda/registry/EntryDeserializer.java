@@ -44,6 +44,7 @@ import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.restoreFromStrings;
 import static java.util.stream.Collectors.toList;
 
+@SuppressWarnings("java:S1192")
 public final class EntryDeserializer {
 
     private EntryDeserializer() {
