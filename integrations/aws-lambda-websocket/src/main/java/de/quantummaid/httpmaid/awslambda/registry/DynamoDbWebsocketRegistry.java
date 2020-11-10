@@ -44,7 +44,6 @@ import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.webs
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings("java:S1192")
 public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
     private final Repository repository;
     private final QueryExecutor queryExecutor;
