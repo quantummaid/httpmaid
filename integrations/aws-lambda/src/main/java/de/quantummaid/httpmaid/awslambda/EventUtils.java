@@ -31,6 +31,14 @@ public final class EventUtils {
     private EventUtils() {
     }
 
+    public static boolean isAuthorizationRequest(final Map<String, Object> event) {
+        if (!isWebSocketRequest(event)) {
+            return false;
+        }
+        final String type = (String) event.get("type");
+        return "REQUEST".equals(type);
+    }
+
     @SuppressWarnings("unchecked")
     public static boolean isWebSocketRequest(final Map<String, Object> event) {
         final Map<String, Object> context = (Map<String, Object>) event.get("requestContext");

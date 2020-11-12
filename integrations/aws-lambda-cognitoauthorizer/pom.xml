@@ -30,14 +30,11 @@
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
-    <artifactId>httpmaid-awslambda-websocket</artifactId>
+    <artifactId>httpmaid-awslambda-cognitoauthorizer</artifactId>
 
-    <name>HttpMaid - Integrations - AWS Lambda (Websockets)</name>
+    <name>HttpMaid - Integrations - AWS Lambda Cognito Authorizer</name>
 
     <properties>
-        <spotbugs.excludeFilterFile>
-            ${project.basedir}/src/test/spotbugs/spotbugs-exclude.xml
-        </spotbugs.excludeFilterFile>
         <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -66,11 +63,7 @@
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>dynamodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>apigatewaymanagementapi</artifactId>
+            <artifactId>cognitoidentityprovider</artifactId>
         </dependency>
     </dependencies>
 </project>
