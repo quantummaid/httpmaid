@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.endpoint;
 
+import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.QueryParametersBuilder;
@@ -32,6 +33,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,7 @@ public final class RawWebsocketConnectBuilder {
     private WebsocketSenderId websocketSenderId;
     private Headers headers;
     private QueryParameters queryParameters;
+    private final Map<MetaDataKey<?>, Object> additionalMetaData = new LinkedHashMap<>();
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
         return new RawWebsocketConnectBuilder();
@@ -80,6 +83,11 @@ public final class RawWebsocketConnectBuilder {
         final QueryParametersBuilder builder = QueryParameters.builder();
         queryParameters.forEach(builder::withParameter);
         this.queryParameters = builder.build();
+        return this;
+    }
+
+    public <T> RawWebsocketConnectBuilder withAdditionalMetaData(final MetaDataKey<T> key, final T value) {
+        additionalMetaData.put(key, value);
         return this;
     }
 

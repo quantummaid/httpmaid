@@ -22,10 +22,13 @@
 package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
@@ -33,15 +36,23 @@ import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketDisconnect implements RawRequest {
     private final ConnectionInformation connectionInformation;
+    private final Map<MetaDataKey<?>, Object> additionalMetaData;
 
     public static RawWebsocketDisconnect rawWebsocketDisconnect(final ConnectionInformation connectionInformation) {
+        return new RawWebsocketDisconnect(connectionInformation, Map.of());
+    }
+
+    public static RawWebsocketDisconnect rawWebsocketDisconnect(final ConnectionInformation connectionInformation,
+                                                                final Map<MetaDataKey<?>, Object> additionalMetaData) {
         validateNotNull(connectionInformation, "connectionInformation");
-        return new RawWebsocketDisconnect(connectionInformation);
+        validateNotNull(additionalMetaData, "additionalMetaData");
+        return new RawWebsocketDisconnect(connectionInformation, additionalMetaData);
     }
 
     @Override
     public void enter(final MetaData metaData) {
         metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
         metaData.set(REQUEST_TYPE, WEBSOCKET_DISCONNECT);
+        additionalMetaData.forEach(metaData::setUnchecked);
     }
 }

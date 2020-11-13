@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
@@ -90,7 +91,7 @@ public final class AwsWebsocketLambdaEndpoint {
             handleConnect(event, connectionInformation);
             return emptyMap();
         } else if (DISCONNECT_EVENT_TYPE.equals(eventType)) {
-            handleDisconnect(connectionInformation);
+            handleDisconnect(connectionInformation, event);
             return emptyMap();
         } else if (MESSAGE_EVENT_TYPE.equals(eventType)) {
             return handleMessage(event, connectionInformation);
@@ -105,6 +106,8 @@ public final class AwsWebsocketLambdaEndpoint {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withConnectionInformation(AWS_WEBSOCKET_SENDER, connectionInformation);
 
+            builder.withAdditionalMetaData(AWS_LAMBDA_EVENT, event);
+
             final Map<String, List<String>> queryParameters = event.getOrDefault("multiValueQueryStringParameters", HashMap::new);
             builder.withQueryParameterMap(queryParameters);
 
@@ -118,8 +121,10 @@ public final class AwsWebsocketLambdaEndpoint {
         });
     }
 
-    private void handleDisconnect(final AwsWebsocketConnectionInformation connectionInformation) {
-        httpMaid.handleRequest(() -> rawWebsocketDisconnect(connectionInformation), response -> {
+    private void handleDisconnect(final AwsWebsocketConnectionInformation connectionInformation,
+                                  final AwsLambdaEvent event) {
+        httpMaid.handleRequest(() -> rawWebsocketDisconnect(connectionInformation,
+                Map.of(AWS_LAMBDA_EVENT, event)), response -> {
         });
     }
 
@@ -127,7 +132,10 @@ public final class AwsWebsocketLambdaEndpoint {
                                               final ConnectionInformation connectionInformation) {
         return httpMaid.handleRequestSynchronously(() -> {
             final String body = event.getAsString("body");
-            return RawWebsocketMessage.rawWebsocketMessage(connectionInformation, body);
+            return RawWebsocketMessage.rawWebsocketMessage(connectionInformation,
+                    body,
+                    Map.of(AWS_LAMBDA_EVENT, event)
+            );
         }, response -> {
             final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
             response.optionalStringBody().ifPresent(s -> responseMap.put("body", s));

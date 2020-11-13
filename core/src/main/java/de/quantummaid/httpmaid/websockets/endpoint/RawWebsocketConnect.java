@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.websockets.endpoint;
 
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.QueryParameters;
@@ -31,6 +32,8 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.QUERY_PARAMETERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_HEADERS;
@@ -46,6 +49,7 @@ public final class RawWebsocketConnect implements RawRequest {
     private final WebsocketSenderId websocketSenderId;
     private final QueryParameters queryParameters;
     private final Headers headers;
+    private final Map<MetaDataKey<?>, Object> additionalMetaData;
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
         return RawWebsocketConnectBuilder.rawWebsocketConnectBuilder();
@@ -55,11 +59,24 @@ public final class RawWebsocketConnect implements RawRequest {
                                                           final WebsocketSenderId websocketSenderId,
                                                           final QueryParameters queryParameters,
                                                           final Headers headers) {
+        return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers, Map.of());
+    }
+
+    public static RawWebsocketConnect rawWebsocketConnect(final ConnectionInformation connectionInformation,
+                                                          final WebsocketSenderId websocketSenderId,
+                                                          final QueryParameters queryParameters,
+                                                          final Headers headers,
+                                                          final Map<MetaDataKey<?>, Object> additionalMetaData) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(websocketSenderId, "websocketSenderId");
         validateNotNull(queryParameters, "queryParameters");
         validateNotNull(headers, "headers");
-        return new RawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
+        validateNotNull(additionalMetaData, "additionalMetaData");
+        return new RawWebsocketConnect(connectionInformation,
+                websocketSenderId,
+                queryParameters,
+                headers,
+                additionalMetaData);
     }
 
     @Override
@@ -69,5 +86,6 @@ public final class RawWebsocketConnect implements RawRequest {
         metaData.set(REQUEST_TYPE, WEBSOCKET_CONNECT);
         metaData.set(QUERY_PARAMETERS, queryParameters);
         metaData.set(REQUEST_HEADERS, headers);
+        additionalMetaData.forEach(metaData::setUnchecked);
     }
 }

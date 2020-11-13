@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.EventUtils.extractPotentiallyEncodedBody;
-import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
+import static de.quantummaid.httpmaid.awslambda.RequestBuilderFactory.createRequestBuilder;
 
 public final class RestApiHandler {
 
@@ -45,7 +45,8 @@ public final class RestApiHandler {
     static Map<String, Object> handleRestApiRequest(final AwsLambdaEvent event,
                                                     final HttpMaid httpMaid) {
         return httpMaid.handleRequestSynchronously(() -> {
-            final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
+            final RawHttpRequestBuilder builder = createRequestBuilder(event);
+
             final String httpRequestMethod = event.getAsString("httpMethod");
             builder.withMethod(httpRequestMethod);
 

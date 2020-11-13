@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.EventUtils.extractPotentiallyEncodedBody;
-import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
+import static de.quantummaid.httpmaid.awslambda.RequestBuilderFactory.createRequestBuilder;
 import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.http.Http.Headers.COOKIE;
 import static de.quantummaid.httpmaid.http.Http.Headers.SET_COOKIE;
@@ -47,7 +47,8 @@ public final class HttpApiHandler {
     static Map<String, Object> handleHttpApiRequest(final AwsLambdaEvent event,
                                                     final HttpMaid httpMaid) {
         return httpMaid.handleRequestSynchronously(() -> {
-            final RawHttpRequestBuilder builder = rawHttpRequestBuilder();
+            final RawHttpRequestBuilder builder = createRequestBuilder(event);
+
             final AwsLambdaEvent requestContext = event.getMap("requestContext");
             final AwsLambdaEvent httpInformation = requestContext.getMap("http");
             final String httpRequestMethod = httpInformation.getAsString("method");
