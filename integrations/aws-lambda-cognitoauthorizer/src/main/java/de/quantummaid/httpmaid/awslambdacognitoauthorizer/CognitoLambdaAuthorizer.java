@@ -69,9 +69,10 @@ public final class CognitoLambdaAuthorizer implements AutoCloseable {
             final AttributeType subjectAttribute = getUserResponse.userAttributes().get(0);
             final String subject = subjectAttribute.value();
             final PolicyDocument policyDocument = createPolicyDocument(ALLOW, awsLambdaEvent);
+            final String username = getUserResponse.username();
             return Map.of(
                     "principalId", subject,
-                    "context", Map.of(),
+                    "context", Map.of("username", username),
                     "policyDocument", policyDocument.asMap()
             );
         } catch (final NotAuthorizedException | PasswordResetRequiredException | UserNotConfirmedException | UserNotFoundException e) {

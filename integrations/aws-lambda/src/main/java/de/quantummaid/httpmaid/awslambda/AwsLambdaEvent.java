@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.awslambda;
 
+import de.quantummaid.httpmaid.chains.MetaDataKey;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,15 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static de.quantummaid.httpmaid.awslambda.LambdaEventException.*;
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static java.util.Objects.requireNonNullElseGet;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AwsLambdaEvent {
+    public static final MetaDataKey<AwsLambdaEvent> AWS_LAMBDA_EVENT = metaDataKey("AWS_LAMBDA_EVENT");
+
     private final Map<String, Object> event;
 
     public static AwsLambdaEvent awsLambdaEvent(final Map<String, Object> event) {
