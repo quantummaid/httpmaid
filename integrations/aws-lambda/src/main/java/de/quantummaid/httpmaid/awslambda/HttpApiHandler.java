@@ -34,7 +34,6 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.EventUtils.extractPotentiallyEncodedBody;
 import static de.quantummaid.httpmaid.awslambda.RequestBuilderFactory.createRequestBuilder;
-import static de.quantummaid.httpmaid.endpoint.RawHttpRequest.rawHttpRequestBuilder;
 import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.http.Http.Headers.COOKIE;
 import static de.quantummaid.httpmaid.http.Http.Headers.SET_COOKIE;
