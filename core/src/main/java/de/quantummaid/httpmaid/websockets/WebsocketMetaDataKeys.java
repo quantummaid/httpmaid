@@ -38,6 +38,8 @@ public final class WebsocketMetaDataKeys {
     public static final MetaDataKey<ConnectionInformation> WEBSOCKET_CONNECTION_INFORMATION = metaDataKey("WEBSOCKET_CONNECTION_INFORMATION");
     public static final MetaDataKey<String> WEBSOCKET_ROUTE = metaDataKey("WEBSOCKET_ROUTE");
 
+    public static final MetaDataKey<Boolean> RESTORATION_FROM_REGISTRY_NEEDED = metaDataKey("RESTORATION_FROM_REGISTRY_NEEDED");
+
     private WebsocketMetaDataKeys() {
     }
 }

@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.105</version>
+        <version>0.9.106</version>
     </parent>
 
     <artifactId>remotespecs-tomcat</artifactId>
@@ -44,56 +44,56 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
             <artifactId>remotespecs</artifactId>
-            <version>0.9.105</version>
+            <version>0.9.106</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-websocket</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper-el</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jsp-api</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-websocket</artifactId>
-            <version>8.5.59</version>
+            <version>8.5.60</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-client</artifactId>
-            <version>0.9.105</version>
+            <version>0.9.106</version>
             <scope>test</scope>
         </dependency>
 

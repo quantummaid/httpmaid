@@ -50,8 +50,10 @@ public final class RestoreWebsocketContextInformationProcessor implements Proces
         if (isWebsocketMessage) {
             final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
             final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
-            final WebsocketRegistryEntry entry = websocketRegistry.byConnectionInformation(connectionInformation);
-            entry.restoreToMetaData(metaData);
+            if (metaData.getOptional(RESTORATION_FROM_REGISTRY_NEEDED).orElse(true)) {
+                final WebsocketRegistryEntry entry = websocketRegistry.byConnectionInformation(connectionInformation);
+                entry.restoreToMetaData(metaData);
+            }
         }
     }
 }

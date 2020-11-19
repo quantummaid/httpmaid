@@ -19,27 +19,31 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import java.io.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PolicyEffect {
-    public static final PolicyEffect ALLOW = new PolicyEffect("Allow");
-    public static final PolicyEffect DENY = new PolicyEffect("Deny");
+public final class MapSerializer {
 
-    private final String value;
-
-    public static PolicyEffect policyEffect(final boolean allowed) {
-        if (allowed) {
-            return ALLOW;
-        } else {
-            return DENY;
-        }
+    private MapSerializer() {
     }
 
-    public String value() {
-        return value;
+    public static String toString(final Map<String, Object> map) {
+        final HashMap<String, Object> hashMap = new HashMap<>(map);
+        return toString((Serializable) hashMap);
+    }
+
+    private static String toString(final Serializable serializable) {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(baos)) {
+                objectOutputStream.writeObject(serializable);
+            }
+            return Base64.getEncoder().encodeToString(baos.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

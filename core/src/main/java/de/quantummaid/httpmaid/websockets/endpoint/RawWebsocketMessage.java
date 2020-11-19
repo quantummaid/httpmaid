@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
+import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -32,8 +34,7 @@ import lombok.ToString;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.IS_HTTP_REQUEST;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_BODY_STRING;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 
@@ -44,6 +45,9 @@ public final class RawWebsocketMessage implements RawRequest {
     private final ConnectionInformation connectionInformation;
     private final String body;
     private final Map<MetaDataKey<?>, Object> additionalMetaData;
+    private final boolean restorationFromRegistryNeeded;
+    private final QueryParameters queryParameters;
+    private final Headers headers;
 
     public static RawWebsocketMessage rawWebsocketMessage(final ConnectionInformation connectionInformation,
                                                           final String body) {
@@ -56,7 +60,32 @@ public final class RawWebsocketMessage implements RawRequest {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(body, "body");
         validateNotNull(additionalMetaData, "additionalMetaData");
-        return new RawWebsocketMessage(connectionInformation, body, additionalMetaData);
+        return new RawWebsocketMessage(connectionInformation,
+                body,
+                additionalMetaData,
+                true,
+                null,
+                null
+        );
+    }
+
+    public static RawWebsocketMessage rawWebsocketMessageWithMetaData(final ConnectionInformation connectionInformation,
+                                                                      final String body,
+                                                                      final QueryParameters queryParameters,
+                                                                      final Headers headers,
+                                                                      final Map<MetaDataKey<?>, Object> additionalMetaData) {
+        validateNotNull(connectionInformation, "connectionInformation");
+        validateNotNull(body, "body");
+        validateNotNull(headers, "headers");
+        validateNotNull(queryParameters, "queryParameters");
+        validateNotNull(additionalMetaData, "additionalMetaData");
+        return new RawWebsocketMessage(connectionInformation,
+                body,
+                additionalMetaData,
+                false,
+                queryParameters,
+                headers
+        );
     }
 
     @Override
@@ -66,5 +95,10 @@ public final class RawWebsocketMessage implements RawRequest {
         metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
         metaData.set(REQUEST_BODY_STRING, body);
         additionalMetaData.forEach(metaData::setUnchecked);
+        metaData.set(RESTORATION_FROM_REGISTRY_NEEDED, restorationFromRegistryNeeded);
+        if (!restorationFromRegistryNeeded) {
+            metaData.set(QUERY_PARAMETERS, queryParameters);
+            metaData.set(REQUEST_HEADERS, headers);
+        }
     }
 }

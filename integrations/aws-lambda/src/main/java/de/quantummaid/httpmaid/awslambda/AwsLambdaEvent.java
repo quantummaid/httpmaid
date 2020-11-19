@@ -68,6 +68,10 @@ public final class AwsLambdaEvent {
         return requireNonNullElseGet(value, alternative);
     }
 
+    public boolean containsKey(final String key) {
+        return event.containsKey(key);
+    }
+
     @SuppressWarnings("unchecked")
     public AwsLambdaEvent getMap(final String key) {
         final Map<String, Object> map = getAs(key, Map.class);

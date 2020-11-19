@@ -19,27 +19,25 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.testlambda;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PolicyEffect {
-    public static final PolicyEffect ALLOW = new PolicyEffect("Allow");
-    public static final PolicyEffect DENY = new PolicyEffect("Deny");
+import java.util.Map;
 
-    private final String value;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.AuthorizationDecision.success;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer.lambdaAuthorizer;
+import static java.util.UUID.randomUUID;
 
-    public static PolicyEffect policyEffect(final boolean allowed) {
-        if (allowed) {
-            return ALLOW;
-        } else {
-            return DENY;
-        }
+public final class DummyAuthorizer {
+
+    private DummyAuthorizer() {
     }
 
-    public String value() {
-        return value;
+    public static LambdaAuthorizer dummyAuthorizer() {
+        return lambdaAuthorizer(metaData -> {
+            final String principalId = randomUUID().toString();
+            return success(principalId, Map.of());
+        });
     }
 }

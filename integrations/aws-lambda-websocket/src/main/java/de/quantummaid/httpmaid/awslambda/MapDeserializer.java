@@ -19,27 +19,31 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.awslambda;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.Base64;
+import java.util.Map;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PolicyEffect {
-    public static final PolicyEffect ALLOW = new PolicyEffect("Allow");
-    public static final PolicyEffect DENY = new PolicyEffect("Deny");
+public final class MapDeserializer {
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
 
-    private final String value;
-
-    public static PolicyEffect policyEffect(final boolean allowed) {
-        if (allowed) {
-            return ALLOW;
-        } else {
-            return DENY;
-        }
+    private MapDeserializer() {
     }
 
-    public String value() {
-        return value;
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> mapFromString(final String string) {
+        return (Map<String, Object>) fromString(string);
+    }
+
+    public static Object fromString(final String string) {
+        final byte[] data = DECODER.decode(string);
+        try (ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(data))) {
+            return stream.readObject();
+        } catch (final IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
