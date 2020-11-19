@@ -61,6 +61,7 @@ public final class AwsWebsocketLambdaEndpoint {
     private static final String CONNECT_EVENT_TYPE = "CONNECT";
     private static final String DISCONNECT_EVENT_TYPE = "DISCONNECT";
     private static final String MESSAGE_EVENT_TYPE = "MESSAGE";
+    private static final String REQUEST_CONTEXT_KEY = "requestContext";
 
     private final HttpMaid httpMaid;
 
@@ -84,7 +85,7 @@ public final class AwsWebsocketLambdaEndpoint {
     }
 
     private Map<String, Object> handleWebsocketRequest(final AwsLambdaEvent event) {
-        final AwsLambdaEvent requestContext = event.getMap("requestContext");
+        final AwsLambdaEvent requestContext = event.getMap(REQUEST_CONTEXT_KEY);
         final String eventType = requestContext.getAsString("eventType");
         final String connectionId = requestContext.getAsString("connectionId");
         final String stage = requestContext.getAsString("stage");
@@ -132,9 +133,9 @@ public final class AwsWebsocketLambdaEndpoint {
         return httpMaid.handleRequestSynchronously(() -> {
             final String body = event.getAsString("body");
             final Map<MetaDataKey<?>, Object> additionalMetaData = Map.of(AWS_LAMBDA_EVENT, event);
-            if (event.getMap("requestContext").containsKey("authorizer")) {
+            if (event.getMap(REQUEST_CONTEXT_KEY).containsKey("authorizer")) {
                 final String serializedEvent = event
-                        .getMap("requestContext")
+                        .getMap(REQUEST_CONTEXT_KEY)
                         .getMap("authorizer")
                         .getAsString("event");
                 final Map<String, Object> authorizerEventMap = MapDeserializer.mapFromString(serializedEvent);
