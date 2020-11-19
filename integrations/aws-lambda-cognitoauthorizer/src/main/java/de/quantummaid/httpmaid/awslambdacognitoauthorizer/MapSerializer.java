@@ -21,7 +21,10 @@
 
 package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +45,8 @@ public final class MapSerializer {
                 objectOutputStream.writeObject(serializable);
             }
             return Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

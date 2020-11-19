@@ -27,6 +27,7 @@ import java.io.ObjectInputStream;
 import java.util.Base64;
 import java.util.Map;
 
+@SuppressWarnings("java:S4508")
 public final class MapDeserializer {
     private static final Base64.Decoder DECODER = Base64.getDecoder();
 
@@ -43,7 +44,7 @@ public final class MapDeserializer {
         try (ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(data))) {
             return stream.readObject();
         } catch (final IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }
