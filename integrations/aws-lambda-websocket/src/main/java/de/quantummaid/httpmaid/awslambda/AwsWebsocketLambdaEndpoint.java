@@ -23,7 +23,11 @@ package de.quantummaid.httpmaid.awslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
+import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.http.QueryParametersBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
@@ -46,6 +50,7 @@ import static de.quantummaid.httpmaid.awslambda.apigateway.DefaultApiGatewayClie
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.rawWebsocketMessageWithMetaData;
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 
@@ -105,17 +110,11 @@ public final class AwsWebsocketLambdaEndpoint {
         httpMaid.handleRequest(() -> {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withConnectionInformation(AWS_WEBSOCKET_SENDER, connectionInformation);
-
             builder.withAdditionalMetaData(AWS_LAMBDA_EVENT, event);
-
-            final Map<String, List<String>> queryParameters = event.getOrDefault("multiValueQueryStringParameters", HashMap::new);
-            builder.withQueryParameterMap(queryParameters);
-
-            final Map<String, List<String>> headers = event.getOrDefault("multiValueHeaders", HashMap::new);
-            final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
-            headersBuilder.withHeadersMap(headers);
-            builder.withHeaders(headersBuilder.build());
-
+            final QueryParameters queryParameters = extractQueryParameters(event);
+            builder.withQueryParameters(queryParameters);
+            final Headers headers = extractHeaders(event);
+            builder.withHeaders(headers);
             return builder.build();
         }, response -> {
         });
@@ -132,10 +131,29 @@ public final class AwsWebsocketLambdaEndpoint {
                                               final ConnectionInformation connectionInformation) {
         return httpMaid.handleRequestSynchronously(() -> {
             final String body = event.getAsString("body");
-            return RawWebsocketMessage.rawWebsocketMessage(connectionInformation,
-                    body,
-                    Map.of(AWS_LAMBDA_EVENT, event)
-            );
+            final Map<MetaDataKey<?>, Object> additionalMetaData = Map.of(AWS_LAMBDA_EVENT, event);
+            if (event.getMap("requestContext").containsKey("authorizer")) {
+                final String serializedEvent = event
+                        .getMap("requestContext")
+                        .getMap("authorizer")
+                        .getAsString("event");
+                final Map<String, Object> authorizerEventMap = MapDeserializer.mapFromString(serializedEvent);
+                final AwsLambdaEvent authorizerEvent = awsLambdaEvent(authorizerEventMap);
+                final QueryParameters queryParameters = extractQueryParameters(authorizerEvent);
+                final Headers headers = extractHeaders(authorizerEvent);
+                return rawWebsocketMessageWithMetaData(
+                        connectionInformation,
+                        body,
+                        queryParameters,
+                        headers,
+                        additionalMetaData
+                );
+            } else {
+                return RawWebsocketMessage.rawWebsocketMessage(connectionInformation,
+                        body,
+                        additionalMetaData
+                );
+            }
         }, response -> {
             final LinkedHashMap<String, Object> responseMap = new LinkedHashMap<>();
             response.optionalStringBody().ifPresent(s -> responseMap.put("body", s));
@@ -145,5 +163,19 @@ public final class AwsWebsocketLambdaEndpoint {
 
     private static String extractRegionFromDomain(final String domain) {
         return domain.split("\\.")[2];
+    }
+
+    private static Headers extractHeaders(final AwsLambdaEvent event) {
+        final Map<String, List<String>> headers = event.getOrDefault("multiValueHeaders", HashMap::new);
+        final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
+        headersBuilder.withHeadersMap(headers);
+        return headersBuilder.build();
+    }
+
+    private static QueryParameters extractQueryParameters(final AwsLambdaEvent event) {
+        final Map<String, List<String>> queryParameters = event.getOrDefault("multiValueQueryStringParameters", HashMap::new);
+        final QueryParametersBuilder builder = QueryParameters.builder();
+        queryParameters.forEach(builder::withParameter);
+        return builder.build();
     }
 }

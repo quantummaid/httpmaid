@@ -74,7 +74,7 @@ public final class RawWebsocketConnectBuilder {
         return withQueryParameters(QueryParameters.fromQueryString(encodedQueryParameters));
     }
 
-    private RawWebsocketConnectBuilder withQueryParameters(final QueryParameters queryParameters) {
+    public RawWebsocketConnectBuilder withQueryParameters(final QueryParameters queryParameters) {
         this.queryParameters = queryParameters;
         return this;
     }

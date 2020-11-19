@@ -19,27 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import de.quantummaid.httpmaid.chains.MetaData;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PolicyEffect {
-    public static final PolicyEffect ALLOW = new PolicyEffect("Allow");
-    public static final PolicyEffect DENY = new PolicyEffect("Deny");
-
-    private final String value;
-
-    public static PolicyEffect policyEffect(final boolean allowed) {
-        if (allowed) {
-            return ALLOW;
-        } else {
-            return DENY;
-        }
-    }
-
-    public String value() {
-        return value;
-    }
+public interface AuthorizationDecisionMaker {
+    AuthorizationDecision isAuthorized(MetaData metaData);
 }

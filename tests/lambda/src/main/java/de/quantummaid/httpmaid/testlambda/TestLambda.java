@@ -25,7 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
-import de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoLambdaAuthorizer;
+import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
 import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.EqualsAndHashCode;
@@ -39,7 +39,7 @@ import static de.quantummaid.httpmaid.awslambda.EventUtils.isAuthorizationReques
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoLambdaAuthorizer.cognitoLambdaAuthorizer;
+import static de.quantummaid.httpmaid.testlambda.DummyAuthorizer.dummyAuthorizer;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
 
 @ToString
@@ -49,9 +49,7 @@ public final class TestLambda {
 
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
     private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
-    private static final CognitoLambdaAuthorizer AUTHORIZER = cognitoLambdaAuthorizer(request ->
-            request.queryParameters().parameter("access_token")
-    );
+    private static final LambdaAuthorizer AUTHORIZER = dummyAuthorizer();
 
     private static HttpMaid httpMaid() {
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
