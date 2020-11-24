@@ -78,6 +78,12 @@ public final class AwsLambdaEvent {
         return new AwsLambdaEvent(map);
     }
 
+    @SuppressWarnings("unchecked")
+    public Optional<AwsLambdaEvent> getOptionalMap(final String key) {
+        return getAsOptional(key, Map.class)
+                .map(e -> new AwsLambdaEvent((Map<String, Object>) e));
+    }
+
     private <T> Optional<T> getAsOptional(final String key, final Class<T> type) {
         final Object value = event.get(key);
         if (value == null) {
