@@ -91,19 +91,19 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
         return websocket((Object) handler);
     }
 
-    public HttpMaidBuilder websocket(final Object handler) {
+    public HttpMaidBuilder websocket(final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         final GenerationCondition condition = webSocketCatchAllRoute();
-        return serving(handler).when(condition);
+        return serving(handler, perRouteConfigurators).when(condition);
     }
 
     public HttpMaidBuilder websocket(final String id, final HttpHandler handler) {
         return websocket(id, (Object) handler);
     }
 
-    public HttpMaidBuilder websocket(final String id, final Object handler) {
+    public HttpMaidBuilder websocket(final String id, final Object handler, final PerRouteConfigurator... perRouteConfigurators) {
         validateNotNull(id, "id");
         final GenerationCondition condition = webSocketCategory(id);
-        return serving(handler).when(condition);
+        return serving(handler, perRouteConfigurators).when(condition);
     }
 
     public <T, U> HttpMaidBuilder broadcastToWebsocketsUsing(final Class<T> broadcaster,
