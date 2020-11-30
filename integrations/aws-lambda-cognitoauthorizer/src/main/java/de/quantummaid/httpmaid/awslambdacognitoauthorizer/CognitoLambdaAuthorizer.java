@@ -21,45 +21,94 @@
 
 package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
+import de.quantummaid.httpmaid.awslambdacognitoauthorizer.jwt.JwtInformation;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.AuthorizationDecision.fail;
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.AuthorizationDecision.success;
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer.lambdaAuthorizer;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.BasicLambdaAuthorizer.basicLambdaAuthorizer;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.jwt.JwtParser.extractJwtPayload;
+import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
+import static de.quantummaid.mapmaid.shared.validators.NotNullValidator.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CognitoLambdaAuthorizer implements AutoCloseable {
+@Slf4j
+public final class CognitoLambdaAuthorizer implements LambdaAuthorizer {
     private final CognitoIdentityProviderClient client;
-    private final LambdaAuthorizer lambdaAuthorizer;
+    private final BasicLambdaAuthorizer basicLambdaAuthorizer;
 
-    public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final TokenExtractor tokenExtractor) {
+    public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final String poolId,
+                                                                  final String region,
+                                                                  final String clientId,
+                                                                  final TokenExtractor tokenExtractor) {
+        final String issuerUrl = String.format("https://cognito-idp.%s.amazonaws.com/%s", region, poolId);
+        return cognitoLambdaAuthorizer(issuerUrl, clientId, tokenExtractor);
+    }
+
+    public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final String issuerUrl,
+                                                                  final String clientId,
+                                                                  final TokenExtractor tokenExtractor) {
         final CognitoIdentityProviderClient client = CognitoIdentityProviderClient.create();
-        return cognitoLambdaAuthorizer(client, tokenExtractor);
+        return cognitoLambdaAuthorizer(client,
+                issuerUrl,
+                clientId,
+                tokenExtractor,
+                (request, event, getUserResponse, authorizationToken) -> Map.of()
+        );
     }
 
     public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final CognitoIdentityProviderClient client,
-                                                                  final TokenExtractor tokenExtractor) {
-        return new CognitoLambdaAuthorizer(client, lambdaAuthorizer(metaData -> {
-            final String accessToken = tokenExtractor.extract(metaData);
+                                                                  final String issuerUrl,
+                                                                  final String clientId,
+                                                                  final TokenExtractor tokenExtractor,
+                                                                  final ContextEnricher contextEnricher) {
+        validateNotNull(client, "client");
+        validateNotNull(issuerUrl, "issuerUrl");
+        validateNotNull(tokenExtractor, "tokenExtractor");
+        return new CognitoLambdaAuthorizer(client, basicLambdaAuthorizer(metaData -> {
+            final HttpRequest httpRequest = httpRequest(metaData);
+            final String accessToken = tokenExtractor.extract(httpRequest);
             try {
+                final JwtInformation jwtInformation = extractJwtPayload(accessToken);
+                if (!jwtInformation.matches(issuerUrl, clientId)) {
+                    log.debug("rejecting token because issuer was '{}' and client id was '{}' but has to be '{}' and '{}'",
+                            jwtInformation.issuerUrl(),
+                            jwtInformation.clientId(),
+                            issuerUrl,
+                            clientId
+                    );
+                    return fail();
+                }
+                log.debug("calling cognito...");
                 final GetUserResponse getUserResponse = client.getUser(builder -> builder.accessToken(accessToken));
+                log.debug("call to cognito was successful: {}", getUserResponse);
                 final AttributeType subjectAttribute = getUserResponse.userAttributes().get(0);
                 final String subject = subjectAttribute.value();
-                final String username = getUserResponse.username();
-                return success(subject, Map.of("username", username));
+                final Map<String, Object> context = contextEnricher.enrich(
+                        httpRequest,
+                        metaData.get(AWS_LAMBDA_EVENT),
+                        getUserResponse,
+                        jwtInformation.payloadMap()
+                );
+                return success(subject, context);
             } catch (final NotAuthorizedException | PasswordResetRequiredException | UserNotConfirmedException | UserNotFoundException e) {
+                log.debug("rejecting authorization request because call to cognito threw an exception", e);
                 return fail();
             }
         }));
     }
 
+    @Override
     public Map<String, Object> delegate(final Map<String, Object> event) {
-        return lambdaAuthorizer.delegate(event);
+        return basicLambdaAuthorizer.delegate(event);
     }
 
     @Override

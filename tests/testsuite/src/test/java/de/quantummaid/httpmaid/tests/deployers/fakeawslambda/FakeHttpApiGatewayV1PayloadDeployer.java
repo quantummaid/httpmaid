@@ -75,6 +75,7 @@ public final class FakeHttpApiGatewayV1PayloadDeployer implements Deployer {
         final ApiGatewayClientFactory apiGatewayClientFactory = fakeApiGatewayClientFactory(apiGatewayManagementServerPort);
         final AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpoint = awsWebsocketLambdaEndpointFor(
                 httpMaid,
+                "not-an-actual-region",
                 apiGatewayClientFactory
         );
 

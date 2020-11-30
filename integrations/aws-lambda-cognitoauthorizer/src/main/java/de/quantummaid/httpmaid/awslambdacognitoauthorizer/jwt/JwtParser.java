@@ -19,25 +19,38 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambda;
+package de.quantummaid.httpmaid.awslambdacognitoauthorizer.jwt;
 
 import de.quantummaid.mapmaid.mapper.marshalling.Unmarshaller;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.jwt.JwtInformation.jwtInformation;
 import static de.quantummaid.mapmaid.minimaljson.MinimalJsonUnmarshaller.minimalJsonUnmarshaller;
 
-@SuppressWarnings("java:S4508")
-public final class MapDeserializer {
+public final class JwtParser {
     private static final Unmarshaller<String> UNMARSHALLER = minimalJsonUnmarshaller();
 
-    private MapDeserializer() {
+    private JwtParser() {
+    }
+
+    public static JwtInformation extractJwtPayload(final String token) {
+        final String[] parts = token.split("\\.");
+        final String encodedPayload = parts[1];
+
+        final Base64.Decoder decoder = Base64.getDecoder();
+        final byte[] bytes = decoder.decode(encodedPayload);
+        final String payload = new String(bytes, StandardCharsets.UTF_8);
+        final Map<String, Object> payloadMap = unmarshal(payload);
+        return jwtInformation(payloadMap);
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> mapFromString(final String string) {
+    private static Map<String, Object> unmarshal(final String payload) {
         try {
-            return (Map<String, Object>) UNMARSHALLER.unmarshal(string);
+            return (Map<String, Object>) UNMARSHALLER.unmarshal(payload);
         } catch (final Exception e) {
             throw new IllegalStateException(e);
         }

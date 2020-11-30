@@ -48,6 +48,7 @@ import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.awsWebsocketSender;
 import static de.quantummaid.httpmaid.awslambda.apigateway.DefaultApiGatewayClientFactory.defaultApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.rawWebsocketMessageWithMetaData;
@@ -64,19 +65,23 @@ public final class AwsWebsocketLambdaEndpoint {
     private static final String REQUEST_CONTEXT_KEY = "requestContext";
 
     private final HttpMaid httpMaid;
+    private final String region;
 
-    public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(final HttpMaid httpMaid) {
-        validateNotNull(httpMaid, "httpMaid");
-        return awsWebsocketLambdaEndpointFor(httpMaid, defaultApiGatewayClientFactory());
+    public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(final HttpMaid httpMaid,
+                                                                           final String region) {
+        return awsWebsocketLambdaEndpointFor(httpMaid, region, defaultApiGatewayClientFactory());
     }
 
     public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(
             final HttpMaid httpMaid,
+            final String region,
             final ApiGatewayClientFactory apiGatewayClientFactory) {
         validateNotNull(httpMaid, "httpMaid");
+        validateNotNullNorEmpty(region, "region");
+        validateNotNull(apiGatewayClientFactory, "apiGatewayClientFactory");
         final AwsWebsocketSender websocketSender = awsWebsocketSender(apiGatewayClientFactory);
         httpMaid.addWebsocketSender(AWS_WEBSOCKET_SENDER, websocketSender);
-        return new AwsWebsocketLambdaEndpoint(httpMaid);
+        return new AwsWebsocketLambdaEndpoint(httpMaid, region);
     }
 
     public Map<String, Object> delegate(final Map<String, Object> event) {
@@ -90,8 +95,6 @@ public final class AwsWebsocketLambdaEndpoint {
         final String connectionId = requestContext.getAsString("connectionId");
         final String stage = requestContext.getAsString("stage");
         final String apiId = requestContext.getAsString("apiId");
-        final String domainName = requestContext.getAsString("domainName");
-        final String region = extractRegionFromDomain(domainName);
         final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(connectionId, stage, apiId, region);
         if (CONNECT_EVENT_TYPE.equals(eventType)) {
             handleConnect(event, connectionInformation);
@@ -160,10 +163,6 @@ public final class AwsWebsocketLambdaEndpoint {
             response.optionalStringBody().ifPresent(s -> responseMap.put("body", s));
             return responseMap;
         });
-    }
-
-    private static String extractRegionFromDomain(final String domain) {
-        return domain.split("\\.")[2];
     }
 
     private static Headers extractHeaders(final AwsLambdaEvent event) {

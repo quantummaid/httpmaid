@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.*;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toMap;
 import static software.amazon.awssdk.services.cloudformation.model.StackStatus.CREATE_COMPLETE;
 import static software.amazon.awssdk.services.cloudformation.model.StackStatus.UPDATE_COMPLETE;
 
@@ -54,15 +55,16 @@ public final class CloudFormationHandler implements AutoCloseable {
         return new CloudFormationHandler(cloudFormationClient);
     }
 
-    public void createOrUpdateStack(final String stackName,
-                                    final String pathToTemplate,
-                                    final Map<String, String> stackParameters) {
+    public Map<String, String> createOrUpdateStack(final String stackName,
+                                                   final String pathToTemplate,
+                                                   final Map<String, String> stackParameters) {
         try {
             createStack(stackName, pathToTemplate, stackParameters);
         } catch (final AlreadyExistsException e) {
             log.info("Stack {} already exists, updating instead.", stackName);
             updateStack(stackName, pathToTemplate, stackParameters);
         }
+        return getStackOutputs(stackName);
     }
 
     public void createStack(final String stackIdentifier,
@@ -151,6 +153,15 @@ public final class CloudFormationHandler implements AutoCloseable {
             throw new RuntimeException(e);
         }
         return contentBuilder.toString();
+    }
+
+    private Map<String, String> getStackOutputs(final String stackIdentifier) {
+        final DescribeStacksResponse describeStacksResponse = cloudFormationClient.describeStacks(
+                builder -> builder.stackName(stackIdentifier)
+        );
+        final Stack stack = describeStacksResponse.stacks().get(0);
+        return stack.outputs().stream()
+                .collect(toMap(Output::outputKey, Output::outputValue));
     }
 
     @Override

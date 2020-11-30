@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda;
 
+import de.quantummaid.httpmaid.remotespecs.AccessTokenHolder;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployment;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.Cognito.generateValidAccessToken;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.httpapi.HttpApiHandler.loadHttpApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.restapi.RestApiHandler.loadRestApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.websocketapi.WebsocketApiHandler.loadWebsocketApiInformation;
@@ -89,10 +91,9 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     private final Boolean developerMode;
 
     public static LambdaDeployer lambdaDeployer() {
-        final LambdaDeployer deployer = userProvidedStackIdentifier()
+        return userProvidedStackIdentifier()
                 .map(LambdaDeployer::perUserLambdaDeployer)
                 .orElseGet(LambdaDeployer::sharedLambdaDeployer);
-        return deployer;
     }
 
     private static LambdaDeployer perUserLambdaDeployer(final String stackIdentifier) {
@@ -121,11 +122,17 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         final File file = new File(lambdaPath);
         final String s3Key = uploadToS3Bucket(artifactBucketName, file);
 
-        create("cf-lambda.yml", stackIdentifier + "-lambda",
+        final Map<String, String> stackOutputs = create("cf-lambda.yml", stackIdentifier + "-lambda",
                 Map.of("StackIdentifier", stackIdentifier,
                         "ArtifactBucketName", artifactBucketName,
                         "ArtifactKey", s3Key));
         resetTable(stackIdentifier);
+
+        final String poolId = stackOutputs.get("PoolId");
+        final String poolClientId = stackOutputs.get("PoolClientId");
+        final String username = UUID.randomUUID().toString();
+        final String accessToken = generateValidAccessToken(poolId, poolClientId, username);
+        AccessTokenHolder.setAccessToken(accessToken);
 
         final Map<Class<? extends RemoteSpecs>, Deployment> deploymentMap = buildDeploymentMap();
 
@@ -176,7 +183,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         return ofNullable(stackIdentifier).map(s -> "dev-" + s);
     }
 
-    private static void create(
+    private static Map<String, String> create(
             final String templateFilename,
             final String stackName,
             final Map<String, String> stackParameters) {
@@ -184,7 +191,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String templatePath = basePath + REALTIVE_PATH_TO_CLOUDFORMATION_TEMPLATE + "/" + templateFilename;
         try (CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
-            cloudFormationHandler.createOrUpdateStack(stackName, templatePath, stackParameters);
+            return cloudFormationHandler.createOrUpdateStack(stackName, templatePath, stackParameters);
         }
     }
 }

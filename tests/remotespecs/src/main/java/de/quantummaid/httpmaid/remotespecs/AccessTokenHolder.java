@@ -19,12 +19,19 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
+package de.quantummaid.httpmaid.remotespecs;
 
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+public final class AccessTokenHolder {
+    private static String accessToken = "not_yet_set";
 
-@FunctionalInterface
-public interface TokenExtractor {
+    private AccessTokenHolder() {
+    }
 
-    String extract(HttpRequest request);
+    public static void setAccessToken(final String accessToken) {
+        AccessTokenHolder.accessToken = accessToken;
+    }
+
+    public static String accessToken() {
+        return accessToken;
+    }
 }
