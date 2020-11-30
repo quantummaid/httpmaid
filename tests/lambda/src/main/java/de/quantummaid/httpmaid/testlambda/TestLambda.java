@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
@@ -39,17 +40,19 @@ import static de.quantummaid.httpmaid.awslambda.EventUtils.isAuthorizationReques
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
-import static de.quantummaid.httpmaid.testlambda.DummyAuthorizer.dummyAuthorizer;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoLambdaAuthorizer.cognitoLambdaAuthorizer;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
 
 @ToString
 @EqualsAndHashCode
+@Slf4j
 public final class TestLambda {
+    private static final String REGION = System.getenv("REGION");
     private static final HttpMaid HTTP_MAID = httpMaid();
 
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
-    private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID);
-    private static final LambdaAuthorizer AUTHORIZER = dummyAuthorizer();
+    private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID, REGION);
+    private static final LambdaAuthorizer AUTHORIZER = createLambdaAuthorizer();
 
     private static HttpMaid httpMaid() {
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
@@ -60,6 +63,7 @@ public final class TestLambda {
     }
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
+        log.debug("new lambda event: {}", event);
         if (isAuthorizationRequest(event)) {
             return AUTHORIZER.delegate(event);
         } else if (!isWebSocketRequest(event)) {
@@ -67,5 +71,16 @@ public final class TestLambda {
         } else {
             return WEBSOCKET_ENDPOINT.delegate(event);
         }
+    }
+
+    private static LambdaAuthorizer createLambdaAuthorizer() {
+        final String poolId = System.getenv("POOL_ID");
+        final String poolClientId = System.getenv("POOL_CLIENT_ID");
+        return cognitoLambdaAuthorizer(
+                poolId,
+                REGION,
+                poolClientId,
+                request -> request.queryParameters().parameter("access_token")
+        );
     }
 }

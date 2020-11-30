@@ -21,31 +21,25 @@
 
 package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Base64;
+import de.quantummaid.mapmaid.mapper.marshalling.Marshaller;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshaller.minimalJsonMarshaller;
+
 public final class MapSerializer {
+    private static final Marshaller<String> MARSHALLER = minimalJsonMarshaller();
 
     private MapSerializer() {
     }
 
     public static String toString(final Map<String, Object> map) {
-        final HashMap<String, Object> hashMap = new HashMap<>(map);
-        return toString((Serializable) hashMap);
-    }
-
-    private static String toString(final Serializable serializable) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(baos)) {
-                objectOutputStream.writeObject(serializable);
-            }
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (final IOException e) {
+        final Map<String, Object> clonedMap = new HashMap<>(map);
+        clonedMap.remove("requestContext");
+        try {
+            return MARSHALLER.marshal(clonedMap);
+        } catch (final Exception e) {
             throw new IllegalStateException(e);
         }
     }

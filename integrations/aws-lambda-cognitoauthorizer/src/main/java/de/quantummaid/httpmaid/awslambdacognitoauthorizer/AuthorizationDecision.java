@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy.PolicyDocument;
 import de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy.PolicyEffect;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy.Policy.policy;
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy.PolicyDocument.policyDocument;
 
+@ToString
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorizationDecision {
     private final boolean authorized;

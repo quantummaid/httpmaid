@@ -27,8 +27,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-public interface RemoteSpecs {
+import static de.quantummaid.httpmaid.remotespecs.AccessTokenHolder.accessToken;
 
+public interface RemoteSpecs {
     RemoteSpecsDeployer provideDeployer();
 
     @Test
@@ -178,7 +179,7 @@ public interface RemoteSpecs {
     @Test
     default void websocketTest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnected()
+                .when().aWebsocketIsConnected(Map.of("access_token", List.of(accessToken())), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
                 .allWebsocketsHaveReceivedTheMessage("handler 2");
     }
@@ -186,7 +187,9 @@ public interface RemoteSpecs {
     @Test
     default void websocketsCanAccessHeaders(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnected(Map.of(), Map.of("X-My-Header", List.of("myvalue")))
+                .when().aWebsocketIsConnected(
+                Map.of("access_token", List.of(accessToken())),
+                Map.of("X-My-Header", List.of("myvalue")))
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"headerhandler\" }")
                 .allWebsocketsHaveReceivedTheMessage("myvalue");
     }
@@ -194,7 +197,7 @@ public interface RemoteSpecs {
     @Test
     default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnected()
+                .when().aWebsocketIsConnected(Map.of("access_token", List.of(accessToken())), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
                 .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aRequestToThePath("/broadcast").viaThePostMethod().withTheBody("{ \"message\": \"foo\" }").isIssued()
@@ -205,7 +208,7 @@ public interface RemoteSpecs {
     @Test
     default void handlersCanDisconnectWebsockets(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
-                .when().aWebsocketIsConnected()
+                .when().aWebsocketIsConnected(Map.of("access_token", List.of(accessToken())), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")
                 .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"check\" }")

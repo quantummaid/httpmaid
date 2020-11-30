@@ -21,10 +21,15 @@
 
 package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
+import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserResponse;
 
-@FunctionalInterface
-public interface TokenExtractor {
+import java.util.Map;
 
-    String extract(HttpRequest request);
+public interface ContextEnricher {
+    Map<String, Object> enrich(HttpRequest request,
+                               AwsLambdaEvent event,
+                               GetUserResponse getUserResponse,
+                               Map<String, Object> authorizationToken);
 }

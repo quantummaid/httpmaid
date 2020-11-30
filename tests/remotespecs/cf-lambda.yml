@@ -73,15 +73,32 @@ Resources:
                   - 'execute-api:ManageConnections'
                 Resource: "*"
                 Effect: Allow
+        - PolicyName: !Sub ${AWS::StackName}-getuser
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - "cognito-idp:GetUser"
+        - PolicyName: !Sub ${AWS::StackName}-lambda
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
-          - Action:
-              - sts:AssumeRole
-            Effect: Allow
+          - Effect: "Allow"
             Principal:
               Service:
-                - lambda.amazonaws.com
+                - "lambda.amazonaws.com"
+                - "apigateway.amazonaws.com" #
+            Action:
+              - "sts:AssumeRole"
 
   FunctionResourcePermission:
     Type: AWS::Lambda::Permission
@@ -89,6 +106,14 @@ Resources:
       Action: lambda:invokeFunction
       Principal: apigateway.amazonaws.com
       FunctionName: !Ref Function
+
+  WsAuthFnPerm:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: apigateway.amazonaws.com
+      FunctionName: !Ref Function
+      SourceArn: !Sub "arn:aws:apigateway:${AWS::Region}::/restapis/${HttpMaidWebsocketsApi}/stages/${HttpMaidWebsocketsApiStage}"
 
   Function:
     Type: AWS::Lambda::Function
@@ -108,6 +133,85 @@ Resources:
       Environment:
         Variables:
           WEBSOCKET_REGISTRY_TABLE: !Ref WebsocketRegistryTable
+          POOL_ID: !Ref Pool
+          POOL_CLIENT_ID: !Ref PoolClient
+          REGION: !Sub "${AWS::Region}"
+
+  ###########
+  # Cognito #
+  ###########
+
+  Pool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Sub "${AWS::StackName}-userpool"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: False
+          RequireNumbers: False
+          RequireSymbols: False
+          RequireUppercase: False
+
+  #PoolDomain:
+  #  Type: "AWS::Cognito::UserPoolDomain"
+  #  Properties:
+  #    UserPoolId: !Ref Pool
+  #    Domain: "testdomainaaaaaaaaaaaaa"
+
+  PoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      UserPoolId: !Ref Pool
+      ClientName: !Sub "${AWS::StackName}-poolclient"
+
+      # config added during edge protection
+  #    PreventUserExistenceErrors: ENABLED
+  #    GenerateSecret: False
+      ExplicitAuthFlows:
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        #- ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+      #
+      # Token expiration configuration
+      #
+      #IdTokenValidity: 1
+      #AccessTokenValidity: 1
+      #RefreshTokenValidity: 1
+      #TokenValidityUnits:
+      #  IdToken: minutes
+      #  AccessToken: minutes
+      #  RefreshToken: minutes
+
+      #
+      # We don't need more than the email attribute for now
+      #
+      ReadAttributes:
+        - email
+      CallbackURLs:
+        - "https://example.org/"
+      LogoutURLs:
+        - "https://example.org/"
+      AllowedOAuthFlowsUserPoolClient: True
+      AllowedOAuthFlows:
+        - "code"
+      AllowedOAuthScopes:
+        - "email"
+        - "openid"
+        - "aws.cognito.signin.user.admin"
+      SupportedIdentityProviders:
+        - COGNITO
+
+  #CognitoUser:
+  #  Type: AWS::Cognito::UserPoolUser
+  #  Properties:
+  #    UserPoolId: !Ref Pool
+  #    Username: testuser
+  #    DesiredDeliveryMediums:
+  #      - "EMAIL"
+  #    ForceAliasCreation: Boolean
+  #    MessageAction: "SUPPRESS"
 
   #####################
   ## HTTP ApiGateway ##
@@ -227,6 +331,22 @@ Resources:
     Properties:
       RestApiId: !Ref HttpMaidApi
 
+  ################
+  ## Authorizer ##
+  ################
+
+  # https://github.com/cazzer/breakdown/blob/c0d2c47d088ffccfaeb1cc26060471b24e9ad611/services/websocket-gateway/template.yaml
+  WsAuth:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      Name: !Sub ${AWS::StackName}-wsauth
+      ApiId: !Ref HttpMaidWebsocketsApi
+      AuthorizerCredentialsArn: !GetAtt FunctionRole.Arn
+      AuthorizerType: REQUEST
+      AuthorizerUri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations
+      IdentitySource:
+        - route.request.querystring.access_token
+
   ###########################
   ## WebSockets ApiGateway ##
   ###########################
@@ -244,7 +364,9 @@ Resources:
     Properties:
       ApiId: !Ref HttpMaidWebsocketsApi
       RouteKey: $connect
-      AuthorizationType: NONE
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref WsAuth
+      #AuthorizationType: NONE
       RouteResponseSelectionExpression: $default
       Target: !Join ['/', [integrations, !Ref HttpMaidWebsocketsApiConnectIntegration]] # See below
 
@@ -296,3 +418,10 @@ Resources:
       StageName: !Ref StackIdentifier
       DeploymentId: !Ref HttpMaidWebsocketsApiDeployment
       ApiId: !Ref HttpMaidWebsocketsApi
+
+Outputs:
+  PoolClientId:
+    Value: !Ref PoolClient
+
+  PoolId:
+    Value: !Ref Pool

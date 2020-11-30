@@ -21,12 +21,12 @@
 
 package de.quantummaid.httpmaid.testlambda;
 
-import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
+import de.quantummaid.httpmaid.awslambdacognitoauthorizer.BasicLambdaAuthorizer;
 
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.AuthorizationDecision.success;
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer.lambdaAuthorizer;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.BasicLambdaAuthorizer.basicLambdaAuthorizer;
 import static java.util.UUID.randomUUID;
 
 public final class DummyAuthorizer {
@@ -34,8 +34,8 @@ public final class DummyAuthorizer {
     private DummyAuthorizer() {
     }
 
-    public static LambdaAuthorizer dummyAuthorizer() {
-        return lambdaAuthorizer(metaData -> {
+    public static BasicLambdaAuthorizer dummyAuthorizer() {
+        return basicLambdaAuthorizer(metaData -> {
             final String principalId = randomUUID().toString();
             return success(principalId, Map.of());
         });

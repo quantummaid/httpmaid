@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.107</version>
+        <version>0.9.108</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.13</version>
+            <version>4.4.14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.98</version>
+            <version>0.9.99</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -180,7 +180,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-cbor</artifactId>
-            <version>2.12.0-rc2</version>
+            <version>2.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
