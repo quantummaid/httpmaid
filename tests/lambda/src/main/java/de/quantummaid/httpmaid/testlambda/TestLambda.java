@@ -47,7 +47,7 @@ import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWeb
 @EqualsAndHashCode
 @Slf4j
 public final class TestLambda {
-    private static final String REGION = System.getenv("REGION"); /* NOSONAR */
+    private static final String REGION = System.getenv("REGION");
     private static final HttpMaid HTTP_MAID = httpMaid();
 
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
@@ -55,7 +55,7 @@ public final class TestLambda {
     private static final LambdaAuthorizer AUTHORIZER = createLambdaAuthorizer();
 
     private static HttpMaid httpMaid() {
-        final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE"); /* NOSONAR */
+        final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
         final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
@@ -74,8 +74,8 @@ public final class TestLambda {
     }
 
     private static LambdaAuthorizer createLambdaAuthorizer() {
-        final String poolId = System.getenv("POOL_ID"); /* NOSONAR */
-        final String poolClientId = System.getenv("POOL_CLIENT_ID"); /* NOSONAR */
+        final String poolId = System.getenv("POOL_ID");
+        final String poolClientId = System.getenv("POOL_CLIENT_ID");
         return cognitoLambdaAuthorizer(
                 poolId,
                 REGION,
