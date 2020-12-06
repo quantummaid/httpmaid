@@ -19,25 +19,20 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.testlambda;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
 
-import de.quantummaid.httpmaid.awslambdacognitoauthorizer.BasicLambdaAuthorizer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.AuthorizationDecision.success;
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.BasicLambdaAuthorizer.basicLambdaAuthorizer;
-import static java.util.UUID.randomUUID;
+public final class Marshaller {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-public final class DummyAuthorizer {
-
-    private DummyAuthorizer() {
+    private Marshaller() {
     }
 
-    public static BasicLambdaAuthorizer dummyAuthorizer() {
-        return basicLambdaAuthorizer(metaData -> {
-            final String principalId = randomUUID().toString();
-            return success(principalId, Map.of());
-        });
+    public static String marshal(final Map<String, Object> map) {
+        return GSON.toJson(map);
     }
 }

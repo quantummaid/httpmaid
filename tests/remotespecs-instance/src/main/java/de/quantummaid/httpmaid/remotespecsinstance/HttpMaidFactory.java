@@ -23,12 +23,14 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
+import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshallerAndUnmarshaller.minimalJsonMarshallerAndUnmarshaller;
 
 @SuppressWarnings("java:S1192")
 public final class HttpMaidFactory {
@@ -92,7 +94,10 @@ public final class HttpMaidFactory {
 
                 .post("/broadcast", (request, response) -> request.websockets().sender().sendToAll("foo"))
                 .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
-                .websocket("disconnect", (request, response) -> request.websockets().disconnector().disconnectAll());
+                .websocket("disconnect", (request, response) -> request.websockets().disconnector().disconnectAll())
+                .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                        .withAdvancedSettings(advancedBuilder -> advancedBuilder
+                                .usingMarshaller(minimalJsonMarshallerAndUnmarshaller()))));
         configurator.accept(builder);
         return builder.build();
     }

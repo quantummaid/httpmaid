@@ -153,40 +153,14 @@ Resources:
           RequireSymbols: False
           RequireUppercase: False
 
-  #PoolDomain:
-  #  Type: "AWS::Cognito::UserPoolDomain"
-  #  Properties:
-  #    UserPoolId: !Ref Pool
-  #    Domain: "testdomainaaaaaaaaaaaaa"
-
   PoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
       UserPoolId: !Ref Pool
       ClientName: !Sub "${AWS::StackName}-poolclient"
-
-      # config added during edge protection
-  #    PreventUserExistenceErrors: ENABLED
-  #    GenerateSecret: False
       ExplicitAuthFlows:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
-        #- ALLOW_USER_SRP_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
-
-      #
-      # Token expiration configuration
-      #
-      #IdTokenValidity: 1
-      #AccessTokenValidity: 1
-      #RefreshTokenValidity: 1
-      #TokenValidityUnits:
-      #  IdToken: minutes
-      #  AccessToken: minutes
-      #  RefreshToken: minutes
-
-      #
-      # We don't need more than the email attribute for now
-      #
       ReadAttributes:
         - email
       CallbackURLs:
@@ -202,16 +176,6 @@ Resources:
         - "aws.cognito.signin.user.admin"
       SupportedIdentityProviders:
         - COGNITO
-
-  #CognitoUser:
-  #  Type: AWS::Cognito::UserPoolUser
-  #  Properties:
-  #    UserPoolId: !Ref Pool
-  #    Username: testuser
-  #    DesiredDeliveryMediums:
-  #      - "EMAIL"
-  #    ForceAliasCreation: Boolean
-  #    MessageAction: "SUPPRESS"
 
   #####################
   ## HTTP ApiGateway ##

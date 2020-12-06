@@ -49,19 +49,45 @@ public final class CognitoLambdaAuthorizer implements LambdaAuthorizer {
                                                                   final String region,
                                                                   final String clientId,
                                                                   final TokenExtractor tokenExtractor) {
+        return cognitoLambdaAuthorizer(
+                poolId,
+                region,
+                clientId,
+                tokenExtractor,
+                (request, event, getUserResponse, authorizationToken) -> Map.of()
+        );
+    }
+
+    public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final String poolId,
+                                                                  final String region,
+                                                                  final String clientId,
+                                                                  final TokenExtractor tokenExtractor,
+                                                                  final ContextEnricher contextEnricher) {
         final String issuerUrl = String.format("https://cognito-idp.%s.amazonaws.com/%s", region, poolId);
-        return cognitoLambdaAuthorizer(issuerUrl, clientId, tokenExtractor);
+        return cognitoLambdaAuthorizer(issuerUrl, clientId, tokenExtractor, contextEnricher);
     }
 
     public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final String issuerUrl,
                                                                   final String clientId,
                                                                   final TokenExtractor tokenExtractor) {
+        return cognitoLambdaAuthorizer(
+                issuerUrl,
+                clientId,
+                tokenExtractor,
+                (request, event, getUserResponse, authorizationToken) -> Map.of()
+        );
+    }
+
+    public static CognitoLambdaAuthorizer cognitoLambdaAuthorizer(final String issuerUrl,
+                                                                  final String clientId,
+                                                                  final TokenExtractor tokenExtractor,
+                                                                  final ContextEnricher contextEnricher) {
         final CognitoIdentityProviderClient client = CognitoIdentityProviderClient.create();
         return cognitoLambdaAuthorizer(client,
                 issuerUrl,
                 clientId,
                 tokenExtractor,
-                (request, event, getUserResponse, authorizationToken) -> Map.of()
+                contextEnricher
         );
     }
 

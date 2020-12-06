@@ -23,12 +23,21 @@ package de.quantummaid.httpmaid.tests.givenwhenthen.builders;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.Then;
 
+import java.util.function.Consumer;
+
 public interface HeaderBuilder {
 
     HeaderBuilder withQueryStringParameter(String name, String value);
 
     default HeaderBuilder withDistinctCookieHeaders(final String... rawCookieHeaders) {
         return withHeaderOccuringMultipleTimesHavingDistinctValue("Cookie", rawCookieHeaders);
+    }
+
+    default HeaderBuilder withTheOptionalHeader(final Consumer<HeaderBuilder> headerProvider) {
+        if (headerProvider != null) {
+            headerProvider.accept(this);
+        }
+        return this;
     }
 
     default HeaderBuilder withTheHeader(final String key, final String value) {

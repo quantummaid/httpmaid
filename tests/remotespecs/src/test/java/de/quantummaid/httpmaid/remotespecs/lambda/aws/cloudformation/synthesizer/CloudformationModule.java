@@ -19,20 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
 
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import static de.quantummaid.httpmaid.remotespecs.lambda.LambdaDeployer.lambdaDeployer;
-
-@ExtendWith(RemoteSpecsExtension.class)
-public final class LambdaHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
-
-    @Override
-    public RemoteSpecsDeployer provideDeployer() {
-        return lambdaDeployer();
-    }
+public interface CloudformationModule {
+    void apply(CloudformationTemplateBuilder builder);
 }

@@ -19,20 +19,24 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
 
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.LambdaDeployer.lambdaDeployer;
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Namespace {
+    private final String prefix;
 
-@ExtendWith(RemoteSpecsExtension.class)
-public final class LambdaHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
+    public static Namespace namespace(final String prefix) {
+        return new Namespace(prefix);
+    }
 
-    @Override
-    public RemoteSpecsDeployer provideDeployer() {
-        return lambdaDeployer();
+    public Namespace sub(final String id) {
+        return new Namespace(prefix + id);
+    }
+
+    public String id(final String id) {
+        return prefix + id;
     }
 }

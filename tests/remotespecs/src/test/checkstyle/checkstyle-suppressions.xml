@@ -24,5 +24,6 @@
         "-//Puppy Crawl//DTD Suppressions 1.1//EN"
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
-    <suppress checks="MagicNumber" files=".*Specs|Md5Checksum" />
+    <suppress checks="MagicNumber" files=".*Specs|Md5Checksum|Cognito|Lambda|S3" />
+    <suppress checks="IllegalCatch" files="YamlMarshaller" />
 </suppressions>
