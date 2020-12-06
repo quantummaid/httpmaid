@@ -21,73 +21,30 @@
 
 package de.quantummaid.httpmaid.testlambda;
 
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
 import de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoLambdaAuthorizer;
 import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
-import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
-import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
-import static de.quantummaid.httpmaid.awslambda.EventUtils.isAuthorizationRequest;
-import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
-import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
-import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
-import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
-
 @ToString
 @EqualsAndHashCode
 @Slf4j
 public final class CognitoAuthorizerLambda {
-    private static final String REGION = System.getenv("REGION");
-    private static final HttpMaid HTTP_MAID = httpMaid();
-
-    private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
-    private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID, REGION);
-    private static final LambdaAuthorizer AUTHORIZER = createLambdaAuthorizer();
-
-    private static HttpMaid httpMaid() {
-        final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
-        final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
-        return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
-                .websocket("returnLambdaContext", (request, response) -> {
-                    final AwsLambdaEvent awsLambdaEvent = request.getMetaData().get(AWS_LAMBDA_EVENT);
-                    final String foo = awsLambdaEvent.getMap("requestContext")
-                            .getMap("authorizer")
-                            .getAsString("foo");
-                    response.setBody(foo);
-                })
-                .configured(toUseWebsocketRegistry(websocketRegistry)));
-    }
+    private static final Router ROUTER = Router.router(CognitoAuthorizerLambda::createLambdaAuthorizer);
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
-        log.debug("new lambda event: {}", event);
-        if (isAuthorizationRequest(event)) {
-            return AUTHORIZER.delegate(event);
-        } else if (!isWebSocketRequest(event)) {
-            return PLAIN_ENDPOINT.delegate(event);
-        } else {
-            return WEBSOCKET_ENDPOINT.delegate(event);
-        }
+        return ROUTER.route(event);
     }
 
-    private static LambdaAuthorizer createLambdaAuthorizer() {
+    private static LambdaAuthorizer createLambdaAuthorizer(final String region) {
         final String poolId = System.getenv("POOL_ID");
         final String poolClientId = System.getenv("POOL_CLIENT_ID");
         return CognitoLambdaAuthorizer.cognitoLambdaAuthorizer(
                 poolId,
-                REGION,
+                region,
                 poolClientId,
                 request -> request.queryParameters().parameter("access_token"),
                 (request, event, getUserResponse, authorizationToken) -> Map.of("foo", "bar")
