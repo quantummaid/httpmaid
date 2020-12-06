@@ -33,13 +33,14 @@ import java.util.Map;
 @EqualsAndHashCode
 @Slf4j
 public final class CognitoAuthorizerLambda {
-    private static final Router ROUTER = Router.router(CognitoAuthorizerLambda::createLambdaAuthorizer);
+    private static final Router ROUTER = Router.router(createLambdaAuthorizer());
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         return ROUTER.route(event);
     }
 
-    private static LambdaAuthorizer createLambdaAuthorizer(final String region) {
+    private static LambdaAuthorizer createLambdaAuthorizer() {
+        final String region = System.getenv("REGION");
         final String poolId = System.getenv("POOL_ID");
         final String poolClientId = System.getenv("POOL_CLIENT_ID");
         return CognitoLambdaAuthorizer.cognitoLambdaAuthorizer(

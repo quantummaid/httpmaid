@@ -34,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
@@ -53,10 +52,6 @@ public final class Router {
     private final LambdaAuthorizer authorizer;
 
     public static Router router(final LambdaAuthorizer authorizer) {
-        return router((Function<String, LambdaAuthorizer>) region -> authorizer);
-    }
-
-    public static Router router(final Function<String, LambdaAuthorizer> authorizerProvider) {
         final String region = System.getenv("REGION");
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
         final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
@@ -72,7 +67,6 @@ public final class Router {
                 .configured(toUseWebsocketRegistry(websocketRegistry)));
         final AwsLambdaEndpoint httpEndpoint = awsLambdaEndpointFor(httpMaid);
         final AwsWebsocketLambdaEndpoint websocketEndpoint = awsWebsocketLambdaEndpointFor(httpMaid, region);
-        final LambdaAuthorizer authorizer = authorizerProvider.apply(region);
         return new Router(httpEndpoint, websocketEndpoint, authorizer);
     }
 
