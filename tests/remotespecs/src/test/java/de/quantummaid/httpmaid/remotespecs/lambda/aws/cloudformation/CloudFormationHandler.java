@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.template.Template;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationWaiter.*;
@@ -56,60 +56,38 @@ public final class CloudFormationHandler implements AutoCloseable {
     }
 
     public Map<String, String> createOrUpdateStack(final String stackName,
-                                                   final String pathToTemplate,
-                                                   final Map<String, String> stackParameters) {
+                                                   final Template template) {
         try {
-            createStack(stackName, pathToTemplate, stackParameters);
+            createStack(stackName, template);
         } catch (final AlreadyExistsException e) {
             log.info("Stack {} already exists, updating instead.", stackName);
-            updateStack(stackName, pathToTemplate, stackParameters);
+            updateStack(stackName, template);
         }
         return getStackOutputs(stackName);
     }
 
     public void createStack(final String stackIdentifier,
-                            final String pathToTemplate,
-                            final Map<String, String> stackParameters) {
+                            final Template template) {
         log.info("Creating stack {}...", stackIdentifier);
-        final String templateBody = fileToString(pathToTemplate);
-
-        final CreateStackRequest createStackRequest = CreateStackRequest.builder()
+        final CreateStackRequest.Builder builder = CreateStackRequest.builder()
                 .stackName(stackIdentifier)
-                .capabilities(Capability.CAPABILITY_NAMED_IAM)
-                .templateBody(templateBody)
-                .parameters(stackParameters.entrySet()
-                        .stream()
-                        .map(
-                                kv -> Parameter.builder()
-                                        .parameterKey(kv.getKey())
-                                        .parameterValue(kv.getValue())
-                                        .build()).collect(Collectors.toList()
-                        ))
-                .build();
-        cloudFormationClient.createStack(createStackRequest);
+                .capabilities(Capability.CAPABILITY_NAMED_IAM);
+        template.addToCreateStackRequest(builder);
+        cloudFormationClient.createStack(builder.build());
 
         waitForStackCreation(stackIdentifier, cloudFormationClient);
         log.info("Created stack {}.", stackIdentifier);
     }
 
     public void updateStack(final String stackIdentifier,
-                            final String pathToTemplate,
-                            final Map<String, String> stackParameters) {
+                            final Template template) {
         log.info("Updating stack {}...", stackIdentifier);
-        final String templateBody = fileToString(pathToTemplate);
-        final UpdateStackRequest updateStackRequest = UpdateStackRequest.builder()
+        final UpdateStackRequest.Builder builder = UpdateStackRequest.builder()
                 .stackName(stackIdentifier)
-                .capabilities(Capability.CAPABILITY_NAMED_IAM)
-                .templateBody(templateBody)
-                .parameters(stackParameters.entrySet().stream().map(
-                        kv -> Parameter.builder()
-                                .parameterKey(kv.getKey())
-                                .parameterValue(kv.getValue())
-                                .build()).collect(Collectors.toList()))
-                .build();
-
+                .capabilities(Capability.CAPABILITY_NAMED_IAM);
+        template.addToUpdateStackRequest(builder);
         try {
-            cloudFormationClient.updateStack(updateStackRequest);
+            cloudFormationClient.updateStack(builder.build());
         } catch (final CloudFormationException e) {
             final String message = e.getMessage();
             if (message.contains("No updates are to be performed.")) {

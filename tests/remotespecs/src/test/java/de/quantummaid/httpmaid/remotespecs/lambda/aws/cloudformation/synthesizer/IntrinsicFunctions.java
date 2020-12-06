@@ -19,20 +19,30 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
 
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
-import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.LambdaDeployer.lambdaDeployer;
+public final class IntrinsicFunctions {
 
-@ExtendWith(RemoteSpecsExtension.class)
-public final class LambdaRestApiRemoteSpecs implements RemoteSpecs {
+    private IntrinsicFunctions() {
+    }
 
-    @Override
-    public RemoteSpecsDeployer provideDeployer() {
-        return lambdaDeployer();
+    public static Object reference(final String resource) {
+        return Map.of("Ref", resource);
+    }
+
+    public static Object sub(final String string) {
+        return Map.of("Fn::Sub", string);
+    }
+
+    public static Object getAttribute(final String name, final String attribute) {
+        return Map.of("Fn::GetAtt", List.of(name, attribute));
+    }
+
+    public static Object join(final String delimiter, final Object... values) {
+        return Map.of("Fn::Join", List.of(delimiter, Arrays.asList(values)));
     }
 }

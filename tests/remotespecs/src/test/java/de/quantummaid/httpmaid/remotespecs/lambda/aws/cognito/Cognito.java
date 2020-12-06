@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.cognito;
 
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;

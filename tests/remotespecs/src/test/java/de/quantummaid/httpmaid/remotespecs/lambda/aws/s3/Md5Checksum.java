@@ -25,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Predicate;
@@ -57,14 +58,28 @@ public class Md5Checksum {
         return value;
     }
 
+    public static Md5Checksum ofString(final String string) {
+        try {
+            final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(string.getBytes(StandardCharsets.UTF_8));
+            final byte[] digest = messageDigest.digest();
+            return new Md5Checksum(bytesToString(digest));
+        } catch (final NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static Md5Checksum ofFile(final File file) {
         final byte[] b = md5ChecksumBytesOf(file.getAbsolutePath());
-        final StringBuilder result = new StringBuilder();
+        return new Md5Checksum(bytesToString(b));
+    }
 
-        for (int i = 0; i < b.length; i++) {
-            result.append(Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1));
+    private static String bytesToString(final byte[] bytes) {
+        final StringBuilder result = new StringBuilder();
+        for (byte aByte : bytes) {
+            result.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
         }
-        return new Md5Checksum(result.toString());
+        return result.toString();
     }
 
     private static byte[] md5ChecksumBytesOf(final String filename) {

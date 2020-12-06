@@ -19,19 +19,26 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
 
-public final class AccessTokenHolder {
-    private static String accessToken = "not_yet_set";
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-    private AccessTokenHolder() {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CloudformationOutput {
+    private final String name;
+    private final Object value;
+
+    public static CloudformationOutput cloudformationOutput(final String name,
+                                                            final Object value) {
+        return new CloudformationOutput(name, value);
     }
 
-    public static void setAccessToken(final String accessToken) {
-        AccessTokenHolder.accessToken = accessToken;
+    public String name() {
+        return name;
     }
 
-    public static String accessToken() {
-        return accessToken;
+    public Object value() {
+        return value;
     }
 }

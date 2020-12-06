@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.testlambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
 import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
@@ -35,18 +36,19 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
+import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isAuthorizationRequest;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoLambdaAuthorizer.cognitoLambdaAuthorizer;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.dummy.DummyAuthorizer.dummyAuthorizer;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
 
 @ToString
 @EqualsAndHashCode
 @Slf4j
-public final class TestLambda {
+public final class DummyAuthorizerLambda {
     private static final String REGION = System.getenv("REGION");
     private static final HttpMaid HTTP_MAID = httpMaid();
 
@@ -59,6 +61,13 @@ public final class TestLambda {
         final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
+                .websocket("returnLambdaContext", (request, response) -> {
+                    final AwsLambdaEvent awsLambdaEvent = request.getMetaData().get(AWS_LAMBDA_EVENT);
+                    final String foo = awsLambdaEvent.getMap("requestContext")
+                            .getMap("authorizer")
+                            .getAsString("foo");
+                    response.setBody(foo);
+                })
                 .configured(toUseWebsocketRegistry(websocketRegistry)));
     }
 
@@ -74,13 +83,6 @@ public final class TestLambda {
     }
 
     private static LambdaAuthorizer createLambdaAuthorizer() {
-        final String poolId = System.getenv("POOL_ID");
-        final String poolClientId = System.getenv("POOL_CLIENT_ID");
-        return cognitoLambdaAuthorizer(
-                poolId,
-                REGION,
-                poolClientId,
-                request -> request.queryParameters().parameter("access_token")
-        );
+        return dummyAuthorizer((httpRequest, event) -> Map.of("foo", "bar"));
     }
 }

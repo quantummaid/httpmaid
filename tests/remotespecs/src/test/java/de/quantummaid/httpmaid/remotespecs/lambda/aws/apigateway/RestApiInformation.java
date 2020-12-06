@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.websocketapi;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.ApiBaseUrl;
 import lombok.AccessLevel;
@@ -33,21 +33,15 @@ import static java.lang.String.format;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class WebsocketApiInformation {
+public final class RestApiInformation {
     private static final int HTTPS_PORT = 443;
 
     private final String apiId;
     private final String region;
-    private final String stageName;
 
-    public static WebsocketApiInformation websocketApiInformation(final String apiId,
-                                                                  final String region,
-                                                                  final String stageName) {
-        return new WebsocketApiInformation(apiId, region, stageName);
-    }
-
-    public String region() {
-        return region;
+    public static RestApiInformation restApiInformation(final String apiId,
+                                                        final String region) {
+        return new RestApiInformation(apiId, region);
     }
 
     public String host() {
@@ -55,10 +49,10 @@ public final class WebsocketApiInformation {
     }
 
     public String basePath() {
-        return format("/%s", stageName);
+        return "/stage";
     }
 
     public ApiBaseUrl baseUrl() {
-        return apiBaseUrl("wss", host(), HTTPS_PORT, basePath());
+        return apiBaseUrl("https", host(), HTTPS_PORT, basePath());
     }
 }

@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.s3;
 
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
@@ -31,6 +32,25 @@ import java.io.File;
 public final class S3Handler {
 
     private S3Handler() {
+    }
+
+    public static String uploadToS3Bucket(final String bucketName,
+                                          final String content) {
+        final String key = keyFromContent(content);
+        try (S3Client s3Client = S3Client.create()) {
+            log.info("Uploading to S3 object {}/{}...", bucketName, key);
+            if (!fileNeedsUploading(bucketName, key, s3Client)) {
+                log.info("S3 object with matching MD5 already present, skipping upload.");
+            } else {
+                log.info("S3 object not already present, uploading...");
+                s3Client.putObject(PutObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(key)
+                        .build(), RequestBody.fromString(content));
+                log.info("Uploaded to S3 object {}/{}.", bucketName, key);
+            }
+            return key;
+        }
     }
 
     public static String uploadToS3Bucket(final String bucketName,
@@ -65,6 +85,11 @@ public final class S3Handler {
 
     private static String keyFromFile(final File file) {
         final Md5Checksum newContentMD5 = Md5Checksum.ofFile(file);
+        return newContentMD5.getValue();
+    }
+
+    private static String keyFromContent(final String content) {
+        final Md5Checksum newContentMD5 = Md5Checksum.ofString(content);
         return newContentMD5.getValue();
     }
 
