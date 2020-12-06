@@ -103,8 +103,8 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     }
 
     private static String sharedStackIdentifier() {
-        final UUID uuid = UUID.randomUUID();
-        return String.format("%s-%s", SHARED_STACK_PREFIX, uuid);
+        final String uuid = UUID.randomUUID().toString().substring(0, 7);
+        return String.format("%s%s", SHARED_STACK_PREFIX, uuid);
     }
 
     @Override
