@@ -28,17 +28,29 @@ import static de.quantummaid.httpmaid.mappath.statemachine.states.ErrorState.err
 
 public interface State {
 
-    Transition handleOpeningSquareBrackets();
+    default Transition handleOpeningSquareBrackets() {
+        throw new UnsupportedOperationException();
+    }
 
-    Transition handleClosingSquareBrackets();
+    default Transition handleClosingSquareBrackets() {
+        throw new UnsupportedOperationException();
+    }
 
-    Transition handleDot();
+    default Transition handleDot() {
+        throw new UnsupportedOperationException();
+    }
 
-    Transition handleNumericCharacter(char c);
+    default Transition handleNumericCharacter(char c) {
+        throw new UnsupportedOperationException();
+    }
 
-    Transition handleNonNumericCharacter(char c);
+    default Transition handleNonNumericCharacter(char c) {
+        throw new UnsupportedOperationException();
+    }
 
-    Transition handleEnd();
+    default Transition handleEnd() {
+        throw new UnsupportedOperationException();
+    }
 
     default Transition handleNewline() {
         return transitionTo(errorState("newline is not supported"));

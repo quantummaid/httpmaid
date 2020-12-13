@@ -35,7 +35,6 @@ public interface FirstWhenStage {
         try {
             return aWebsocketIsConnected(Map.of(), Map.of());
         } catch (final Exception e) {
-            e.printStackTrace();
             return httpMaidIsInitialized();
         }
     }

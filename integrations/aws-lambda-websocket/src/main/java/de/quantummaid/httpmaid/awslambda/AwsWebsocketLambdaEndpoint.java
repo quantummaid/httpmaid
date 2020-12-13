@@ -66,6 +66,7 @@ public final class AwsWebsocketLambdaEndpoint {
     private static final String DISCONNECT_EVENT_TYPE = "DISCONNECT";
     private static final String MESSAGE_EVENT_TYPE = "MESSAGE";
     private static final String REQUEST_CONTEXT_KEY = "requestContext";
+    private static final String AUTHORIZER_KEY = "authorizer";
 
     private final HttpMaid httpMaid;
     private final String region;
@@ -118,7 +119,7 @@ public final class AwsWebsocketLambdaEndpoint {
         if (isAlreadyAuthorized(event)) {
             additionalWebsocketData = extractAdditionalData(event
                     .getMap(REQUEST_CONTEXT_KEY)
-                    .getMap("authorizer"));
+                    .getMap(AUTHORIZER_KEY));
         } else {
             final AuthorizationDecision authorizationDecision = authorize(event, httpMaid);
             if (!authorizationDecision.isAuthorized()) {
@@ -155,7 +156,7 @@ public final class AwsWebsocketLambdaEndpoint {
             if (isAlreadyAuthorized(event)) {
                 final AwsLambdaEvent authorizerContext = event
                         .getMap(REQUEST_CONTEXT_KEY)
-                        .getMap("authorizer");
+                        .getMap(AUTHORIZER_KEY);
                 final String serializedEvent = authorizerContext
                         .getAsString(AUTHORIZER_EVENT_KEY);
                 final Map<String, Object> authorizerEventMap = mapFromString(serializedEvent);
@@ -186,7 +187,7 @@ public final class AwsWebsocketLambdaEndpoint {
 
     private boolean isAlreadyAuthorized(final AwsLambdaEvent event) {
         final AwsLambdaEvent context = event.getMap(REQUEST_CONTEXT_KEY);
-        return context.containsKey("authorizer");
+        return context.containsKey(AUTHORIZER_KEY);
     }
 
     private static Map<String, Object> extractAdditionalData(final AwsLambdaEvent authorizerContext) {
