@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.mappath.statemachine.states;
 
-import de.quantummaid.httpmaid.mappath.statemachine.Transition;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -35,35 +34,5 @@ public final class ErrorState implements State {
 
     public String message() {
         return message;
-    }
-
-    @Override
-    public Transition handleOpeningSquareBrackets() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Transition handleClosingSquareBrackets() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Transition handleDot() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Transition handleNumericCharacter(final char c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Transition handleNonNumericCharacter(final char c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Transition handleEnd() {
-        throw new UnsupportedOperationException();
     }
 }

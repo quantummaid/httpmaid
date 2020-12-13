@@ -28,9 +28,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static de.quantummaid.httpmaid.mappath.rendering.RenderedElement.renderedElement;
 import static java.lang.String.format;
@@ -39,21 +36,10 @@ import static java.lang.String.format;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class IndexMapPathElement implements MapPathElement {
-    private static final Pattern PATTERN = Pattern.compile("\\[(\\d++)]");
     private final int index;
 
     public static IndexMapPathElement indexMapPathElement(final int index) {
         return new IndexMapPathElement(index);
-    }
-
-    public static Optional<MapPathElement> parse(final String element) {
-        final Matcher matcher = PATTERN.matcher(element);
-        if (!matcher.matches()) {
-            return Optional.empty();
-        }
-        final String number = matcher.group(1);
-        final int index = Integer.parseInt(number);
-        return Optional.of(indexMapPathElement(index));
     }
 
     @SuppressWarnings("unchecked")

@@ -50,7 +50,7 @@ public final class KeyState implements State {
     public Transition handleOpeningSquareBrackets() {
         return buildElement()
                 .map(element -> transitionTo(indexState(), element))
-                .orElseGet(() -> transitionTo(errorState("key is empty")));
+                .orElseGet(this::emptyKeyError);
     }
 
     @Override
@@ -62,7 +62,7 @@ public final class KeyState implements State {
     public Transition handleDot() {
         return buildElement()
                 .map(element -> transitionTo(keyState(), element))
-                .orElseGet(() -> transitionTo(errorState("key is empty")));
+                .orElseGet(this::emptyKeyError);
     }
 
     @Override
@@ -80,7 +80,7 @@ public final class KeyState implements State {
     public Transition handleEnd() {
         return buildElement()
                 .map(element -> transitionTo(successState(), element))
-                .orElseGet(() -> transitionTo(errorState("key is empty")));
+                .orElseGet(this::emptyKeyError);
     }
 
     private Optional<MapPathElement> buildElement() {
@@ -89,5 +89,9 @@ public final class KeyState implements State {
         }
         final String key = stringBuilder.toString();
         return Optional.of(keyMapPathElement(key));
+    }
+
+    private Transition emptyKeyError() {
+        return transitionTo(errorState("key is empty"));
     }
 }
