@@ -19,15 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
+package de.quantummaid.httpmaid.awslambda.authorizer;
 
+import de.quantummaid.mapmaid.mapper.marshalling.Marshaller;
+
+import java.util.HashMap;
 import java.util.Map;
 
-public interface LambdaAuthorizer extends AutoCloseable {
+import static de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshaller.minimalJsonMarshaller;
 
-    Map<String, Object> delegate(Map<String, Object> event);
+public final class MapSerializer {
+    private static final Marshaller<String> MARSHALLER = minimalJsonMarshaller();
 
-    @Override
-    default void close() {
+    private MapSerializer() {
+    }
+
+    public static String toString(final Map<String, Object> map) {
+        final Map<String, Object> clonedMap = new HashMap<>(map);
+        clonedMap.remove("requestContext");
+        try {
+            return MARSHALLER.marshal(clonedMap);
+        } catch (final Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 }

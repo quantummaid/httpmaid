@@ -48,7 +48,6 @@ public final class PathParameterEnricher implements TopEnricher {
 
     @Override
     public Optional<String> extractValue(final HttpRequest request) {
-        return request.pathParameters()
-                .getOptionalPathParameter(parameterName);
+        return request.pathParameters().getOptionalPathParameter(parameterName);
     }
 }

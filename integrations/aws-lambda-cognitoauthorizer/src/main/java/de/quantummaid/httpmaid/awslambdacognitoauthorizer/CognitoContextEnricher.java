@@ -21,15 +21,26 @@
 
 package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
+import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.websockets.additionaldata.AdditionalWebsocketDataProvider;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserResponse;
 
 import java.util.Map;
 
-public interface ContextEnricher {
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoWebsocketAuthorizer.AUTHORIZATION_TOKEN;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoWebsocketAuthorizer.GET_USER_RESPONSE;
+
+public interface CognitoContextEnricher extends AdditionalWebsocketDataProvider {
     Map<String, Object> enrich(HttpRequest request,
-                               AwsLambdaEvent event,
                                GetUserResponse getUserResponse,
                                Map<String, Object> authorizationToken);
+
+    @Override
+    default Map<String, Object> provide(final HttpRequest request) {
+        final MetaData metaData = request.getMetaData();
+        final GetUserResponse getUserResponse = metaData.get(GET_USER_RESPONSE);
+        final Map<String, Object> authorizationToken = metaData.get(AUTHORIZATION_TOKEN);
+        return enrich(request, getUserResponse, authorizationToken);
+    }
 }

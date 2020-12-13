@@ -48,6 +48,7 @@ public final class RawWebsocketMessage implements RawRequest {
     private final boolean restorationFromRegistryNeeded;
     private final QueryParameters queryParameters;
     private final Headers headers;
+    private final Map<String, Object> additionalWebsocketData;
 
     public static RawWebsocketMessage rawWebsocketMessage(final ConnectionInformation connectionInformation,
                                                           final String body) {
@@ -65,6 +66,7 @@ public final class RawWebsocketMessage implements RawRequest {
                 additionalMetaData,
                 true,
                 null,
+                null,
                 null
         );
     }
@@ -73,18 +75,21 @@ public final class RawWebsocketMessage implements RawRequest {
                                                                       final String body,
                                                                       final QueryParameters queryParameters,
                                                                       final Headers headers,
+                                                                      final Map<String, Object> additionalWebsocketData,
                                                                       final Map<MetaDataKey<?>, Object> additionalMetaData) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(body, "body");
         validateNotNull(headers, "headers");
         validateNotNull(queryParameters, "queryParameters");
+        validateNotNull(additionalWebsocketData, "additionalWebsocketData");
         validateNotNull(additionalMetaData, "additionalMetaData");
         return new RawWebsocketMessage(connectionInformation,
                 body,
                 additionalMetaData,
                 false,
                 queryParameters,
-                headers
+                headers,
+                additionalWebsocketData
         );
     }
 
@@ -99,6 +104,7 @@ public final class RawWebsocketMessage implements RawRequest {
         if (!restorationFromRegistryNeeded) {
             metaData.set(QUERY_PARAMETERS, queryParameters);
             metaData.set(REQUEST_HEADERS, headers);
+            metaData.set(ADDITIONAL_WEBSOCKET_DATA, additionalWebsocketData);
         }
     }
 }

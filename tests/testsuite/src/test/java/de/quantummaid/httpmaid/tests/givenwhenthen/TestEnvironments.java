@@ -31,8 +31,11 @@ import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDepl
 import static de.quantummaid.httpmaid.tests.deployers.DeployerManager.activeDeployersWithOnlyShittyClient;
 import static de.quantummaid.httpmaid.tests.deployers.bypassed.BypassedDeployer.bypassedDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV1PayloadDeployer.fakeHttpApiGatewayV1PayloadDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV1PayloadWithWsAuthDeployer.fakeHttpApiGatewayV1PayloadWithWsAuthDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadDeployer.fakeHttpApiGatewayV2PayloadDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadWithWsAuthDeployer.fakeHttpApiGatewayV2PayloadWithWsAuthDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayDeployer.fakeRestApiGatewayDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayWithWsAuthorizationDeployer.fakeRestApiGatewayWithWsAuthorizationDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jettywebsockets.JettyWebsocketsDeployer.jettyWebsocketsDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jsr356ontyrus.Jsr356OnTyrusDeployer.programmaticJsr356OnTyrusDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.testEnvironment;
@@ -54,8 +57,11 @@ public final class TestEnvironments {
         final List<Deployer> deployers = List.of(
                 bypassedDeployer(),
                 fakeRestApiGatewayDeployer(),
+                fakeRestApiGatewayWithWsAuthorizationDeployer(),
                 fakeHttpApiGatewayV2PayloadDeployer(),
+                fakeHttpApiGatewayV2PayloadWithWsAuthDeployer(),
                 fakeHttpApiGatewayV1PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadWithWsAuthDeployer(),
                 programmaticJsr356OnTyrusDeployer(),
                 jettyWebsocketsDeployer()
         );
@@ -70,8 +76,11 @@ public final class TestEnvironments {
         final List<Deployer> deployers = List.of(
                 bypassedDeployer(),
                 fakeRestApiGatewayDeployer(),
+                fakeRestApiGatewayWithWsAuthorizationDeployer(),
                 fakeHttpApiGatewayV2PayloadDeployer(),
+                fakeHttpApiGatewayV2PayloadWithWsAuthDeployer(),
                 fakeHttpApiGatewayV1PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadWithWsAuthDeployer(),
                 programmaticJsr356OnTyrusDeployer()
         );
         return deployers.stream()
@@ -86,8 +95,11 @@ public final class TestEnvironments {
                 jettyWebsocketsDeployer(),
                 bypassedDeployer(),
                 fakeRestApiGatewayDeployer(),
+                fakeRestApiGatewayWithWsAuthorizationDeployer(),
                 fakeHttpApiGatewayV2PayloadDeployer(),
-                fakeHttpApiGatewayV1PayloadDeployer()
+                fakeHttpApiGatewayV2PayloadWithWsAuthDeployer(),
+                fakeHttpApiGatewayV1PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadWithWsAuthDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()
@@ -101,8 +113,11 @@ public final class TestEnvironments {
                 jettyWebsocketsDeployer(),
                 bypassedDeployer(),
                 fakeRestApiGatewayDeployer(),
+                fakeRestApiGatewayWithWsAuthorizationDeployer(),
                 fakeHttpApiGatewayV2PayloadDeployer(),
-                fakeHttpApiGatewayV1PayloadDeployer()
+                fakeHttpApiGatewayV2PayloadWithWsAuthDeployer(),
+                fakeHttpApiGatewayV1PayloadDeployer(),
+                fakeHttpApiGatewayV1PayloadWithWsAuthDeployer()
         );
         return deployers.stream()
                 .flatMap(deployer -> deployer.supportedClients().stream()

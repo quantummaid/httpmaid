@@ -25,14 +25,19 @@ import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 
+import java.util.Map;
+
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 
 public final class WebsocketMetaDataKeys {
+    public static final String WEBSOCKET_AUTHORIZATION = "WEBSOCKET_AUTHORIZATION";
     public static final String WEBSOCKET_CONNECT = "WEBSOCKET_CONNECT";
     public static final String WEBSOCKET_MESSAGE = "WEBSOCKET_MESSAGE";
     public static final String WEBSOCKET_DISCONNECT = "WEBSOCKET_DISCONNECT";
 
     public static final MetaDataKey<WebsocketRegistry> WEBSOCKET_REGISTRY = metaDataKey("WEBSOCKET_REGISTRY");
+
+    public static final MetaDataKey<Map<String, Object>> ADDITIONAL_WEBSOCKET_DATA = metaDataKey("ADDITIONAL_WEBSOCKET_DATA");
 
     public static final MetaDataKey<String> REQUEST_TYPE = metaDataKey("REQUEST_TYPE");
     public static final MetaDataKey<ConnectionInformation> WEBSOCKET_CONNECTION_INFORMATION = metaDataKey("WEBSOCKET_CONNECTION_INFORMATION");

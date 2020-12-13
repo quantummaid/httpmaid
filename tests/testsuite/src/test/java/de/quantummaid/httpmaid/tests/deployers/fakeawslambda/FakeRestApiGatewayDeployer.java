@@ -83,7 +83,7 @@ public final class FakeRestApiGatewayDeployer implements Deployer {
         currentRestLambda = fakeRestApiGateway(awsLambdaEndpoint, httpPort);
 
         final int websocketsPort = freePort();
-        currentWebsocketLambda = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort, apiWebsockets);
+        currentWebsocketLambda = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, null, websocketsPort, apiWebsockets);
 
         return localhostHttpAndWebsocketDeployment(httpPort, websocketsPort);
     }

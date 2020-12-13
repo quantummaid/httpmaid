@@ -22,11 +22,11 @@
 package de.quantummaid.httpmaid.testlambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.HttpMaidBuilder;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
-import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
 import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
@@ -34,12 +34,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isAuthorizationRequest;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
+import static de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer.lambdaWebsocketAuthorizer;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
@@ -49,24 +50,20 @@ import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWeb
 public final class Router {
     private final AwsLambdaEndpoint httpEndpoint;
     private final AwsWebsocketLambdaEndpoint websocketEndpoint;
-    private final LambdaAuthorizer authorizer;
+    private final LambdaWebsocketAuthorizer authorizer;
 
-    public static Router router(final LambdaAuthorizer authorizer) {
+    public static Router router(final Consumer<HttpMaidBuilder> additionalConfig) {
         final String region = System.getenv("REGION");
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
         final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
-        final HttpMaid httpMaid = HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
-                .websocket("returnLambdaContext", (request, response) -> {
-                    final AwsLambdaEvent awsLambdaEvent = request.getMetaData().get(AWS_LAMBDA_EVENT);
-                    final String foo = awsLambdaEvent.getMap("requestContext")
-                            .getMap("authorizer")
-                            .getAsString("foo");
-                    response.setBody(foo);
-                })
-                .configured(toUseWebsocketRegistry(websocketRegistry)));
+        final HttpMaid httpMaid = HttpMaidFactory.httpMaid(httpMaidBuilder -> {
+            additionalConfig.accept(httpMaidBuilder);
+            httpMaidBuilder.configured(toUseWebsocketRegistry(websocketRegistry));
+        });
         final AwsLambdaEndpoint httpEndpoint = awsLambdaEndpointFor(httpMaid);
         final AwsWebsocketLambdaEndpoint websocketEndpoint = awsWebsocketLambdaEndpointFor(httpMaid, region);
+        final LambdaWebsocketAuthorizer authorizer = lambdaWebsocketAuthorizer(httpMaid);
         return new Router(httpEndpoint, websocketEndpoint, authorizer);
     }
 

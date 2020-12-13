@@ -27,8 +27,10 @@ import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.HttpApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.*;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Cognito;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,7 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.LambdaDeployer.lamb
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.LambdaDeployer.loadToken;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.HttpApiInformation.httpApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation.websocketApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationOutput.cloudformationOutput;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.sub;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.PseudoParameters.REGION;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.CognitoModule.cognitoModule;
@@ -55,15 +58,23 @@ import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.http
 public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
     private static String accessToken;
     private static String maliciousAccessToken;
+    private static String tokenFromDifferentCognitoClient;
 
     public static CloudformationModule infrastructureRequirements(final Namespace namespace,
                                                                   final String bucketName,
                                                                   final String artifactKey) {
         return builder -> {
             final CognitoModule cognitoModule = cognitoModule(namespace);
-
-            final Namespace malicious = namespace.sub("malicious");
-            final CognitoModule maliciousCognitoModule = cognitoModule(malicious);
+            final Namespace malicious2 = namespace.sub("malicious2");
+            final CloudformationResource otherClient = Cognito.poolClient(
+                    malicious2.id("OtherClient"),
+                    malicious2.id("OtherClient"),
+                    cognitoModule.pool()
+            );
+            builder
+                    .withResources(otherClient)
+                    .withOutputs(cloudformationOutput(malicious2.id("PoolId"), cognitoModule.pool().reference()))
+                    .withOutputs(cloudformationOutput(malicious2.id("PoolClientId"), otherClient.reference()));
 
             final WebsocketRegistryModule websocketRegistryModule = websocketRegistryModule(namespace);
             final FunctionModule functionModule = cognitoAuthorizedFunctionModule(namespace, bucketName, artifactKey, Map.of(
@@ -74,17 +85,12 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
             ));
 
             final HttpApiModule httpApi = authorizedHttpApiWithV1PayloadModule(
-                    namespace,
-                    functionModule.function(),
-                    cognitoModule.pool(),
-                    cognitoModule.poolClient()
-            );
+                    namespace, functionModule.function(), cognitoModule.pool(), cognitoModule.poolClient());
             final WebsocketApiModule websocketApiModule = websocketApiModule(
-                    namespace,
-                    functionModule.role(),
-                    functionModule.function(),
-                    true
-            );
+                    namespace, functionModule.role(), functionModule.function(), true);
+
+            final Namespace malicious = namespace.sub("malicious");
+            final CognitoModule maliciousCognitoModule = cognitoModule(malicious);
 
             builder.withModule(cognitoModule);
             builder.withModule(maliciousCognitoModule);
@@ -99,6 +105,7 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
                                             final Namespace namespace) {
         accessToken = loadToken(stackOutputs, namespace);
         maliciousAccessToken = loadToken(stackOutputs, namespace.sub("malicious"));
+        tokenFromDifferentCognitoClient = loadToken(stackOutputs, namespace.sub("malicious2"));
 
         final String websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
@@ -148,6 +155,15 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody()
                 .withTheHeader("Authorization", String.format("Bearer %s", maliciousAccessToken)).isIssued()
+                .theStatusCodeWas(401)
+                .theResponseBodyWas("{\"message\":\"Unauthorized\"}");
+    }
+
+    @Test
+    public void httpRequestsWithTokenFromDifferentCognitoClientAreRejected(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody()
+                .withTheHeader("Authorization", String.format("Bearer %s", tokenFromDifferentCognitoClient)).isIssued()
                 .theStatusCodeWas(401)
                 .theResponseBodyWas("{\"message\":\"Unauthorized\"}");
     }

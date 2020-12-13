@@ -22,8 +22,11 @@
 package de.quantummaid.httpmaid.websockets;
 
 import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.websockets.additionaldata.AdditionalWebsocketDataProvider;
+import de.quantummaid.httpmaid.websockets.authorization.WebsocketAuthorizer;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 
+import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 public final class WebsocketConfigurators {
@@ -31,14 +34,26 @@ public final class WebsocketConfigurators {
     private WebsocketConfigurators() {
     }
 
+    public static Configurator toStoreAdditionalDataInWebsocketContext(final AdditionalWebsocketDataProvider dataProvider) {
+        validateNotNull(dataProvider, "dataProvider");
+        return configuratorForType(WebsocketsModule.class,
+                websocketsModule -> websocketsModule.setAdditionalWebsocketDataProvider(dataProvider));
+    }
+
     public static Configurator toSelectWebsocketRoutesBasedOn(final String routeSelectionExpression) {
         validateNotNull(routeSelectionExpression, "routeSelectionExpression");
-        return Configurator.configuratorForType(WebsocketsModule.class,
+        return configuratorForType(WebsocketsModule.class,
                 websocketsModule -> websocketsModule.setRouteSelectionExpression(routeSelectionExpression));
     }
 
     public static Configurator toUseWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
-        return Configurator.configuratorForType(WebsocketsModule.class,
+        return configuratorForType(WebsocketsModule.class,
                 websocketsModule -> websocketsModule.setWebsocketRegistry(websocketRegistry));
+    }
+
+    public static Configurator toAuthorizeWebsocketsUsing(final WebsocketAuthorizer authorizer) {
+        validateNotNull(authorizer, "authorizer");
+        return configuratorForType(WebsocketsModule.class,
+                websocketsModule -> websocketsModule.setWebsocketAuthorizer(authorizer));
     }
 }

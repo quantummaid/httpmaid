@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,12 @@ import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.addFullWebsocketMetaData;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeLambdaWebsocket.fakeLambdaWebsocket;
 
 @ToString
@@ -39,18 +44,38 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocketCreator implements WebSocketCreator {
     private final AwsWebsocketLambdaEndpoint endpoint;
+    private final LambdaWebsocketAuthorizer authorizer;
     private final ApiWebsockets apiWebsockets;
 
     public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final AwsWebsocketLambdaEndpoint endpoint,
+                                                                        final LambdaWebsocketAuthorizer authorizer,
                                                                         final ApiWebsockets apiWebsockets) {
-        return new FakeLambdaWebsocketCreator(endpoint, apiWebsockets);
+        return new FakeLambdaWebsocketCreator(endpoint, authorizer, apiWebsockets);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object createWebSocket(final ServletUpgradeRequest request,
                                   final ServletUpgradeResponse response) {
+        final Object authorizationContext;
+        if (authorizer != null) {
+            final Map<String, Object> authorizationEvent = new LinkedHashMap<>();
+            authorizationEvent.put("methodArn", "asdf");
+            addFullWebsocketMetaData(request, authorizationEvent);
+            final Map<String, Object> authorizationResponse = authorizer.delegate(authorizationEvent);
+            final Map<String, Object> policyDocument = (Map<String, Object>) authorizationResponse.get("policyDocument");
+            final List<Map<String, Object>> statements = (List<Map<String, Object>>) policyDocument.get("Statement");
+            final Map<String, Object> statement = statements.get(0);
+            if (!"Allow".equals(statement.get("Effect"))) {
+                throw new RuntimeException("unauthorized: " + authorizationResponse);
+            }
+            authorizationContext = authorizationResponse.get("context");
+        } else {
+            authorizationContext = null;
+        }
+
         final String connectionId = UUID.randomUUID().toString();
-        final FakeLambdaWebsocket websocket = fakeLambdaWebsocket(endpoint, connectionId);
+        final FakeLambdaWebsocket websocket = fakeLambdaWebsocket(endpoint, connectionId, authorizationContext);
         apiWebsockets.add(connectionId, websocket);
         return websocket;
     }

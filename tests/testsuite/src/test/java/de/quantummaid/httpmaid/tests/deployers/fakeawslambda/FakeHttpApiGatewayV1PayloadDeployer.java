@@ -83,7 +83,7 @@ public final class FakeHttpApiGatewayV1PayloadDeployer implements Deployer {
         currentHttpGateway = fakeHttpV1PayloadApiGateway(awsLambdaEndpoint, httpPort);
 
         final int websocketsPort = freePort();
-        currentWebsocketGateway = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, websocketsPort, apiWebsockets);
+        currentWebsocketGateway = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, null, websocketsPort, apiWebsockets);
 
         return localhostHttpAndWebsocketDeployment(httpPort, websocketsPort);
     }

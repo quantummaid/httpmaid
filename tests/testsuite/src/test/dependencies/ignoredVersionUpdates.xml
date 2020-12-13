@@ -27,11 +27,13 @@
                 <ignoreVersion>10.0.0.beta1</ignoreVersion>
                 <ignoreVersion>10.0.0.beta2</ignoreVersion>
                 <ignoreVersion>10.0.0.beta3</ignoreVersion>
+                <ignoreVersion>10.0.0</ignoreVersion>
                 <ignoreVersion>11.0.0.alpha0</ignoreVersion>
                 <ignoreVersion>11.0.0-alpha0</ignoreVersion>
                 <ignoreVersion>11.0.0.beta1</ignoreVersion>
                 <ignoreVersion>11.0.0.beta2</ignoreVersion>
                 <ignoreVersion>11.0.0.beta3</ignoreVersion>
+                <ignoreVersion>11.0.0</ignoreVersion>
             </ignoreVersions>
         </rule>
         <rule groupId="software.amazon.awssdk">

@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.jsr356;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
+import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,9 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.jsr356.Jsr356Endpoint.programmaticJsr356Endpoint;
+import static de.quantummaid.httpmaid.jsr356.Jsr356Exception.jsr356Exception;
+import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder.rawWebsocketAuthorizationBuilder;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -53,7 +58,8 @@ public final class Jsr356EndpointConfigurator extends ServerEndpointConfig.Confi
     @Override
     public synchronized <T> T getEndpointInstance(final Class<T> endpointClass) {
         final Headers headers = handshakeMetaData.getHeaders();
-        return (T) programmaticJsr356Endpoint(httpMaid, headers);
+        final Map<String, Object> additionalWebsocketData = handshakeMetaData.getAdditionalWebsocketData();
+        return (T) programmaticJsr356Endpoint(httpMaid, headers, additionalWebsocketData);
     }
 
     @Override
@@ -64,6 +70,23 @@ public final class Jsr356EndpointConfigurator extends ServerEndpointConfig.Confi
         final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
         headersBuilder.withHeadersMap(requestHeaders);
         final Headers headers = headersBuilder.build();
+
+        final AuthorizationDecision authorizationDecision = httpMaid.handleRequestSynchronously(
+                () -> {
+                    final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder();
+                    builder.withHeaders(headers);
+                    final String queryString = request.getQueryString();
+                    builder.withEncodedQueryString(queryString);
+                    return builder.build();
+                },
+                authorizationResponse -> authorizationResponse.metaData().get(AUTHORIZATION_DECISION)
+        );
+
+        if (!authorizationDecision.isAuthorized()) {
+            throw jsr356Exception("not authorized");
+        }
+
         handshakeMetaData.setHeaders(headers);
+        handshakeMetaData.setAdditionalWebsocketData(authorizationDecision.additionalData());
     }
 }

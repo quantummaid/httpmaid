@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
+import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,15 +38,17 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 public final class FakeLambdaServlet extends WebSocketServlet {
     private static final long serialVersionUID = 1L;
     private final transient AwsWebsocketLambdaEndpoint endpoint;
+    private final transient LambdaWebsocketAuthorizer authorizer;
     private final transient ApiWebsockets apiWebsockets;
 
     public static FakeLambdaServlet fakeLambdaServlet(final AwsWebsocketLambdaEndpoint endpoint,
+                                                      final LambdaWebsocketAuthorizer authorizer,
                                                       final ApiWebsockets apiWebsockets) {
-        return new FakeLambdaServlet(endpoint, apiWebsockets);
+        return new FakeLambdaServlet(endpoint, authorizer, apiWebsockets);
     }
 
     @Override
     public void configure(final WebSocketServletFactory webSocketServletFactory) {
-        webSocketServletFactory.setCreator(fakeLambdaWebsocketCreator(endpoint, apiWebsockets));
+        webSocketServletFactory.setCreator(fakeLambdaWebsocketCreator(endpoint, authorizer, apiWebsockets));
     }
 }

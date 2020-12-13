@@ -34,9 +34,11 @@ import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
+import java.util.Map;
 
 import static de.quantummaid.httpmaid.jsr356.Jsr356ConnectionInformation.jsr356ConnectionInformation;
 import static de.quantummaid.httpmaid.jsr356.Jsr356MessageHandler.jsr356MessageHandler;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
 
@@ -46,11 +48,13 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect
 public class Jsr356Endpoint extends Endpoint {
     private final HttpMaid httpMaid;
     private final Headers headers;
+    private final Map<String, Object> additionalWebsocketData;
     private NonSerializableConnectionInformation connectionInformation;
 
     public static Jsr356Endpoint programmaticJsr356Endpoint(final HttpMaid httpMaid,
-                                                            final Headers headers) {
-        return new Jsr356Endpoint(httpMaid, headers);
+                                                            final Headers headers,
+                                                            final Map<String, Object> additionalWebsocketData) {
+        return new Jsr356Endpoint(httpMaid, headers, additionalWebsocketData);
     }
 
     @Override
@@ -63,9 +67,10 @@ public class Jsr356Endpoint extends Endpoint {
                     builder.withHeaders(headers);
                     final String queryString = session.getQueryString();
                     builder.withEncodedQueryString(queryString);
+                    builder.withAdditionalMetaData(ADDITIONAL_WEBSOCKET_DATA, additionalWebsocketData);
                     return builder.build();
                 },
-                response -> {
+                ignored -> {
                 }
         );
         session.addMessageHandler(jsr356MessageHandler(connectionInformation, session, httpMaid));

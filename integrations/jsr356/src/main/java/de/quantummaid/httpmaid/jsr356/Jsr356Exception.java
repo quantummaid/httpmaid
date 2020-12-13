@@ -23,11 +23,15 @@ package de.quantummaid.httpmaid.jsr356;
 
 public final class Jsr356Exception extends RuntimeException {
 
-    private Jsr356Exception(final Throwable cause) {
-        super(cause);
+    private Jsr356Exception(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
     public static Jsr356Exception jsr356Exception(final Throwable cause) {
-        return new Jsr356Exception(cause);
+        return new Jsr356Exception(null, cause);
+    }
+
+    public static Jsr356Exception jsr356Exception(final String message) {
+        return new Jsr356Exception(message, null);
     }
 }

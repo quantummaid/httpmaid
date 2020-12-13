@@ -45,6 +45,10 @@ public final class EventUtils {
         return context.containsKey("connectionId");
     }
 
+    public static String extractMethodArn(final AwsLambdaEvent event) {
+        return event.getAsString("methodArn");
+    }
+
     static String extractPotentiallyEncodedBody(final AwsLambdaEvent event) {
         return event.getAsOptionalString("body")
                 .map(rawBody -> {

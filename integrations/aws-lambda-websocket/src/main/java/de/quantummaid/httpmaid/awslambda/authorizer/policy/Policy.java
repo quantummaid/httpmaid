@@ -19,7 +19,7 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.awslambda.authorizer.policy;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

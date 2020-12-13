@@ -19,27 +19,35 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.mappath.statemachine;
 
+import de.quantummaid.httpmaid.mappath.MapPathElement;
+import de.quantummaid.httpmaid.mappath.statemachine.states.State;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PolicyEffect {
-    public static final PolicyEffect ALLOW = new PolicyEffect("Allow");
-    public static final PolicyEffect DENY = new PolicyEffect("Deny");
+public final class Transition {
+    private final State nextState;
+    private final MapPathElement mapPathElement;
 
-    private final String value;
-
-    public static PolicyEffect policyEffect(final boolean allowed) {
-        if (allowed) {
-            return ALLOW;
-        } else {
-            return DENY;
-        }
+    public static Transition transitionTo(final State nextState) {
+        return new Transition(nextState, null);
     }
 
-    public String value() {
-        return value;
+    public static Transition transitionTo(final State nextState, final MapPathElement mapPathElement) {
+        return new Transition(nextState, mapPathElement);
+    }
+
+    public Optional<MapPathElement> mapPathElement() {
+        return ofNullable(mapPathElement);
+    }
+
+    public State nextState() {
+        return nextState;
     }
 }

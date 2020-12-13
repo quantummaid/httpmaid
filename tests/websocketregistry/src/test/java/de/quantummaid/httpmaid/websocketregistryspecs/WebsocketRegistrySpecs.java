@@ -31,6 +31,7 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.http.Header.header;
@@ -66,7 +67,8 @@ public interface WebsocketRegistrySpecs {
                         queryParameter(queryParameterName("query-name"),
                                 queryParameterValue("query-value"))
                         )
-                )
+                ),
+                Map.of("a", "b")
         );
         websocketRegistry.addConnection(entry);
         final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
@@ -95,7 +97,8 @@ public interface WebsocketRegistrySpecs {
                 websocketSenderId("foo"),
                 headers(emptyList()),
                 ContentType.json(),
-                queryParameters(emptyList())
+                queryParameters(emptyList()),
+                Map.of("a", "b")
         );
         websocketRegistry.addConnection(entry);
         final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(websocketCriteria());
@@ -112,8 +115,8 @@ public interface WebsocketRegistrySpecs {
                 websocketSenderId("foo"),
                 headers(List.of()),
                 ContentType.fromString(Optional.empty()),
-                queryParameters(List.of()
-                )
+                queryParameters(List.of()),
+                Map.of("a", "b")
         );
         websocketRegistry.addConnection(entry);
         final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
@@ -130,7 +133,8 @@ public interface WebsocketRegistrySpecs {
                 websocketSenderId("foo"),
                 headers(emptyList()),
                 ContentType.json(),
-                queryParameters(emptyList())
+                queryParameters(emptyList()),
+                Map.of("a", "b")
         );
         websocketRegistry.addConnection(entry);
 

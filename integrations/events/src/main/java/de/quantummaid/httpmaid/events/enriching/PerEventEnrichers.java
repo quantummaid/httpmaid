@@ -42,6 +42,7 @@ public final class PerEventEnrichers {
     private final List<HeaderEnricher> headerEnrichers = new ArrayList<>();
     private final List<CookieEnricher> cookieEnrichers = new ArrayList<>();
     private final List<Enricher> authenticationInformationEnrichers = new ArrayList<>();
+    private final List<AdditionalDataEnricher> additionalDataEnrichers = new ArrayList<>();
 
     public static PerEventEnrichers perEventEnrichers() {
         return new PerEventEnrichers();
@@ -68,7 +69,11 @@ public final class PerEventEnrichers {
     }
 
     public void addAuthenticationInformationEnricher(final Enricher enricher) {
-        this.authenticationInformationEnrichers.add(enricher);
+        authenticationInformationEnrichers.add(enricher);
+    }
+
+    public void addAdditionalDataEnricher(final AdditionalDataEnricher enricher) {
+        additionalDataEnrichers.add(enricher);
     }
 
     public void enrich(final HttpRequest httpRequest, final Event event) {
@@ -78,5 +83,6 @@ public final class PerEventEnrichers {
         headerEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
         cookieEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
         authenticationInformationEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
+        additionalDataEnrichers.forEach(enricher -> enricher.enrich(httpRequest, event));
     }
 }

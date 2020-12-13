@@ -51,5 +51,5 @@
     <suppress checks="IllegalCatch"
               files="FakeWebsocketLambda|ResourcesTracker|FakeRestApiGateway|FakeHttpV1PayloadApiGateway|FakeHttpV2PayloadApiGateway."/>
     <suppress checks="ParameterNumber" files="Deployment"/>
-    <suppress checks="IllegalCatch" files="AutoCloseableResolvedParametersSupportExtension|TestEnvironment"/>
+    <suppress checks="IllegalCatch" files="AutoCloseableResolvedParametersSupportExtension|TestEnvironment|FirstWhenStage"/>
 </suppressions>

@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.tests.specs.mapmaid;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyFailingWithEmptyMessageUseCase;
 import de.quantummaid.httpmaid.tests.specs.mapmaid.usecases.MyUseCase;
@@ -185,7 +186,11 @@ public final class MapMaidSpecs {
                                 mappingPathParameter("value1", "dataTransferObject.value1"),
                                 mappingHeader("value2", "dataTransferObject.value2"),
                                 mappingHeader("value3", "dataTransferObject.value3"),
-                                mappingHeader("value4", "dataTransferObject.value4"))
+                                mappingHeader("value4", "dataTransferObject.value4")
+                        )
+                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, response) -> {
+                            exception.getCause().printStackTrace();
+                        }))
                         .build()
         )
                 .when().aRequestToThePath("/mapmaid/derp").viaTheGetMethod().withAnEmptyBody()

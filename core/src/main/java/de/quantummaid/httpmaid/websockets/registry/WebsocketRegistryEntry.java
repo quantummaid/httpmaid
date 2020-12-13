@@ -31,10 +31,12 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_CONNECTION_INFORMATION;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
@@ -48,18 +50,28 @@ public final class WebsocketRegistryEntry {
     private final Headers headers;
     private final ContentType contentType;
     private final QueryParameters queryParameters;
+    private final Map<String, Object> additionalData;
 
     public static WebsocketRegistryEntry websocketRegistryEntry(final ConnectionInformation connectionInformation,
                                                                 final WebsocketSenderId senderId,
                                                                 final Headers headers,
                                                                 final ContentType contentType,
-                                                                final QueryParameters queryParameters) {
+                                                                final QueryParameters queryParameters,
+                                                                final Map<String, Object> additionalData) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(senderId, "senderId");
         validateNotNull(headers, "headers");
         validateNotNull(contentType, "contentType");
         validateNotNull(queryParameters, "queryParameters");
-        return new WebsocketRegistryEntry(connectionInformation, senderId, headers, contentType, queryParameters);
+        validateNotNull(additionalData, "additionalData");
+        return new WebsocketRegistryEntry(
+                connectionInformation,
+                senderId,
+                headers,
+                contentType,
+                queryParameters,
+                additionalData
+        );
     }
 
     public static WebsocketRegistryEntry loadFromMetaData(final MetaData metaData) {
@@ -68,17 +80,26 @@ public final class WebsocketRegistryEntry {
         final Headers headers = metaData.get(REQUEST_HEADERS);
         final ContentType contentType = metaData.get(REQUEST_CONTENT_TYPE);
         final QueryParameters queryParameters = metaData.get(QUERY_PARAMETERS);
-        return websocketRegistryEntry(connectionInformation, senderId, headers, contentType, queryParameters);
+        final Map<String, Object> additionalData = metaData.get(ADDITIONAL_WEBSOCKET_DATA);
+        return websocketRegistryEntry(connectionInformation, senderId, headers, contentType, queryParameters, additionalData);
     }
 
     public static WebsocketRegistryEntry restoreFromStrings(final ConnectionInformation connectionInformation,
                                                             final String senderId,
                                                             final Headers headers,
                                                             final Optional<String> contentType,
-                                                            final QueryParameters queryParameters) {
+                                                            final QueryParameters queryParameters,
+                                                            final Map<String, Object> additionalData) {
         final WebsocketSenderId websocketSenderId = websocketSenderId(senderId);
         final ContentType contentTypeObject = ContentType.fromString(contentType);
-        return websocketRegistryEntry(connectionInformation, websocketSenderId, headers, contentTypeObject, queryParameters);
+        return websocketRegistryEntry(
+                connectionInformation,
+                websocketSenderId,
+                headers,
+                contentTypeObject,
+                queryParameters,
+                additionalData
+        );
     }
 
     public WebsocketSenderId senderId() {
@@ -105,9 +126,14 @@ public final class WebsocketRegistryEntry {
         return queryParameters;
     }
 
+    public Map<String, Object> additionalData() {
+        return additionalData;
+    }
+
     public void restoreToMetaData(final MetaData metaData) {
         metaData.set(REQUEST_HEADERS, headers);
         metaData.set(REQUEST_CONTENT_TYPE, contentType);
         metaData.set(QUERY_PARAMETERS, queryParameters);
+        metaData.set(ADDITIONAL_WEBSOCKET_DATA, additionalData);
     }
 }

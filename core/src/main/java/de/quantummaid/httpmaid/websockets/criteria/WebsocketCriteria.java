@@ -32,6 +32,7 @@ import static de.quantummaid.httpmaid.http.HeaderName.headerName;
 import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
+import static de.quantummaid.httpmaid.websockets.criteria.AdditionalDataStringCriterion.additionalDataStringCriterion;
 import static de.quantummaid.httpmaid.websockets.criteria.HeaderCriterion.headerCriterion;
 import static de.quantummaid.httpmaid.websockets.criteria.QueryParameterCriterion.queryParameterCriterion;
 
@@ -39,9 +40,11 @@ import static de.quantummaid.httpmaid.websockets.criteria.QueryParameterCriterio
 public final class WebsocketCriteria {
     private final List<HeaderCriterion> headerCriteria;
     private final List<QueryParameterCriterion> queryParameterCriteria;
+    private final List<AdditionalDataStringCriterion> additionalDataStringCriteria;
 
     public static WebsocketCriteria websocketCriteria() {
         return new WebsocketCriteria(
+                new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>()
         );
@@ -61,12 +64,20 @@ public final class WebsocketCriteria {
         return this;
     }
 
+    public WebsocketCriteria addititionalDataString(final String key, final String value) {
+        final AdditionalDataStringCriterion additionalDataStringCriterion = additionalDataStringCriterion(key, value);
+        additionalDataStringCriteria.add(additionalDataStringCriterion);
+        return this;
+    }
+
     public boolean filter(final WebsocketRegistryEntry entry) {
         final boolean headersAreMatched = headerCriteria.stream()
                 .allMatch(headerCriterion -> headerCriterion.filter(entry));
         final boolean queryParametersAreMatched = queryParameterCriteria.stream()
                 .allMatch(queryParameterCriterion -> queryParameterCriterion.filter(entry));
-        return headersAreMatched && queryParametersAreMatched;
+        final boolean additionalDataIsMatched = additionalDataStringCriteria.stream()
+                .allMatch(additionalDataStringCriterion -> additionalDataStringCriterion.filter(entry));
+        return headersAreMatched && queryParametersAreMatched && additionalDataIsMatched;
     }
 
     public List<HeaderCriterion> headerCriteria() {

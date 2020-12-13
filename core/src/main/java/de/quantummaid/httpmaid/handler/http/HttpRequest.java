@@ -43,6 +43,7 @@ import java.util.Optional;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.http.headers.cookies.Cookies.cookiesFromHeaders;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
 import static de.quantummaid.httpmaid.websockets.broadcast.NonSerializingSender.nonSerializingSender;
 import static de.quantummaid.httpmaid.websockets.disconnect.Disconnector.disconnector;
@@ -138,6 +139,11 @@ public final class HttpRequest {
                         return Optional.empty();
                     }
                 });
+    }
+
+    public Map<String, Object> additionalData() {
+        return metaData.getOptional(ADDITIONAL_WEBSOCKET_DATA)
+                .orElseGet(Map::of);
     }
 
     public Websockets websockets() {
