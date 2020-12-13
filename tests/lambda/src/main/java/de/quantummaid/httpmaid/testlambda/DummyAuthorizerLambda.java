@@ -27,15 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.dummy.DummyAuthorizer.dummyAuthorizer;
-
 @ToString
 @EqualsAndHashCode
 @Slf4j
 public final class DummyAuthorizerLambda {
-    private static final Router ROUTER = Router.router(
-            dummyAuthorizer((httpRequest, event) -> Map.of("foo", "bar"))
-    );
+    private static final Router ROUTER = Router.router(builder -> {
+    });
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         return ROUTER.route(event);

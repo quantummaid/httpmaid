@@ -23,7 +23,6 @@ package de.quantummaid.httpmaid.jetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
@@ -35,12 +34,13 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.http.HeadersBuilder.headersBuilder;
 import static de.quantummaid.httpmaid.jetty.JettyConnectionInformation.jettyConnectionInformation;
+import static de.quantummaid.httpmaid.jetty.UpgradeRequestUtils.extractHeaders;
+import static de.quantummaid.httpmaid.jetty.UpgradeRequestUtils.extractQueryParameters;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnect.rawWebsocketConnectBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketDisconnect.rawWebsocketDisconnect;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.rawWebsocketMessage;
@@ -51,10 +51,12 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketMessage.ra
 @Slf4j
 public final class JettyHttpMaidWebsocket implements WebSocketListener {
     private final HttpMaid httpMaid;
+    private final Map<String, Object> additionalWebsocketData;
     private NonSerializableConnectionInformation connectionInformation;
 
-    public static JettyHttpMaidWebsocket jettyHttpMaidWebsocket(final HttpMaid endpoint) {
-        return new JettyHttpMaidWebsocket(endpoint);
+    public static JettyHttpMaidWebsocket jettyHttpMaidWebsocket(final HttpMaid endpoint,
+                                                                final Map<String, Object> additionalWebsocketData) {
+        return new JettyHttpMaidWebsocket(endpoint, additionalWebsocketData);
     }
 
     @Override
@@ -64,20 +66,16 @@ public final class JettyHttpMaidWebsocket implements WebSocketListener {
             final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
             builder.withNonSerializableConnectionInformation(connectionInformation);
 
-            final Map<String, List<String>> queryParameters = new HashMap<>();
-            final Map<String, List<String>> parameterMap = session.getUpgradeRequest().getParameterMap();
-            parameterMap.forEach(queryParameters::put);
-            builder.withQueryParameterMap(queryParameters);
-
             final UpgradeRequest upgradeRequest = session.getUpgradeRequest();
-            final HeadersBuilder headersBuilder = headersBuilder();
-            final Map<String, List<String>> headersMap = upgradeRequest.getHeaders();
-            headersBuilder.withHeadersMap(headersMap);
-            final Headers headers = headersBuilder.build();
+            final Map<String, List<String>> queryParameters = extractQueryParameters(upgradeRequest);
+            builder.withQueryParameterMap(queryParameters);
+            final Headers headers = extractHeaders(upgradeRequest);
             builder.withHeaders(headers);
 
+            builder.withAdditionalMetaData(ADDITIONAL_WEBSOCKET_DATA, additionalWebsocketData);
+
             return builder.build();
-        }, response -> {
+        }, ignored -> {
         });
     }
 

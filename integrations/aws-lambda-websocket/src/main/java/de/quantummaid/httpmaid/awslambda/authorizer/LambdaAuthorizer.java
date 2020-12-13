@@ -19,34 +19,15 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.policy;
+package de.quantummaid.httpmaid.awslambda.authorizer;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
+public interface LambdaAuthorizer extends AutoCloseable {
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PolicyDocument {
-    private static final String VERSION = "2012-10-17";
+    Map<String, Object> delegate(Map<String, Object> event);
 
-    private final List<Policy> policies;
-
-    public static PolicyDocument policyDocument(final Policy... policies) {
-        return new PolicyDocument(asList(policies));
-    }
-
-    public Map<String, Object> asMap() {
-        final List<Map<String, String>> statementList = policies.stream()
-                .map(Policy::asMap)
-                .collect(Collectors.toList());
-        return Map.of(
-                "Version", VERSION,
-                "Statement", statementList
-        );
+    @Override
+    default void close() {
     }
 }

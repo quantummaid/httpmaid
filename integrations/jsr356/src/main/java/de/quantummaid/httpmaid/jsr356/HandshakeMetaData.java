@@ -26,11 +26,14 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.util.Map;
+
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public final class HandshakeMetaData {
     private Headers headers;
+    private Map<String, Object> additionalWebsocketData;
 
     public static HandshakeMetaData handshakeMetaData() {
         return new HandshakeMetaData();
@@ -42,5 +45,13 @@ public final class HandshakeMetaData {
 
     public synchronized Headers getHeaders() {
         return headers;
+    }
+
+    public void setAdditionalWebsocketData(final Map<String, Object> additionalWebsocketData) {
+        this.additionalWebsocketData = additionalWebsocketData;
+    }
+
+    public Map<String, Object> getAdditionalWebsocketData() {
+        return additionalWebsocketData;
     }
 }

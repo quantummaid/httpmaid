@@ -31,6 +31,10 @@ public final class JettyEndpointException extends RuntimeException {
         return new JettyEndpointException(null, cause);
     }
 
+    public static JettyEndpointException jettyEndpointException(final String message) {
+        return new JettyEndpointException(message, null);
+    }
+
     public static JettyEndpointException jettyEndpointException(final String message, final Throwable cause) {
         return new JettyEndpointException(message, cause);
     }

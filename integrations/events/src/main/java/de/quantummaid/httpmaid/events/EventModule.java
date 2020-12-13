@@ -25,7 +25,6 @@ import de.quantummaid.eventmaid.messagebus.MessageBus;
 import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.closing.ClosingActions;
-import de.quantummaid.httpmaid.events.enriching.EnrichableMap;
 import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
 import de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher;
 import de.quantummaid.httpmaid.events.extraction.PerEventExtractors;
@@ -47,14 +46,12 @@ import static de.quantummaid.eventmaid.configuration.AsynchronousConfiguration.c
 import static de.quantummaid.eventmaid.messagebus.MessageBusBuilder.aMessageBus;
 import static de.quantummaid.eventmaid.messagebus.MessageBusType.ASYNCHRONOUS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.UNMARSHALLED_REQUEST_BODY;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
 import static de.quantummaid.httpmaid.chains.ChainRegistry.CHAIN_REGISTRY;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
 import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
 import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
-import static de.quantummaid.httpmaid.events.Event.event;
 import static de.quantummaid.httpmaid.events.EventsChains.MAP_REQUEST_TO_EVENT;
 import static de.quantummaid.httpmaid.events.LoggingExceptionHandler.loggingExceptionHandler;
 import static de.quantummaid.httpmaid.events.enriching.EnrichableMap.emptyEnrichableMap;
@@ -62,6 +59,7 @@ import static de.quantummaid.httpmaid.events.enriching.PerEventEnrichers.perEven
 import static de.quantummaid.httpmaid.events.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
 import static de.quantummaid.httpmaid.events.extraction.PerEventExtractors.perEventExtractors;
 import static de.quantummaid.httpmaid.events.processors.BroadcastingProcessor.broadcastingProcessor;
+import static de.quantummaid.httpmaid.events.processors.ConstructEventMapProcessor.constructEventMapProcessor;
 import static de.quantummaid.httpmaid.events.processors.PerRequestEnrichersProcessor.enrichersProcessor;
 import static de.quantummaid.httpmaid.events.processors.PerRequestExtractorsProcessor.extractorsProcessor;
 import static de.quantummaid.httpmaid.events.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
@@ -176,14 +174,7 @@ public final class EventModule implements ChainModule {
         extender.routeIfSet(PREPARE_RESPONSE, jumpTo(MAP_REQUEST_TO_EVENT), EVENT_TYPE);
 
         extender.createChain(MAP_REQUEST_TO_EVENT, jumpTo(EventsChains.SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
-        extender.appendProcessor(MAP_REQUEST_TO_EVENT, metaData -> {
-            final Object unmarshalled = metaData.getOptional(UNMARSHALLED_REQUEST_BODY).orElse(null);
-            final EventType eventType = metaData.get(EVENT_TYPE);
-            final EventFactory eventFactory = eventFactories.get(eventType);
-            final EnrichableMap map = eventFactory.createEvent(unmarshalled);
-            final Event event = event(map);
-            metaData.set(EVENT, event);
-        });
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, constructEventMapProcessor(eventFactories));
         extender.appendProcessor(MAP_REQUEST_TO_EVENT, enrichersProcessor(enrichers));
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
         extender.appendProcessor(MAP_REQUEST_TO_EVENT, broadcastingProcessor(broadcasters));

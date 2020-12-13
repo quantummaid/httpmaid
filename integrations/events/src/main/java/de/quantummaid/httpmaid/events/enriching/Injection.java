@@ -36,10 +36,10 @@ public final class Injection {
     private final String value;
 
     public static Injection injection(final String key,
-                                      final String object) {
+                                      final String value) {
         validateNotNull(key, "key");
-        validateNotNull(object, "object");
-        return new Injection(key, object);
+        validateNotNull(value, "value");
+        return new Injection(key, value);
     }
 
     public String key() {

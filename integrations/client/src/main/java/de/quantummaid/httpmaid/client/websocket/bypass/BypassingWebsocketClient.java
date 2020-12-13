@@ -27,6 +27,8 @@ import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketErrorHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
+import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
+import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
@@ -40,6 +42,9 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.client.websocket.bypass.BypassedConnectionInformation.bypassedConnectionInformation;
 import static de.quantummaid.httpmaid.client.websocket.bypass.BypassedWebsocket.bypassedWebsocket;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
+import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
+import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder.rawWebsocketAuthorizationBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
 
 @ToString
@@ -64,6 +69,20 @@ public final class BypassingWebsocketClient implements WebsocketClient {
                 messageHandler,
                 closeHandler
         );
+
+        final AuthorizationDecision decision = httpMaid.handleRequestSynchronously(
+                () -> {
+                    final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder();
+                    builder.withQueryParameterMap(queryParameters);
+                    final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
+                    headersBuilder.withHeadersMap(headers);
+                    builder.withHeaders(headersBuilder.build());
+                    return builder.build();
+                }, response -> response.metaData().get(AUTHORIZATION_DECISION)
+        );
+
+        final Map<String, Object> additionalWebsocketData = decision.additionalData();
+
         httpMaid.handleRequest(
                 () -> {
                     final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
@@ -72,11 +91,13 @@ public final class BypassingWebsocketClient implements WebsocketClient {
                     final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
                     headersBuilder.withHeadersMap(headers);
                     builder.withHeaders(headersBuilder.build());
+                    builder.withAdditionalMetaData(ADDITIONAL_WEBSOCKET_DATA, additionalWebsocketData);
                     return builder.build();
                 },
-                response -> {
+                ignored -> {
                 }
         );
+
         return bypassedWebsocket(httpMaid, messageHandler, connectionInformation);
     }
 }

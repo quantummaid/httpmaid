@@ -92,6 +92,12 @@ public final class RawWebsocketConnectBuilder {
     }
 
     public RawWebsocketConnect build() {
-        return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers);
+        return rawWebsocketConnect(
+                connectionInformation,
+                websocketSenderId,
+                queryParameters,
+                headers,
+                additionalMetaData
+        );
     }
 }

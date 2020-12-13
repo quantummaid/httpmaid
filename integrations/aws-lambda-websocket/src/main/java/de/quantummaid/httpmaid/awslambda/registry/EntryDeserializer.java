@@ -58,12 +58,7 @@ public final class EntryDeserializer {
         final String apiId = (String) connectionInformationMap.get("apiId");
         final String region = (String) connectionInformationMap.get("region");
         final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(
-                connectionId,
-                stage,
-                apiId,
-                region
-        );
-
+                connectionId, stage, apiId, region);
         final String senderId = (String) map.get("senderId");
         final List<Map<String, String>> serializedHeaders = (List<Map<String, String>>) map.get("headers");
         final List<Header> headers = serializedHeaders.stream()
@@ -73,7 +68,6 @@ public final class EntryDeserializer {
                     return header(headerName(name), headerValue(value));
                 })
                 .collect(toList());
-
         final Optional<String> contentType = Optional.ofNullable((String) map.get("contentType"));
         final List<Map<String, String>> serializedQueryParameters = (List<Map<String, String>>) map.get("queryParameters");
         final List<QueryParameter> queryParameters = serializedQueryParameters.stream()
@@ -83,8 +77,9 @@ public final class EntryDeserializer {
                     return queryParameter(queryParameterName(name), queryParameterValue(value));
                 })
                 .collect(toList());
-
-        return restoreFromStrings(connectionInformation, senderId, headers(headers), contentType, queryParameters(queryParameters));
+        final Map<String, Object> additionalData = (Map<String, Object>) map.get("additionalData");
+        return restoreFromStrings(connectionInformation, senderId, headers(headers),
+                contentType, queryParameters(queryParameters), additionalData);
     }
 
     public static Map<String, Object> serializeEntry(final WebsocketRegistryEntry entry) {
@@ -114,6 +109,7 @@ public final class EntryDeserializer {
                 ))
                 .collect(toList());
         map.put("queryParameters", queryParameters);
+        map.put("additionalData", entry.additionalData());
         return map;
     }
 

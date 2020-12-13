@@ -42,7 +42,7 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.HttpApiI
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation.websocketApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.sub;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.PseudoParameters.REGION;
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.FunctionModule.cognitoAuthorizedFunctionModule;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.FunctionModule.unauthorizedFunctionModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.HttpApiModule.unauthorizedHttpApiWithV1PayloadModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketApiModule.websocketApiModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketRegistryModule.websocketRegistryModule;
@@ -57,7 +57,7 @@ public final class UnauthHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
                                                                   final String artifactKey) {
         return builder -> {
             final WebsocketRegistryModule websocketRegistryModule = websocketRegistryModule(namespace);
-            final FunctionModule functionModule = cognitoAuthorizedFunctionModule(namespace, bucketName, artifactKey, Map.of(
+            final FunctionModule functionModule = unauthorizedFunctionModule(namespace, bucketName, artifactKey, Map.of(
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
                     "REGION", sub(REGION)
             ));

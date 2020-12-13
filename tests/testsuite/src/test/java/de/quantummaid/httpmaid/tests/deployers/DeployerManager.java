@@ -31,8 +31,11 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.tests.deployers.bypassed.BypassedDeployer.bypassedDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV1PayloadDeployer.fakeHttpApiGatewayV1PayloadDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV1PayloadWithWsAuthDeployer.fakeHttpApiGatewayV1PayloadWithWsAuthDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadDeployer.fakeHttpApiGatewayV2PayloadDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeHttpApiGatewayV2PayloadWithWsAuthDeployer.fakeHttpApiGatewayV2PayloadWithWsAuthDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayDeployer.fakeRestApiGatewayDeployer;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeRestApiGatewayWithWsAuthorizationDeployer.fakeRestApiGatewayWithWsAuthorizationDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jetty.JettyDeployer.jettyDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.jettywebsockets.JettyWebsocketsDeployer.jettyWebsocketsDeployer;
 import static de.quantummaid.httpmaid.tests.deployers.purejava.PureJavaDeployer.pureJavaDeployer;
@@ -47,8 +50,11 @@ public final class DeployerManager {
             pureJavaDeployer(),
             servletOnJettyDeployer(),
             fakeRestApiGatewayDeployer(),
+            fakeRestApiGatewayWithWsAuthorizationDeployer(),
             fakeHttpApiGatewayV2PayloadDeployer(),
+            fakeHttpApiGatewayV2PayloadWithWsAuthDeployer(),
             fakeHttpApiGatewayV1PayloadDeployer(),
+            fakeHttpApiGatewayV1PayloadWithWsAuthDeployer(),
             bypassedDeployer(),
             jettyWebsocketsDeployer()
     );

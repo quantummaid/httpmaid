@@ -19,28 +19,32 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
+package de.quantummaid.httpmaid.mappath.rendering;
 
-import de.quantummaid.mapmaid.mapper.marshalling.Marshaller;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
-import static de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshaller.minimalJsonMarshaller;
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RenderedElement {
+    private final String content;
+    private final String connector;
 
-public final class MapSerializer {
-    private static final Marshaller<String> MARSHALLER = minimalJsonMarshaller();
-
-    private MapSerializer() {
+    public static RenderedElement renderedElement(final String content) {
+        return new RenderedElement(content, null);
     }
 
-    public static String toString(final Map<String, Object> map) {
-        final Map<String, Object> clonedMap = new HashMap<>(map);
-        clonedMap.remove("requestContext");
-        try {
-            return MARSHALLER.marshal(clonedMap);
-        } catch (final Exception e) {
-            throw new IllegalStateException(e);
-        }
+    public static RenderedElement renderedElement(final String content,
+                                                  final String connector) {
+        return new RenderedElement(content, connector);
+    }
+
+    public String content() {
+        return content;
+    }
+
+    public Optional<String> connector() {
+        return Optional.ofNullable(connector);
     }
 }

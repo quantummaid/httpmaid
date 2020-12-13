@@ -43,6 +43,10 @@ public final class AwsLambdaEvent {
 
     private final Map<String, Object> event;
 
+    public Map<String, Object> getRaw() {
+        return event;
+    }
+
     public static AwsLambdaEvent awsLambdaEvent(final Map<String, Object> event) {
         if (event.isEmpty()) {
             throw emptyLambdaEventException();

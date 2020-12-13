@@ -21,34 +21,39 @@
 
 package de.quantummaid.httpmaid.testlambda;
 
-import de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoLambdaAuthorizer;
-import de.quantummaid.httpmaid.awslambdacognitoauthorizer.LambdaAuthorizer;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoConfigurators.toAuthorizeWebsocketsWithCognito;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoConfigurators.toStoreCognitoDataInWebsocketContext;
+
 @ToString
 @EqualsAndHashCode
 @Slf4j
 public final class CognitoAuthorizerLambda {
-    private static final Router ROUTER = Router.router(createLambdaAuthorizer());
+    private static final Router ROUTER = Router.router(builder -> {
+        final String region = System.getenv("REGION");
+        final String poolId = System.getenv("POOL_ID");
+        final String issuerUrl = String.format("https://cognito-idp.%s.amazonaws.com/%s", region, poolId);
+        final String poolClientId = System.getenv("POOL_CLIENT_ID");
+        builder
+                .websocket("returnLambdaContext", (request, response) -> {
+                    final String foo = (String) request.additionalData().get("foo");
+                    response.setBody(foo);
+                })
+                .configured(toAuthorizeWebsocketsWithCognito(
+                        issuerUrl,
+                        poolClientId,
+                        request -> request.queryParameters().parameter("access_token"))
+                )
+                .configured(toStoreCognitoDataInWebsocketContext(
+                        (request, getUserResponse, authorizationToken) -> Map.of("foo", "bar")));
+    });
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         return ROUTER.route(event);
-    }
-
-    private static LambdaAuthorizer createLambdaAuthorizer() {
-        final String region = System.getenv("REGION");
-        final String poolId = System.getenv("POOL_ID");
-        final String poolClientId = System.getenv("POOL_CLIENT_ID");
-        return CognitoLambdaAuthorizer.cognitoLambdaAuthorizer(
-                poolId,
-                region,
-                poolClientId,
-                request -> request.queryParameters().parameter("access_token"),
-                (request, event, getUserResponse, authorizationToken) -> Map.of("foo", "bar")
-        );
     }
 }

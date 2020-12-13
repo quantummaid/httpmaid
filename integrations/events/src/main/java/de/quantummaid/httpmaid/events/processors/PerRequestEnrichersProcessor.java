@@ -25,7 +25,6 @@ import de.quantummaid.eventmaid.processingcontext.EventType;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.events.Event;
-import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import lombok.AccessLevel;
@@ -35,6 +34,8 @@ import lombok.ToString;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.events.EventModule.EVENT;
+import static de.quantummaid.httpmaid.events.EventModule.EVENT_TYPE;
 import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 
 @ToString
@@ -49,13 +50,14 @@ public final class PerRequestEnrichersProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
-        metaData.getOptional(EventModule.EVENT_TYPE).ifPresent(eventType -> {
+        metaData.getOptional(EVENT_TYPE).ifPresent(eventType -> {
             if (!enrichers.containsKey(eventType)) {
                 return;
             }
-            final Event event = metaData.get(EventModule.EVENT);
+            final Event event = metaData.get(EVENT);
             final HttpRequest httpRequest = httpRequest(metaData);
-            enrichers.get(eventType).enrich(httpRequest, event);
+            final PerEventEnrichers perEventEnrichers = enrichers.get(eventType);
+            perEventEnrichers.enrich(httpRequest, event);
         });
     }
 }

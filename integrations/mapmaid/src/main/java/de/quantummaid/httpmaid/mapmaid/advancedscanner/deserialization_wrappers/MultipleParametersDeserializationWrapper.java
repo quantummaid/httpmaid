@@ -51,7 +51,11 @@ public final class MultipleParametersDeserializationWrapper implements MethodPar
                 input,
                 this.typeIdentifier,
                 injector -> {
-                    injections.forEach(injection -> injector.put(injection.key(), injection.value()));
+                    injections.forEach(injection -> {
+                        final String key = injection.key();
+                        final String value = injection.value();
+                        injector.put(key, value);
+                    });
                     typeInjections.forEach(injector::put);
                 }
         );

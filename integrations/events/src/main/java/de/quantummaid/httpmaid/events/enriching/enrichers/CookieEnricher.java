@@ -48,7 +48,6 @@ public final class CookieEnricher implements TopEnricher {
 
     @Override
     public Optional<String> extractValue(final HttpRequest request) {
-        return request.cookies()
-                .getOptionalCookie(cookieName);
+        return request.cookies().getOptionalCookie(cookieName);
     }
 }

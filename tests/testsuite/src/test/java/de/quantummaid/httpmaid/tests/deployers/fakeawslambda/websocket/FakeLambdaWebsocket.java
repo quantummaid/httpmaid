@@ -27,15 +27,14 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.addFullWebsocketMetaData;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.createWebsocketEvent;
 
 @ToString
 @EqualsAndHashCode
@@ -44,15 +43,17 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
     private final AwsWebsocketLambdaEndpoint endpoint;
     private final String connectionId;
     private Session session;
+    private final Object authorizerContext;
 
     public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsWebsocketLambdaEndpoint endpoint,
-                                                          final String connectionId) {
-        return new FakeLambdaWebsocket(endpoint, connectionId);
+                                                          final String connectionId,
+                                                          final Object authorizerContext) {
+        return new FakeLambdaWebsocket(endpoint, connectionId, authorizerContext);
     }
 
     @Override
     public synchronized void onWebSocketText(final String message) {
-        final Map<String, Object> event = createEvent("MESSAGE");
+        final Map<String, Object> event = createWebsocketEvent(connectionId, "MESSAGE", authorizerContext);
         event.put("body", message);
 
         final Map<String, Object> responseEvent = endpoint.delegate(event);
@@ -77,37 +78,22 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
 
     @Override
     public void onWebSocketClose(final int i, final String s) {
-        final Map<String, Object> event = createEvent("DISCONNECT");
+        final Map<String, Object> event = createWebsocketEvent(connectionId, "DISCONNECT", authorizerContext);
         endpoint.delegate(event);
     }
 
     @Override
     public synchronized void onWebSocketConnect(final Session session) {
         this.session = session;
-        final Map<String, Object> event = createEvent("CONNECT");
-        final Map<String, List<String>> queryParameters = new HashMap<>();
-        final Map<String, List<String>> parameterMap = session.getUpgradeRequest().getParameterMap();
-        parameterMap.forEach(queryParameters::put);
-        event.put("multiValueQueryStringParameters", queryParameters);
-        final UpgradeRequest upgradeRequest = session.getUpgradeRequest();
-        final Map<String, List<String>> headers = upgradeRequest.getHeaders();
-        final Map<String, List<String>> normalizedHeaders = new HashMap<>();
-        headers.forEach((name, values) -> {
-            final List<String> normalizedValues;
-            if (values.size() == 1) {
-                final String[] splitValues = values.get(0).split(", ");
-                normalizedValues = Arrays.asList(splitValues);
-            } else {
-                normalizedValues = values;
-            }
-            normalizedHeaders.put(name, normalizedValues);
-        });
-        event.put("multiValueHeaders", normalizedHeaders);
+        final Map<String, Object> event = createWebsocketEvent(connectionId, "CONNECT", authorizerContext);
+        addFullWebsocketMetaData(session.getUpgradeRequest(), event);
         endpoint.delegate(event);
     }
 
     @Override
     public void onWebSocketError(final Throwable throwable) {
+        throwable.printStackTrace();
+        disconnect();
     }
 
     public void disconnect() {
@@ -116,17 +102,5 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-    }
-
-    private Map<String, Object> createEvent(final String eventType) {
-        final Map<String, Object> requestContext = new HashMap<>();
-        requestContext.put("eventType", eventType);
-        requestContext.put("connectionId", connectionId);
-        requestContext.put("stage", "fake");
-        requestContext.put("apiId", "fake");
-        requestContext.put("domainName", "fake.execute-api.fake-1.amazonaws.com");
-        final Map<String, Object> event = new HashMap<>();
-        event.put("requestContext", requestContext);
-        return event;
     }
 }

@@ -19,14 +19,28 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer.dummy;
+package de.quantummaid.httpmaid.mappath.statemachine.states;
 
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
-import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.mappath.statemachine.Transition;
 
-import java.util.Map;
+import static de.quantummaid.httpmaid.mappath.statemachine.Transition.transitionTo;
+import static de.quantummaid.httpmaid.mappath.statemachine.states.ErrorState.errorState;
 
-public interface DummyAuthorizerContextEnricher {
+public interface State {
 
-    Map<String, Object> enrich(HttpRequest httpRequest, AwsLambdaEvent event);
+    Transition handleOpeningSquareBrackets();
+
+    Transition handleClosingSquareBrackets();
+
+    Transition handleDot();
+
+    Transition handleNumericCharacter(char c);
+
+    Transition handleNonNumericCharacter(char c);
+
+    Transition handleEnd();
+
+    default Transition handleNewline() {
+        return transitionTo(errorState("newline is not supported"));
+    }
 }

@@ -28,11 +28,13 @@ import de.quantummaid.httpmaid.chains.Configurator;
 import de.quantummaid.httpmaid.events.enriching.PerEventEnrichers;
 import de.quantummaid.httpmaid.events.enriching.enrichers.*;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.mappath.MapPath;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
+import static de.quantummaid.httpmaid.events.enriching.enrichers.AdditionalDataEnricher.additionalDataEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.CookieEnricher.cookieEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.HeaderEnricher.headerEnricher;
 import static de.quantummaid.httpmaid.events.enriching.enrichers.OptionalAuthenticationInformationEnricher.optionalAuthenticationInformationEnricher;
@@ -101,6 +103,20 @@ public final class EventConfigurators {
     public static PerRouteConfigurator mappingHeader(final String headerName, final String mapKey) {
         final HeaderEnricher enricher = headerEnricher(headerName, mapKey);
         return mapping(perEventEnrichers -> perEventEnrichers.addHeaderEnricher(enricher));
+    }
+
+    public static PerRouteConfigurator mappingAdditionalWebsocketData(final String key) {
+        return mappingAdditionalWebsocketData(key, key);
+    }
+
+    public static PerRouteConfigurator mappingAdditionalWebsocketData(final String key, final String mapKey) {
+        final MapPath mapPath = MapPath.parse(key);
+        return mappingAdditionalWebsocketData(mapPath, mapKey);
+    }
+
+    public static PerRouteConfigurator mappingAdditionalWebsocketData(final MapPath mapPath, final String mapKey) {
+        final AdditionalDataEnricher enricher = additionalDataEnricher(mapPath, mapKey);
+        return mapping(perEventEnrichers -> perEventEnrichers.addAuthenticationInformationEnricher(enricher));
     }
 
     public static PerRouteConfigurator mappingCookie(final String name) {

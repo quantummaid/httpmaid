@@ -19,10 +19,22 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
+package de.quantummaid.httpmaid.mappath.exposition;
 
-import de.quantummaid.httpmaid.chains.MetaData;
+import static java.lang.String.format;
 
-public interface AuthorizationDecisionMaker {
-    AuthorizationDecision isAuthorized(MetaData metaData);
+public final class Exposition {
+
+    private Exposition() {
+    }
+
+    public static String renderOneLinePositionExposition(final String string,
+                                                         final int position) {
+        return format("%s%n%s", string, buildArrowLine('^', position));
+    }
+
+    private static String buildArrowLine(final char symbol,
+                                         final int position) {
+        return " ".repeat(position) + symbol;
+    }
 }

@@ -84,4 +84,8 @@ public final class RawResponse {
         return optionalStringBody()
                 .orElse("");
     }
+
+    public MetaData metaData() {
+        return metaData;
+    }
 }

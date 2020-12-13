@@ -46,6 +46,12 @@ public final class DynamoDbRepository implements Repository {
     private final String tableName;
     private final String primaryKey;
 
+    public static DynamoDbRepository dynamoDbRepository(final String tableName,
+                                                        final String primaryKey) {
+        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
+        return dynamoDbRepository(dynamoDbClient, tableName, primaryKey);
+    }
+
     public static DynamoDbRepository dynamoDbRepository(final DynamoDbClient dynamoDbClient,
                                                         final String tableName,
                                                         final String primaryKey) {
@@ -53,12 +59,6 @@ public final class DynamoDbRepository implements Repository {
         validateNotNull(tableName, "tableName");
         validateNotNull(primaryKey, "primaryKey");
         return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey);
-    }
-
-    public static DynamoDbRepository dynamoDbRepository(final String tableName,
-                                                        final String primaryKey) {
-        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
-        return dynamoDbRepository(dynamoDbClient, tableName, primaryKey);
     }
 
     @Override
