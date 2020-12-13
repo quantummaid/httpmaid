@@ -21,11 +21,10 @@
 
 package de.quantummaid.httpmaid.mappath.statemachine.states;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SuccessState implements State {
+
+    private SuccessState() {
+    }
 
     public static SuccessState successState() {
         return new SuccessState();
