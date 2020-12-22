@@ -79,7 +79,6 @@ her mind.
 
 Besides allowing you to easily export usecases, HttpMaid offers the following features:
 
-* dependency injection with built-in support for [Guice](https://github.com/google/guice) and [Dagger](https://dagger.dev/)
 * seamless endpoint integrations such as 
     - AWS Lambda
     - Jetty
