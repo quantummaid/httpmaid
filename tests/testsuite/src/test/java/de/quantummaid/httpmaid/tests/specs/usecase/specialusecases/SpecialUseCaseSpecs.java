@@ -39,6 +39,10 @@ import static de.quantummaid.reflectmaid.GenericType.genericType;
 
 public final class SpecialUseCaseSpecs {
 
+    /*
+    final data class UseCaseResponse<T>(val type: String, val payload: T, val mapMaidFix: String = "");
+     */
+
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
     public void useCaseWithTwoMethods(final TestEnvironment testEnvironment) {

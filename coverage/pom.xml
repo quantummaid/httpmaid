@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>httpmaid-parent</artifactId>
-        <version>0.9.110</version>
+        <version>0.9.111</version>
     </parent>
 
     <artifactId>coverage</artifactId>
@@ -65,17 +65,7 @@
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-dagger</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-events</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.quantummaid.httpmaid.integrations</groupId>
-            <artifactId>httpmaid-guice</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -131,6 +121,11 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
             <artifactId>websocketregistry</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.quantummaid.httpmaid.integrations</groupId>
+            <artifactId>httpmaid-awslambda-cognitoauthorizer</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
