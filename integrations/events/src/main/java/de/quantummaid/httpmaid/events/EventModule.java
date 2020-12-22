@@ -102,17 +102,13 @@ public final class EventModule implements ChainModule {
     }
 
     public void addEnricher(final EventType eventType, final Consumer<PerEventEnrichers> enricher) {
-        if (!enrichers.containsKey(eventType)) {
-            enrichers.put(eventType, perEventEnrichers());
-        }
+        enrichers.computeIfAbsent(eventType, x -> perEventEnrichers());
         final PerEventEnrichers perEventEnrichers = enrichers.get(eventType);
         enricher.accept(perEventEnrichers);
     }
 
     public void addExtractor(final EventType eventType, final Consumer<PerEventExtractors> extractor) {
-        if(!extractors.containsKey(eventType)) {
-            extractors.put(eventType, perEventExtractors());
-        }
+        extractors.computeIfAbsent(eventType, x -> perEventExtractors());
         final PerEventExtractors perEventExtractors = extractors.get(eventType);
         extractor.accept(perEventExtractors);
     }

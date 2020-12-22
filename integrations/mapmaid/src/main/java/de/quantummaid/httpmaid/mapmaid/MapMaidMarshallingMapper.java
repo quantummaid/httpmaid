@@ -79,30 +79,28 @@ final class MapMaidMarshallingMapper {
         contentTypeMappingsForMarshalling.put(contentType, marshallingType);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
     void mapMarshalling(final MapMaid mapMaid, final MarshallingModule marshallingModule) {
         final Unmarshaller<String> urlEncodedMarshaller = urlEncodedUnmarshaller();
         marshallingModule.addUnmarshaller(formUrlEncoded(), urlEncodedMarshaller::unmarshal);
 
         mapMaid.deserializer().supportedMarshallingTypes().stream()
-                .map(marshallingType -> (MarshallingType<String>) marshallingType)
                 .filter(marshallingType -> !contentTypeMappingsForUnmarshalling.containsValue(marshallingType))
                 .filter(DEFAULT_SUPPORTED_TYPES_FOR_UNMARSHALLING::contains)
                 .forEach(marshallingType -> {
                     final ContentType contentType = DEFAULT_CONTENT_TYPE_MAPPINGS.get(marshallingType);
-                    contentTypeMappingsForUnmarshalling.put(contentType, marshallingType);
+                    contentTypeMappingsForUnmarshalling.put(contentType, (MarshallingType<String>) marshallingType);
                 });
 
         contentTypeMappingsForUnmarshalling.forEach((contentType, marshallingType) -> marshallingModule
                 .addUnmarshaller(contentType, input -> mapMaid.deserializer().deserializeToUniversalObject(input, marshallingType)));
 
         mapMaid.serializer().supportedMarshallingTypes().stream()
-                .map(marshallingType -> (MarshallingType<String>) marshallingType)
                 .filter(marshallingType -> !contentTypeMappingsForMarshalling.containsValue(marshallingType))
                 .filter(DEFAULT_SUPPORTED_TYPES_FOR_MARSHALLING::contains)
                 .forEach(marshallingType -> {
                     final ContentType contentType = DEFAULT_CONTENT_TYPE_MAPPINGS.get(marshallingType);
-                    contentTypeMappingsForMarshalling.put(contentType, marshallingType);
+                    contentTypeMappingsForMarshalling.put(contentType, (MarshallingType<String>) marshallingType);
                 });
         contentTypeMappingsForMarshalling.forEach((contentType, marshallingType) -> marshallingModule
                 .addMarshaller(contentType, map -> mapMaid.serializer().marshalFromUniversalObject(map, marshallingType)));
