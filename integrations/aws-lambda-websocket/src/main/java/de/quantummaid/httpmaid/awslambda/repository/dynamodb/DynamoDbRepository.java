@@ -112,10 +112,9 @@ public final class DynamoDbRepository implements Repository {
                 .tableName(tableName)
                 .build();
         final ScanResponse scan = dynamoDbClient.scan(scanRequest);
-        return scan.items().stream()
+        return (List<Map<String, Object>>) (Object) scan.items().stream()
                 .map(DynamoDbUnmarshaller::unmarshalMap)
                 .map(map -> map.get(VALUE_IDENTIFIER))
-                .map(object -> (Map<String, Object>) object)
                 .collect(toList());
     }
 

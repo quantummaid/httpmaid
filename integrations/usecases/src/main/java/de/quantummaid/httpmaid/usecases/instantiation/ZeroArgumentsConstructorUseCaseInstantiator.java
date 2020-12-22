@@ -30,7 +30,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.usecases.instantiation.InstantiationInformation.instantiationInformationFor;
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiatorException.zeroArgumentsConstructorUseCaseInstantiatorException;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -46,10 +45,7 @@ public final class ZeroArgumentsConstructorUseCaseInstantiator implements UseCas
 
     @Override
     public <T> T instantiate(final Class<T> type) {
-        if (!instantiationInformations.containsKey(type)) {
-            final InstantiationInformation instantiationInformation = instantiationInformationFor(type);
-            instantiationInformations.put(type, instantiationInformation);
-        }
+        instantiationInformations.computeIfAbsent(type, InstantiationInformation::instantiationInformationFor);
         final InstantiationInformation instantiationInformation = instantiationInformations.get(type);
         final Constructor<?> constructor = instantiationInformation.constructor();
         try {
