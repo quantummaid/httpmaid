@@ -73,7 +73,7 @@ public class EnrichingSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyContains("Requiring the input to be an 'string' but found '{}' at 'parameter'");
+                .theResponseBodyContains("Requiring the input to be an 'string' for field 'parameter'");
     }
 
     @ParameterizedTest
@@ -231,6 +231,6 @@ public class EnrichingSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyContains("Requiring the input to be an 'string' but found '{}' at 'parameter'");
+                .theResponseBodyContains("Requiring the input to be an 'string' for field 'parameter'");
     }
 }
