@@ -225,4 +225,19 @@ public final class UseCaseSpecs {
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("\"foobar\"");
     }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void useCaseWithSameDtoInRequestAndResponse(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .post("/", UseCaseWithSameDtoInRequestAndResponse.class)
+                        .build()
+        )
+                .when().aRequestToThePath("/").viaThePostMethod()
+                .withTheBody("{ \"id\": \"abc\", \"dto\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" } }")
+                .withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theJsonResponseEquals("{\"value\":{\"fieldB\":\"bar\",\"fieldA\":\"foo\"},\"id\":\"abc\"}");
+    }
 }
