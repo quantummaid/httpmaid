@@ -26,11 +26,11 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>quantummaid-opensource-parent</artifactId>
-        <version>0.9.69</version>
+        <version>0.9.71</version>
     </parent>
 
     <artifactId>httpmaid-parent</artifactId>
-    <version>0.9.112</version>
+    <version>0.9.113</version>
     <packaging>pom</packaging>
 
     <name>HttpMaid</name>
@@ -91,6 +91,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>de.quantummaid.httpmaid</groupId>
+                <artifactId>httpmaid-bom</artifactId>
+                <version>0.9.113</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
