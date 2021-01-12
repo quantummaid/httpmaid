@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.examples</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.113</version>
+        <version>0.9.114</version>
     </parent>
 
     <artifactId>documentation</artifactId>
@@ -54,7 +54,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.12.0</version>
+                <version>2.12.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid</groupId>
             <artifactId>core</artifactId>
-            <version>0.9.113</version>
+            <version>0.9.114</version>
         </dependency>
         <!-- Showcase end httpmaiddependency -->
         <dependency>
@@ -90,28 +90,28 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty</artifactId>
-            <version>0.9.113</version>
+            <version>0.9.114</version>
         </dependency>
         <!-- Showcase end jettydependency -->
         <!-- Showcase start servletdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-servlet</artifactId>
-            <version>0.9.113</version>
+            <version>0.9.114</version>
         </dependency>
         <!-- Showcase end servletdependency -->
         <!-- Showcase start jettywebsocketsdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty-websockets</artifactId>
-            <version>0.9.113</version>
+            <version>0.9.114</version>
         </dependency>
         <!-- Showcase end jettywebsocketsdependency -->
         <!-- Showcase start awsdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-awslambda</artifactId>
-            <version>0.9.113</version>
+            <version>0.9.114</version>
         </dependency>
         <!-- Showcase end awsdependency -->
         <dependency>
@@ -140,7 +140,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.12.0</version>
+            <version>2.12.1</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
