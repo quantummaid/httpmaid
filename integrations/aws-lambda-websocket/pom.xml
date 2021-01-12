@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid</groupId>
         <artifactId>integrations-parent</artifactId>
-        <version>0.9.113</version>
+        <version>0.9.114</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
@@ -119,12 +119,6 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>dynamodb</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -133,7 +127,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.104</version>
+            <version>0.9.105</version>
         </dependency>
     </dependencies>
 </project>
