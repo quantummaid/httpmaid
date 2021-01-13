@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid</groupId>
         <artifactId>integrations-parent</artifactId>
-        <version>0.9.114</version>
+        <version>0.9.115</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
