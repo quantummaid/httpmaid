@@ -23,21 +23,34 @@ package de.quantummaid.httpmaid.awslambda.apigateway;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClientBuilder;
 
 import java.net.URI;
 
+import static software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient.*;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DefaultApiGatewayClientFactory implements ApiGatewayClientFactory {
+    private final AwsCredentialsProvider credentialsProvider;
+    private final SdkAsyncHttpClient httpClient;
 
     public static ApiGatewayClientFactory defaultApiGatewayClientFactory() {
-        return new DefaultApiGatewayClientFactory();
+        final AwsCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
+        final SdkAsyncHttpClient httpClient = create();
+        return new DefaultApiGatewayClientFactory(credentialsProvider, httpClient);
     }
 
     @Override
     public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
-        return ApiGatewayManagementApiAsyncClient.builder()
-                .endpointOverride(URI.create(endpointUrl))
+        final ApiGatewayManagementApiAsyncClientBuilder apiGatewayManagementApiAsyncClientBuilder = ApiGatewayManagementApiAsyncClient.builder()
+                .credentialsProvider(credentialsProvider)
+                .httpClient(httpClient)
+                .endpointOverride(URI.create(endpointUrl));
+        return apiGatewayManagementApiAsyncClientBuilder
                 .build();
     }
 }
