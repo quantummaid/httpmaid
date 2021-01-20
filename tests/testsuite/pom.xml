@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.115</version>
+        <version>0.9.116</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -70,32 +70,32 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
-                <version>4.1.57.Final</version>
+                <version>4.1.58.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport</artifactId>
-                <version>4.1.57.Final</version>
+                <version>4.1.58.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.1.57.Final</version>
+                <version>4.1.58.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec</artifactId>
-                <version>4.1.57.Final</version>
+                <version>4.1.58.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>4.1.57.Final</version>
+                <version>4.1.58.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
-                <version>4.1.57.Final</version>
+                <version>4.1.58.Final</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -171,7 +171,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.106</version>
+            <version>0.9.107</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -229,7 +229,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.35.v20201120</version>
+            <version>9.4.36.v20210114</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -240,7 +240,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.35.v20201120</version>
+            <version>9.4.36.v20210114</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -270,7 +270,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>9.4.35.v20201120</version>
+            <version>9.4.36.v20210114</version>
             <scope>test</scope>
         </dependency>
 
