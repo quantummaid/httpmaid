@@ -29,10 +29,12 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInf
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.*;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.LambdaDeployer.lambdaDeployer;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.HttpApiInformation.httpApiInformation;
@@ -44,11 +46,20 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synt
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.HttpApiModule.unauthorizedHttpApiWithV2PayloadModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketApiModule.websocketApiModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketRegistryModule.websocketRegistryModule;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference.builder;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb.DynamoDbHandler.resetTable;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static java.util.Optional.ofNullable;
 
 @ExtendWith(RemoteSpecsExtension.class)
 public final class UnauthHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
+    private static CloudwatchLogGroupReference logGroupReference;
+
+    @Override
+    public Optional<String> additionInformationOnError() {
+        return ofNullable(logGroupReference)
+                .map(CloudwatchLogGroupReference::buildDescription);
+    }
 
     public static CloudformationModule infrastructureRequirements(final Namespace namespace,
                                                                   final String bucketName,
@@ -62,6 +73,11 @@ public final class UnauthHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
                     "REGION", sub(REGION)
             ));
+            final String functionName = functionModule.function().name();
+            logGroupReference = builder()
+                    .withConventionalLogGroupNameForLambda(functionName)
+                    .withRegionFromEnvironment()
+                    .build();
 
             final HttpApiModule httpApi = unauthorizedHttpApiWithV2PayloadModule(
                     namespace,

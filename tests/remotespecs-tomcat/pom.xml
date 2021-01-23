@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.116</version>
+        <version>0.9.117</version>
     </parent>
 
     <artifactId>remotespecs-tomcat</artifactId>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
             <artifactId>remotespecs</artifactId>
-            <version>0.9.116</version>
+            <version>0.9.117</version>
             <scope>test</scope>
         </dependency>
         <dependency>

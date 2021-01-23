@@ -24,17 +24,21 @@ package de.quantummaid.httpmaid.remotespecs;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.ClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.client.real.RealHttpMaidClientFactory;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployer;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 
+import static de.quantummaid.httpmaid.remotespecs.AdditionalInformationCarrier.additionalInformationCarrier;
 import static de.quantummaid.httpmaid.remotespecs.DummyDeployer.dummyDeployer;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment.testEnvironment;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
+@Slf4j
 public final class RemoteSpecsExtension implements ParameterResolver,
         BeforeEachCallback,
-        AfterAllCallback {
+        AfterAllCallback,
+        TestWatcher {
     private RemoteSpecsDeployer deployer;
 
     @Override
@@ -81,6 +85,19 @@ public final class RemoteSpecsExtension implements ParameterResolver,
                                final RemoteSpecsDeployment deployment) {
         final Store store = context.getRoot().getStore(GLOBAL);
         store.put(deployer.getClass().getName(), deployment);
+    }
+
+    @Override
+    public void testFailed(final ExtensionContext context, final Throwable cause) {
+        final RemoteSpecs testInstance = (RemoteSpecs) context.getRequiredTestInstance();
+        try {
+            testInstance.additionInformationOnError().ifPresent(info -> {
+                log.info("additional information for failure: {}", info);
+                cause.addSuppressed(additionalInformationCarrier(info));
+            });
+        } catch (final Throwable e) {
+            log.warn("could not determine additional information for failure", e);
+        }
     }
 
     @Override

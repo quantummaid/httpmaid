@@ -113,7 +113,6 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
 
         final CloudformationTemplate bucketTemplate = Templates.bucketTemplate(artifactBucketName);
         create(stackIdentifier + "-bucket", StringTemplate.stringTemplate(bucketTemplate));
-
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
         final File file = new File(lambdaPath);
