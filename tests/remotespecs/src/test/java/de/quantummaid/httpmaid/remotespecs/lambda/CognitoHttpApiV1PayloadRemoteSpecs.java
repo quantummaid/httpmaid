@@ -31,6 +31,7 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.*;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Cognito;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.junit.jupiter.api.Test;
@@ -51,14 +52,23 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synt
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.HttpApiModule.authorizedHttpApiWithV1PayloadModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketApiModule.websocketApiModule;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketRegistryModule.websocketRegistryModule;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference.builder;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb.DynamoDbHandler.resetTable;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment.httpDeployment;
+import static java.util.Optional.ofNullable;
 
 @ExtendWith(RemoteSpecsExtension.class)
 public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
     private static String accessToken;
     private static String maliciousAccessToken;
     private static String tokenFromDifferentCognitoClient;
+    private static CloudwatchLogGroupReference logGroupReference;
+
+    @Override
+    public Optional<String> additionInformationOnError() {
+        return ofNullable(logGroupReference)
+                .map(CloudwatchLogGroupReference::buildDescription);
+    }
 
     public static CloudformationModule infrastructureRequirements(final Namespace namespace,
                                                                   final String bucketName,
@@ -75,7 +85,6 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
                     .withResources(otherClient)
                     .withOutputs(cloudformationOutput(malicious2.id("PoolId"), cognitoModule.pool().reference()))
                     .withOutputs(cloudformationOutput(malicious2.id("PoolClientId"), otherClient.reference()));
-
             final WebsocketRegistryModule websocketRegistryModule = websocketRegistryModule(namespace);
             final FunctionModule functionModule = cognitoAuthorizedFunctionModule(namespace, bucketName, artifactKey, Map.of(
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
@@ -83,15 +92,17 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
                     "POOL_CLIENT_ID", cognitoModule.poolClient().reference(),
                     "REGION", sub(REGION)
             ));
-
+            final String functionName = functionModule.function().name();
+            logGroupReference = builder()
+                    .withConventionalLogGroupNameForLambda(functionName)
+                    .withRegionFromEnvironment()
+                    .build();
             final HttpApiModule httpApi = authorizedHttpApiWithV1PayloadModule(
                     namespace, functionModule.function(), cognitoModule.pool(), cognitoModule.poolClient());
             final WebsocketApiModule websocketApiModule = websocketApiModule(
                     namespace, functionModule.role(), functionModule.function(), true);
-
             final Namespace malicious = namespace.sub("malicious");
             final CognitoModule maliciousCognitoModule = cognitoModule(malicious);
-
             builder.withModule(cognitoModule);
             builder.withModule(maliciousCognitoModule);
             builder.withModule(websocketRegistryModule);

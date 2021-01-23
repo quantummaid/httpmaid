@@ -37,6 +37,10 @@ public interface RemoteSpecs {
         return Optional.empty();
     }
 
+    default Optional<String> additionInformationOnError() {
+        return Optional.empty();
+    }
+
     default Map<String, List<String>> mapWithAccessToken() {
         return accessToken()
                 .map(accessToken -> Map.of("access_token", List.of(accessToken)))

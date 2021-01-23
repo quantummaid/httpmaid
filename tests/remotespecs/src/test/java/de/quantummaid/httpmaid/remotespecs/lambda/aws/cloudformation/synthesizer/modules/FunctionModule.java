@@ -118,7 +118,6 @@ public final class FunctionModule implements CloudformationModule {
 
     @Override
     public void apply(final CloudformationTemplateBuilder builder) {
-
         builder.withResources(functionRole, function, functionResourcePermission);
     }
 }
