@@ -95,7 +95,7 @@ public final class RemoteSpecsExtension implements ParameterResolver,
                 log.info("additional information for failure: {}", info);
                 cause.addSuppressed(additionalInformationCarrier(info));
             });
-        } catch (final Throwable e) {
+        } catch (final Exception e) {
             log.warn("could not determine additional information for failure", e);
         }
     }
