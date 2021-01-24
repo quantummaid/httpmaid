@@ -125,6 +125,19 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     }
 
     @Override
+    public Then allWebsocketsAreDisconnected() {
+        testData.getWebsockets().all().forEach(websocket -> {
+            final WrappedWebsocket websocketWebsocket = websocket.getWebsocket();
+            try {
+                websocketWebsocket.close();
+            } catch (final IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
+        return Then.then(testData);
+    }
+
+    @Override
     public Then theRuntimeDataIsQueriedUntilTheNumberOfWebsocketsBecomes(final long expectedNumberOfWebsockets) {
         final int maxNumberOfTries = 60;
         final int sleepTimeInMilliseconds = 1000;

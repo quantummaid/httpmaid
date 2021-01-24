@@ -58,6 +58,7 @@ import static java.util.Optional.ofNullable;
 @ExtendWith(RemoteSpecsExtension.class)
 public final class DummyAuthRestApiRemoteSpecs implements RemoteSpecs {
     private static CloudwatchLogGroupReference logGroupReference;
+    private static String websocketRegistryDynamoDb;
 
     @Override
     public Optional<String> additionInformationOnError() {
@@ -98,7 +99,7 @@ public final class DummyAuthRestApiRemoteSpecs implements RemoteSpecs {
 
     public static Deployment loadDeployment(final Map<String, String> stackOutputs,
                                             final Namespace namespace) {
-        final String websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
+        websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
 
         final String region = stackOutputs.get("Region");
@@ -125,5 +126,17 @@ public final class DummyAuthRestApiRemoteSpecs implements RemoteSpecs {
                 .when().aWebsocketIsConnected()
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"returnLambdaContext\" }")
                 .allWebsocketsHaveReceivedTheMessage("bar");
+    }
+
+    @Test
+    public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(final TestEnvironment testEnvironment) {
+        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(
+                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
+    }
+
+    @Test
+    public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByServer(final TestEnvironment testEnvironment) {
+        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByServer(
+                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
     }
 }

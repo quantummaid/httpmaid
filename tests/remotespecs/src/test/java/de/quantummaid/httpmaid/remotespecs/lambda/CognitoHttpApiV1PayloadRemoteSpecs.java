@@ -63,6 +63,7 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
     private static String maliciousAccessToken;
     private static String tokenFromDifferentCognitoClient;
     private static CloudwatchLogGroupReference logGroupReference;
+    private static String websocketRegistryDynamoDb;
 
     @Override
     public Optional<String> additionInformationOnError() {
@@ -118,7 +119,7 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
         maliciousAccessToken = loadToken(stackOutputs, namespace.sub("malicious"));
         tokenFromDifferentCognitoClient = loadToken(stackOutputs, namespace.sub("malicious2"));
 
-        final String websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
+        websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
 
         final String region = stackOutputs.get("Region");
@@ -177,5 +178,17 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
                 .withTheHeader("Authorization", String.format("Bearer %s", tokenFromDifferentCognitoClient)).isIssued()
                 .theStatusCodeWas(401)
                 .theResponseBodyWas("{\"message\":\"Unauthorized\"}");
+    }
+
+    @Test
+    public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(final TestEnvironment testEnvironment) {
+        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(
+                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
+    }
+
+    @Test
+    public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByServer(final TestEnvironment testEnvironment) {
+        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByServer(
+                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
     }
 }
