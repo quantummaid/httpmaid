@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
 import static de.quantummaid.httpmaid.RuntimeInformation.runtimeInformation;
@@ -101,6 +102,15 @@ public final class HttpMaid implements AutoCloseable {
     public void setWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
         validateNotNull(websocketRegistry, "websocketRegistry");
         chainRegistry.addMetaDatum(WEBSOCKET_REGISTRY, websocketRegistry);
+    }
+
+    public <T> Optional<T> getOptionalMetaDatum(final MetaDataKey<T> key) {
+        validateNotNull(key, "key");
+        return chainRegistry.getOptionalMetaDatum(key);
+    }
+
+    public <T> void setMetaDatum(final MetaDataKey<T> key, final T value) {
+        chainRegistry.addMetaDatum(key, value);
     }
 
     public <T> T getMetaDatum(final MetaDataKey<T> key) {
