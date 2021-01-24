@@ -38,6 +38,16 @@ public final class DynamoDbHandler {
     private DynamoDbHandler() {
     }
 
+    public static int countEntries(final String tableName) {
+        try (DynamoDbClient dynamoDbClient = DynamoDbClient.create()) {
+            final ScanRequest scanRequest = ScanRequest.builder()
+                    .tableName(tableName)
+                    .build();
+            final ScanResponse scan = dynamoDbClient.scan(scanRequest);
+            return scan.items().size();
+        }
+    }
+
     public static void resetTable(final String tableName) {
         log.info("Resetting table {}...", tableName);
         try (DynamoDbClient dynamoDbClient = DynamoDbClient.create()) {

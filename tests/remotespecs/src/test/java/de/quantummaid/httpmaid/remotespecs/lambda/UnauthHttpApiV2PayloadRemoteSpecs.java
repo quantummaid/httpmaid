@@ -30,7 +30,9 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.*;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference;
+import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Map;
@@ -54,6 +56,7 @@ import static java.util.Optional.ofNullable;
 @ExtendWith(RemoteSpecsExtension.class)
 public final class UnauthHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
     private static CloudwatchLogGroupReference logGroupReference;
+    private static String websocketRegistryDynamoDb;
 
     @Override
     public Optional<String> additionInformationOnError() {
@@ -100,7 +103,7 @@ public final class UnauthHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
 
     public static Deployment loadDeployment(final Map<String, String> stackOutputs,
                                             final Namespace namespace) {
-        final String websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
+        websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
 
         final String region = stackOutputs.get("Region");
@@ -119,5 +122,17 @@ public final class UnauthHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
     @Override
     public RemoteSpecsDeployer provideDeployer() {
         return lambdaDeployer();
+    }
+
+    @Test
+    public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(final TestEnvironment testEnvironment) {
+        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(
+                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
+    }
+
+    @Test
+    public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByServer(final TestEnvironment testEnvironment) {
+        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByServer(
+                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
     }
 }

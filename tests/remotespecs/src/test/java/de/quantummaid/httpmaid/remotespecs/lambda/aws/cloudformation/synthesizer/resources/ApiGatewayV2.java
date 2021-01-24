@@ -112,7 +112,6 @@ public final class ApiGatewayV2 {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", map);
     }
 
-
     public static CloudformationResource deployment(final String resourceId,
                                                     final CloudformationResource api,
                                                     final CloudformationResource apiIntegration,
