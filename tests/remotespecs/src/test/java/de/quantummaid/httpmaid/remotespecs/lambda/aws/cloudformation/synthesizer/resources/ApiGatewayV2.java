@@ -82,10 +82,24 @@ public final class ApiGatewayV2 {
                                                                    final CloudformationResource api,
                                                                    final CloudformationResource integration,
                                                                    final CloudformationResource authorizer) {
+        return websocketsApiRoute(resourceId, api, "$connect", integration, authorizer);
+    }
+
+    public static CloudformationResource websocketsApiDisconnectRoute(final String resourceId,
+                                                                      final CloudformationResource api,
+                                                                      final CloudformationResource integration) {
+        return websocketsApiRoute(resourceId, api, "$disconnect", integration, null);
+    }
+
+    private static CloudformationResource websocketsApiRoute(final String resourceId,
+                                                             final CloudformationResource api,
+                                                             final String routeKey,
+                                                             final CloudformationResource integration,
+                                                             final CloudformationResource authorizer) {
         final Object target = join("/", "integrations", integration.reference());
         final Map<String, Object> map = new LinkedHashMap<>(Map.of(
                 "ApiId", api.reference(),
-                "RouteKey", "$connect",
+                "RouteKey", routeKey,
                 "RouteResponseSelectionExpression", "$default",
                 "Target", target
         ));
@@ -97,6 +111,7 @@ public final class ApiGatewayV2 {
         }
         return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", map);
     }
+
 
     public static CloudformationResource deployment(final String resourceId,
                                                     final CloudformationResource api,

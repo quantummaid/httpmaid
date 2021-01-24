@@ -63,6 +63,8 @@ public final class WebsocketApiModule implements CloudformationModule {
         final CloudformationResource websocketsApiConnectRoute = websocketsApiConnectRoute(
                 namespace.id("WebsocketsApiConnectRoute"), websocketsApi, websocketsApiConnectIntegration,
                 websocketAuthorizer);
+        final CloudformationResource websocketsApiDisconnectRoute = websocketsApiDisconnectRoute(
+                namespace.id("WebsocketsApiDisconnectRoute"), websocketsApi, websocketsApiConnectIntegration);
         final CloudformationResource websocketsApiDefaultIntegration = websocketsApiIntegration(
                 namespace.id("WebsocketsApiDefaultIntegration"), websocketsApi, function);
         final CloudformationResource websocketsApiDefaultRoute = websocketsApiDefaultRoute(
@@ -79,9 +81,9 @@ public final class WebsocketApiModule implements CloudformationModule {
                     namespace.id("WsAuthFnPerm"), function, websocketsApi, websocketsApiStage);
             builder.withResources(websocketsAuthorizerPermission);
         }
-        builder.withResources(websocketsApi, websocketsApiConnectIntegration, websocketsApiConnectRoute,
-                websocketsApiDefaultIntegration, websocketsApiDefaultRoute, websocketsApiRouteResponse,
-                websocketsApiDeployment, websocketsApiStage);
+        builder.withResources(websocketsApi, websocketsApiConnectIntegration, websocketsApiDisconnectRoute,
+                websocketsApiConnectRoute, websocketsApiDefaultIntegration, websocketsApiDefaultRoute,
+                websocketsApiRouteResponse, websocketsApiDeployment, websocketsApiStage);
         builder.withOutputs(cloudformationOutput(namespace.id("WebsocketApiId"), websocketsApi.reference()));
     }
 }
