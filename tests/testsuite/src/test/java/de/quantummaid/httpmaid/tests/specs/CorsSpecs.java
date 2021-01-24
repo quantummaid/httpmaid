@@ -78,7 +78,7 @@ public final class CorsSpecs {
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
-    public void testCorsPreflightRequest(final TestEnvironment testEnvironment) {
+    public void corsPreflightRequestWorks(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .configured(toActivateCORSWithoutValidatingTheOrigin()
@@ -94,5 +94,60 @@ public final class CorsSpecs {
                 .theReponseContainsTheHeader("Access-Control-Allow-Headers", "x-custom-header")
                 .theReponseContainsTheHeader("Access-Control-Allow-Methods", "PUT")
                 .theResponseBodyWas("");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void corsCanAllowAllHeaders(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .configured(toActivateCORSWithoutValidatingTheOrigin()
+                                .withAllowedMethods(GET, POST, PUT, DELETE)
+                                .allowingAllHeaders()
+                        )
+                        .build()
+        )
+                .when().aRequestToThePath("/the/path/does/not/matter/for/options/requests")
+                .viaTheOptionsMethod().withAnEmptyBody().withTheHeader("Origin", "foo.bar")
+                .withTheHeader("Access-Control-Request-Headers", "X-Custom-Header")
+                .withTheHeader("Access-Control-Request-Method", "PUT").isIssued()
+                .theStatusCodeWas(200)
+                .theReponseContainsTheHeader("Access-Control-Allow-Headers", "x-custom-header")
+                .theReponseContainsTheHeader("Access-Control-Allow-Methods", "PUT")
+                .theResponseBodyWas("");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void corsCanExposeAllHeaders(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/test", (request, response) -> response.setBody("foo"))
+                        .configured(toActivateCORSWithoutValidatingTheOrigin()
+                                .exposingAllResponseHeaders()
+                        )
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().withTheHeader("Origin", "localhost").isIssued()
+                .theStatusCodeWas(200)
+                .theReponseContainsTheHeader("Access-Control-Allow-Origin", "localhost")
+                .theReponseContainsTheHeaderRawValue("Access-Control-Expose-Headers", "*");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void corsCanProhibitCredentials(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/test", (request, response) -> response.setBody("foo"))
+                        .configured(toActivateCORSWithoutValidatingTheOrigin()
+                                .notAllowingCredentials()
+                        )
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().withTheHeader("Origin", "localhost").isIssued()
+                .theStatusCodeWas(200)
+                .theReponseContainsTheHeader("Access-Control-Allow-Origin", "localhost")
+                .theResponseDoesNotContainTheHeader("Access-Control-Allow-Credentials");
     }
 }

@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.JsonNormalizer.normalizeJsonToMap;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @ToString
@@ -70,6 +70,15 @@ public final class Then {
 
     public Then theResponseContentTypeWas(final String expectedContentType) {
         return theReponseContainsTheHeader("Content-Type", expectedContentType);
+    }
+
+    public Then theResponseDoesNotContainTheHeader(final String name) {
+        final Map<String, List<String>> headers = testData.getResponse().getHeaders();
+        final Map<String, List<String>> normalizedHeaders = normalizeHeaderNames(headers);
+        final Set<String> normalizedNames = normalizedHeaders.keySet();
+        final String normalizedName = name.toLowerCase();
+        assertThat(normalizedNames, not(hasItem(normalizedName)));
+        return this;
     }
 
     public Then theReponseContainsTheHeader(final String key, final String... values) {
