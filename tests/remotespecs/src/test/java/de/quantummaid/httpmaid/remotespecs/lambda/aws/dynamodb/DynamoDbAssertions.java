@@ -28,6 +28,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class DynamoDbAssertions {
+    private static final int MAX_NUMBER_OF_TRIES = 120;
+    private static final int SLEEP_TIME_IN_MILLISECONDS = 1000;
 
     private DynamoDbAssertions() {
     }
@@ -37,7 +39,7 @@ public final class DynamoDbAssertions {
     }
 
     public static void assertTableHasNumberOfEntries(final int numberOfEntries, final String tableName) {
-        Poller.pollWithTimeout(() -> {
+        Poller.pollWithTimeout(MAX_NUMBER_OF_TRIES, SLEEP_TIME_IN_MILLISECONDS, () -> {
             final int entries = countEntries(tableName);
             return entries == numberOfEntries;
         });
