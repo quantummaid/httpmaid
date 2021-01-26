@@ -61,8 +61,8 @@ public final class CorsSpecs {
                         .get("/test", (request, response) -> {
                             throw new IllegalArgumentException();
                         })
-                        .configured(toMapExceptionsOfType(IllegalArgumentException.class, (exception, response) -> response.setStatus(501)))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setStatus(500)))
+                        .configured(toMapExceptionsOfType(IllegalArgumentException.class, (exception, request, response) -> response.setStatus(501)))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setStatus(500)))
                         .configured(toActivateCORSWithoutValidatingTheOrigin()
                                 .exposingTheResponseHeaders("Some-Header", "Another-Header", "Yet-Another-Header")
                                 .withTimeOutAfter(10, TimeUnit.DAYS)

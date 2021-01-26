@@ -222,7 +222,7 @@ public final class MarshallingSpecs {
                         .configured(toThrowAnExceptionIfNoMarshallerWasFound())
                         .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
-                        .configured(toMapExceptionsOfType(UnsupportedContentTypeException.class, (exception, response) -> {
+                        .configured(toMapExceptionsOfType(UnsupportedContentTypeException.class, (exception, request, response) -> {
                             response.setStatus(501);
                             response.setBody(exception.getMessage());
                         }))
@@ -242,7 +242,7 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .configured(toThrowAnExceptionIfNoMarshallerWasFound())
-                        .configured(toMapExceptionsOfType(MarshallingException.class, (exception, response) -> response.setStatus(501)))
+                        .configured(toMapExceptionsOfType(MarshallingException.class, (exception, request, response) -> response.setStatus(501)))
                         .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()

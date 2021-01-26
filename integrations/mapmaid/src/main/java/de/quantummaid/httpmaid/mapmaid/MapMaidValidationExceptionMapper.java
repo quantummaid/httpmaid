@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.mapmaid;
 
 import de.quantummaid.httpmaid.exceptions.HttpExceptionMapper;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.handler.http.HttpResponse;
 import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
 import lombok.AccessLevel;
@@ -48,6 +49,7 @@ public final class MapMaidValidationExceptionMapper implements HttpExceptionMapp
 
     @Override
     public void map(final Throwable exception,
+                    final HttpRequest request,
                     final HttpResponse response) {
         if (!(exception instanceof AggregatedValidationException)) {
             throw new UnsupportedOperationException(

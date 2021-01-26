@@ -73,7 +73,7 @@ public final class StaticFilesSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/file", (request, response) -> response.setFileAsBody(BASE_PATH + "/not_a_file"))
-                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                         .build()
         )
                 .when().aRequestToThePath("/file").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -87,7 +87,7 @@ public final class StaticFilesSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/file", (request, response) -> response.setFileAsBody(BASE_PATH + "/directory"))
-                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                         .build()
         )
                 .when().aRequestToThePath("/file").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -114,7 +114,7 @@ public final class StaticFilesSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/resource", (request, response) -> response.setJavaResourceAsBody("staticfiles/directory/not_a_file"))
-                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                         .build()
         )
                 .when().aRequestToThePath("/resource").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -128,7 +128,7 @@ public final class StaticFilesSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/resource", (request, response) -> response.setJavaResourceAsBody("staticfiles/directory"))
-                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                         .build()
         )
                 .when().aRequestToThePath("/resource").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -142,7 +142,7 @@ public final class StaticFilesSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/resource", (request, response) -> response.setJavaResourceAsBody("de/quantummaid/messageMaid/channel"))
-                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                        .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                         .build()
         )
                 .when().aRequestToThePath("/resource").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -187,7 +187,7 @@ public final class StaticFilesSpecs {
             testEnvironment.given(
                     anHttpMaid()
                             .get("*", (request, response) -> response.mapPathToFileInDirectory(BASE_PATH))
-                            .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                            .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                             .build()
             )
                     .when().aRequestToThePath(file).viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -233,7 +233,7 @@ public final class StaticFilesSpecs {
             testEnvironment.given(
                     anHttpMaid()
                             .get("*", (request, response) -> response.mapPathToJavaResourceInDirectory("staticfiles/directory"))
-                            .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, response) -> response.setStatus(404)))
+                            .configured(toMapExceptionsOfType(FileDoesNotExistException.class, (exception, request, response) -> response.setStatus(404)))
                             .build()
             )
                     .when().aRequestToThePath(file).viaTheGetMethod().withAnEmptyBody().isIssued()

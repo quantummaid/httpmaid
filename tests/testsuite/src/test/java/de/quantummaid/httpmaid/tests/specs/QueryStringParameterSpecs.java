@@ -102,7 +102,7 @@ public class QueryStringParameterSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", (request, response) -> request.queryParameters().parameter("not_existing"))
-                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, response) -> {
+                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, request, response) -> {
                             response.setBody(exception.getMessage());
                             response.setStatus(501);
                         }))
@@ -119,7 +119,7 @@ public class QueryStringParameterSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", (request, response) -> request.queryParameters().optionalParameter("multiple_values"))
-                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, response) -> {
+                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, request, response) -> {
                             response.setBody(exception.getMessage());
                             response.setStatus(501);
                         }))

@@ -104,10 +104,11 @@ public final class HeaderSpecs {
         testEnvironment.given(() ->
                 anHttpMaid()
                         .get("/", (request, response) -> request.headers().header("not_existing"))
-                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, response) -> {
-                            response.setBody(exception.getMessage());
-                            response.setStatus(501);
-                        }))
+                        .configured(toMapExceptionsOfType(HttpRequestException.class,
+                                (exception, request, response) -> {
+                                    response.setBody(exception.getMessage());
+                                    response.setStatus(501);
+                                }))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -121,10 +122,11 @@ public final class HeaderSpecs {
         testEnvironment.given(() ->
                 anHttpMaid()
                         .get("/", (request, response) -> request.headers().optionalHeader("multiple_values"))
-                        .configured(toMapExceptionsOfType(HttpRequestException.class, (exception, response) -> {
-                            response.setBody(exception.getMessage());
-                            response.setStatus(501);
-                        }))
+                        .configured(toMapExceptionsOfType(HttpRequestException.class,
+                                (exception, request, response) -> {
+                                    response.setBody(exception.getMessage());
+                                    response.setStatus(501);
+                                }))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody()

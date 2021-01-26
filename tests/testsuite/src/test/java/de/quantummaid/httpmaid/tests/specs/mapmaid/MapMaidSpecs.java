@@ -188,7 +188,7 @@ public final class MapMaidSpecs {
                                 mappingHeader("value3", "dataTransferObject.value3"),
                                 mappingHeader("value4", "dataTransferObject.value4")
                         )
-                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, response) -> {
+                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, request, response) -> {
                             exception.getCause().printStackTrace();
                         }))
                         .build()

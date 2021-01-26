@@ -174,7 +174,7 @@ public final class SpecialUseCaseSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .post("/", genericType(UseCaseWithClassScopeTypeVariableAsDirectParameter.class, String.class))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
@@ -201,7 +201,7 @@ public final class SpecialUseCaseSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .post("/", genericType(UseCaseWithClassScopeTypeVariableAsIndirectParameter.class, String.class))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\", \"b\", \"c\"]").withContentType("application/json").isIssued()
@@ -309,7 +309,7 @@ public final class SpecialUseCaseSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .post("/", UseCaseWithGenericsInParameter.class)
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\",\"b\",\"c\"]").withContentType("application/json").isIssued()

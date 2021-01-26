@@ -22,15 +22,17 @@
 package de.quantummaid.httpmaid.exceptions;
 
 import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.handler.http.HttpResponse;
 
 public interface HttpExceptionMapper<T extends Throwable> extends ExceptionMapper<T> {
 
     @Override
     default void map(final T exception, final MetaData metaData) {
+        final HttpRequest request = HttpRequest.httpRequest(metaData);
         final HttpResponse response = HttpResponse.httpResponse(metaData);
-        map(exception, response);
+        map(exception, request, response);
     }
 
-    void map(T exception, HttpResponse response);
+    void map(T exception, HttpRequest request, HttpResponse response);
 }

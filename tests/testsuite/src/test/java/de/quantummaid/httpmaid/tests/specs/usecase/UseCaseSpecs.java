@@ -133,11 +133,11 @@ public final class UseCaseSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", ThrowCheckedExceptionUseCase.class)
-                        .configured(toMapExceptionsOfType(SomeCheckedException.class, (exception, response) -> {
+                        .configured(toMapExceptionsOfType(SomeCheckedException.class, (exception, request, response) -> {
                             response.setBody("The correct exception has been thrown");
                             response.setStatus(505);
                         }))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> {
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> {
                             response.setBody("The incorrect exception has been thrown");
                             response.setStatus(501);
                         }))
