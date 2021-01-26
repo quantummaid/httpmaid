@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.121](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.121/jar) - 2021-01-26
+### Changed
+- ExceptionMappers with access to HttpRequest.
+
 ## [0.9.120](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.120/jar) - 2021-01-24
 ### Changed
 - Update dependencies.

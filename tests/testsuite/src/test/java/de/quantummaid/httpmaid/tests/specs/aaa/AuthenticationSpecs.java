@@ -211,7 +211,7 @@ public final class AuthenticationSpecs {
                 anHttpMaid()
                         .get("/", AuthenticatedWithGenericsUseCase.class, mappingAuthenticationInformation())
                         .configured(toAuthenticateUsingHeader("user", challenge -> Optional.of(GenericUser.user(challenge))))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("user", "foo").isIssued()

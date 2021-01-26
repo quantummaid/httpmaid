@@ -87,7 +87,7 @@ public final class PathSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/*/a/*/b/*/c", (request, response) -> response.setBody("handler has been called"))
-                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody("no handler")))
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, request, response) -> response.setBody("no handler")))
                         .build()
         )
                 .when().aRequestToThePath("/x/x/x/a/y/y/y/z/z/z/c").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -127,7 +127,7 @@ public final class PathSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/wild/<x>/card", (request, response) -> response.setBody("foo"))
-                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> {
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, request, response) -> {
                             response.setStatus(METHOD_NOT_ALLOWED);
                             response.setBody("No use case found.");
                         }))

@@ -66,7 +66,7 @@ public final class PageNotFoundSpecs {
     public void pageNotFoundExceptionContainsContext(final TestEnvironment testEnvironment) {
         testEnvironment.given(() ->
                 anHttpMaid()
-                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaThePostMethod().withAnEmptyBody().isIssued()

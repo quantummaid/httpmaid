@@ -60,11 +60,12 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", FailInInitializerUseCase.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class, (exception, response) -> {
-                            response.setBody("The correct exception has been thrown");
-                            response.setStatus(505);
-                        }))
-                        .configured(toMapExceptionsByDefaultUsing((exception, response) -> {
+                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
+                                (exception, request, response) -> {
+                                    response.setBody("The correct exception has been thrown");
+                                    response.setStatus(505);
+                                }))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> {
                             response.setBody("The incorrect exception has been thrown");
                             response.setStatus(501);
                         }))
@@ -99,7 +100,7 @@ public final class InstantiationSpecs {
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, response) -> response.setBody(exception.getMessage())))
+                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .disableStartupChecks()
                         .disableAutodectectionOfModules()
                         .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
@@ -117,7 +118,7 @@ public final class InstantiationSpecs {
                 () -> anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, response) -> response.setBody(exception.getMessage())))
+                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .disableAutodectectionOfModules()
                         .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()
@@ -134,7 +135,7 @@ public final class InstantiationSpecs {
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, response) -> response.setBody(exception.getMessage())))
+                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .disableStartupChecks()
                         .disableAutodectectionOfModules()
                         .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
@@ -152,7 +153,7 @@ public final class InstantiationSpecs {
                 () -> anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
                         .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, response) -> response.setBody(exception.getMessage())))
+                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .disableAutodectectionOfModules()
                         .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .build()

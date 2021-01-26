@@ -38,7 +38,7 @@ public final class ExceptionSpecs {
     public void testUseCaseNotFoundExceptionHandler(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
-                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, response) -> {
+                        .configured(toMapExceptionsOfType(PageNotFoundException.class, (exception, request, response) -> {
                             response.setStatus(METHOD_NOT_ALLOWED);
                             response.setBody("No use case found.");
                         }))
@@ -72,7 +72,8 @@ public final class ExceptionSpecs {
                         .get("/exception", (request, response) -> {
                             throw new UnsupportedOperationException();
                         })
-                        .configured(toMapExceptionsOfType(UnsupportedOperationException.class, (exception, response) -> response.setBody("this exception is mapped")))
+                        .configured(toMapExceptionsOfType(UnsupportedOperationException.class,
+                                (exception, request, response) -> response.setBody("this exception is mapped")))
                         .build()
         )
                 .when().aRequestToThePath("/exception").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -88,7 +89,8 @@ public final class ExceptionSpecs {
                         .get("/test", (request, response) -> {
                             throw (RuntimeException) new Exception();
                         })
-                        .configured(toMapExceptionsOfType(Exception.class, (exception, response) -> response.setStatus(501)))
+                        .configured(toMapExceptionsOfType(Exception.class,
+                                (exception, request, response) -> response.setStatus(501)))
                         .build()
         )
                 .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -103,10 +105,32 @@ public final class ExceptionSpecs {
                         .get("/test", (request, response) -> {
                             throw new UnsupportedOperationException();
                         })
-                        .configured(toMapExceptionsOfType(Exception.class, (exception, response) -> response.setStatus(501)))
+                        .configured(toMapExceptionsOfType(Exception.class,
+                                (exception, request, response) -> response.setStatus(501)))
                         .build()
         )
                 .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().isIssued()
                 .theStatusCodeWas(501);
+    }
+
+    @ParameterizedTest
+    @MethodSource(ALL_ENVIRONMENTS)
+    public void exceptionMappersCanAccessRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/test", (request, response) -> {
+                            throw new UnsupportedOperationException();
+                        })
+                        .configured(toMapExceptionsOfType(Exception.class,
+                                (exception, request, response) -> {
+                                    final String message = request.headers().header("message");
+                                    response.setBody(message);
+                                    response.setStatus(501);
+                                }))
+                        .build()
+        )
+                .when().aRequestToThePath("/test").viaTheGetMethod().withAnEmptyBody().withTheHeader("message", "foo").isIssued()
+                .theStatusCodeWas(501)
+                .theResponseBodyWas("foo");
     }
 }

@@ -33,6 +33,7 @@ import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.events.EventConfigurators.*;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingPathParameter;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingQueryParameter;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
@@ -69,7 +70,8 @@ public class EnrichingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/<parameter>", SingleStringParameterUseCase.class, ignorePathParameter("parameter"))
-                        .configured(ExceptionConfigurators.toMapExceptionsOfType(MapMaidException.class, (exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(ExceptionConfigurators.toMapExceptionsOfType(MapMaidException.class,
+                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/foo").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -199,7 +201,7 @@ public class EnrichingSpecs {
                         .get("/", SingleStringParameterUseCase.class, mappingAuthenticationInformation("parameter"))
                         .configured(toAuthenticateUsingQueryParameter("user", Optional::ofNullable)
                                 .notFailingOnMissingAuthentication())
-                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -227,7 +229,7 @@ public class EnrichingSpecs {
                         .get("/", SingleStringParameterUseCase.class, mappingOptionalAuthenticationInformation("parameter"))
                         .configured(toAuthenticateUsingQueryParameter("user", Optional::ofNullable)
                                 .notFailingOnMissingAuthentication())
-                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, response) -> response.setBody(exception.getMessage())))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
