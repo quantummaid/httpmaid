@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.122</version>
+        <version>0.9.123</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -171,7 +171,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.9.109</version>
+            <version>0.9.110</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -319,7 +319,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.16</version>
+                            <version>1.18.18</version>
                         </path>
                         <path>
                             <groupId>com.google.dagger</groupId>
