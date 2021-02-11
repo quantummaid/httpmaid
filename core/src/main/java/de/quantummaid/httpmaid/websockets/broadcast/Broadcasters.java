@@ -30,7 +30,7 @@ import de.quantummaid.httpmaid.websockets.disconnect.Disconnector;
 import de.quantummaid.httpmaid.websockets.disconnect.DisconnectorFactory;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.GenericType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +49,7 @@ import static de.quantummaid.httpmaid.websockets.broadcast.RegisteredBroadcaster
 import static de.quantummaid.httpmaid.websockets.broadcast.SerializingSender.serializingSender;
 import static de.quantummaid.httpmaid.websockets.disconnect.Disconnector.disconnector;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
+import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 import static java.util.stream.Collectors.toList;
 
 @ToString
@@ -58,40 +59,69 @@ import static java.util.stream.Collectors.toList;
 public final class Broadcasters {
     public static final MetaDataKey<Broadcasters> BROADCASTERS = metaDataKey("BROADCASTERS");
 
-    private final List<RegisteredBroadcasterFactory> broadcasterFactories = new ArrayList<>();
-    private final Map<Class<?>, DisconnectorFactory<?>> disconnectorFactories = new LinkedHashMap<>();
+    private final Map<GenericType<?>, RegisteredBroadcasterFactory> broadcasterFactories = new LinkedHashMap<>();
+    private final Map<GenericType<?>, DisconnectorFactory<?>> disconnectorFactories = new LinkedHashMap<>();
 
     public static Broadcasters broadcasters() {
         return new Broadcasters();
     }
 
-    public <T, U> void addBroadcaster(final Class<T> type,
-                                      final Class<U> messageType,
+    public <T, U> void addBroadcaster(final GenericType<T> type,
+                                      final GenericType<U> messageType,
                                       final BroadcasterFactory<T, U> factory) {
         final RegisteredBroadcasterFactory registeredFactory = registeredBroadcasterFactory(factory, type, messageType);
-        broadcasterFactories.add(registeredFactory);
+        broadcasterFactories.put(type, registeredFactory);
     }
 
-    public <T> void addDisconnector(final Class<T> type,
+    public <T> void addDisconnector(final GenericType<T> type,
                                     final DisconnectorFactory<T> factory) {
         disconnectorFactories.put(type, factory);
     }
 
-    public List<Class<?>> injectionTypes() {
-        final List<Class<?>> injectionTypes = new ArrayList<>();
-        broadcasterFactories.stream()
-                .map(RegisteredBroadcasterFactory::senderType)
-                .map(ResolvedType::assignableType)
-                .forEach(injectionTypes::add);
+    public List<GenericType<?>> injectionTypes() {
+        final List<GenericType<?>> injectionTypes = new ArrayList<>();
+        injectionTypes.addAll(broadcasterFactories.keySet());
         injectionTypes.addAll(disconnectorFactories.keySet());
         return injectionTypes;
     }
 
-    public List<Class<?>> messageTypes() {
-        return broadcasterFactories.stream()
+    public List<GenericType<?>> messageTypes() {
+        return broadcasterFactories.values().stream()
                 .map(RegisteredBroadcasterFactory::messageType)
-                .map(ResolvedType::assignableType)
                 .collect(toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T instantiateBroadcaster(final GenericType<T> type,
+                                        final WebsocketRegistry websocketRegistry,
+                                        final WebsocketSenders websocketSenders,
+                                        final Serializer serializer,
+                                        final Marshaller marshaller,
+                                        final MetaData metaData) {
+        final RegisteredBroadcasterFactory broadcasterFactory = broadcasterFactories.get(type);
+        validateNotNull(broadcasterFactory, "broadcasterFactory");
+        final GenericType<?> messageType = broadcasterFactory.messageType();
+        final SerializingSender<Object> serializingSender = serializingSender(
+                websocketRegistry,
+                websocketSenders,
+                messageType.toResolvedType(),
+                marshaller,
+                serializer,
+                metaData
+        );
+        final BroadcasterFactory<?, Object> factory = broadcasterFactory.factory();
+        return (T) factory.createBroadcaster(serializingSender);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T instantiateDisconnector(final GenericType<T> type,
+                                         final WebsocketRegistry websocketRegistry,
+                                         final WebsocketSenders websocketSenders,
+                                         final MetaData metaData) {
+        final DisconnectorFactory<?> disconnectorFactory = disconnectorFactories.get(type);
+        validateNotNull(disconnectorFactory, "disconnectorFactory");
+        final Disconnector disconnector = disconnector(websocketRegistry, websocketSenders, metaData);
+        return (T) disconnectorFactory.createDisconnector(disconnector);
     }
 
     public List<Object> instantiateAll(final MetaData metaData) {
@@ -99,22 +129,10 @@ public final class Broadcasters {
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
         final Serializer serializer = metaData.get(SERIALIZER);
         final List<Object> instances = new ArrayList<>();
-        broadcasterFactories.stream()
-                .map(broadcasterFactory -> {
-                    final Marshallers marshallers = metaData.get(MARSHALLERS);
-                    final Marshaller marshaller = marshallers.determineResponseMarshaller(metaData);
-                    final ResolvedType messageType = broadcasterFactory.messageType();
-                    final SerializingSender<Object> serializingSender = serializingSender(
-                            websocketRegistry,
-                            websocketSenders,
-                            messageType,
-                            marshaller,
-                            serializer,
-                            metaData
-                    );
-                    final BroadcasterFactory<?, Object> factory = broadcasterFactory.factory();
-                    return factory.createBroadcaster(serializingSender);
-                })
+        final Marshallers marshallers = metaData.get(MARSHALLERS);
+        final Marshaller marshaller = marshallers.determineResponseMarshaller(metaData);
+        broadcasterFactories.keySet().stream()
+                .map(type -> instantiateBroadcaster(type, websocketRegistry, websocketSenders, serializer, marshaller, metaData))
                 .forEach(instances::add);
         final Disconnector disconnector = disconnector(websocketRegistry, websocketSenders, metaData);
         disconnectorFactories.values().stream()

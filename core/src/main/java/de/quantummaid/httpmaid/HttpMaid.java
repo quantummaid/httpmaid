@@ -30,7 +30,10 @@ import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.marshalling.Marshaller;
 import de.quantummaid.httpmaid.marshalling.Marshallers;
 import de.quantummaid.httpmaid.serialization.Serializer;
+import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
+import de.quantummaid.httpmaid.websockets.broadcast.NonSerializingSender;
 import de.quantummaid.httpmaid.websockets.broadcast.SerializingSender;
+import de.quantummaid.httpmaid.websockets.disconnect.Disconnector;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
@@ -55,7 +58,10 @@ import static de.quantummaid.httpmaid.marshalling.Marshallers.MARSHALLERS;
 import static de.quantummaid.httpmaid.serialization.Serializer.SERIALIZER;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
+import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
+import static de.quantummaid.httpmaid.websockets.broadcast.NonSerializingSender.nonSerializingSender;
 import static de.quantummaid.httpmaid.websockets.broadcast.SerializingSender.serializingSender;
+import static de.quantummaid.httpmaid.websockets.disconnect.Disconnector.disconnector;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 import static de.quantummaid.reflectmaid.GenericType.genericType;
 
@@ -139,6 +145,12 @@ public final class HttpMaid implements AutoCloseable {
         return runtimeInformation(numberOfConnectedWebsockets);
     }
 
+    public NonSerializingSender websocketSender() {
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
+        return nonSerializingSender(websocketRegistry, websocketSenders, emptyMetaData());
+    }
+
     public <T> SerializingSender<T> websocketSender(final Class<T> messageType) {
         return websocketSender(messageType, json());
     }
@@ -162,6 +174,57 @@ public final class HttpMaid implements AutoCloseable {
                 messageType.toResolvedType(),
                 marshaller,
                 serializer,
+                emptyMetaData()
+        );
+    }
+
+    public <T> T websocketBroadcaster(final Class<T> broadcasterType) {
+        return websocketBroadcaster(broadcasterType, json());
+    }
+
+    public <T> T websocketBroadcaster(final Class<T> broadcasterType,
+                                      final ContentType contentType) {
+        final GenericType<T> genericType = genericType(broadcasterType);
+        return websocketBroadcaster(genericType, contentType);
+    }
+
+    public <T> T websocketBroadcaster(final GenericType<T> broadcasterType,
+                                      final ContentType contentType) {
+        final Marshallers marshallers = getMetaDatum(MARSHALLERS);
+        final Marshaller marshaller = marshallers.marshallerFor(contentType);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
+        final Serializer serializer = getMetaDatum(SERIALIZER);
+        final Broadcasters broadcasters = getMetaDatum(BROADCASTERS);
+        return broadcasters.instantiateBroadcaster(
+                broadcasterType,
+                websocketRegistry,
+                websocketSenders,
+                serializer,
+                marshaller,
+                emptyMetaData()
+        );
+    }
+
+    public Disconnector websocketDisconnector() {
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
+        return disconnector(websocketRegistry, websocketSenders, emptyMetaData());
+    }
+
+    public <T> T websocketDisconnector(final Class<T> disconnectorType) {
+        final GenericType<T> genericType = genericType(disconnectorType);
+        return websocketDisconnector(genericType);
+    }
+
+    public <T> T websocketDisconnector(final GenericType<T> disconnectorType) {
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
+        final Broadcasters broadcasters = getMetaDatum(BROADCASTERS);
+        return broadcasters.instantiateDisconnector(
+                disconnectorType,
+                websocketRegistry,
+                websocketSenders,
                 emptyMetaData()
         );
     }
