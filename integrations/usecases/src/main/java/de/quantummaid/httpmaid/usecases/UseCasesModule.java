@@ -157,7 +157,6 @@ public final class UseCasesModule implements ChainModule {
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
         final List<Class<?>> injectionTypes = broadcasters.injectionTypes();
         final List<Class<?>> messageTypes = broadcasters.messageTypes();
-        final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization =
                 serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes, messageTypes);
         final Serializer returnValueSerializer = serializationAndDeserialization.returnValueSerializer();
@@ -170,6 +169,7 @@ public final class UseCasesModule implements ChainModule {
                 .collect(toList());
         final UseCaseInstantiator useCaseInstantiator = useCaseInstantiatorFactory.createInstantiator(useCaseClasses);
         final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
+        final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
         useCaseMethods.forEach(useCaseMethod -> {
             final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
             final EventType eventType = useCaseToEventMappings.get(useCaseClass);
