@@ -39,7 +39,6 @@ public final class ManagedWebsocket {
     @Setter
     private WrappedWebsocket websocket;
     @Getter
-    @Setter
     private WebsocketStatus status;
     private final List<String> receivedMessages = new ArrayList<>();
 
@@ -61,5 +60,9 @@ public final class ManagedWebsocket {
 
     public synchronized boolean hasReceivedMessage(final Predicate<String> checker) {
         return receivedMessages.stream().anyMatch(checker);
+    }
+
+    public void setStatus(final WebsocketStatus status) {
+        this.status = status;
     }
 }

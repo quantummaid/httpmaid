@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.GenericType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -33,32 +33,26 @@ import lombok.ToString;
 @SuppressWarnings("java:S1452")
 public final class RegisteredBroadcasterFactory {
     private final BroadcasterFactory<?, Object> factory;
-    private final ResolvedType senderType;
-    private final ResolvedType messageType;
+    private final GenericType<?> senderType;
+    private final GenericType<?> messageType;
 
     @SuppressWarnings("unchecked")
     public static <T, U> RegisteredBroadcasterFactory registeredBroadcasterFactory(
             final BroadcasterFactory<T, U> factory,
-            final Class<T> senderType,
-            final Class<U> messageType) {
-        final ResolvedType resolvedSenderType = ResolvedType.resolvedType(senderType);
-        final ResolvedType resolvedMessageType = ResolvedType.resolvedType(messageType);
-        return new RegisteredBroadcasterFactory(
-                (BroadcasterFactory<?, Object>) factory,
-                resolvedSenderType,
-                resolvedMessageType
-        );
+            final GenericType<T> senderType,
+            final GenericType<U> messageType) {
+        return new RegisteredBroadcasterFactory((BroadcasterFactory<?, Object>) factory, senderType, messageType);
     }
 
     public BroadcasterFactory<?, Object> factory() {
         return factory;
     }
 
-    public ResolvedType messageType() {
+    public GenericType<?> messageType() {
         return messageType;
     }
 
-    public ResolvedType senderType() {
+    public GenericType<?> senderType() {
         return senderType;
     }
 }

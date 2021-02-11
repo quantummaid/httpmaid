@@ -22,11 +22,12 @@
 package de.quantummaid.httpmaid.usecases.serializing;
 
 import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
+import de.quantummaid.reflectmaid.GenericType;
 
 import java.util.List;
 
 public interface SerializationAndDeserializationProvider {
     UseCaseSerializationAndDeserialization provide(List<UseCaseMethod> useCaseMethods,
-                                                   List<Class<?>> injectionTypes,
-                                                   List<Class<?>> messageTypes);
+                                                   List<GenericType<?>> injectionTypes,
+                                                   List<GenericType<?>> messageTypes);
 }

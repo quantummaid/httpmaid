@@ -31,6 +31,7 @@ import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.websockets.broadcast.BroadcasterFactory;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
 import de.quantummaid.httpmaid.websockets.disconnect.DisconnectorFactory;
+import de.quantummaid.reflectmaid.GenericType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,7 @@ import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCAS
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.broadcasters;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.websocketSenders;
+import static de.quantummaid.reflectmaid.GenericType.genericType;
 import static java.time.Duration.between;
 import static java.util.Arrays.asList;
 
@@ -109,11 +111,22 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
     public <T, U> HttpMaidBuilder broadcastToWebsocketsUsing(final Class<T> broadcaster,
                                                              final Class<U> messageType,
                                                              final BroadcasterFactory<T, U> factory) {
+        return broadcastToWebsocketsUsing(genericType(broadcaster), genericType(messageType), factory);
+    }
+
+    public <T, U> HttpMaidBuilder broadcastToWebsocketsUsing(final GenericType<T> broadcaster,
+                                                             final GenericType<U> messageType,
+                                                             final BroadcasterFactory<T, U> factory) {
         this.broadcasters.addBroadcaster(broadcaster, messageType, factory);
         return this;
     }
 
     public <T> HttpMaidBuilder disconnectWebsocketsUsing(final Class<T> disconnector,
+                                                         final DisconnectorFactory<T> factory) {
+        return disconnectWebsocketsUsing(genericType(disconnector), factory);
+    }
+
+    public <T> HttpMaidBuilder disconnectWebsocketsUsing(final GenericType<T> disconnector,
                                                          final DisconnectorFactory<T> factory) {
         this.broadcasters.addDisconnector(disconnector, factory);
         return this;

@@ -155,8 +155,8 @@ public final class UseCasesModule implements ChainModule {
     @Override
     public void register(final ChainExtender extender) {
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
-        final List<Class<?>> injectionTypes = broadcasters.injectionTypes();
-        final List<Class<?>> messageTypes = broadcasters.messageTypes();
+        final List<GenericType<?>> injectionTypes = broadcasters.injectionTypes();
+        final List<GenericType<?>> messageTypes = broadcasters.messageTypes();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization =
                 serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes, messageTypes);
         final Serializer returnValueSerializer = serializationAndDeserialization.returnValueSerializer();

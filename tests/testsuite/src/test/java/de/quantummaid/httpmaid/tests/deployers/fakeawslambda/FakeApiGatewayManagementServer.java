@@ -48,6 +48,7 @@ public final class FakeApiGatewayManagementServer implements AutoCloseable {
             if ("DELETE".equals(requestMethod)) {
                 delete(connectionId, apiWebsockets);
                 exchange.sendResponseHeaders(OK, 0);
+                exchange.close();
             } else if ("POST".equals(requestMethod)) {
                 final InputStream bodyStream = exchange.getRequestBody();
                 final String bodyString = inputStreamToString(bodyStream);
