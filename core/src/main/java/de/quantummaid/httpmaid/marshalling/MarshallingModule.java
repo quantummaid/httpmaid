@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
+import static de.quantummaid.httpmaid.marshalling.Marshallers.MARSHALLERS;
 import static de.quantummaid.httpmaid.marshalling.Marshallers.marshallers;
 import static de.quantummaid.httpmaid.marshalling.Unmarshallers.unmarshallers;
 import static de.quantummaid.httpmaid.marshalling.processors.MarshalProcessor.marshalProcessor;
@@ -94,6 +95,7 @@ public final class MarshallingModule implements ChainModule {
                 defaultContentTypeProvider
         ));
         final Marshallers marshallers = marshallers(marshallersMap, defaultContentTypeProvider);
+        extender.addMetaDatum(MARSHALLERS, marshallers);
         extender.prependProcessor(POST_INVOKE, marshalProcessor(
                 marshallers,
                 throwExceptionIfNoMarshallerFound

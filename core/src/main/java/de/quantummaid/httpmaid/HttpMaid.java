@@ -26,10 +26,16 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.endpoint.*;
+import de.quantummaid.httpmaid.http.headers.ContentType;
+import de.quantummaid.httpmaid.marshalling.Marshaller;
+import de.quantummaid.httpmaid.marshalling.Marshallers;
+import de.quantummaid.httpmaid.serialization.Serializer;
+import de.quantummaid.httpmaid.websockets.broadcast.SerializingSender;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
+import de.quantummaid.reflectmaid.GenericType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -44,9 +50,14 @@ import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
 import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
+import static de.quantummaid.httpmaid.http.headers.ContentType.json;
+import static de.quantummaid.httpmaid.marshalling.Marshallers.MARSHALLERS;
+import static de.quantummaid.httpmaid.serialization.Serializer.SERIALIZER;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
+import static de.quantummaid.httpmaid.websockets.broadcast.SerializingSender.serializingSender;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
+import static de.quantummaid.reflectmaid.GenericType.genericType;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaid implements AutoCloseable {
@@ -126,6 +137,33 @@ public final class HttpMaid implements AutoCloseable {
         final WebsocketRegistry websocketRegistry = chainRegistry.getMetaDatum(WEBSOCKET_REGISTRY);
         final long numberOfConnectedWebsockets = websocketRegistry.countConnections();
         return runtimeInformation(numberOfConnectedWebsockets);
+    }
+
+    public <T> SerializingSender<T> websocketSender(final Class<T> messageType) {
+        return websocketSender(messageType, json());
+    }
+
+    public <T> SerializingSender<T> websocketSender(final Class<T> messageType,
+                                                    final ContentType contentType) {
+        final GenericType<T> genericType = genericType(messageType);
+        return websocketSender(genericType, contentType);
+    }
+
+    public <T> SerializingSender<T> websocketSender(final GenericType<T> messageType,
+                                                    final ContentType contentType) {
+        final Marshallers marshallers = getMetaDatum(MARSHALLERS);
+        final Marshaller marshaller = marshallers.marshallerFor(contentType);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
+        final Serializer serializer = getMetaDatum(SERIALIZER);
+        return serializingSender(
+                websocketRegistry,
+                websocketSenders,
+                messageType.toResolvedType(),
+                marshaller,
+                serializer,
+                emptyMetaData()
+        );
     }
 
     public static HttpMaidBuilder anHttpMaid() {
