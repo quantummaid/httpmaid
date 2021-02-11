@@ -29,7 +29,10 @@ import java.util.Map;
 public interface FirstWhenStage {
     MethodBuilder aRequestToThePath(String path);
 
-    Then httpMaidIsInitialized();
+    default Then httpMaidIsInitialized() {
+        return running(() -> {
+        });
+    }
 
     default Then aWebsocketIsTriedToBeConnected() {
         try {
@@ -42,6 +45,8 @@ public interface FirstWhenStage {
     default Then aWebsocketIsConnected() {
         return aWebsocketIsConnected(Map.of(), Map.of());
     }
+
+    Then running(Runnable runnable);
 
     Then aWebsocketIsConnected(Map<String, List<String>> queryParameters, Map<String, List<String>> headers);
 

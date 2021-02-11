@@ -39,6 +39,7 @@ import de.quantummaid.httpmaid.events.EventModule;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
+import de.quantummaid.httpmaid.serialization.Serializer;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory;
@@ -65,6 +66,7 @@ import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
+import static de.quantummaid.httpmaid.serialization.Serializer.SERIALIZER;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.usecases.RegisterSerializerProcessor.registerSerializerProcessor;
 import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
@@ -158,8 +160,10 @@ public final class UseCasesModule implements ChainModule {
         final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization =
                 serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes, messageTypes);
+        final Serializer returnValueSerializer = serializationAndDeserialization.returnValueSerializer();
         extender.appendProcessor(HttpMaidChains.INIT,
-                registerSerializerProcessor(serializationAndDeserialization.returnValueSerializer()));
+                registerSerializerProcessor(returnValueSerializer));
+        extender.addMetaDatum(SERIALIZER, returnValueSerializer);
         final List<Class<?>> useCaseClasses = useCaseMethods.stream()
                 .map(UseCaseMethod::useCaseClass)
                 .map(ResolvedType::assignableType)

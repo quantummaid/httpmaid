@@ -64,7 +64,8 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
     }
 
     @Override
-    public Then httpMaidIsInitialized() {
+    public Then running(final Runnable runnable) {
+        runnable.run();
         return Then.then(testData);
     }
 
