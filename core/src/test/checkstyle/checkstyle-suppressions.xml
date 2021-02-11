@@ -31,7 +31,7 @@
     <suppress checks="ParameterNumber" files="Core"/>
     <suppress checks="IllegalCatch" files="Chain"/>
     <suppress checks="EmptyBlock" files="Chain"/>
-    <suppress checks="ClassFanOutComplexity" files="HttpMaidConfigurator"/>
+    <suppress checks="ClassFanOutComplexity" files="HttpMaidConfigurator|HttpMaid"/>
     <suppress checks="ExplicitInitialization" files=".*"/>
     <suppress checks="AbbreviationAsWordInName" files="CorsConfigurators"/>
     <suppress checks="VariableDeclarationUsageDistance|TrailingComment" files="HttpMaidBuilder"/>
