@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid</groupId>
         <artifactId>httpmaid-parent</artifactId>
-        <version>0.9.126</version>
+        <version>0.9.127</version>
     </parent>
 
     <groupId>de.quantummaid.httpmaid</groupId>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>de.quantummaid.reflectmaid</groupId>
             <artifactId>reflectmaid-parent</artifactId>
-            <version>0.1.55</version>
+            <version>0.1.57</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

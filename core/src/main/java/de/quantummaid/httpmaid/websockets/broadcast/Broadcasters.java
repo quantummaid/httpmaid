@@ -50,6 +50,7 @@ import static de.quantummaid.httpmaid.websockets.broadcast.SerializingSender.ser
 import static de.quantummaid.httpmaid.websockets.disconnect.Disconnector.disconnector;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
 import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 @ToString
@@ -125,6 +126,9 @@ public final class Broadcasters {
     }
 
     public List<Object> instantiateAll(final MetaData metaData) {
+        if (broadcasterFactories.isEmpty() && disconnectorFactories.isEmpty()) {
+            return emptyList();
+        }
         final WebsocketSenders websocketSenders = metaData.get(WEBSOCKET_SENDERS);
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
         final Serializer serializer = metaData.get(SERIALIZER);
