@@ -291,7 +291,7 @@ final HttpMaid httpMaid = anHttpMaid()
         .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
                 mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
         .configured(MapMaidConfigurators.toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
-        .configured(ExceptionConfigurators.toMapExceptionsOfType(AggregatedValidationException.class, (exception, response) -> {
+        .configured(ExceptionConfigurators.toMapExceptionsOfType(AggregatedValidationException.class, (exception, request, response) -> {
             // handle validation errors here
         }))
         .build();

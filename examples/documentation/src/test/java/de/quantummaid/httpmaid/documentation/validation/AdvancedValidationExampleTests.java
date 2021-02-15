@@ -44,7 +44,6 @@ public final class AdvancedValidationExampleTests {
                 .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
                         mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
                 .configured(MapMaidConfigurators.toSetStatusCodeOnMapMaidValidationErrorsTo(401))
-                .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, request, response) -> exception.printStackTrace()))
                 .build();
         //Showcase end setValidationErrorStatusCode
 
