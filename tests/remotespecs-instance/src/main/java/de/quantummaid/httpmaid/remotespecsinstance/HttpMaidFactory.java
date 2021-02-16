@@ -23,13 +23,14 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
-import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toStoreAdditionalDataInWebsocketContext;
 import static de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshallerAndUnmarshaller.minimalJsonMarshallerAndUnmarshaller;
 
 @SuppressWarnings("java:S1192")
@@ -54,6 +55,8 @@ public final class HttpMaidFactory {
                 .get("/statusCode/201", (request, response) -> response.setStatus(201))
 
                 .post("/echo", (request, response) -> response.setBody(request.bodyString()))
+                .put("/echo", (request, response) -> response.setBody(request.bodyString()))
+                .delete("/echo", (request, response) -> response.setBody(request.bodyString()))
 
                 .get("/returnHeader/<name>", (request, response) -> {
                     final String headerName = request.pathParameters().getPathParameter("name");
@@ -91,13 +94,27 @@ public final class HttpMaidFactory {
                     final String header = request.headers().header("X-My-Header");
                     response.setBody(header);
                 })
+                .websocket("queryparameterhandler", (request, response) -> {
+                    final String header = request.queryParameters().parameter("myParameter");
+                    response.setBody(header);
+                })
 
                 .post("/broadcast", (request, response) -> request.websockets().sender().sendToAll("foo"))
                 .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
                 .websocket("disconnect", (request, response) -> request.websockets().disconnector().disconnectAll())
-                .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                .websocket("echofromcontext", (request, response) -> {
+                    final String value = (String) request.additionalData().get("key");
+                    response.setBody(value);
+                })
+                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
                         .withAdvancedSettings(advancedBuilder -> advancedBuilder
-                                .usingMarshaller(minimalJsonMarshallerAndUnmarshaller()))));
+                                .usingMarshaller(minimalJsonMarshallerAndUnmarshaller()))))
+
+                .configured(toStoreAdditionalDataInWebsocketContext(request -> request
+                        .queryParameters()
+                        .optionalParameter("toBeStoredInContext")
+                        .map(value -> Map.of("key", (Object) value))
+                        .orElseGet(Map::of)));
         configurator.accept(builder);
         return builder.build();
     }

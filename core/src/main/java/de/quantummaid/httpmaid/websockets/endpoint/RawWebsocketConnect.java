@@ -24,9 +24,8 @@ package de.quantummaid.httpmaid.websockets.endpoint;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
-import de.quantummaid.httpmaid.http.Headers;
-import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,8 +34,6 @@ import lombok.ToString;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.QUERY_PARAMETERS;
-import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
@@ -47,8 +44,7 @@ import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOC
 public final class RawWebsocketConnect implements RawRequest {
     private final ConnectionInformation connectionInformation;
     private final WebsocketSenderId websocketSenderId;
-    private final QueryParameters queryParameters;
-    private final Headers headers;
+    private final WebsocketRegistryEntry registryEntry;
     private final Map<MetaDataKey<?>, Object> additionalMetaData;
 
     public static RawWebsocketConnectBuilder rawWebsocketConnectBuilder() {
@@ -57,25 +53,21 @@ public final class RawWebsocketConnect implements RawRequest {
 
     public static RawWebsocketConnect rawWebsocketConnect(final ConnectionInformation connectionInformation,
                                                           final WebsocketSenderId websocketSenderId,
-                                                          final QueryParameters queryParameters,
-                                                          final Headers headers) {
-        return rawWebsocketConnect(connectionInformation, websocketSenderId, queryParameters, headers, Map.of());
+                                                          final WebsocketRegistryEntry registryEntry) {
+        return rawWebsocketConnect(connectionInformation, websocketSenderId, registryEntry, Map.of());
     }
 
     public static RawWebsocketConnect rawWebsocketConnect(final ConnectionInformation connectionInformation,
                                                           final WebsocketSenderId websocketSenderId,
-                                                          final QueryParameters queryParameters,
-                                                          final Headers headers,
+                                                          final WebsocketRegistryEntry registryEntry,
                                                           final Map<MetaDataKey<?>, Object> additionalMetaData) {
         validateNotNull(connectionInformation, "connectionInformation");
         validateNotNull(websocketSenderId, "websocketSenderId");
-        validateNotNull(queryParameters, "queryParameters");
-        validateNotNull(headers, "headers");
+        validateNotNull(registryEntry, "registryEntry");
         validateNotNull(additionalMetaData, "additionalMetaData");
         return new RawWebsocketConnect(connectionInformation,
                 websocketSenderId,
-                queryParameters,
-                headers,
+                registryEntry,
                 additionalMetaData);
     }
 
@@ -83,9 +75,8 @@ public final class RawWebsocketConnect implements RawRequest {
     public void enter(final MetaData metaData) {
         metaData.set(WEBSOCKET_CONNECTION_INFORMATION, connectionInformation);
         metaData.set(WEBSOCKET_SENDER_ID, websocketSenderId);
+        metaData.set(WEBSOCKET_REGISTRY_ENTRY, registryEntry);
         metaData.set(REQUEST_TYPE, WEBSOCKET_CONNECT);
-        metaData.set(QUERY_PARAMETERS, queryParameters);
-        metaData.set(REQUEST_HEADERS, headers);
         additionalMetaData.forEach(metaData::setUnchecked);
     }
 }

@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.processors;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
@@ -31,8 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY;
-import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.loadFromMetaData;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.*;
 
 @Slf4j
 @ToString
@@ -46,7 +46,9 @@ public final class PutWebsocketInRegistryProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
-        final WebsocketRegistryEntry entry = loadFromMetaData(metaData);
+        final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
+        final WebsocketRegistryEntry dummyEntry = metaData.get(WEBSOCKET_REGISTRY_ENTRY);
+        final WebsocketRegistryEntry entry = dummyEntry.fixConnectionInformation(connectionInformation);
         final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
         log.debug("adding websocket to registry");
         websocketRegistry.addConnection(entry);

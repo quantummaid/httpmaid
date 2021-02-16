@@ -30,6 +30,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,5 +46,6 @@ public final class AuthorizeWebsocketProcessor implements Processor {
         final HttpRequest httpRequest = httpRequest(metaData);
         final AuthorizationDecision authorizationDecision = authorizer.isAuthorized(httpRequest);
         metaData.set(AUTHORIZATION_DECISION, authorizationDecision);
+        metaData.set(ADDITIONAL_WEBSOCKET_DATA, authorizationDecision.additionalData());
     }
 }

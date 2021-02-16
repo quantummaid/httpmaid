@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ValidatedAwsLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -33,29 +33,26 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.addFullWebsocketMetaData;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.createWebsocketEvent;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.*;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocket implements WebSocketListener {
-    private final AwsWebsocketLambdaEndpoint endpoint;
+    private final ValidatedAwsLambdaEndpoint endpoint;
     private final String connectionId;
     private Session session;
-    private final Object authorizerContext;
+    private final Map<String, Object> authorizerContext;
 
-    public static FakeLambdaWebsocket fakeLambdaWebsocket(final AwsWebsocketLambdaEndpoint endpoint,
+    public static FakeLambdaWebsocket fakeLambdaWebsocket(final ValidatedAwsLambdaEndpoint endpoint,
                                                           final String connectionId,
-                                                          final Object authorizerContext) {
+                                                          final Map<String, Object> authorizerContext) {
         return new FakeLambdaWebsocket(endpoint, connectionId, authorizerContext);
     }
 
     @Override
     public synchronized void onWebSocketText(final String message) {
-        final Map<String, Object> event = createWebsocketEvent(connectionId, "MESSAGE", authorizerContext);
-        event.put("body", message);
-
+        final Map<String, Object> event = createWebsocketMessageEvent(connectionId, message, authorizerContext);
         final Map<String, Object> responseEvent = endpoint.delegate(event);
         final String body = (String) responseEvent.get("body");
         if (body != null) {
@@ -78,15 +75,14 @@ public final class FakeLambdaWebsocket implements WebSocketListener {
 
     @Override
     public void onWebSocketClose(final int i, final String s) {
-        final Map<String, Object> event = createWebsocketEvent(connectionId, "DISCONNECT", authorizerContext);
+        final Map<String, Object> event = createWebsocketDisconnectEvent(connectionId, authorizerContext);
         endpoint.delegate(event);
     }
 
     @Override
     public synchronized void onWebSocketConnect(final Session session) {
         this.session = session;
-        final Map<String, Object> event = createWebsocketEvent(connectionId, "CONNECT", authorizerContext);
-        addFullWebsocketMetaData(session.getUpgradeRequest(), event);
+        final Map<String, Object> event = createWebsocketConnectEvent(connectionId, session.getUpgradeRequest(), authorizerContext);
         endpoint.delegate(event);
     }
 

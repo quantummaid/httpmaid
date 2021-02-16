@@ -21,8 +21,8 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway;
 
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.Server;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ValidatedAwsLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.A
 public final class FakeHttpV1PayloadApiGateway implements AutoCloseable {
     private final Server server;
 
-    public static FakeHttpV1PayloadApiGateway fakeHttpV1PayloadApiGateway(final AwsLambdaEndpoint endpoint,
+    public static FakeHttpV1PayloadApiGateway fakeHttpV1PayloadApiGateway(final ValidatedAwsLambdaEndpoint endpoint,
                                                                           final int port) {
         final Server server = Server.server(port, exchange -> {
             try {

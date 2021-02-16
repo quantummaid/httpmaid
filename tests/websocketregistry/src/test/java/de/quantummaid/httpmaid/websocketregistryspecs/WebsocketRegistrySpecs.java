@@ -23,7 +23,6 @@ package de.quantummaid.httpmaid.websocketregistryspecs;
 
 import de.quantummaid.httpmaid.http.Header;
 import de.quantummaid.httpmaid.http.QueryParameter;
-import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryDeployment;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -32,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static de.quantummaid.httpmaid.http.Header.header;
 import static de.quantummaid.httpmaid.http.HeaderName.headerName;
@@ -62,7 +60,6 @@ public interface WebsocketRegistrySpecs {
                 connectionInformation,
                 websocketSenderId("foo"),
                 headers(List.of(header(headerName("header-name"), headerValue("header-value")))),
-                ContentType.json(),
                 queryParameters(List.of(
                         queryParameter(queryParameterName("query-name"),
                                 queryParameterValue("query-value"))
@@ -73,8 +70,6 @@ public interface WebsocketRegistrySpecs {
         websocketRegistry.addConnection(entry);
         final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
         assertThat(queriedEntry.getSenderId().asString(), is("foo"));
-
-        assertThat(queriedEntry.contentType(), is(ContentType.json()));
 
         final List<Header> headerList = queriedEntry.headers().asList();
         assertThat(headerList.size(), is(1));
@@ -96,7 +91,6 @@ public interface WebsocketRegistrySpecs {
                 connectionInformation,
                 websocketSenderId("foo"),
                 headers(emptyList()),
-                ContentType.json(),
                 queryParameters(emptyList()),
                 Map.of("a", "b")
         );
@@ -108,31 +102,12 @@ public interface WebsocketRegistrySpecs {
     }
 
     @Test
-    default void contentTypeOfConnectionCanBeEmpty(final WebsocketRegistry websocketRegistry) {
-        final ConnectionInformation connectionInformation = connectionInformation();
-        final WebsocketRegistryEntry entry = websocketRegistryEntry(
-                connectionInformation,
-                websocketSenderId("foo"),
-                headers(List.of()),
-                ContentType.fromString(Optional.empty()),
-                queryParameters(List.of()),
-                Map.of("a", "b")
-        );
-        websocketRegistry.addConnection(entry);
-        final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
-        assertThat(queriedEntry.getSenderId().asString(), is("foo"));
-
-        assertThat(queriedEntry.contentType(), is(ContentType.fromString(Optional.empty())));
-    }
-
-    @Test
     default void connectionCanBeDeleted(final WebsocketRegistry websocketRegistry) {
         final ConnectionInformation connectionInformation = connectionInformation();
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
                 websocketSenderId("foo"),
                 headers(emptyList()),
-                ContentType.json(),
                 queryParameters(emptyList()),
                 Map.of("a", "b")
         );

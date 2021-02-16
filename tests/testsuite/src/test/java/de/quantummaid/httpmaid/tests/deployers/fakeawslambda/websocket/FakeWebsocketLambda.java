@@ -21,8 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ValidatedAwsLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +41,7 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 public final class FakeWebsocketLambda implements AutoCloseable {
     private final Server server;
 
-    public static FakeWebsocketLambda fakeWebsocketLambda(final AwsWebsocketLambdaEndpoint endpoint,
-                                                          final LambdaWebsocketAuthorizer authorizer,
+    public static FakeWebsocketLambda fakeWebsocketLambda(final ValidatedAwsLambdaEndpoint endpoint,
                                                           final int port,
                                                           final ApiWebsockets apiWebsockets) {
         final Server server = new Server(port);
@@ -53,7 +51,7 @@ public final class FakeWebsocketLambda implements AutoCloseable {
 
         final ServletHandler servletHandler = new ServletHandler();
         server.setHandler(servletHandler);
-        final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(endpoint, authorizer, apiWebsockets));
+        final ServletHolder servletHolder = new ServletHolder(fakeLambdaServlet(endpoint, apiWebsockets));
         servletHandler.addServletWithMapping(servletHolder, "/*");
         try {
             server.start();

@@ -26,17 +26,19 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbMarshaller.marshalTopLevelMap;
+import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepositoryException.dynamoDbRepositoryException;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbUnmarshaller.unmarshalMap;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,6 +47,7 @@ public final class DynamoDbRepository implements Repository {
     private final DynamoDbClient dynamoDbClient;
     private final String tableName;
     private final String primaryKey;
+    private final Double enforcedMaxWriteCapacityUnits;
 
     public static DynamoDbRepository dynamoDbRepository(final String tableName,
                                                         final String primaryKey) {
@@ -55,10 +58,17 @@ public final class DynamoDbRepository implements Repository {
     public static DynamoDbRepository dynamoDbRepository(final DynamoDbClient dynamoDbClient,
                                                         final String tableName,
                                                         final String primaryKey) {
+        return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey, null);
+    }
+
+    public static DynamoDbRepository dynamoDbRepository(final DynamoDbClient dynamoDbClient,
+                                                        final String tableName,
+                                                        final String primaryKey,
+                                                        final Double enforcedMaxWriteCapacityUnits) {
         validateNotNull(dynamoDbClient, "dynamoDbClient");
         validateNotNull(tableName, "tableName");
         validateNotNull(primaryKey, "primaryKey");
-        return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey);
+        return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey, enforcedMaxWriteCapacityUnits);
     }
 
     @Override
@@ -68,38 +78,41 @@ public final class DynamoDbRepository implements Repository {
                 VALUE_IDENTIFIER, value
         );
         final Map<String, AttributeValue> marshalledMap = marshalTopLevelMap(wrappedMap);
-        final Put put = Put.builder()
+        final PutItemResponse response = dynamoDbClient.putItem(builder -> builder
                 .tableName(tableName)
                 .item(marshalledMap)
-                .build();
-        final TransactWriteItem transactWriteItem = TransactWriteItem.builder()
-                .put(put)
-                .build();
-        final TransactWriteItemsRequest transactionWriteRequest = TransactWriteItemsRequest.builder()
-                .transactItems(List.of(transactWriteItem))
-                .build();
-        dynamoDbClient.transactWriteItems(transactionWriteRequest);
+                .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+        );
+        final double writeCapacityUnits = response.consumedCapacity().writeCapacityUnits();
+        log.info("write of item {} to DynamoDB table {} consumed {} WCUs", key, tableName, writeCapacityUnits);
+        if (enforcedMaxWriteCapacityUnits != null && writeCapacityUnits > enforcedMaxWriteCapacityUnits) {
+            throw dynamoDbRepositoryException(
+                    "write capacity units of item " + key + " in DynamoDB table " + tableName +
+                            " consumed " + writeCapacityUnits +
+                            " WCUs but is only allowed to consume " + enforcedMaxWriteCapacityUnits + " WCUs"
+            );
+        }
     }
 
     @Override
     public void delete(final String key) {
         final Map<String, AttributeValue> keyMap = marshalTopLevelMap(Map.of(primaryKey, key));
-        final DeleteItemRequest deleteItemRequest = DeleteItemRequest.builder()
-                .key(keyMap)
-                .tableName(tableName)
-                .build();
-        dynamoDbClient.deleteItem(deleteItemRequest);
+        dynamoDbClient.deleteItem(
+                builder -> builder
+                        .key(keyMap)
+                        .tableName(tableName)
+        );
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, Object> load(final String key) {
         final Map<String, AttributeValue> keyMap = marshalTopLevelMap(Map.of(primaryKey, key));
-        final GetItemRequest getItemRequest = GetItemRequest.builder()
-                .key(keyMap)
-                .tableName(tableName)
-                .build();
-        final GetItemResponse getItemResponse = dynamoDbClient.getItem(getItemRequest);
+        final GetItemResponse getItemResponse = dynamoDbClient.getItem(
+                builder -> builder
+                        .key(keyMap)
+                        .tableName(tableName)
+        );
         final Map<String, AttributeValue> responseItem = getItemResponse.item();
         final Map<String, Object> marshalled = unmarshalMap(responseItem);
         return (Map<String, Object>) marshalled.get(VALUE_IDENTIFIER);
@@ -107,15 +120,17 @@ public final class DynamoDbRepository implements Repository {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Map<String, Object>> loadAll() {
-        final ScanRequest scanRequest = ScanRequest.builder()
-                .tableName(tableName)
-                .build();
-        final ScanResponse scan = dynamoDbClient.scan(scanRequest);
-        return (List<Map<String, Object>>) (Object) scan.items().stream()
+    public Map<String, Map<String, Object>> loadAll() {
+        final ScanResponse scan = dynamoDbClient.scan(builder -> builder.tableName(tableName));
+        final Map<String, Map<String, Object>> result = new LinkedHashMap<>();
+        scan.items().stream()
                 .map(DynamoDbUnmarshaller::unmarshalMap)
-                .map(map -> map.get(VALUE_IDENTIFIER))
-                .collect(toList());
+                .forEach(map -> {
+                    final String key = (String) map.get(primaryKey);
+                    final Map<String, Object> value = (Map<String, Object>) map.get(VALUE_IDENTIFIER);
+                    result.put(key, value);
+                });
+        return result;
     }
 
     public DynamoDbClient dynamoDbClient() {

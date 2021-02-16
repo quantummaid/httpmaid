@@ -21,32 +21,72 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
+import de.quantummaid.httpmaid.lambdastructure.Structures;
 import org.eclipse.jetty.websocket.api.UpgradeRequest;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static de.quantummaid.httpmaid.lambdastructure.Structures.WEBSOCKET_CONNECT;
+import static de.quantummaid.httpmaid.lambdastructure.Structures.WEBSOCKET_DISCONNECT;
 
 public final class EventUtils {
 
     private EventUtils() {
     }
 
-    public static Map<String, Object> createWebsocketEvent(final String connectionId,
-                                                           final String eventType,
-                                                           final Object authorizerContext) {
-        final Map<String, Object> requestContext = new HashMap<>();
-        requestContext.put("eventType", eventType);
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> createWebsocketConnectEvent(final String connectionId,
+                                                                  final UpgradeRequest upgradeRequest,
+                                                                  final Map<String, Object> authorizerContext) {
+        final Map<String, Object> event = (Map<String, Object>) WEBSOCKET_CONNECT.mutableSample();
+        final Map<String, Object> requestContext = (Map<String, Object>) event.get("requestContext");
         requestContext.put("connectionId", connectionId);
         requestContext.put("stage", "fake");
         requestContext.put("apiId", "fake");
         requestContext.put("domainName", "fake.execute-api.fake-1.amazonaws.com");
         if (authorizerContext != null) {
-            requestContext.put("authorizer", authorizerContext);
+            final Map<String, Object> enhancedAuthorizerContext = new LinkedHashMap<>(authorizerContext);
+            enhancedAuthorizerContext.put("principalId", "foo");
+            enhancedAuthorizerContext.put("integrationLatency", 1);
+            requestContext.put("authorizer", enhancedAuthorizerContext);
         }
-        final Map<String, Object> event = new HashMap<>();
-        event.put("requestContext", requestContext);
+        addFullWebsocketMetaData(upgradeRequest, event);
+        return event;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> createWebsocketMessageEvent(final String connectionId,
+                                                                  final String body,
+                                                                  final Map<String, Object> authorizerContext) {
+        final Map<String, Object> event = (Map<String, Object>) Structures.WEBSOCKET_MESSAGE.mutableSample();
+        final Map<String, Object> requestContext = (Map<String, Object>) event.get("requestContext");
+        requestContext.put("connectionId", connectionId);
+        requestContext.put("stage", "fake");
+        requestContext.put("apiId", "fake");
+        requestContext.put("domainName", "fake.execute-api.fake-1.amazonaws.com");
+        if (authorizerContext != null) {
+            final Map<String, Object> enhancedAuthorizerContext = new LinkedHashMap<>(authorizerContext);
+            enhancedAuthorizerContext.put("principalId", "foo");
+            requestContext.put("authorizer", enhancedAuthorizerContext);
+        }
+        event.put("body", body);
+        return event;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> createWebsocketDisconnectEvent(final String connectionId,
+                                                                     final Map<String, Object> authorizerContext) {
+        final Map<String, Object> event = (Map<String, Object>) WEBSOCKET_DISCONNECT.mutableSample();
+        final Map<String, Object> requestContext = (Map<String, Object>) event.get("requestContext");
+        requestContext.put("connectionId", connectionId);
+        requestContext.put("stage", "fake");
+        requestContext.put("apiId", "fake");
+        requestContext.put("domainName", "fake.execute-api.fake-1.amazonaws.com");
+        if (authorizerContext != null) {
+            final Map<String, Object> enhancedAuthorizerContext = new LinkedHashMap<>(authorizerContext);
+            enhancedAuthorizerContext.put("principalId", "foo");
+            requestContext.put("authorizer", enhancedAuthorizerContext);
+        }
         return event;
     }
 

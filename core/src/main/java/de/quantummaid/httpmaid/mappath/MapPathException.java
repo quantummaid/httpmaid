@@ -38,4 +38,8 @@ public final class MapPathException extends RuntimeException {
                 input, index, message, exposition);
         return new MapPathException(fullMessage);
     }
+
+    public static MapPathException retrievalException(final String message) {
+        return new MapPathException(message);
+    }
 }

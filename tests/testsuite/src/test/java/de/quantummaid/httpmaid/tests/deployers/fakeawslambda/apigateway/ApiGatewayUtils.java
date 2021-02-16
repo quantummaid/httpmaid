@@ -31,6 +31,8 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.util.*;
 
+import static de.quantummaid.httpmaid.lambdastructure.Structures.HTTP_REQUEST_V1;
+import static de.quantummaid.httpmaid.lambdastructure.Structures.REST_REQUEST;
 import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -44,6 +46,10 @@ public final class ApiGatewayUtils {
 
     public static void addBodyToEvent(final InputStream bodyStream, final Map<String, Object> event) {
         final String body = inputStreamToString(bodyStream);
+        addBodyToEvent(body, event);
+    }
+
+    public static void addBodyToEvent(final String body, final Map<String, Object> event) {
         if (body.isEmpty()) {
             event.put("body", null);
             event.put("isBase64Encoded", false);
@@ -60,15 +66,16 @@ public final class ApiGatewayUtils {
         return new String(bytes, UTF_8);
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Object> mapRequestToHttpApiV1PayloadEvent(final HttpExchange exchange) {
-        final Map<String, Object> event = new HashMap<>();
-        event.put("version", "1.0");
+        final Map<String, Object> event = (Map<String, Object>) HTTP_REQUEST_V1.mutableSample();
         mapRequestToEvent(exchange, event);
         return event;
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Object> mapRequestToRestApiEvent(final HttpExchange exchange) {
-        final Map<String, Object> event = new HashMap<>();
+        final Map<String, Object> event = (Map<String, Object>) REST_REQUEST.mutableSample();
         mapRequestToEvent(exchange, event);
         return event;
     }

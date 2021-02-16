@@ -33,6 +33,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ENVIRONMENTS_WITH_ALL_CAPABILITIES;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ENVIRONMENTS_WITH_ALL_CAPABILITIES_WITHOUT_SHITTY_CLIENT;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toRememberHeadersInWebsocketMessages;
 
 public final class BroadcastingSpecs {
 
@@ -93,6 +94,7 @@ public final class BroadcastingSpecs {
                                 )
                         )
                         .websocket("check", (request, response) -> response.setBody("websocket has been registered"))
+                        .configured(toRememberHeadersInWebsocketMessages("X-My-Header"))
                         .build()
         )
                 .when().aWebsocketIsConnected(Map.of(), Map.of("X-My-Header", List.of("foo")))

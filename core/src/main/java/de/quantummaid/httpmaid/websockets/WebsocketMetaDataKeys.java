@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.websockets;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 
 import java.util.Map;
 
@@ -42,8 +43,7 @@ public final class WebsocketMetaDataKeys {
     public static final MetaDataKey<String> REQUEST_TYPE = metaDataKey("REQUEST_TYPE");
     public static final MetaDataKey<ConnectionInformation> WEBSOCKET_CONNECTION_INFORMATION = metaDataKey("WEBSOCKET_CONNECTION_INFORMATION");
     public static final MetaDataKey<String> WEBSOCKET_ROUTE = metaDataKey("WEBSOCKET_ROUTE");
-
-    public static final MetaDataKey<Boolean> RESTORATION_FROM_REGISTRY_NEEDED = metaDataKey("RESTORATION_FROM_REGISTRY_NEEDED");
+    public static final MetaDataKey<WebsocketRegistryEntry> WEBSOCKET_REGISTRY_ENTRY = metaDataKey("WEBSOCKET_REGISTRY_ENTRY");
 
     private WebsocketMetaDataKeys() {
     }

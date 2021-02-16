@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.criteria;
 
+import de.quantummaid.httpmaid.mappath.MapPath;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,12 @@ public final class WebsocketCriteria {
         return this;
     }
 
-    public WebsocketCriteria addititionalDataString(final String key, final String value) {
+    public WebsocketCriteria additionalDataString(final String key, final String value) {
+        final MapPath mapPathKey = MapPath.parse(key);
+        return additionalDataString(mapPathKey, value);
+    }
+
+    public WebsocketCriteria additionalDataString(final MapPath key, final String value) {
         final AdditionalDataStringCriterion additionalDataStringCriterion = additionalDataStringCriterion(key, value);
         additionalDataStringCriteria.add(additionalDataStringCriterion);
         return this;

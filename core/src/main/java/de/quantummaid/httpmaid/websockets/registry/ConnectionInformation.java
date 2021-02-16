@@ -23,5 +23,9 @@ package de.quantummaid.httpmaid.websockets.registry;
 
 public interface ConnectionInformation {
 
+    static ConnectionInformation dummyConnectionInformation() {
+        return () -> "dummy";
+    }
+
     String uniqueIdentifier();
 }

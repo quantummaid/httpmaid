@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWe
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
+import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
 
 @ToString
@@ -51,8 +53,9 @@ public final class UnauthorizedLambda {
     private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID, REGION);
 
     private static HttpMaid httpMaid() {
+        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 1.0);
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
                 .configured(toUseWebsocketRegistry(websocketRegistry)));
@@ -60,6 +63,7 @@ public final class UnauthorizedLambda {
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         log.debug("new lambda event: {}", event);
+        LAMBDA_EVENT.runValidation(event);
         if (!isWebSocketRequest(event)) {
             return PLAIN_ENDPOINT.delegate(event);
         } else {

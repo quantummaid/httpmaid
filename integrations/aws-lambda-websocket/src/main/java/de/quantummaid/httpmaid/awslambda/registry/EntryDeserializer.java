@@ -21,18 +21,16 @@
 
 package de.quantummaid.httpmaid.awslambda.registry;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
 import de.quantummaid.httpmaid.http.Header;
 import de.quantummaid.httpmaid.http.QueryParameter;
-import de.quantummaid.httpmaid.http.headers.ContentType;
+import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.http.Header.header;
 import static de.quantummaid.httpmaid.http.HeaderName.headerName;
 import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
@@ -46,78 +44,55 @@ import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("java:S1192")
 public final class EntryDeserializer {
+    private static final String HEADERS = "h";
+    private static final String NAME = "n";
+    private static final String VALUE = "v";
+    private static final String QUERY_PARAMETERS = "q";
+    private static final String ADDITIONAL_DATA = "a";
 
     private EntryDeserializer() {
     }
 
     @SuppressWarnings("unchecked")
-    public static WebsocketRegistryEntry deserializeEntry(final Map<String, Object> map) {
-        final Map<String, Object> connectionInformationMap = (Map<String, Object>) map.get("connectionInformation");
-        final String connectionId = (String) connectionInformationMap.get("connectionId");
-        final String stage = (String) connectionInformationMap.get("stage");
-        final String apiId = (String) connectionInformationMap.get("apiId");
-        final String region = (String) connectionInformationMap.get("region");
-        final AwsWebsocketConnectionInformation connectionInformation = awsWebsocketConnectionInformation(
-                connectionId, stage, apiId, region);
-        final String senderId = (String) map.get("senderId");
-        final List<Map<String, String>> serializedHeaders = (List<Map<String, String>>) map.get("headers");
+    public static WebsocketRegistryEntry deserializeEntry(final ConnectionInformation connectionInformation,
+                                                          final Map<String, Object> map) {
+        final List<Map<String, String>> serializedHeaders = (List<Map<String, String>>) map.get(HEADERS);
         final List<Header> headers = serializedHeaders.stream()
                 .map(headerMap -> {
-                    final String name = headerMap.get("name");
-                    final String value = headerMap.get("value");
+                    final String name = headerMap.get(NAME);
+                    final String value = headerMap.get(VALUE);
                     return header(headerName(name), headerValue(value));
                 })
                 .collect(toList());
-        final Optional<String> contentType = Optional.ofNullable((String) map.get("contentType"));
-        final List<Map<String, String>> serializedQueryParameters = (List<Map<String, String>>) map.get("queryParameters");
+        final List<Map<String, String>> serializedQueryParameters = (List<Map<String, String>>) map.get(QUERY_PARAMETERS);
         final List<QueryParameter> queryParameters = serializedQueryParameters.stream()
                 .map(queryParameterMap -> {
-                    final String name = queryParameterMap.get("name");
-                    final String value = queryParameterMap.get("value");
+                    final String name = queryParameterMap.get(NAME);
+                    final String value = queryParameterMap.get(VALUE);
                     return queryParameter(queryParameterName(name), queryParameterValue(value));
                 })
                 .collect(toList());
-        final Map<String, Object> additionalData = (Map<String, Object>) map.get("additionalData");
-        return restoreFromStrings(connectionInformation, senderId, headers(headers),
-                contentType, queryParameters(queryParameters), additionalData);
+        final Map<String, Object> additionalData = (Map<String, Object>) map.get(ADDITIONAL_DATA);
+        final String senderId = AWS_WEBSOCKET_SENDER.asString();
+        return restoreFromStrings(connectionInformation, senderId, headers(headers), queryParameters(queryParameters), additionalData);
     }
 
     public static Map<String, Object> serializeEntry(final WebsocketRegistryEntry entry) {
-        final AwsWebsocketConnectionInformation connectionInformation = (AwsWebsocketConnectionInformation) entry.connectionInformation();
-        final Map<String, Object> connectionInformationMap = new HashMap<>();
-        connectionInformationMap.put("connectionId", connectionInformation.connectionId);
-        connectionInformationMap.put("stage", connectionInformation.stage);
-        connectionInformationMap.put("apiId", connectionInformation.apiId);
-        connectionInformationMap.put("region", connectionInformation.region);
-
         final Map<String, Object> map = new HashMap<>();
-        map.put("connectionInformation", connectionInformationMap);
-        map.put("senderId", entry.senderId().asString());
         final List<Map<String, String>> headers = entry.headers().asList().stream()
-                .map(header -> Map.of("name", header.name().stringValue(),
-                        "value", header.value().stringValue()))
+                .map(header -> Map.of(NAME, header.name().stringValue(),
+                        VALUE, header.value().stringValue()))
                 .collect(toList());
-        map.put("headers", headers);
-
-        final String contentType = encodeContentType(entry.contentType());
-        map.put("contentType", contentType);
+        map.put(HEADERS, headers);
 
         final List<Map<String, String>> queryParameters = entry.queryParameters().asList().stream()
                 .map(queryParameter -> Map.of(
-                        "name", queryParameter.name().stringValue(),
-                        "value", queryParameter.value().stringValue()
+                        NAME, queryParameter.name().stringValue(),
+                        VALUE, queryParameter.value().stringValue()
                 ))
                 .collect(toList());
-        map.put("queryParameters", queryParameters);
-        map.put("additionalData", entry.additionalData());
+        map.put(QUERY_PARAMETERS, queryParameters);
+        map.put(ADDITIONAL_DATA, entry.additionalData());
         return map;
-    }
-
-    private static String encodeContentType(final ContentType contentType) {
-        if (contentType.isEmpty()) {
-            return null;
-        } else {
-            return contentType.internalValueForMapping();
-        }
     }
 }

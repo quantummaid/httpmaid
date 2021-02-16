@@ -63,10 +63,30 @@ public final class AdditionalDataSpecs {
                 anHttpMaid()
                         .get("/broadcast", (request, response) -> request
                                 .websockets().sender().sendTo("foo",
-                                websocketCriteria().addititionalDataString("clientId", "a")))
+                                        websocketCriteria().additionalDataString("clientId", "a")))
                         .configured(toStoreAdditionalDataInWebsocketContext(request -> {
                             final String id = request.queryParameters().parameter("id");
                             return Map.of("clientId", id);
+                        }))
+                        .build()
+        )
+                .when().aWebsocketIsConnected(Map.of("id", List.of("a")), Map.of())
+                .andWhen().aWebsocketIsConnected(Map.of("id", List.of("b")), Map.of())
+                .andWhen().aRequestToThePath("/broadcast").viaTheGetMethod().withAnEmptyBody().isIssued()
+                .oneWebsocketHasReceivedTheMessage("foo");
+    }
+
+    @ParameterizedTest
+    @MethodSource(ENVIRONMENTS_WITH_ALL_CAPABILITIES_WITHOUT_SHITTY_CLIENT)
+    public void dotNotationCanBeUsedInAdditionalDataCriterion(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .get("/broadcast", (request, response) -> request
+                                .websockets().sender().sendTo("foo",
+                                        websocketCriteria().additionalDataString("foo[0].clientId", "a")))
+                        .configured(toStoreAdditionalDataInWebsocketContext(request -> {
+                            final String id = request.queryParameters().parameter("id");
+                            return Map.of("foo", List.of(Map.of("clientId", id)));
                         }))
                         .build()
         )

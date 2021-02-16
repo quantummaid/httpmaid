@@ -73,7 +73,7 @@ public final class DynamoDbWebsocketRegistry implements WebsocketRegistry {
     public WebsocketRegistryEntry byConnectionInformation(final ConnectionInformation connectionInformation) {
         final String key = connectionInformation.uniqueIdentifier();
         final Map<String, Object> map = repository.load(key);
-        return deserializeEntry(map);
+        return deserializeEntry(connectionInformation, map);
     }
 
     @Override

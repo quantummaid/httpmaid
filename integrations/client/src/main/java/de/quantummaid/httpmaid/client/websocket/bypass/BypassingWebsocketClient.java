@@ -26,10 +26,11 @@ import de.quantummaid.httpmaid.client.websocket.WebsocketClient;
 import de.quantummaid.httpmaid.client.websocket.WebsocketCloseHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketErrorHandler;
 import de.quantummaid.httpmaid.client.websocket.WebsocketMessageHandler;
+import de.quantummaid.httpmaid.endpoint.RawResponse;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
-import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import de.quantummaid.httpmaid.websockets.sender.NonSerializableConnectionInformation;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -42,10 +43,10 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.client.websocket.bypass.BypassedConnectionInformation.bypassedConnectionInformation;
 import static de.quantummaid.httpmaid.client.websocket.bypass.BypassedWebsocket.bypassedWebsocket;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
-import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder.rawWebsocketAuthorizationBuilder;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketConnectBuilder.rawWebsocketConnectBuilder;
+import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocketSender.NON_SERIALIZABLE_WEBSOCKET_SENDER;
 
 @ToString
 @EqualsAndHashCode
@@ -70,28 +71,23 @@ public final class BypassingWebsocketClient implements WebsocketClient {
                 closeHandler
         );
 
-        final AuthorizationDecision decision = httpMaid.handleRequestSynchronously(
+        final RawResponse rawResponse = httpMaid.handleRequestSynchronously(
                 () -> {
-                    final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder();
+                    final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder(NON_SERIALIZABLE_WEBSOCKET_SENDER);
                     builder.withQueryParameterMap(queryParameters);
                     final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
                     headersBuilder.withHeadersMap(headers);
                     builder.withHeaders(headersBuilder.build());
                     return builder.build();
-                }, response -> response.metaData().get(AUTHORIZATION_DECISION)
-        );
+                }, response -> response);
 
-        final Map<String, Object> additionalWebsocketData = decision.additionalData();
+        final WebsocketRegistryEntry registryEntry = rawResponse.metaData().get(WEBSOCKET_REGISTRY_ENTRY);
 
         httpMaid.handleRequest(
                 () -> {
                     final RawWebsocketConnectBuilder builder = rawWebsocketConnectBuilder();
                     builder.withNonSerializableConnectionInformation(connectionInformation);
-                    builder.withQueryParameterMap(queryParameters);
-                    final HeadersBuilder headersBuilder = HeadersBuilder.headersBuilder();
-                    headersBuilder.withHeadersMap(headers);
-                    builder.withHeaders(headersBuilder.build());
-                    builder.withAdditionalMetaData(ADDITIONAL_WEBSOCKET_DATA, additionalWebsocketData);
+                    builder.withRegistryEntry(registryEntry);
                     return builder.build();
                 },
                 ignored -> {

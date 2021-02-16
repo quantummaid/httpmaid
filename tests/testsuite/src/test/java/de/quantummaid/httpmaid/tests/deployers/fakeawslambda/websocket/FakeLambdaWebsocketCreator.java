@@ -21,8 +21,7 @@
 
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket;
 
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ValidatedAwsLambdaEndpoint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +30,11 @@ import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static de.quantummaid.httpmaid.lambdastructure.Structures.WEBSOCKET_AUTHORIZATION;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.EventUtils.addFullWebsocketMetaData;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeLambdaWebsocket.fakeLambdaWebsocket;
 
@@ -43,33 +42,30 @@ import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.Fa
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FakeLambdaWebsocketCreator implements WebSocketCreator {
-    private final AwsWebsocketLambdaEndpoint endpoint;
-    private final LambdaWebsocketAuthorizer authorizer;
+    private final ValidatedAwsLambdaEndpoint endpoint;
     private final ApiWebsockets apiWebsockets;
 
-    public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final AwsWebsocketLambdaEndpoint endpoint,
-                                                                        final LambdaWebsocketAuthorizer authorizer,
+    public static FakeLambdaWebsocketCreator fakeLambdaWebsocketCreator(final ValidatedAwsLambdaEndpoint endpoint,
                                                                         final ApiWebsockets apiWebsockets) {
-        return new FakeLambdaWebsocketCreator(endpoint, authorizer, apiWebsockets);
+        return new FakeLambdaWebsocketCreator(endpoint, apiWebsockets);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Object createWebSocket(final ServletUpgradeRequest request,
                                   final ServletUpgradeResponse response) {
-        final Object authorizationContext;
-        if (authorizer != null) {
-            final Map<String, Object> authorizationEvent = new LinkedHashMap<>();
-            authorizationEvent.put("methodArn", "asdf");
+        final Map<String, Object> authorizationContext;
+        if (endpoint.hasAuthorizer()) {
+            final Map<String, Object> authorizationEvent = (Map<String, Object>) WEBSOCKET_AUTHORIZATION.mutableSample();
             addFullWebsocketMetaData(request, authorizationEvent);
-            final Map<String, Object> authorizationResponse = authorizer.delegate(authorizationEvent);
+            final Map<String, Object> authorizationResponse = endpoint.delegate(authorizationEvent);
             final Map<String, Object> policyDocument = (Map<String, Object>) authorizationResponse.get("policyDocument");
             final List<Map<String, Object>> statements = (List<Map<String, Object>>) policyDocument.get("Statement");
             final Map<String, Object> statement = statements.get(0);
             if (!"Allow".equals(statement.get("Effect"))) {
                 throw new RuntimeException("unauthorized: " + authorizationResponse);
             }
-            authorizationContext = authorizationResponse.get("context");
+            authorizationContext = (Map<String, Object>) authorizationResponse.get("context");
         } else {
             authorizationContext = null;
         }

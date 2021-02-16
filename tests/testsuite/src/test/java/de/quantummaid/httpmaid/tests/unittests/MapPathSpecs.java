@@ -23,10 +23,10 @@ package de.quantummaid.httpmaid.tests.unittests;
 
 import de.quantummaid.httpmaid.mappath.MapPath;
 import de.quantummaid.httpmaid.mappath.MapPathException;
+import de.quantummaid.httpmaid.mappath.Retrieval;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.quantummaid.httpmaid.mappath.MapPath.mapPath;
 import static org.hamcrest.CoreMatchers.*;
@@ -57,41 +57,50 @@ public final class MapPathSpecs {
     }
 
     @Test
-    public void errorHandling() {
-        assertError("", "at position 0: key is empty");
-        assertError(".", "at position 0: key is empty");
-        assertError("[", "at position 0: key is empty");
-        assertError("foo.", "at position 4: key is empty");
-        assertError("foo..", "at position 4: key is empty");
-        assertError("foo..bar", "at position 4: key is empty");
-        assertError("foo[]", "at position 4: index is empty");
-        assertError("foo[", "at position 4: square brackets are never closed");
-        assertError("foo]", "at position 3: square brackets are closed without opening them before");
-        assertError("]", "at position 0: square brackets are closed without opening them before");
-        assertError("foo[bar]", "at position 4: non-digit character in array index: 'b'");
-        assertError("foo[1]]", "at position 6: square brackets are closed without opening them before");
-        assertError("foo[.]", "at position 4: non-digit character in array index: '.'");
-        assertError("foo[[", "at position 4: square brackets are opened inside of square brackets");
-        assertError("foo[1][", "at position 7: square brackets are never closed");
-        assertError("foo[1[", "at position 5: square brackets are opened inside of square brackets");
-        assertError("foo[-1]", "at position 4: non-digit character in array index: '-'");
-        assertError("foo.[1337]", "at position 4: key is empty");
-        assertError("foo\n", "at position 3: newline is not supported");
-        assertError("foo[1337]bar", "at position 9: unexpected character 'b' ('.' or '[' expected)");
+    public void parseErrorHandling() {
+        assertParseError("", "at position 0: key is empty");
+        assertParseError(".", "at position 0: key is empty");
+        assertParseError("[", "at position 0: key is empty");
+        assertParseError("foo.", "at position 4: key is empty");
+        assertParseError("foo..", "at position 4: key is empty");
+        assertParseError("foo..bar", "at position 4: key is empty");
+        assertParseError("foo[]", "at position 4: index is empty");
+        assertParseError("foo[", "at position 4: square brackets are never closed");
+        assertParseError("foo]", "at position 3: square brackets are closed without opening them before");
+        assertParseError("]", "at position 0: square brackets are closed without opening them before");
+        assertParseError("foo[bar]", "at position 4: non-digit character in array index: 'b'");
+        assertParseError("foo[1]]", "at position 6: square brackets are closed without opening them before");
+        assertParseError("foo[.]", "at position 4: non-digit character in array index: '.'");
+        assertParseError("foo[[", "at position 4: square brackets are opened inside of square brackets");
+        assertParseError("foo[1][", "at position 7: square brackets are never closed");
+        assertParseError("foo[1[", "at position 5: square brackets are opened inside of square brackets");
+        assertParseError("foo[-1]", "at position 4: non-digit character in array index: '-'");
+        assertParseError("foo.[1337]", "at position 4: key is empty");
+        assertParseError("foo\n", "at position 3: newline is not supported");
+        assertParseError("foo[1337]bar", "at position 9: unexpected character 'b' ('.' or '[' expected)");
     }
 
     @Test
-    public void mapPathCanBeUsedToRetrieveValuesFromMap() {
-        final Map<String, Object> map = Map.of(
+    public void mapPathCanBeUsedForRetrieval() {
+        assertRetrievable("foo", mapOf("foo", null), null);
+        assertRetrievable("foo[0]", mapOf("foo", listOf(null, null)), null);
+        assertRetrievable("foo[2].e", Map.of(
                 "foo", List.of(
                         Map.of("a", "b"),
                         Map.of("c", "d"),
                         Map.of("e", "f")
                 )
-        );
-        final MapPath mapPath = mapPath().key("foo").index(2).key("e");
-        final Object retrieved = mapPath.retrieve(map);
-        assertThat(retrieved, is("f"));
+        ), "f");
+    }
+
+    @Test
+    public void retrieveErrorHandling() {
+        assertRetrieveError("foo", null, "expected a Map in order to retrieve key 'foo' but found: null");
+        assertRetrieveError("foo", Map.of(), "did not find key 'foo' in Map");
+        assertRetrieveError("foo.bar", mapOf("foo", null), "expected a Map in order to retrieve key 'bar' but found: null");
+        assertRetrieveError("foo[0]", mapOf("foo", null), "expected a List in order to retrieve index '0' but found: null");
+        assertRetrieveError("foo[0]", Map.of("foo", List.of()), "cannot retrieve index '0' out of List because its size is '0'");
+        assertRetrieveError("foo[0].e", Map.of("foo", listOf(null, "bar")), "expected a Map in order to retrieve key 'e' but found: null");
     }
 
     private static void assertParsable(final String path) {
@@ -99,7 +108,7 @@ public final class MapPathSpecs {
         assertThat(mapPath.render(), is(path));
     }
 
-    private static void assertError(final String path, final String message) {
+    private static void assertParseError(final String path, final String message) {
         MapPathException exception = null;
         try {
             MapPath.parse(path);
@@ -108,5 +117,42 @@ public final class MapPathSpecs {
         }
         assertThat(exception, is(notNullValue()));
         assertThat(exception.getMessage(), containsString(message));
+    }
+
+    private static void assertRetrievable(final String path,
+                                          final Map<String, Object> map,
+                                          final Object result) {
+        final MapPath mapPath = MapPath.parse(path);
+        final Object actual = mapPath.retrieve(map);
+        assertThat(actual, is(result));
+    }
+
+    private static void assertRetrieveError(final String path,
+                                            final Map<String, Object> map,
+                                            final String message) {
+        final MapPath mapPath = MapPath.parse(path);
+        MapPathException exception = null;
+        try {
+            mapPath.retrieve(map);
+        } catch (final MapPathException e) {
+            exception = e;
+        }
+        assertThat(exception, is(notNullValue()));
+        assertThat(exception.getMessage(), containsString(message));
+
+        final Retrieval retrieval = mapPath.retrieveOptionally(map);
+        assertThat(retrieval.isError(), is(true));
+    }
+
+    private static Map<String, Object> mapOf(final String key, final Object value) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put(key, value);
+        return map;
+    }
+
+    private static List<Object> listOf(final Object... values) {
+        final List<Object> list = new ArrayList<>(values.length);
+        list.addAll(Arrays.asList(values));
+        return list;
     }
 }

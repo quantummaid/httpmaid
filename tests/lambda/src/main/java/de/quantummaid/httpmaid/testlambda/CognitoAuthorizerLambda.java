@@ -29,6 +29,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoConfigurators.toAuthorizeWebsocketsWithCognito;
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoConfigurators.toStoreCognitoDataInWebsocketContext;
+import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
 
 @ToString
 @EqualsAndHashCode
@@ -54,6 +55,8 @@ public final class CognitoAuthorizerLambda {
     });
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
+        log.debug("new lambda event: {}", event);
+        LAMBDA_EVENT.runValidation(event);
         return ROUTER.route(event);
     }
 }

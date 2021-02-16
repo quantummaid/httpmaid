@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.awslambda.registry.queryexecutor;
 
+import de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation;
 import de.quantummaid.httpmaid.awslambda.registry.EntryDeserializer;
 import de.quantummaid.httpmaid.awslambda.repository.Repository;
 import de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.restore;
 import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,9 +45,13 @@ public final class DefaultQueryExecutor implements QueryExecutor {
     @Override
     public List<WebsocketRegistryEntry> connections(final WebsocketCriteria criteria,
                                                     final Repository repository) {
-        final List<Map<String, Object>> maps = repository.loadAll();
-        return maps.stream()
-                .map(EntryDeserializer::deserializeEntry)
+        final Map<String, Map<String, Object>> maps = repository.loadAll();
+        return maps.entrySet().stream()
+                .map(entry -> {
+                    final String key = entry.getKey();
+                    final AwsWebsocketConnectionInformation connectionInformation = restore(key);
+                    return EntryDeserializer.deserializeEntry(connectionInformation, entry.getValue());
+                })
                 .filter(criteria::filter)
                 .collect(toList());
     }

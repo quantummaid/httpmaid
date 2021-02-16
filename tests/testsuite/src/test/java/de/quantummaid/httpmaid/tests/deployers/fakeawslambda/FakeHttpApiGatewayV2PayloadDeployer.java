@@ -22,9 +22,6 @@
 package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.FakeHttpV2PayloadApiGateway;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.ApiWebsockets;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda;
@@ -38,10 +35,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import static de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint.awsLambdaEndpointFor;
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWebsocketLambdaEndpointFor;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGatewayClientFactory.fakeApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGatewayManagementServer.start;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ValidatedAwsLambdaEndpoint.validatedLambdaEndpoint;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.FakeHttpV2PayloadApiGateway.fakeHttpV2PayloadApiGateway;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.ApiWebsockets.apiWebsockets;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.websocket.FakeWebsocketLambda.fakeWebsocketLambda;
@@ -72,19 +67,13 @@ public final class FakeHttpApiGatewayV2PayloadDeployer implements Deployer {
         final int apiGatewayManagementServerPort = freePort();
         apiGatewayManagementServer = start(apiGatewayManagementServerPort, apiWebsockets);
 
-        final AwsLambdaEndpoint awsLambdaEndpoint = awsLambdaEndpointFor(httpMaid);
-        final ApiGatewayClientFactory apiGatewayClientFactory = fakeApiGatewayClientFactory(apiGatewayManagementServerPort);
-        final AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpoint = awsWebsocketLambdaEndpointFor(
-                httpMaid,
-                "not-an-actual-region",
-                apiGatewayClientFactory
-        );
+        final ValidatedAwsLambdaEndpoint awsLambdaEndpoint = validatedLambdaEndpoint(httpMaid, apiGatewayManagementServerPort);
 
         final int httpPort = FreePortPool.freePort();
         currentHttpGateway = fakeHttpV2PayloadApiGateway(awsLambdaEndpoint, httpPort);
 
         final int websocketsPort = freePort();
-        currentWebsocketGateway = fakeWebsocketLambda(awsWebsocketLambdaEndpoint, null, websocketsPort, apiWebsockets);
+        currentWebsocketGateway = fakeWebsocketLambda(awsLambdaEndpoint, websocketsPort, apiWebsockets);
 
         return localhostHttpAndWebsocketDeployment(httpPort, websocketsPort);
     }
