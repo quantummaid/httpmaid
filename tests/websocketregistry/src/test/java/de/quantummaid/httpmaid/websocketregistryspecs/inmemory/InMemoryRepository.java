@@ -25,9 +25,7 @@ import de.quantummaid.httpmaid.awslambda.repository.Repository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -54,8 +52,8 @@ public final class InMemoryRepository implements Repository {
     }
 
     @Override
-    public List<Map<String, Object>> loadAll() {
-        return new ArrayList<>(map.values());
+    public Map<String, Map<String, Object>> loadAll() {
+        return map;
     }
 
     @Override

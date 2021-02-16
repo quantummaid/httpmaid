@@ -32,6 +32,7 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -55,7 +56,8 @@ public final class Router {
     public static Router router(final Consumer<HttpMaidBuilder> additionalConfig) {
         final String region = System.getenv("REGION");
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(websocketRegistryTable, "id");
+        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 1.0);
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         final HttpMaid httpMaid = HttpMaidFactory.httpMaid(httpMaidBuilder -> {
             additionalConfig.accept(httpMaidBuilder);
@@ -68,7 +70,6 @@ public final class Router {
     }
 
     public Map<String, Object> route(final Map<String, Object> event) {
-        log.debug("new lambda event: {}", event);
         if (isAuthorizationRequest(event)) {
             return authorizer.delegate(event);
         } else if (!isWebSocketRequest(event)) {

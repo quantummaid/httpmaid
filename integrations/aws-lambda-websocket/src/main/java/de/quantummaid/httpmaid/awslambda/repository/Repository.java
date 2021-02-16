@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.awslambda.repository;
 
 import java.io.Closeable;
-import java.util.List;
 import java.util.Map;
 
 public interface Repository extends Closeable {
@@ -33,5 +32,5 @@ public interface Repository extends Closeable {
 
     Map<String, Object> load(String key);
 
-    List<Map<String, Object>> loadAll();
+    Map<String, Map<String, Object>> loadAll();
 }

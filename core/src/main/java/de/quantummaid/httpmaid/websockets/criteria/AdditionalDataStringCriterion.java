@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.websockets.criteria;
 
+import de.quantummaid.httpmaid.mappath.MapPath;
+import de.quantummaid.httpmaid.mappath.Retrieval;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,10 +37,10 @@ import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNot
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AdditionalDataStringCriterion {
-    private final String key;
+    private final MapPath key;
     private final String value;
 
-    public static AdditionalDataStringCriterion additionalDataStringCriterion(final String key,
+    public static AdditionalDataStringCriterion additionalDataStringCriterion(final MapPath key,
                                                                               final String value) {
         validateNotNull(key, "key");
         validateNotNull(value, "value");
@@ -47,17 +49,16 @@ public final class AdditionalDataStringCriterion {
 
     public boolean filter(final WebsocketRegistryEntry entry) {
         final Map<String, Object> additionalData = entry.additionalData();
-        if (!additionalData.containsKey(key)) {
+        final Retrieval retrieval = key.retrieveOptionally(additionalData);
+        if (retrieval.isError()) {
             return false;
+        } else {
+            final Object retrievedValue = retrieval.value();
+            return value.equals(retrievedValue);
         }
-        final Object actualValue = additionalData.get(key);
-        if (!(actualValue instanceof String)) {
-            return false;
-        }
-        return value.equals(actualValue);
     }
 
-    public String key() {
+    public MapPath key() {
         return key;
     }
 

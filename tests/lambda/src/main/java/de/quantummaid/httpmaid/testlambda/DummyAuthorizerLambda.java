@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
+
 @ToString
 @EqualsAndHashCode
 @Slf4j
@@ -35,6 +37,8 @@ public final class DummyAuthorizerLambda {
     });
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
+        log.debug("new lambda event: {}", event);
+        LAMBDA_EVENT.runValidation(event);
         return ROUTER.route(event);
     }
 }

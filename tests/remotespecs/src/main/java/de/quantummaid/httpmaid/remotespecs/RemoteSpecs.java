@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.givenwhenthen.builders.HeaderBuilder;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,6 +68,24 @@ public interface RemoteSpecs {
     default void handlerCanReceiveBodyOfPostRequest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/echo").viaThePostMethod().withTheBody("This is a post request.")
+                .withTheOptionalHeader(authorizationHeader()).isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("This is a post request.");
+    }
+
+    @Test
+    default void handlerCanReceiveBodyOfPutRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/echo").viaThePutMethod().withTheBody("This is a post request.")
+                .withTheOptionalHeader(authorizationHeader()).isIssued()
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("This is a post request.");
+    }
+
+    @Test
+    default void handlerCanReceiveBodyOfDeleteRequest(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/echo").viaTheDeleteMethod().withTheBody("This is a post request.")
                 .withTheOptionalHeader(authorizationHeader()).isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("This is a post request.");
@@ -225,6 +244,16 @@ public interface RemoteSpecs {
     }
 
     @Test
+    default void websocketsCanAccessQueryParameters(final TestEnvironment testEnvironment) {
+        final Map<String, List<String>> queryParameters = new LinkedHashMap<>(mapWithAccessToken());
+        queryParameters.put("myParameter", List.of("myValue"));
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected(queryParameters, Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"queryparameterhandler\" }")
+                .allWebsocketsHaveReceivedTheMessage("myvalue");
+    }
+
+    @Test
     default void handlersCanBroadcast(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aWebsocketIsConnected(mapWithAccessToken(), Map.of())
@@ -248,5 +277,15 @@ public interface RemoteSpecs {
                 .allWebsocketsHaveReceivedTheMessage("websocket has been registered")
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"disconnect\" }")
                 .allWebsocketsHaveBeenClosed();
+    }
+
+    @Test
+    default void additionalDataCanBeStoredInWebsocketRegistry(final TestEnvironment testEnvironment) {
+        final Map<String, List<String>> queryParameters = new LinkedHashMap<>(mapWithAccessToken());
+        queryParameters.put("toBeStoredInContext", List.of("foobar"));
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aWebsocketIsConnected(queryParameters, Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"echofromcontext\" }")
+                .allWebsocketsHaveReceivedTheMessage("foobar");
     }
 }

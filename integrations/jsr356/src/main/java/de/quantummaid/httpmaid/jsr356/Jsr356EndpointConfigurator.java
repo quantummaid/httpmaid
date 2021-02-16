@@ -22,10 +22,12 @@
 package de.quantummaid.httpmaid.jsr356;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.HeadersBuilder;
 import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +41,10 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.jsr356.Jsr356Endpoint.programmaticJsr356Endpoint;
 import static de.quantummaid.httpmaid.jsr356.Jsr356Exception.jsr356Exception;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder.rawWebsocketAuthorizationBuilder;
+import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocketSender.NON_SERIALIZABLE_WEBSOCKET_SENDER;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
@@ -57,9 +61,8 @@ public final class Jsr356EndpointConfigurator extends ServerEndpointConfig.Confi
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <T> T getEndpointInstance(final Class<T> endpointClass) {
-        final Headers headers = handshakeMetaData.getHeaders();
-        final Map<String, Object> additionalWebsocketData = handshakeMetaData.getAdditionalWebsocketData();
-        return (T) programmaticJsr356Endpoint(httpMaid, headers, additionalWebsocketData);
+        final WebsocketRegistryEntry websocketRegistryEntry = handshakeMetaData.getWebsocketRegistryEntry();
+        return (T) programmaticJsr356Endpoint(httpMaid, websocketRegistryEntry);
     }
 
     @Override
@@ -73,20 +76,21 @@ public final class Jsr356EndpointConfigurator extends ServerEndpointConfig.Confi
 
         final AuthorizationDecision authorizationDecision = httpMaid.handleRequestSynchronously(
                 () -> {
-                    final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder();
+                    final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder(NON_SERIALIZABLE_WEBSOCKET_SENDER);
                     builder.withHeaders(headers);
                     final String queryString = request.getQueryString();
                     builder.withEncodedQueryString(queryString);
                     return builder.build();
                 },
-                authorizationResponse -> authorizationResponse.metaData().get(AUTHORIZATION_DECISION)
+                authorizationResponse -> {
+                    final MetaData metaData = authorizationResponse.metaData();
+                    handshakeMetaData.setWebsocketRegistryEntry(metaData.get(WEBSOCKET_REGISTRY_ENTRY));
+                    return authorizationResponse.metaData().get(AUTHORIZATION_DECISION);
+                }
         );
 
         if (!authorizationDecision.isAuthorized()) {
             throw jsr356Exception("not authorized");
         }
-
-        handshakeMetaData.setHeaders(headers);
-        handshakeMetaData.setAdditionalWebsocketData(authorizationDecision.additionalData());
     }
 }

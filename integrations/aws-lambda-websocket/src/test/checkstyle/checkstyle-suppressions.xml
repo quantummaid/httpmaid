@@ -25,4 +25,5 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress checks="IllegalCatch" files="MapDeserializer|MapSerializer" />
+    <suppress checks="MagicNumber" files="AwsWebsocketConnectionInformation" />
 </suppressions>

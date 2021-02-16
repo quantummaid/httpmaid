@@ -44,13 +44,17 @@ public final class KeyMapPathElement implements MapPathElement {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object retrieve(final Object object) {
+    public Retrieval retrieve(final Object object) {
         if (!(object instanceof Map)) {
-            throw new IllegalArgumentException(format("expected a Map in order to retrieve key '%s' but found: %s",
+            return Retrieval.error(format("expected a Map in order to retrieve key '%s' but found: %s",
                     key, object));
         }
         final Map<String, Object> map = (Map<String, Object>) object;
-        return map.get(key);
+        if (!map.containsKey(key)) {
+            return Retrieval.error(format("did not find key '%s' in Map", key));
+        }
+        final Object value = map.get(key);
+        return Retrieval.success(value);
     }
 
     @Override

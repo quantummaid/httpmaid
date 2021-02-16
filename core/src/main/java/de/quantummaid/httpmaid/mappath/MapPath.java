@@ -67,12 +67,21 @@ public final class MapPath {
     }
 
     public Object retrieve(final Map<String, Object> map) {
-        validateNotNull(map, "map");
-        Object retrievedObject = map;
+        final Retrieval retrieval = retrieveOptionally(map);
+        return retrieval.value();
+    }
+
+    public Retrieval retrieveOptionally(final Map<String, Object> map) {
+        Object value = map;
+        Retrieval retrieval = null;
         for (final MapPathElement element : elements) {
-            retrievedObject = element.retrieve(retrievedObject);
+            retrieval = element.retrieve(value);
+            if (retrieval.isError()) {
+                break;
+            }
+            value = retrieval.value();
         }
-        return retrievedObject;
+        return retrieval;
     }
 
     public String render() {

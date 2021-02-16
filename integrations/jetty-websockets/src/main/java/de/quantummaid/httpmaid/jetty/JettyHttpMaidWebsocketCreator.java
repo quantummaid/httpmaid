@@ -22,9 +22,11 @@
 package de.quantummaid.httpmaid.jetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
+import de.quantummaid.httpmaid.endpoint.RawResponse;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
 import de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +42,10 @@ import static de.quantummaid.httpmaid.jetty.JettyEndpointException.jettyEndpoint
 import static de.quantummaid.httpmaid.jetty.JettyHttpMaidWebsocket.jettyHttpMaidWebsocket;
 import static de.quantummaid.httpmaid.jetty.UpgradeRequestUtils.extractHeaders;
 import static de.quantummaid.httpmaid.jetty.UpgradeRequestUtils.extractQueryParameters;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder.rawWebsocketAuthorizationBuilder;
+import static de.quantummaid.httpmaid.websockets.sender.NonSerializableWebsocketSender.NON_SERIALIZABLE_WEBSOCKET_SENDER;
 
 @ToString
 @EqualsAndHashCode
@@ -56,8 +60,8 @@ public final class JettyHttpMaidWebsocketCreator implements WebSocketCreator {
     @Override
     public Object createWebSocket(final ServletUpgradeRequest request,
                                   final ServletUpgradeResponse response) {
-        final AuthorizationDecision authorizationDecision = httpMaid.handleRequestSynchronously(() -> {
-            final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder();
+        final RawResponse rawResponse = httpMaid.handleRequestSynchronously(() -> {
+            final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder(NON_SERIALIZABLE_WEBSOCKET_SENDER);
 
             final Map<String, List<String>> queryParameters = extractQueryParameters(request);
             builder.withQueryParameterMap(queryParameters);
@@ -65,13 +69,15 @@ public final class JettyHttpMaidWebsocketCreator implements WebSocketCreator {
             builder.withHeaders(headers);
 
             return builder.build();
-        }, authorizationResponse -> authorizationResponse.metaData().get(AUTHORIZATION_DECISION));
+        }, authorizationResponse -> authorizationResponse);
+
+        final AuthorizationDecision authorizationDecision = rawResponse.metaData().get(AUTHORIZATION_DECISION);
 
         if (!authorizationDecision.isAuthorized()) {
             throw jettyEndpointException("not authorized");
         }
 
-        final Map<String, Object> additionalData = authorizationDecision.additionalData();
-        return jettyHttpMaidWebsocket(httpMaid, additionalData);
+        final WebsocketRegistryEntry registryEntry = rawResponse.metaData().get(WEBSOCKET_REGISTRY_ENTRY);
+        return jettyHttpMaidWebsocket(httpMaid, registryEntry);
     }
 }

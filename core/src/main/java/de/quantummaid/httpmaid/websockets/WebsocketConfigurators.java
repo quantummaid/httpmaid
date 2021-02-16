@@ -22,12 +22,17 @@
 package de.quantummaid.httpmaid.websockets;
 
 import de.quantummaid.httpmaid.chains.Configurator;
+import de.quantummaid.httpmaid.http.HeaderName;
 import de.quantummaid.httpmaid.websockets.additionaldata.AdditionalWebsocketDataProvider;
 import de.quantummaid.httpmaid.websockets.authorization.WebsocketAuthorizer;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 
+import java.util.List;
+
 import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 
 public final class WebsocketConfigurators {
 
@@ -55,5 +60,17 @@ public final class WebsocketConfigurators {
         validateNotNull(authorizer, "authorizer");
         return configuratorForType(WebsocketsModule.class,
                 websocketsModule -> websocketsModule.setWebsocketAuthorizer(authorizer));
+    }
+
+    public static Configurator toRememberHeadersInWebsocketMessages(final String... headerNames) {
+        final List<HeaderName> list = stream(headerNames)
+                .map(HeaderName::headerName)
+                .collect(toList());
+        return toRememberHeadersInWebsocketMessages(list);
+    }
+
+    public static Configurator toRememberHeadersInWebsocketMessages(final List<HeaderName> headerNames) {
+        return configuratorForType(WebsocketsModule.class, websocketsModule ->
+                headerNames.forEach(websocketsModule::addAllowedHeaderInRegistry));
     }
 }

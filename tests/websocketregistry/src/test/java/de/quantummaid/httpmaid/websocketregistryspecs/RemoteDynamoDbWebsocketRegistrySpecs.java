@@ -23,20 +23,37 @@ package de.quantummaid.httpmaid.websocketregistryspecs;
 
 import de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
+import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepositoryException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.basedirectory.BaseDirectoryFinder;
 import de.quantummaid.httpmaid.websocketregistryspecs.remotedynamodb.aws.cloudformation.CloudFormationHandler;
 import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryDeployment;
 import de.quantummaid.httpmaid.websocketregistryspecs.testsupport.WebsocketRegistryTestExtension;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
+import static de.quantummaid.httpmaid.http.Header.header;
+import static de.quantummaid.httpmaid.http.HeaderName.headerName;
+import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
+import static de.quantummaid.httpmaid.http.Headers.headers;
+import static de.quantummaid.httpmaid.http.QueryParameter.queryParameter;
+import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
+import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
+import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
+import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.websocketRegistryEntry;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.websocketSenderId;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @ExtendWith(WebsocketRegistryTestExtension.class)
 public final class RemoteDynamoDbWebsocketRegistrySpecs implements WebsocketRegistrySpecs {
@@ -56,7 +73,7 @@ public final class RemoteDynamoDbWebsocketRegistrySpecs implements WebsocketRegi
         }
 
         final DynamoDbClient dynamoDbClient = DynamoDbClient.create();
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, stackIdentifier, PRIMARY_KEY);
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, stackIdentifier, PRIMARY_KEY, 2.0);
         final DynamoDbWebsocketRegistry dynamoDbWebsocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
 
         return WebsocketRegistryDeployment.websocketRegistryDeployment(dynamoDbWebsocketRegistry, () -> {
@@ -68,5 +85,33 @@ public final class RemoteDynamoDbWebsocketRegistrySpecs implements WebsocketRegi
 
     public ConnectionInformation connectionInformation() {
         return awsWebsocketConnectionInformation("a", "b", "c", "d");
+    }
+
+    @Test
+    public void maxWriteCapacityUnitsCanBeEnforced(final WebsocketRegistry websocketRegistry) {
+        final String largeString = "abc".repeat(1000);
+        final ConnectionInformation connectionInformation = connectionInformation();
+        final WebsocketRegistryEntry entry = websocketRegistryEntry(
+                connectionInformation,
+                websocketSenderId("foo"),
+                headers(List.of(header(headerName("header-name"), headerValue(largeString)))),
+                queryParameters(List.of(
+                        queryParameter(queryParameterName("query-name"),
+                                queryParameterValue("query-value"))
+                        )
+                ),
+                Map.of("a", "b")
+        );
+        DynamoDbRepositoryException exception = null;
+        try {
+            websocketRegistry.addConnection(entry);
+        } catch (final DynamoDbRepositoryException e) {
+            exception = e;
+        }
+        assertThat(exception, is(notNullValue()));
+        final String message = exception.getMessage();
+        assertThat(message, containsString("write capacity units of item a/b/c/d " +
+                "in DynamoDB table websocketregistryspecs-"));
+        assertThat(message, containsString("consumed 8.0 WCUs but is only allowed to consume 2.0 WCUs"));
     }
 }

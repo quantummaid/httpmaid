@@ -24,7 +24,7 @@ package de.quantummaid.httpmaid.mappath;
 import de.quantummaid.httpmaid.mappath.rendering.RenderedElement;
 
 public interface MapPathElement {
-    Object retrieve(Object object);
+    Retrieval retrieve(Object object);
 
     RenderedElement render();
 }

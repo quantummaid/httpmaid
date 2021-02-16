@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.http.QueryParametersBuilder;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -40,12 +41,13 @@ import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizat
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketAuthorizationBuilder {
+    private final WebsocketSenderId senderId;
     private Headers headers;
     private QueryParameters queryParameters;
     private final Map<MetaDataKey<?>, Object> additionalMetaData = new LinkedHashMap<>();
 
-    public static RawWebsocketAuthorizationBuilder rawWebsocketAuthorizationBuilder() {
-        return new RawWebsocketAuthorizationBuilder();
+    public static RawWebsocketAuthorizationBuilder rawWebsocketAuthorizationBuilder(final WebsocketSenderId senderId) {
+        return new RawWebsocketAuthorizationBuilder(senderId);
     }
 
     public RawWebsocketAuthorizationBuilder withHeaders(final Headers headers) {
@@ -75,6 +77,6 @@ public final class RawWebsocketAuthorizationBuilder {
     }
 
     public RawWebsocketAuthorization build() {
-        return rawWebsocketAuthorization(queryParameters, headers, additionalMetaData);
+        return rawWebsocketAuthorization(queryParameters, headers, senderId, additionalMetaData);
     }
 }

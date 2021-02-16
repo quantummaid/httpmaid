@@ -23,8 +23,8 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.Server;
+import de.quantummaid.httpmaid.tests.deployers.fakeawslambda.ValidatedAwsLambdaEndpoint;
 import de.quantummaid.httpmaid.util.streams.Streams;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -36,7 +36,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
 
+import static de.quantummaid.httpmaid.lambdastructure.Structures.HTTP_REQUEST_V2;
 import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.apigateway.ApiGatewayUtils.addBodyToEvent;
+import static de.quantummaid.httpmaid.util.streams.Streams.inputStreamToString;
 import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOutputStream;
 
 @ToString
@@ -45,7 +47,7 @@ import static de.quantummaid.httpmaid.util.streams.Streams.streamInputStreamToOu
 public final class FakeHttpV2PayloadApiGateway implements AutoCloseable {
     private final Server server;
 
-    public static FakeHttpV2PayloadApiGateway fakeHttpV2PayloadApiGateway(final AwsLambdaEndpoint endpoint,
+    public static FakeHttpV2PayloadApiGateway fakeHttpV2PayloadApiGateway(final ValidatedAwsLambdaEndpoint endpoint,
                                                                           final int port) {
         final Server server = Server.server(port, exchange -> {
             try {
@@ -65,11 +67,13 @@ public final class FakeHttpV2PayloadApiGateway implements AutoCloseable {
         server.close();
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, Object> mapRequestToEvent(final HttpExchange exchange) {
-        final Map<String, Object> event = new HashMap<>();
+        final Map<String, Object> event = (Map<String, Object>) HTTP_REQUEST_V2.mutableSample();
         event.put("version", "2.0");
 
-        final Map<String, Object> httpInformation = new LinkedHashMap<>();
+        final Map<String, Object> requestContext = (Map<String, Object>) event.get("requestContext");
+        final Map<String, Object> httpInformation = (Map<String, Object>) requestContext.get("http");
 
         final URI requestURI = exchange.getRequestURI();
         final String path = requestURI.getPath();
@@ -77,8 +81,6 @@ public final class FakeHttpV2PayloadApiGateway implements AutoCloseable {
 
         final String method = exchange.getRequestMethod();
         httpInformation.put("method", method);
-
-        event.put("requestContext", Map.of("http", httpInformation));
 
         final Map<String, String> headers = new LinkedHashMap<>();
         final List<String> cookies = new ArrayList<>();
@@ -96,7 +98,10 @@ public final class FakeHttpV2PayloadApiGateway implements AutoCloseable {
         final String rawQuery = Optional.ofNullable(requestURI.getRawQuery()).orElse("");
         event.put("rawQueryString", rawQuery);
 
-        addBodyToEvent(exchange.getRequestBody(), event);
+        final String body = inputStreamToString(exchange.getRequestBody());
+        if (!body.isEmpty()) {
+            addBodyToEvent(body, event);
+        }
         return event;
     }
 

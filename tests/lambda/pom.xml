@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.127</version>
+        <version>0.9.128</version>
     </parent>
 
     <artifactId>testlambda</artifactId>
@@ -106,6 +106,16 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-cognitoauthorizer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.quantummaid.httpmaid.tests</groupId>
+            <artifactId>lambdastructure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
         </dependency>
     </dependencies>
 

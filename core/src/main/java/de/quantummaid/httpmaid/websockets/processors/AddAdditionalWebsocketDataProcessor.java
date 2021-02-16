@@ -25,13 +25,13 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
 import de.quantummaid.httpmaid.websockets.additionaldata.AdditionalWebsocketDataProvider;
-import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
+import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,9 +47,14 @@ public final class AddAdditionalWebsocketDataProcessor implements Processor {
 
     @Override
     public void apply(final MetaData metaData) {
+        final Map<String, Object> additionalData = metaData.getOptional(ADDITIONAL_WEBSOCKET_DATA)
+                .map(LinkedHashMap::new)
+                .orElseGet(LinkedHashMap::new);
+
         final HttpRequest httpRequest = HttpRequest.httpRequest(metaData);
-        final Map<String, Object> additionalWebsocketData = dataProvider.provide(httpRequest);
-        final AuthorizationDecision authorizationDecision = metaData.get(AUTHORIZATION_DECISION);
-        authorizationDecision.mergeInAdditionalData(additionalWebsocketData);
+        final Map<String, Object> providedData = dataProvider.provide(httpRequest);
+        additionalData.putAll(providedData);
+
+        metaData.set(ADDITIONAL_WEBSOCKET_DATA, additionalData);
     }
 }

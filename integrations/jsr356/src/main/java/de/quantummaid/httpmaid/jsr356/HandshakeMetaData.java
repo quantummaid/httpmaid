@@ -21,37 +21,26 @@
 
 package de.quantummaid.httpmaid.jsr356;
 
-import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-
-import java.util.Map;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public final class HandshakeMetaData {
-    private Headers headers;
-    private Map<String, Object> additionalWebsocketData;
+    private WebsocketRegistryEntry websocketRegistryEntry;
 
     public static HandshakeMetaData handshakeMetaData() {
         return new HandshakeMetaData();
     }
 
-    public synchronized void setHeaders(final Headers headers) {
-        this.headers = headers;
+    public synchronized void setWebsocketRegistryEntry(final WebsocketRegistryEntry websocketRegistryEntry) {
+        this.websocketRegistryEntry = websocketRegistryEntry;
     }
 
-    public synchronized Headers getHeaders() {
-        return headers;
-    }
-
-    public void setAdditionalWebsocketData(final Map<String, Object> additionalWebsocketData) {
-        this.additionalWebsocketData = additionalWebsocketData;
-    }
-
-    public Map<String, Object> getAdditionalWebsocketData() {
-        return additionalWebsocketData;
+    public synchronized WebsocketRegistryEntry getWebsocketRegistryEntry() {
+        return websocketRegistryEntry;
     }
 }

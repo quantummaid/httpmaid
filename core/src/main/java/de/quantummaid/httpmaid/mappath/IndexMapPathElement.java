@@ -44,13 +44,17 @@ public final class IndexMapPathElement implements MapPathElement {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object retrieve(final Object object) {
+    public Retrieval retrieve(final Object object) {
         if (!(object instanceof List)) {
-            throw new IllegalArgumentException(format("expected a List in order to retrieve index '%d' but found: %s",
+            return Retrieval.error(format("expected a List in order to retrieve index '%d' but found: %s",
                     index, object));
         }
         final List<Object> list = (List<Object>) object;
-        return list.get(index);
+        if (index >= list.size()) {
+            return Retrieval.error(format("cannot retrieve index '%d' out of List because its size is '%d'",
+                    index, list.size()));
+        }
+        return Retrieval.success(list.get(index));
     }
 
     @Override

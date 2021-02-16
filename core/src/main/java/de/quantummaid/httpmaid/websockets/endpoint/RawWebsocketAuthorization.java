@@ -26,6 +26,7 @@ import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawRequest;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.QueryParameters;
+import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -35,17 +36,20 @@ import static de.quantummaid.httpmaid.HttpMaidChainKeys.QUERY_PARAMETERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.REQUEST_TYPE;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_AUTHORIZATION;
+import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RawWebsocketAuthorization implements RawRequest {
     private final QueryParameters queryParameters;
     private final Headers headers;
+    private final WebsocketSenderId websocketSenderId;
     private final Map<MetaDataKey<?>, Object> additionalMetaData;
 
     public static RawWebsocketAuthorization rawWebsocketAuthorization(final QueryParameters queryParameters,
                                                                       final Headers headers,
+                                                                      final WebsocketSenderId websocketSenderId,
                                                                       final Map<MetaDataKey<?>, Object> additionalMetaData) {
-        return new RawWebsocketAuthorization(queryParameters, headers, additionalMetaData);
+        return new RawWebsocketAuthorization(queryParameters, headers, websocketSenderId, additionalMetaData);
     }
 
     @Override
@@ -53,6 +57,7 @@ public final class RawWebsocketAuthorization implements RawRequest {
         metaData.set(REQUEST_TYPE, WEBSOCKET_AUTHORIZATION);
         metaData.set(QUERY_PARAMETERS, queryParameters);
         metaData.set(REQUEST_HEADERS, headers);
+        metaData.set(WEBSOCKET_SENDER_ID, websocketSenderId);
         additionalMetaData.forEach(metaData::setUnchecked);
     }
 }

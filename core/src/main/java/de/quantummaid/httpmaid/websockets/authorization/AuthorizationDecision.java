@@ -26,7 +26,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
@@ -37,7 +36,7 @@ public final class AuthorizationDecision {
     public static final MetaDataKey<AuthorizationDecision> AUTHORIZATION_DECISION = metaDataKey("AUTHORIZATION_DECISION");
 
     private final boolean authorized;
-    private Map<String, Object> additionalData;
+    private final Map<String, Object> additionalData;
 
     public static AuthorizationDecision success() {
         return success(Map.of());
@@ -58,12 +57,6 @@ public final class AuthorizationDecision {
 
     public boolean isAuthorized() {
         return authorized;
-    }
-
-    public void mergeInAdditionalData(final Map<String, Object> additionalData) {
-        final Map<String, Object> newData = new LinkedHashMap<>(this.additionalData);
-        newData.putAll(additionalData);
-        this.additionalData = newData;
     }
 
     public Map<String, Object> additionalData() {

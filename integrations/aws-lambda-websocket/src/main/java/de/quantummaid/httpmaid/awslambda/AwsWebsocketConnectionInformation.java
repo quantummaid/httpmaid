@@ -38,6 +38,15 @@ public final class AwsWebsocketConnectionInformation implements ConnectionInform
     public final String apiId;
     public final String region;
 
+    public static AwsWebsocketConnectionInformation restore(final String serialized) {
+        final String[] split = serialized.split("/");
+        final String connectionId = split[0];
+        final String stage = split[1];
+        final String apiId = split[2];
+        final String region = split[3];
+        return new AwsWebsocketConnectionInformation(connectionId, stage, apiId, region);
+    }
+
     public static AwsWebsocketConnectionInformation awsWebsocketConnectionInformation(final String connectionId,
                                                                                       final String stage,
                                                                                       final String apiId,
@@ -56,6 +65,6 @@ public final class AwsWebsocketConnectionInformation implements ConnectionInform
 
     @Override
     public String uniqueIdentifier() {
-        return toEndpointUrl() + "/" + connectionId;
+        return connectionId + "/" + stage + "/" + apiId + "/" + region;
     }
 }
