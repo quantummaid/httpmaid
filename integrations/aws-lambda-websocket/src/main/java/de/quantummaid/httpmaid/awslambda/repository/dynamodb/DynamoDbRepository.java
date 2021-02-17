@@ -78,19 +78,26 @@ public final class DynamoDbRepository implements Repository {
                 VALUE_IDENTIFIER, value
         );
         final Map<String, AttributeValue> marshalledMap = marshalTopLevelMap(wrappedMap);
-        final PutItemResponse response = dynamoDbClient.putItem(builder -> builder
-                .tableName(tableName)
-                .item(marshalledMap)
-                .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+        final PutItemResponse response = dynamoDbClient.putItem(builder -> {
+                    builder
+                            .tableName(tableName)
+                            .item(marshalledMap);
+                    if (enforcedMaxWriteCapacityUnits != null) {
+                        builder.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL);
+                    }
+                }
         );
-        final double writeCapacityUnits = response.consumedCapacity().writeCapacityUnits();
-        log.info("write of item {} to DynamoDB table {} consumed {} WCUs", key, tableName, writeCapacityUnits);
-        if (enforcedMaxWriteCapacityUnits != null && writeCapacityUnits > enforcedMaxWriteCapacityUnits) {
-            throw dynamoDbRepositoryException(
-                    "write capacity units of item " + key + " in DynamoDB table " + tableName +
-                            " consumed " + writeCapacityUnits +
-                            " WCUs but is only allowed to consume " + enforcedMaxWriteCapacityUnits + " WCUs"
-            );
+        if (enforcedMaxWriteCapacityUnits != null) {
+            final ConsumedCapacity consumedCapacity = response.consumedCapacity();
+            final double writeCapacityUnits = consumedCapacity.capacityUnits();
+            log.info("write of item {} to DynamoDB table {} consumed {} WCUs", key, tableName, writeCapacityUnits);
+            if (writeCapacityUnits > enforcedMaxWriteCapacityUnits) {
+                throw dynamoDbRepositoryException(
+                        "write capacity units of item " + key + " in DynamoDB table " + tableName +
+                                " consumed " + writeCapacityUnits +
+                                " WCUs but is only allowed to consume " + enforcedMaxWriteCapacityUnits + " WCUs"
+                );
+            }
         }
     }
 
