@@ -28,7 +28,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public final class DynamoDbAssertions {
-    private static final int MAX_NUMBER_OF_TRIES = 120;
+    private static final int MAX_NUMBER_OF_TRIES = 240;
     private static final int SLEEP_TIME_IN_MILLISECONDS = 1000;
 
     private DynamoDbAssertions() {
