@@ -58,7 +58,7 @@ public interface WebsocketRegistrySpecs {
         final ConnectionInformation connectionInformation = connectionInformation();
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
-                websocketSenderId("foo"),
+                websocketSenderId("AWS_WEBSOCKET_SENDER"),
                 headers(List.of(header(headerName("header-name"), headerValue("header-value")))),
                 queryParameters(List.of(
                         queryParameter(queryParameterName("query-name"),
@@ -69,7 +69,7 @@ public interface WebsocketRegistrySpecs {
         );
         websocketRegistry.addConnection(entry);
         final WebsocketRegistryEntry queriedEntry = websocketRegistry.byConnectionInformation(connectionInformation);
-        assertThat(queriedEntry.getSenderId().asString(), is("foo"));
+        assertThat(queriedEntry.getSenderId().asString(), is("AWS_WEBSOCKET_SENDER"));
 
         final List<Header> headerList = queriedEntry.headers().asList();
         assertThat(headerList.size(), is(1));
@@ -89,7 +89,7 @@ public interface WebsocketRegistrySpecs {
         final ConnectionInformation connectionInformation = connectionInformation();
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
-                websocketSenderId("foo"),
+                websocketSenderId("AWS_WEBSOCKET_SENDER"),
                 headers(emptyList()),
                 queryParameters(emptyList()),
                 Map.of("a", "b")
@@ -98,7 +98,7 @@ public interface WebsocketRegistrySpecs {
         final List<WebsocketRegistryEntry> connections = websocketRegistry.connections(websocketCriteria());
         assertThat(connections.size(), is(1));
         final WebsocketRegistryEntry queriedEntry = connections.get(0);
-        assertThat(queriedEntry.getSenderId().asString(), is("foo"));
+        assertThat(queriedEntry.getSenderId().asString(), is("AWS_WEBSOCKET_SENDER"));
     }
 
     @Test
@@ -106,7 +106,7 @@ public interface WebsocketRegistrySpecs {
         final ConnectionInformation connectionInformation = connectionInformation();
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
-                websocketSenderId("foo"),
+                websocketSenderId("AWS_WEBSOCKET_SENDER"),
                 headers(emptyList()),
                 queryParameters(emptyList()),
                 Map.of("a", "b")
