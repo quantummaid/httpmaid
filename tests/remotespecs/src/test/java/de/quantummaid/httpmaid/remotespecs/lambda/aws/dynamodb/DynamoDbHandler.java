@@ -36,7 +36,7 @@ import static de.quantummaid.mapmaid.dynamodb.attributevalue.AttributeValueUnmar
 @Slf4j
 public final class DynamoDbHandler {
     private static final int MAX_NUMBER_OF_TRIES = 10;
-    private static final int SLEEP_TIME_IN_MILLISECONDS = 5000;
+    private static final int SLEEP_TIME_IN_MILLISECONDS = 1000;
     private static final String PARTITION_KEY = "id";
     private static final Unmarshaller<AttributeValue> UNMARSHALLER = attributeValueUnmarshaller();
 
