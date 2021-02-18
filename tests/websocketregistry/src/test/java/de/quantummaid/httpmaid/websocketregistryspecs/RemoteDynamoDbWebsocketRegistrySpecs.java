@@ -112,6 +112,6 @@ public final class RemoteDynamoDbWebsocketRegistrySpecs implements WebsocketRegi
         final String message = exception.getMessage();
         assertThat(message, containsString("write capacity units of item a/b/c/d " +
                 "in DynamoDB table websocketregistryspecs-"));
-        assertThat(message, containsString("consumed 8.0 WCUs but is only allowed to consume 2.0 WCUs"));
+        assertThat(message, containsString("consumed 4.0 WCUs but is only allowed to consume 2.0 WCUs"));
     }
 }
