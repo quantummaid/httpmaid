@@ -179,6 +179,12 @@
         </dependency>
 
         <dependency>
+            <groupId>de.quantummaid.mapmaid.integrations</groupId>
+            <artifactId>mapmaid-dynamodb</artifactId>
+            <version>0.9.113</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
         </dependency>

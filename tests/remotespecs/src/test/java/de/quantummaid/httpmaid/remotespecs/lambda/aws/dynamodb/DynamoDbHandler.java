@@ -21,30 +21,47 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb;
 
+import de.quantummaid.mapmaid.mapper.marshalling.Unmarshaller;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
+import static de.quantummaid.mapmaid.dynamodb.attributevalue.AttributeValueUnmarshaller.attributeValueUnmarshaller;
 
 @Slf4j
 public final class DynamoDbHandler {
     private static final int MAX_NUMBER_OF_TRIES = 10;
-    private static final int SLEEP_TIME_IN_MILLISECONDS = 5000;
+    private static final int SLEEP_TIME_IN_MILLISECONDS = 1000;
     private static final String PARTITION_KEY = "id";
+    private static final Unmarshaller<AttributeValue> UNMARSHALLER = attributeValueUnmarshaller();
 
     private DynamoDbHandler() {
     }
 
-    public static int countEntries(final String tableName) {
+    public static List<Map<String, Object>> entries(final String tableName) {
         try (DynamoDbClient dynamoDbClient = DynamoDbClient.create()) {
             final ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)
                     .build();
             final ScanResponse scan = dynamoDbClient.scan(scanRequest);
-            return scan.items().size();
+            return scan.items().stream()
+                    .map(map -> {
+                        try {
+                            final AttributeValue marshalledKey = map.get(PARTITION_KEY);
+                            final String key = (String) UNMARSHALLER.unmarshal(marshalledKey);
+                            final AttributeValue marshalledValue = map.get("value");
+                            final Object value = UNMARSHALLER.unmarshal(marshalledValue);
+                            return Map.of(key, value);
+                        } catch (final Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
         }
     }
 
