@@ -23,9 +23,12 @@ package de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.Poller;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb.DynamoDbHandler.countEntries;
-import static org.hamcrest.CoreMatchers.is;
+import java.util.List;
+import java.util.Map;
+
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.dynamodb.DynamoDbHandler.entries;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 public final class DynamoDbAssertions {
     private static final int MAX_NUMBER_OF_TRIES = 240;
@@ -40,11 +43,11 @@ public final class DynamoDbAssertions {
 
     public static void assertTableHasNumberOfEntries(final int numberOfEntries, final String tableName) {
         Poller.pollWithTimeout(MAX_NUMBER_OF_TRIES, SLEEP_TIME_IN_MILLISECONDS, () -> {
-            final int entries = countEntries(tableName);
+            final int entries = entries(tableName).size();
             return entries == numberOfEntries;
         });
 
-        final int entries = countEntries(tableName);
-        assertThat(entries, is(numberOfEntries));
+        final List<Map<String, Object>> entries = entries(tableName);
+        assertThat(entries, hasSize(numberOfEntries));
     }
 }
