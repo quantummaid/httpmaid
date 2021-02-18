@@ -95,7 +95,8 @@ public final class DynamoDbRepository implements Repository {
                 throw dynamoDbRepositoryException(
                         "write capacity units of item " + key + " in DynamoDB table " + tableName +
                                 " consumed " + writeCapacityUnits +
-                                " WCUs but is only allowed to consume " + enforcedMaxWriteCapacityUnits + " WCUs"
+                                " WCUs but is only allowed to consume " + enforcedMaxWriteCapacityUnits + " WCUs" +
+                                " (value: " + value + ")"
                 );
             }
         }
