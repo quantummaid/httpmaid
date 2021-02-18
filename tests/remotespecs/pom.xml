@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.129</version>
+        <version>0.9.130</version>
     </parent>
 
     <artifactId>remotespecs</artifactId>
@@ -182,6 +182,7 @@
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-dynamodb</artifactId>
             <version>0.9.113</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

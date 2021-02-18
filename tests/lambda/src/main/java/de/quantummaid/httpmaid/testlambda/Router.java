@@ -57,7 +57,7 @@ public final class Router {
         final String region = System.getenv("REGION");
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
         final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 1.0);
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 2.0);
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         final HttpMaid httpMaid = HttpMaidFactory.httpMaid(httpMaidBuilder -> {
             additionalConfig.accept(httpMaidBuilder);

@@ -55,7 +55,7 @@ public final class UnauthorizedLambda {
     private static HttpMaid httpMaid() {
         final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
         final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 1.0);
+        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 2.0);
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
                 .configured(toUseWebsocketRegistry(websocketRegistry)));

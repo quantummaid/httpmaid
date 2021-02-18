@@ -285,7 +285,7 @@ public final class Structures {
     public static final StructureValidator WEBSOCKET_MESSAGE = map()
             .key("requestContext", map()
                     .key("routeKey", fixed("$default"))
-                    .key("disconnectStatusCode", nullValue())
+                    .optionalKey("disconnectStatusCode", nullValue())
                     .optionalKey("authorizer", map()
                             .key("principalId", string())
                             .key("registryEntry", string())
@@ -295,7 +295,7 @@ public final class Structures {
                     .key("extendedRequestId", string())
                     .key("requestTime", string())
                     .key("messageDirection", fixed("IN"))
-                    .key("disconnectReason", nullValue())
+                    .optionalKey("disconnectReason", nullValue())
                     .key("stage", string())
                     .key("connectedAt", number())
                     .key("requestTimeEpoch", number())
@@ -326,7 +326,7 @@ public final class Structures {
             .key("multiValueHeaders", mapOf(listOf(string())))
             .key("requestContext", map()
                     .key("routeKey", fixed("$disconnect"))
-                    .key("disconnectStatusCode", number())
+                    .optionalKey("disconnectStatusCode", number())
                     .optionalKey("authorizer", map()
                             .key("principalId", string())
                             .key("registryEntry", string())
@@ -336,7 +336,7 @@ public final class Structures {
                     .key("extendedRequestId", string())
                     .key("requestTime", string())
                     .key("messageDirection", fixed("IN"))
-                    .key("disconnectReason", oneOf(
+                    .optionalKey("disconnectReason", oneOf(
                             fixed("Shutdown"),
                             fixed("Connection Closed Normally")
                     ))
