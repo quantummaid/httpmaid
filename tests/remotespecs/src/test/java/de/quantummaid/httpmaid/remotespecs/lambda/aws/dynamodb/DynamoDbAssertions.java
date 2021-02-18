@@ -48,6 +48,6 @@ public final class DynamoDbAssertions {
         });
 
         final List<Map<String, Object>> entries = entries(tableName);
-        assertThat(entries, hasSize(numberOfEntries));
+        assertThat(entries.toString(), entries, hasSize(numberOfEntries));
     }
 }
