@@ -19,41 +19,32 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.websockets.registry;
+package de.quantummaid.httpmaid.websockets.registry.filter.queryparameter;
 
-import de.quantummaid.httpmaid.http.Header;
-import de.quantummaid.httpmaid.http.HeaderName;
+import de.quantummaid.httpmaid.http.QueryParameter;
+import de.quantummaid.httpmaid.http.QueryParameterName;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
 import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HeaderFilter {
-    private final List<HeaderName> names;
+public final class AllowListQueryParameterFilter implements QueryParameterFilter {
+    private final List<QueryParameterName> names;
 
-    public static HeaderFilter allowListHeaderFilter(final List<HeaderName> names) {
+    public static QueryParameterFilter allowListQueryParameterFilter(final List<QueryParameterName> names) {
         validateNotNull(names, "names");
-        final HeaderName contentTypeHeader = HeaderName.headerName(CONTENT_TYPE);
-        final List<HeaderName> allAllowedHeaders;
-        if (names.contains(contentTypeHeader)) {
-            allAllowedHeaders = names;
-        } else {
-            allAllowedHeaders = new ArrayList<>(names);
-            allAllowedHeaders.add(contentTypeHeader);
-        }
-        return new HeaderFilter(allAllowedHeaders);
+        return new AllowListQueryParameterFilter(names);
     }
 
-    public List<Header> filter(final List<Header> values) {
-        return values.stream()
-                .filter(header -> {
-                    final HeaderName name = header.name();
+    @Override
+    public List<QueryParameter> filter(final List<QueryParameter> queryParameters) {
+        return queryParameters.stream()
+                .filter(queryParameter -> {
+                    final QueryParameterName name = queryParameter.name();
                     return names.contains(name);
                 })
                 .collect(toList());

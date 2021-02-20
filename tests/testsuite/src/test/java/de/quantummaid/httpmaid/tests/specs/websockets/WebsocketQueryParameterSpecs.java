@@ -29,14 +29,17 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toDropAllQueryParametersInWebsocketMessages;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toRememberQueryParametersInWebsocketMessages;
 
 public final class WebsocketQueryParameterSpecs {
 
     @ParameterizedTest
     @MethodSource(WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT)
-    public void websocketsAccessQueryParameters(final TestEnvironment testEnvironment) {
+    public void websocketsCanAccessQueryParametersByDefault(final TestEnvironment testEnvironment) {
         testEnvironment.given(anHttpMaid()
                 .websocket("handler", (request, response) -> {
                     final String queryParameter = request.queryParameters().parameter("param+1 %ü");
@@ -46,7 +49,51 @@ public final class WebsocketQueryParameterSpecs {
         )
                 .when().aWebsocketIsConnected(Map.of("param+1 %ü", List.of("value+1 %ü")), Map.of())
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .allWebsocketsHaveReceivedTheMessage("value+1 %ü");
+                .oneWebsocketHasReceivedTheMessage("value+1 %ü");
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT)
+    public void allQueryParametersCanBeDroppedForWebsockets(final TestEnvironment testEnvironment) {
+        testEnvironment.given(anHttpMaid()
+                .websocket("handler", (request, response) -> {
+                    final String queryParameter = request.queryParameters().parameter("param+1 %ü");
+                    response.setBody(queryParameter);
+                })
+                .configured(toDropAllQueryParametersInWebsocketMessages())
+                .configured(toMapExceptionsByDefaultUsing((exception, request, response) ->
+                        response.setBody(exception.getMessage())))
+                .build()
+        )
+                .when().aWebsocketIsConnected(Map.of("param+1 %ü", List.of("value+1 %ü")), Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
+                .oneWebsocketHasReceivedTheMessage("No query parameter with the name 'param+1 %ü'");
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT)
+    public void queryParametersCanBeAllowListedForWebsockets(final TestEnvironment testEnvironment) {
+        testEnvironment.given(anHttpMaid()
+                .websocket("handler1", (request, response) -> {
+                    final String queryParameter = request.queryParameters().parameter("allowed");
+                    response.setBody(queryParameter);
+                })
+                .websocket("handler2", (request, response) -> {
+                    final String queryParameter = request.queryParameters().parameter("denied");
+                    response.setBody(queryParameter);
+                })
+                .configured(toRememberQueryParametersInWebsocketMessages("allowed"))
+                .configured(toMapExceptionsByDefaultUsing((exception, request, response) ->
+                        response.setBody(exception.getMessage())))
+                .build()
+        )
+                .when().aWebsocketIsConnected(Map.of("allowed", List.of("value")), Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler1\" }")
+                .oneWebsocketHasReceivedTheMessage("value")
+
+                .andWhen().aWebsocketIsConnected(Map.of("denied", List.of("value")), Map.of())
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler2\" }")
+                .oneWebsocketHasReceivedTheMessage("No query parameter with the name 'denied'");
     }
 
     @ParameterizedTest
