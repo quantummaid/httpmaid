@@ -21,7 +21,6 @@
 
 package de.quantummaid.httpmaid.tests.specs.websockets;
 
-import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
 import de.quantummaid.httpmaid.http.headers.ContentType;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,9 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS_WITHOUT_SHITTY_CLIENT;
-import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toRememberHeadersInWebsocketMessages;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toRememberAdditionalHeadersInWebsocketMessages;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toRememberAllHeadersInWebsocketMessages;
 
 public final class WebsocketHeaderSpecs {
 
@@ -46,7 +47,25 @@ public final class WebsocketHeaderSpecs {
                             final String myHeader = request.headers().header("myHeader");
                             response.setBody(myHeader);
                         })
-                        .configured(toRememberHeadersInWebsocketMessages("myHeader"))
+                        .configured(toMapExceptionsByDefaultUsing((exception, request, response) ->
+                                response.setBody(exception.getMessage())))
+                        .build()
+        )
+                .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
+                .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
+                .oneWebsocketHasReceivedTheMessage("No header with name 'myHeader'");
+    }
+
+    @ParameterizedTest
+    @MethodSource(WEBSOCKET_ENVIRONMENTS)
+    public void websocketsHandlerCanAccessHeadersWhenAllowListed(final TestEnvironment testEnvironment) {
+        testEnvironment.given(
+                anHttpMaid()
+                        .websocket("handler", (request, response) -> {
+                            final String myHeader = request.headers().header("myHeader");
+                            response.setBody(myHeader);
+                        })
+                        .configured(toRememberAdditionalHeadersInWebsocketMessages("myHeader"))
                         .build()
         )
                 .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
@@ -56,20 +75,19 @@ public final class WebsocketHeaderSpecs {
 
     @ParameterizedTest
     @MethodSource(WEBSOCKET_ENVIRONMENTS)
-    public void websocketsHandlerCanAccessHeaders(final TestEnvironment testEnvironment) {
+    public void websocketsHandlerCanAccessHeadersWhenAllHeadersAreAllowed(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 anHttpMaid()
                         .websocket("handler", (request, response) -> {
                             final String myHeader = request.headers().header("myHeader");
                             response.setBody(myHeader);
                         })
-                        .configured(ExceptionConfigurators.toMapExceptionsByDefaultUsing((exception, request, response) ->
-                                response.setBody(exception.getMessage())))
+                        .configured(toRememberAllHeadersInWebsocketMessages())
                         .build()
         )
                 .when().aWebsocketIsConnected(Map.of(), Map.of("myHeader", List.of("foo")))
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"handler\" }")
-                .oneWebsocketHasReceivedTheMessage("No header with name 'myHeader'");
+                .oneWebsocketHasReceivedTheMessage("foo");
     }
 
     @ParameterizedTest

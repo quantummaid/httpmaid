@@ -25,10 +25,12 @@ import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.http.Header;
 import de.quantummaid.httpmaid.http.Headers;
+import de.quantummaid.httpmaid.http.QueryParameter;
 import de.quantummaid.httpmaid.http.QueryParameters;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
-import de.quantummaid.httpmaid.websockets.registry.HeaderFilter;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
+import de.quantummaid.httpmaid.websockets.registry.filter.header.HeaderFilter;
+import de.quantummaid.httpmaid.websockets.registry.filter.queryparameter.QueryParameterFilter;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.QUERY_PARAMETERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.http.Headers.headers;
+import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.registry.ConnectionInformation.dummyConnectionInformation;
@@ -49,27 +52,42 @@ import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNot
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CreateWebsocketRegistryEntryProcessor implements Processor {
     private final HeaderFilter headerFilter;
+    private final QueryParameterFilter queryParameterFilter;
 
-    public static CreateWebsocketRegistryEntryProcessor createWebsocketRegistryEntryProcessor(final HeaderFilter headerFilter) {
+    public static CreateWebsocketRegistryEntryProcessor createWebsocketRegistryEntryProcessor(
+            final HeaderFilter headerFilter,
+            final QueryParameterFilter queryParameterFilter) {
         validateNotNull(headerFilter, "headerFilter");
-        return new CreateWebsocketRegistryEntryProcessor(headerFilter);
+        validateNotNull(queryParameterFilter, "queryParameterFilter");
+        return new CreateWebsocketRegistryEntryProcessor(headerFilter, queryParameterFilter);
     }
 
     @Override
     public void apply(final MetaData metaData) {
         final ConnectionInformation connectionInformation = dummyConnectionInformation();
         final WebsocketSenderId senderId = metaData.get(WEBSOCKET_SENDER_ID);
-        final Headers headers = metaData.get(REQUEST_HEADERS);
-        final List<Header> filteredHeaders = headerFilter.filter(headers.asList());
-        final QueryParameters queryParameters = metaData.get(QUERY_PARAMETERS);
+        final Headers headers = filteredHeaders(metaData);
+        final QueryParameters queryParameters = filteredQueryParameters(metaData);
         final Map<String, Object> additionalData = metaData.get(ADDITIONAL_WEBSOCKET_DATA);
         final WebsocketRegistryEntry entry = websocketRegistryEntry(
                 connectionInformation,
                 senderId,
-                headers(filteredHeaders),
+                headers,
                 queryParameters,
                 additionalData
         );
         metaData.set(WEBSOCKET_REGISTRY_ENTRY, entry);
+    }
+
+    private Headers filteredHeaders(final MetaData metaData) {
+        final Headers headers = metaData.get(REQUEST_HEADERS);
+        final List<Header> filteredHeaders = headerFilter.filter(headers.asList());
+        return headers(filteredHeaders);
+    }
+
+    private QueryParameters filteredQueryParameters(final MetaData metaData) {
+        final QueryParameters queryParameters = metaData.get(QUERY_PARAMETERS);
+        final List<QueryParameter> filteredQueryParameters = queryParameterFilter.filter(queryParameters.asList());
+        return queryParameters(filteredQueryParameters);
     }
 }
