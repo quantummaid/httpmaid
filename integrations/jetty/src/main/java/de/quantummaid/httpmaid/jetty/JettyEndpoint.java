@@ -22,7 +22,6 @@
 package de.quantummaid.httpmaid.jetty;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.closing.ClosingAction;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.server.ConnectionFactory;
@@ -62,7 +61,7 @@ public final class JettyEndpoint implements AutoCloseable {
         }
     }
 
-    private static ClosingAction closeJetty(final Server server) {
+    private static AutoCloseable closeJetty(final Server server) {
         return () -> {
             try {
                 server.stop();

@@ -19,40 +19,29 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.closing;
+package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 
-import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.LowLevelFactory;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.net.URI;
 
-import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
-
-@ToString
-@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ClosingActions {
-    public static final MetaDataKey<ClosingActions> CLOSING_ACTIONS = metaDataKey("CLOSING_ACTIONS");
+public final class FakeApiGatewayAsyncClientFactory implements LowLevelFactory<ApiGatewayManagementApiAsyncClient> {
+    private final int port;
 
-    private final List<AutoCloseable> actions;
-
-    public static ClosingActions closingActions() {
-        return new ClosingActions(new LinkedList<>());
+    public static LowLevelFactory<ApiGatewayManagementApiAsyncClient> fakeApiGatewayClientFactory(final int port) {
+        return new FakeApiGatewayAsyncClientFactory(port);
     }
 
-    public void addClosingAction(final AutoCloseable autoCloseable) {
-        validateNotNull(autoCloseable, "autoCloseable");
-        actions.add(autoCloseable);
-    }
-
-    public void closeAll() throws Exception {
-        for (final AutoCloseable autoCloseable : actions) {
-            autoCloseable.close();
-        }
+    @Override
+    public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
+        CredentialsFixer.fixCredentials();
+        final String uri = String.format("http://localhost:%d/", port);
+        return ApiGatewayManagementApiAsyncClient.builder()
+                .endpointOverride(URI.create(uri))
+                .build();
     }
 }

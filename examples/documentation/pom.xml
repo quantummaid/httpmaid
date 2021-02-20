@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.examples</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.131</version>
+        <version>0.9.132</version>
     </parent>
 
     <artifactId>documentation</artifactId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid</groupId>
             <artifactId>core</artifactId>
-            <version>0.9.131</version>
+            <version>0.9.132</version>
         </dependency>
         <!-- Showcase end httpmaiddependency -->
         <dependency>
@@ -90,28 +90,28 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty</artifactId>
-            <version>0.9.131</version>
+            <version>0.9.132</version>
         </dependency>
         <!-- Showcase end jettydependency -->
         <!-- Showcase start servletdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-servlet</artifactId>
-            <version>0.9.131</version>
+            <version>0.9.132</version>
         </dependency>
         <!-- Showcase end servletdependency -->
         <!-- Showcase start jettywebsocketsdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty-websockets</artifactId>
-            <version>0.9.131</version>
+            <version>0.9.132</version>
         </dependency>
         <!-- Showcase end jettywebsocketsdependency -->
         <!-- Showcase start awsdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-awslambda</artifactId>
-            <version>0.9.131</version>
+            <version>0.9.132</version>
         </dependency>
         <!-- Showcase end awsdependency -->
         <dependency>

@@ -43,6 +43,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.StackIdentifier.sharedStackIdentifier;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.StackIdentifier.userProvidedStackIdentifier;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.connectToCloudFormation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationOutput.cloudformationOutput;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationTemplateBuilder.cloudformationTemplateBuilder;
@@ -53,7 +55,6 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cognito.Cognito.gen
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.deleteAllObjectsInBucket;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.uploadToS3Bucket;
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 
 /**
  * When stackIdentifier is not user-supplied (developerMode == false), then
@@ -81,11 +82,9 @@ import static java.util.Optional.ofNullable;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public final class LambdaDeployer implements RemoteSpecsDeployer {
-    private static final String SHARED_STACK_PREFIX = "remotespecs";
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
-    private static final String REMOTESPECS_STACK_IDENTIFIER_ENV = "REMOTESPECS_STACK_IDENTIFIER";
 
-    private final String stackIdentifier;
+    private final StackIdentifier stackIdentifier;
     private final Boolean developerMode;
 
     public static LambdaDeployer lambdaDeployer() {
@@ -94,7 +93,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
                 .orElseGet(LambdaDeployer::sharedLambdaDeployer);
     }
 
-    private static LambdaDeployer perUserLambdaDeployer(final String stackIdentifier) {
+    private static LambdaDeployer perUserLambdaDeployer(final StackIdentifier stackIdentifier) {
         return new LambdaDeployer(stackIdentifier, true);
     }
 
@@ -102,17 +101,12 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         return new LambdaDeployer(sharedStackIdentifier(), false);
     }
 
-    private static String sharedStackIdentifier() {
-        final String uuid = UUID.randomUUID().toString().substring(0, 7);
-        return String.format("%s%s", SHARED_STACK_PREFIX, uuid);
-    }
-
     @Override
     public RemoteSpecsDeployment deploy() {
-        final String artifactBucketName = stackIdentifier + "-bucket";
+        final String artifactBucketName = stackIdentifier.value() + "-bucket";
 
         final CloudformationTemplate bucketTemplate = Templates.bucketTemplate(artifactBucketName);
-        create(stackIdentifier + "-bucket", StringTemplate.stringTemplate(bucketTemplate));
+        create(artifactBucketName, StringTemplate.stringTemplate(bucketTemplate));
         final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
         final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
         final File file = new File(lambdaPath);
@@ -122,12 +116,12 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
                 .filter(this::hasCloudformationRequirements)
                 .collect(Collectors.toList());
 
-        final Namespace namespace = Namespace.namespace(stackIdentifier);
+        final Namespace namespace = Namespace.namespace(stackIdentifier.value());
         final CloudformationTemplate lambdaTemplate = buildTemplate(relevantClassSources, namespace, artifactBucketName, s3Key);
         final String renderedTemplate = lambdaTemplate.render();
         log.debug(renderedTemplate);
         final String templateArtifactName = uploadToS3Bucket(artifactBucketName, renderedTemplate);
-        final Map<String, String> stackOutputs = create(stackIdentifier + "-lambda", s3Template(artifactBucketName, templateArtifactName));
+        final Map<String, String> stackOutputs = create(stackIdentifier.value() + "-lambda", s3Template(artifactBucketName, templateArtifactName));
 
         final Map<Class<? extends RemoteSpecs>, Deployment> deploymentMap = buildDeploymentMap(relevantClassSources, stackOutputs, namespace);
 
@@ -240,17 +234,12 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         if (developerMode) {
             return;
         }
-        final String artifactBucketName = stackIdentifier + "-bucket";
+        final String artifactBucketName = stackIdentifier.value() + "-bucket";
         deleteAllObjectsInBucket(artifactBucketName);
         try (CloudFormationHandler cloudFormationHandler = connectToCloudFormation()) {
-            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier + "-lambda");
-            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier + "-bucket");
+            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier.value() + "-lambda");
+            cloudFormationHandler.deleteStacksStartingWith(stackIdentifier.value() + "-bucket");
         }
-    }
-
-    private static Optional<String> userProvidedStackIdentifier() {
-        final String stackIdentifier = System.getenv(REMOTESPECS_STACK_IDENTIFIER_ENV);
-        return ofNullable(stackIdentifier).map(s -> "dev" + s);
     }
 
     private static Map<String, String> create(

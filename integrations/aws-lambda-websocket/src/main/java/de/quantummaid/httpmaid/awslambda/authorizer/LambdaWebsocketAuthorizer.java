@@ -39,7 +39,7 @@ import java.util.UUID;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
+import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.extractMethodArn;
 import static de.quantummaid.httpmaid.awslambda.WebsocketEventUtils.extractHeaders;
 import static de.quantummaid.httpmaid.awslambda.WebsocketEventUtils.extractQueryParameters;

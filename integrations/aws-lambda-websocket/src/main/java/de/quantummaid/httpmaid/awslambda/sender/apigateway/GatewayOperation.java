@@ -19,8 +19,10 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.closing;
+package de.quantummaid.httpmaid.awslambda.sender.apigateway;
 
-public interface ClosingAction {
-    void close();
+import java.util.function.Consumer;
+
+public interface GatewayOperation {
+    void awaitResult(Consumer<Throwable> onException);
 }

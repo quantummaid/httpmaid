@@ -22,7 +22,8 @@
 package de.quantummaid.httpmaid.awslambda;
 
 import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
+import de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender;
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.chains.MetaDataKey;
 import de.quantummaid.httpmaid.endpoint.RawResponse;
 import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
@@ -41,13 +42,14 @@ import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketAuthorizationException.awsWebsocketAuthorizationException;
 import static de.quantummaid.httpmaid.awslambda.AwsWebsocketConnectionInformation.awsWebsocketConnectionInformation;
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.awsWebsocketSender;
 import static de.quantummaid.httpmaid.awslambda.MapDeserializer.mapFromString;
-import static de.quantummaid.httpmaid.awslambda.apigateway.DefaultApiGatewayClientFactory.defaultApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer.REGISTRY_ENTRY_KEY;
 import static de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer.authorize;
 import static de.quantummaid.httpmaid.awslambda.registry.EntryDeserializer.deserializeEntry;
+import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
+import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.awsWebsocketSender;
+import static de.quantummaid.httpmaid.awslambda.sender.apigateway.async.ApiGatewayAsyncClientFactory.defaultAsyncApiGatewayClientFactory;
+import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
@@ -74,7 +76,7 @@ public final class AwsWebsocketLambdaEndpoint {
 
     public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(final HttpMaid httpMaid,
                                                                            final String region) {
-        return awsWebsocketLambdaEndpointFor(httpMaid, region, defaultApiGatewayClientFactory());
+        return awsWebsocketLambdaEndpointFor(httpMaid, region, defaultAsyncApiGatewayClientFactory());
     }
 
     public static AwsWebsocketLambdaEndpoint awsWebsocketLambdaEndpointFor(
@@ -86,6 +88,7 @@ public final class AwsWebsocketLambdaEndpoint {
         validateNotNull(apiGatewayClientFactory, "apiGatewayClientFactory");
         final AwsWebsocketSender websocketSender = awsWebsocketSender(apiGatewayClientFactory);
         httpMaid.addWebsocketSender(AWS_WEBSOCKET_SENDER, websocketSender);
+        httpMaid.getMetaDatum(CLOSING_ACTIONS).addClosingAction(websocketSender);
         return new AwsWebsocketLambdaEndpoint(httpMaid, region);
     }
 

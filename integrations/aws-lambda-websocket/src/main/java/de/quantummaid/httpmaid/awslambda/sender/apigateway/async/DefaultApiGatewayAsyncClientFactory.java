@@ -19,38 +19,43 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambda.apigateway;
+package de.quantummaid.httpmaid.awslambda.sender.apigateway.async;
 
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.LowLevelFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClientBuilder;
 
 import java.net.URI;
 
 import static software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DefaultApiGatewayClientFactory implements ApiGatewayClientFactory {
+public final class DefaultApiGatewayAsyncClientFactory
+        implements LowLevelFactory<ApiGatewayManagementApiAsyncClient> {
     private final AwsCredentialsProvider credentialsProvider;
     private final SdkAsyncHttpClient httpClient;
 
-    public static ApiGatewayClientFactory defaultApiGatewayClientFactory() {
+    public static LowLevelFactory<ApiGatewayManagementApiAsyncClient> defaultApiGatewayAsyncClientFactory() {
         final AwsCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
         final SdkAsyncHttpClient httpClient = create();
-        return new DefaultApiGatewayClientFactory(credentialsProvider, httpClient);
+        return new DefaultApiGatewayAsyncClientFactory(credentialsProvider, httpClient);
     }
 
     @Override
     public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
-        final ApiGatewayManagementApiAsyncClientBuilder apiGatewayManagementApiAsyncClientBuilder = ApiGatewayManagementApiAsyncClient.builder()
+        return ApiGatewayManagementApiAsyncClient.builder()
                 .credentialsProvider(credentialsProvider)
                 .httpClient(httpClient)
-                .endpointOverride(URI.create(endpointUrl));
-        return apiGatewayManagementApiAsyncClientBuilder
+                .endpointOverride(URI.create(endpointUrl))
                 .build();
+    }
+
+    @Override
+    public void close() {
+        httpClient.close();
     }
 }

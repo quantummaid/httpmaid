@@ -19,29 +19,34 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
+package de.quantummaid.httpmaid.awslambda.sender;
 
-import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.AbstractGatewayClient;
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.ApiGatewayClientFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
 
-import java.net.URI;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FakeApiGatewayClientFactory implements ApiGatewayClientFactory {
-    private final int port;
+public final class ClientCache implements AutoCloseable {
+    private final Map<String, AbstractGatewayClient> clientsByEndpointUrl;
+    private final ApiGatewayClientFactory clientFactory;
 
-    public static ApiGatewayClientFactory fakeApiGatewayClientFactory(final int port) {
-        return new FakeApiGatewayClientFactory(port);
+    public static ClientCache clientCache(final ApiGatewayClientFactory clientFactory) {
+        return new ClientCache(new ConcurrentHashMap<>(), clientFactory);
+    }
+
+    public AbstractGatewayClient get(final String endpointUrl) {
+        return clientsByEndpointUrl.computeIfAbsent(endpointUrl, clientFactory::provide);
     }
 
     @Override
-    public ApiGatewayManagementApiAsyncClient provide(final String endpointUrl) {
-        CredentialsFixer.fixCredentials();
-        final String uri = String.format("http://localhost:%d/", port);
-        return ApiGatewayManagementApiAsyncClient.builder()
-                .endpointOverride(URI.create(uri))
-                .build();
+    public void close() {
+        clientFactory.close();
+        for (final AbstractGatewayClient client : clientsByEndpointUrl.values()) {
+            client.close();
+        }
     }
 }
