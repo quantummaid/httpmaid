@@ -51,6 +51,7 @@ import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
 import static de.quantummaid.httpmaid.RuntimeInformation.runtimeInformation;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
+import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
 import static de.quantummaid.httpmaid.endpoint.RawResponse.rawResponse;
 import static de.quantummaid.httpmaid.endpoint.SynchronizationWrapper.synchronizationWrapper;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
@@ -235,7 +236,11 @@ public final class HttpMaid implements AutoCloseable {
 
     @Override
     public void close() {
-        final ClosingActions closingActions = chainRegistry.getMetaDatum(ClosingActions.CLOSING_ACTIONS);
-        closingActions.closeAll();
+        final ClosingActions closingActions = chainRegistry.getMetaDatum(CLOSING_ACTIONS);
+        try {
+            closingActions.closeAll();
+        } catch (final Exception e) {
+            throw HttpMaidException.httpMaidException("exception during closing of HttpMaid", e);
+        }
     }
 }

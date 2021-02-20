@@ -24,8 +24,8 @@ package de.quantummaid.httpmaid.tests.deployers.fakeawslambda;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
-import de.quantummaid.httpmaid.awslambda.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.ApiGatewayClientFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -36,8 +36,9 @@ import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWe
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isAuthorizationRequest;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
 import static de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer.lambdaWebsocketAuthorizer;
+import static de.quantummaid.httpmaid.awslambda.sender.apigateway.async.ApiGatewayAsyncClientFactory.asyncApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
-import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGatewayClientFactory.fakeApiGatewayClientFactory;
+import static de.quantummaid.httpmaid.tests.deployers.fakeawslambda.FakeApiGatewayAsyncClientFactory.fakeApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -63,7 +64,8 @@ public class ValidatedAwsLambdaEndpoint {
                                                                       final int apiGatewayManagementServerPort) {
         validateNotNull(httpMaid, "httpMaid");
         final AwsLambdaEndpoint httpEndpoint = awsLambdaEndpointFor(httpMaid);
-        final ApiGatewayClientFactory apiGatewayClientFactory = fakeApiGatewayClientFactory(apiGatewayManagementServerPort);
+        final ApiGatewayClientFactory apiGatewayClientFactory = asyncApiGatewayClientFactory(
+                fakeApiGatewayClientFactory(apiGatewayManagementServerPort));
         final AwsWebsocketLambdaEndpoint websocketEndpoint = awsWebsocketLambdaEndpointFor(
                 httpMaid,
                 "not-an-actual-region",

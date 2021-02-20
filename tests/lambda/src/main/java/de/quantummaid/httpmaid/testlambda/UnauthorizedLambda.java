@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
+import de.quantummaid.httpmaid.awslambda.sender.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,7 @@ import static de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint.awsWe
 import static de.quantummaid.httpmaid.awslambda.EventUtils.isWebSocketRequest;
 import static de.quantummaid.httpmaid.awslambda.registry.DynamoDbWebsocketRegistry.dynamoDbWebsocketRegistry;
 import static de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository.dynamoDbRepository;
+import static de.quantummaid.httpmaid.awslambda.sender.apigateway.sync.ApiGatewaySyncClientFactory.defaultSyncApiGatewayClientFactory;
 import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWebsocketRegistry;
 
@@ -50,7 +52,7 @@ public final class UnauthorizedLambda {
     private static final HttpMaid HTTP_MAID = httpMaid();
 
     private static final AwsLambdaEndpoint PLAIN_ENDPOINT = awsLambdaEndpointFor(HTTP_MAID);
-    private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = awsWebsocketLambdaEndpointFor(HTTP_MAID, REGION);
+    private static final AwsWebsocketLambdaEndpoint WEBSOCKET_ENDPOINT = websocketLambdaEndpoint();
 
     private static HttpMaid httpMaid() {
         final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
@@ -59,6 +61,11 @@ public final class UnauthorizedLambda {
         final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
                 .configured(toUseWebsocketRegistry(websocketRegistry)));
+    }
+
+    private static AwsWebsocketLambdaEndpoint websocketLambdaEndpoint() {
+        final ApiGatewayClientFactory clientFactory = defaultSyncApiGatewayClientFactory();
+        return awsWebsocketLambdaEndpointFor(HTTP_MAID, REGION, clientFactory);
     }
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {

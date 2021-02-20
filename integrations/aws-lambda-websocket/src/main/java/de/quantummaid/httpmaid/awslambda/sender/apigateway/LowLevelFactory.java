@@ -19,10 +19,12 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.awslambda.apigateway;
+package de.quantummaid.httpmaid.awslambda.sender.apigateway;
 
-import software.amazon.awssdk.services.apigatewaymanagementapi.ApiGatewayManagementApiAsyncClient;
+public interface LowLevelFactory<T> extends AutoCloseable {
+    T provide(String endpointUrl);
 
-public interface ApiGatewayClientFactory {
-    ApiGatewayManagementApiAsyncClient provide(String endpointUrl);
+    @Override
+    default void close() {
+    }
 }

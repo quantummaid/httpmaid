@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.awslambda.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
+import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.http.Header.header;
 import static de.quantummaid.httpmaid.http.HeaderName.headerName;
 import static de.quantummaid.httpmaid.http.HeaderValue.headerValue;
