@@ -36,7 +36,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FutureGatewayOperation implements GatewayOperation {
-    private static final int TIMEOUT_IN_SECONDS = 5;
+    private static final int TIMEOUT_IN_SECONDS = 10;
     private final CompletableFuture<?> future;
 
     public static GatewayOperation futureGatewayOperation(final CompletableFuture<?> future) {

@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.junit;
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 public final class Listener implements TestExecutionListener {
     private static final String JUPITER_ID = "[engine:junit-jupiter]";
     private static final List<Class<?>> CLASS_SOURCES = new ArrayList<>();
@@ -45,6 +48,15 @@ public final class Listener implements TestExecutionListener {
                 .map(testSource -> (ClassSource) testSource)
                 .map(ClassSource::getJavaClass)
                 .forEach(CLASS_SOURCES::add);
+    }
+
+    @Override
+    public void executionFinished(final TestIdentifier testIdentifier, final TestExecutionResult testExecutionResult) {
+        final TestExecutionResult.Status status = testExecutionResult.getStatus();
+        if (status != TestExecutionResult.Status.SUCCESSFUL) {
+            log.warn("test {} failed - stopping all test executions to enable better debugging", testIdentifier.getDisplayName());
+            System.exit(1);
+        }
     }
 
     public static List<Class<?>> getClassSources() {
