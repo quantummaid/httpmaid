@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.chains;
 
 import de.quantummaid.httpmaid.chains.rules.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.lang.String.format;
 import static lombok.AccessLevel.PRIVATE;
 
+@Slf4j
 @RequiredArgsConstructor(access = PRIVATE)
 public class ChainRegistry {
     public static final MetaDataKey<ChainRegistry> CHAIN_REGISTRY = MetaDataKey.metaDataKey("CHAIN_REGISTRY");
@@ -66,6 +68,9 @@ public class ChainRegistry {
     private void accept(final ChainName chainName,
                         final ProcessingContext processingContext) {
         final Chain chain = getChainFor(chainName);
+        if (log.isTraceEnabled()) {
+            log.trace("executing chain {}", chainName.name());
+        }
         final Action action = chain.accept(processingContext);
         handleAction(action, processingContext);
     }

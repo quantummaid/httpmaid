@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.chains.rules.Action;
 import de.quantummaid.httpmaid.chains.rules.Rule;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.List;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.EXCEPTION;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Chain {
     private final Action defaultAction;
@@ -71,7 +73,12 @@ public class Chain {
         try {
             processors.stream()
                     .map(RegisteredProcessor::processor)
-                    .forEach(processor -> processor.apply(metaData));
+                    .forEach(processor -> {
+                        if (log.isTraceEnabled()) {
+                            log.trace("executing chain processor {}", processor.identifier());
+                        }
+                        processor.apply(metaData);
+                    });
             return rules.stream()
                     .filter(rule -> rule.matches(metaData))
                     .findFirst()
