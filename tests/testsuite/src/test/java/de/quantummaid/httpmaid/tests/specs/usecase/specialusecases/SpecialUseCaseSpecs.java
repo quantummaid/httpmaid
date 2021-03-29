@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.*;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import de.quantummaid.reflectmaid.GenericType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -126,7 +127,8 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("\"foo\"");
+                .theStatusCodeWas(500)
+                .theResponseBodyWas("");
     }
 
     @ParameterizedTest
@@ -152,7 +154,8 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("[\"a\",\"b\",\"c\"]");
+                .theStatusCodeWas(500)
+                .theResponseBodyWas("");
     }
 
     @ParameterizedTest
@@ -178,7 +181,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
-                .theResponseBodyWas("foo");
+                .theResponseBodyWas("type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsDirectParameter' contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
     }
 
     @ParameterizedTest
@@ -205,7 +208,7 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\", \"b\", \"c\"]").withContentType("application/json").isIssued()
-                .theResponseBodyWas("{a, b, c}");
+                .theResponseBodyWas("type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsIndirectParameter' contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
     }
 
     @ParameterizedTest
@@ -350,9 +353,10 @@ public final class SpecialUseCaseSpecs {
                         .disableAutodectectionOfModules()
                         .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
+
                             @SuppressWarnings("unchecked")
                             @Override
-                            public <T> T instantiate(final Class<T> type) {
+                            public <T> T instantiate(final GenericType<T> type) {
                                 return (T) new UseCaseThatIsAnInterface() {};
                             }
                         }))
@@ -371,9 +375,10 @@ public final class SpecialUseCaseSpecs {
                         .disableAutodectectionOfModules()
                         .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
                         .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
+
                             @SuppressWarnings("unchecked")
                             @Override
-                            public <T> T instantiate(final Class<T> type) {
+                            public <T> T instantiate(final GenericType<T> type) {
                                 return (T) new UseCaseThatIsAnAbstractClass() {};
                             }
                         }))

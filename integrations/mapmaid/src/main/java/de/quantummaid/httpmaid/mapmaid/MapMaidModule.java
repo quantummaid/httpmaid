@@ -37,7 +37,9 @@ import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
 import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
 import de.quantummaid.mapmaid.mapper.marshalling.MarshallingType;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.CoreModule.REFLECT_MAID;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidMarshallingMapper.mapMaidMarshallingMapper;
 import static de.quantummaid.httpmaid.mapmaid.MapMaidValidationExceptionMapper.mapMaidValidationExceptionMapper;
 import static de.quantummaid.httpmaid.mapmaid.advancedscanner.UseCaseClassScanner.addAllReferencedClassesIn;
@@ -55,7 +58,6 @@ import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshal
 import static de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization.useCaseSerializationAndDeserialization;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
 import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdentifierFor;
-import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static java.util.Collections.singletonList;
 
 @Slf4j
@@ -100,19 +102,18 @@ public final class MapMaidModule implements ChainModule {
     @Override
     public void configure(final DependencyRegistry dependencyRegistry) {
         final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-
         final SerializationAndDeserializationProvider serializationAndDeserializationProvider =
                 (useCaseMethods, injectionTypes, messageTypes) -> {
-                    final MapMaidBuilder mapMaidBuilder = aMapMaid();
+                    final ReflectMaid reflectMaid = dependencyRegistry.getMetaDatum(REFLECT_MAID);
+                    final MapMaidBuilder mapMaidBuilder = aMapMaid(reflectMaid);
                     injectionTypes.forEach(mapMaidBuilder::injecting);
-                    messageTypes.forEach(mapMaidBuilder::serializing);
-
+                    messageTypes.stream()
+                            .map(GenericType::fromResolvedType)
+                            .forEach(mapMaidBuilder::serializing);
                     final Map<ResolvedType, MethodParameterDeserializationWrapper> deserializationWrappers =
                             addAllReferencedClassesIn(useCaseMethods, mapMaidBuilder);
-
                     dependencyRegistry.getMetaData().getOptional(MapMaidConfigurators.RECIPES)
                             .ifPresent(recipes -> recipes.forEach(mapMaidBuilder::usingRecipe));
-
                     final MapMaid mapMaid = buildMapMaid(mapMaidBuilder);
                     final Map<ResolvedType, UseCaseParamaterProvider> parameterProviders = new HashMap<>();
                     deserializationWrappers.forEach((type, wrapper) ->
@@ -122,16 +123,13 @@ public final class MapMaidModule implements ChainModule {
                                 final List<Object> typeInjections = event.typeInjections();
                                 return wrapper.deserializeParameters(map, injections, typeInjections, mapMaid);
                             }));
-
                     final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
                     mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
-
                     final Serializer serializer = (returnValue, type) ->
-                            mapMaid.serializer().serializeToUniversalObject(returnValue, typeIdentifierFor(fromResolvedType(type)));
+                            mapMaid.serializer().serializeToUniversalObject(returnValue, typeIdentifierFor(type));
                     return useCaseSerializationAndDeserialization(parameterProviders, serializer);
                 };
         useCasesModule.setSerializationAndDeserializationProvider(serializationAndDeserializationProvider);
-
         if (addAggregatedExceptionHandler) {
             addExceptionHandler(dependencyRegistry);
         }

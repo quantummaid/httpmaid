@@ -22,6 +22,9 @@
 package de.quantummaid.httpmaid.chains.autoloading;
 
 import de.quantummaid.httpmaid.chains.ChainModule;
+import de.quantummaid.reflectmaid.resolvedtype.ClassType;
+import de.quantummaid.reflectmaid.ReflectMaid;
+import de.quantummaid.reflectmaid.resolvedtype.resolver.ResolvedMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,9 +33,6 @@ import java.util.Optional;
 import static de.quantummaid.httpmaid.chains.autoloading.AutoloadingException.autoloadingException;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 import static java.lang.Thread.currentThread;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -41,10 +41,10 @@ public final class Autoloader {
     private Autoloader() {
     }
 
-    public static Optional<ChainModule> loadModule(final String fullyQualifiedClassName) {
+    public static Optional<ChainModule> loadModule(final ReflectMaid reflectMaid, final String fullyQualifiedClassName) {
         validateNotNullNorEmpty(fullyQualifiedClassName, "fullyQualifiedClassName");
         return loadClass(fullyQualifiedClassName).map(clazz -> {
-            final Method staticInitializer = findStaticInitializer(clazz);
+            final ResolvedMethod staticInitializer = findStaticInitializer(reflectMaid, clazz);
             return invoke(staticInitializer);
         });
     }
@@ -61,20 +61,24 @@ public final class Autoloader {
         }
     }
 
-    private static Method findStaticInitializer(final Class<? extends ChainModule> clazz) {
-        final Method[] methods = clazz.getMethods();
-        return stream(methods)
-                .filter(method -> isPublic(method.getModifiers()))
-                .filter(method -> isStatic(method.getModifiers()))
-                .filter(method -> method.getReturnType().equals(clazz))
-                .filter(method -> method.getParameterCount() == 0)
+    private static ResolvedMethod findStaticInitializer(final ReflectMaid reflectMaid,
+                                                        final Class<? extends ChainModule> clazz) {
+        final ClassType classType = (ClassType) reflectMaid.resolve(clazz);
+        return classType.methods().stream()
+                .filter(ResolvedMethod::isPublic)
+                .filter(ResolvedMethod::isStatic)
+                .filter(method -> method.returnType()
+                        .map(classType::equals)
+                        .orElse(false))
+                .filter(method -> method.getParameters().isEmpty())
                 .findFirst()
                 .orElseThrow();
     }
 
-    private static ChainModule invoke(final Method staticInitializer) {
+    private static ChainModule invoke(final ResolvedMethod staticInitializer) {
+        final Method method = staticInitializer.getMethod();
         try {
-            return (ChainModule) staticInitializer.invoke(null);
+            return (ChainModule) method.invoke(null);
         } catch (final IllegalAccessException | InvocationTargetException e) {
             throw autoloadingException(e);
         }

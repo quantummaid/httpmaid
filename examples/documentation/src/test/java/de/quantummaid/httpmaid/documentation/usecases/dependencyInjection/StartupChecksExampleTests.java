@@ -2,6 +2,7 @@ package de.quantummaid.httpmaid.documentation.usecases.dependencyInjection;
 
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import de.quantummaid.reflectmaid.GenericType;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,8 +18,9 @@ public final class StartupChecksExampleTests {
     public void disableStartupChecksExample() {
         final AtomicInteger integer = new AtomicInteger();
         final UseCaseInstantiator injector = new UseCaseInstantiator() {
+
             @Override
-            public <T> T instantiate(Class<T> type) {
+            public <T> T instantiate(GenericType<T> type) {
                 integer.incrementAndGet();
                 return null;
             }

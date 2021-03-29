@@ -35,7 +35,7 @@ import static java.util.Optional.ofNullable;
 public final class StackIdentifier {
     private static final Pattern PATTERN = Pattern.compile("[a-zA-Z0-9]+");
 
-    private static final String SHARED_STACK_PREFIX = "remotespecs";
+    private static final String SHARED_STACK_PREFIX = "rmt";
     private static final String REMOTESPECS_STACK_IDENTIFIER_ENV = "REMOTESPECS_STACK_IDENTIFIER";
 
     private final String value;

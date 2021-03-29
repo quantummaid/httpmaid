@@ -38,7 +38,9 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -47,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.Optional;
 
+import static de.quantummaid.httpmaid.CoreModule.REFLECT_MAID;
 import static de.quantummaid.httpmaid.HttpMaidBuilder.httpMaidBuilder;
 import static de.quantummaid.httpmaid.RuntimeInformation.runtimeInformation;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
@@ -169,10 +172,12 @@ public final class HttpMaid implements AutoCloseable {
         final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         final Serializer serializer = getMetaDatum(SERIALIZER);
+        final ReflectMaid reflectMaid = getMetaDatum(REFLECT_MAID);
+        final ResolvedType resolvedMessageType = reflectMaid.resolve(messageType);
         return serializingSender(
                 websocketRegistry,
                 websocketSenders,
-                messageType.toResolvedType(),
+                resolvedMessageType,
                 marshaller,
                 serializer,
                 emptyMetaData()
@@ -231,7 +236,12 @@ public final class HttpMaid implements AutoCloseable {
     }
 
     public static HttpMaidBuilder anHttpMaid() {
-        return httpMaidBuilder();
+        final ReflectMaid reflectMaid = ReflectMaid.aReflectMaid();
+        return anHttpMaid(reflectMaid);
+    }
+
+    public static HttpMaidBuilder anHttpMaid(final ReflectMaid reflectMaid) {
+        return httpMaidBuilder(reflectMaid);
     }
 
     @Override
@@ -242,5 +252,9 @@ public final class HttpMaid implements AutoCloseable {
         } catch (final Exception e) {
             throw HttpMaidException.httpMaidException("exception during closing of HttpMaid", e);
         }
+    }
+
+    public ReflectMaid reflectMaid() {
+        return chainRegistry.getMetaDatum(REFLECT_MAID);
     }
 }

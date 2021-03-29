@@ -19,26 +19,21 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
+package de.quantummaid.httpmaid.remotespecsinstance;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class JarCoordinates {
-    private final String bucket;
-    private final String object;
+public final class Response<T> {
+    @Getter
+    private final String id;
+    @Getter
+    private final T value;
 
-    public static JarCoordinates jarCoordinates(final String bucket,
-                                                final String object) {
-        return new JarCoordinates(bucket, object);
-    }
-
-    public String bucket() {
-        return bucket;
-    }
-
-    public String object() {
-        return object;
+    public static <T> Response<T> response(final String id,
+                                           final T value) {
+        return new Response<>(id, value);
     }
 }

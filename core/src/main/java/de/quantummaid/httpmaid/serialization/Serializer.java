@@ -22,7 +22,7 @@
 package de.quantummaid.httpmaid.serialization;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 

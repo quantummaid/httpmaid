@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.132</version>
+        <version>0.9.133</version>
     </parent>
 
     <artifactId>testlambda</artifactId>
@@ -34,7 +34,8 @@
     <name>HttpMaid - Tests - Test Lambda</name>
 
     <properties>
-        <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
+        <skipgraal>false</skipgraal>
+        <plugin-update-file-checksum>915baffd77985e9da0d3cfee67e149eb</plugin-update-file-checksum>
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -64,7 +65,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
-                <version>4.1.59.Final</version>
+                <version>4.1.60.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -90,9 +91,20 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>de.quantummaid.graalvmlambdaruntime</groupId>
+            <artifactId>core</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.nativeimage</groupId>
+            <artifactId>svm</artifactId>
+            <version>21.0.0.2</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -112,6 +124,55 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>21.0.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${skipgraal}</skip>
+                    <imageName>bootstrap</imageName>
+                    <mainClass>de.quantummaid.httpmaid.testlambda.Main</mainClass>
+                    <buildArgs>
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                        <buildArg>-H:EnableURLProtocols=http</buildArg>
+                        <buildArg>--enable-https</buildArg>
+                        <buildArg>--no-fallback</buildArg>
+                        <buildArg>-H:+ReportUnsupportedElementsAtRuntime</buildArg>
+                        <buildArg>-H:+PrintClassInitialization</buildArg>
+                        <buildArg>--initialize-at-build-time</buildArg>
+                        <buildArg>--allow-incomplete-classpath</buildArg>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <skipAssembly>${skipgraal}</skipAssembly>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/main/assembly/zip.xml</descriptor>
+                            </descriptors>
+                            <finalName>remotespecs</finalName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

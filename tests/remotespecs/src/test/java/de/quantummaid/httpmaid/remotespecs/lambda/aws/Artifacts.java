@@ -19,15 +19,26 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.usecases.instantiation;
+package de.quantummaid.httpmaid.remotespecs.lambda.aws;
 
-import de.quantummaid.reflectmaid.GenericType;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-public interface GenericUseCaseInstantiator {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Artifacts {
+    private final Artifact jarImage;
+    private final Artifact graalVmImage;
 
-    <T> T instantiate(GenericType<T> type);
+    public static Artifacts artifacts(final Artifact jarImage,
+                                      final Artifact graalVmImage) {
+        return new Artifacts(jarImage, graalVmImage);
+    }
 
-    default void check(final GenericType<?> type) {
-        instantiate(type);
+    public Artifact jarImage() {
+        return jarImage;
+    }
+
+    public Artifact graalVmImage() {
+        return graalVmImage;
     }
 }

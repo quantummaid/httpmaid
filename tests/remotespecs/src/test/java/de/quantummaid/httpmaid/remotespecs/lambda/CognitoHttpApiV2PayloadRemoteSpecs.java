@@ -25,6 +25,8 @@ import de.quantummaid.httpmaid.client.HttpMaidClientException;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifact;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifacts;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.HttpApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
@@ -77,8 +79,7 @@ public final class CognitoHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
     }
 
     public static CloudformationModule infrastructureRequirements(final Namespace namespace,
-                                                                  final String bucketName,
-                                                                  final String artifactKey) {
+                                                                  final Artifacts artifacts) {
         return builder -> {
             final CognitoModule cognitoModule = cognitoModule(namespace);
             final Namespace malicious2 = namespace.sub("malicious2");
@@ -92,7 +93,8 @@ public final class CognitoHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
                     .withOutputs(cloudformationOutput(malicious2.id("PoolId"), cognitoModule.pool().reference()))
                     .withOutputs(cloudformationOutput(malicious2.id("PoolClientId"), otherClient.reference()));
             final WebsocketRegistryModule websocketRegistryModule = websocketRegistryModule(namespace);
-            final FunctionModule functionModule = cognitoAuthorizedFunctionModule(namespace, bucketName, artifactKey, Map.of(
+            final Artifact artifact = artifacts.jarImage();
+            final FunctionModule functionModule = cognitoAuthorizedFunctionModule(namespace, artifact, Map.of(
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
                     "POOL_ID", cognitoModule.pool().reference(),
                     "POOL_CLIENT_ID", cognitoModule.poolClient().reference(),

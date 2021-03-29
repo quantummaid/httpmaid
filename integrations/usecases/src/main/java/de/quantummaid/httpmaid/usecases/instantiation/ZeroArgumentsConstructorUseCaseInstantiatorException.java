@@ -21,6 +21,8 @@
 
 package de.quantummaid.httpmaid.usecases.instantiation;
 
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+
 import static java.lang.String.format;
 
 public final class ZeroArgumentsConstructorUseCaseInstantiatorException extends RuntimeException {
@@ -30,14 +32,14 @@ public final class ZeroArgumentsConstructorUseCaseInstantiatorException extends 
     }
 
     static ZeroArgumentsConstructorUseCaseInstantiatorException zeroArgumentsConstructorUseCaseInstantiatorException(
-            final Class<?> type, final Throwable cause) {
-        final String message = format("Exception during instantiation of %s using zero argument constructor", type.getName());
+            final ResolvedType type, final Throwable cause) {
+        final String message = format("Exception during instantiation of %s using zero argument constructor", type.description());
         return new ZeroArgumentsConstructorUseCaseInstantiatorException(message, cause);
     }
 
     static ZeroArgumentsConstructorUseCaseInstantiatorException zeroArgumentsConstructorUseCaseInstantiatorException(
-            final Class<?> type, final String message) {
-        final String combinedMessage = format("Exception during instantiation of %s using zero argument constructor: %s", type.getName(), message);
+            final ResolvedType type, final String message) {
+        final String combinedMessage = format("Exception during instantiation of %s using zero argument constructor: %s", type.description(), message);
         return new ZeroArgumentsConstructorUseCaseInstantiatorException(combinedMessage, null);
     }
 }

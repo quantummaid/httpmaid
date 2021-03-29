@@ -65,6 +65,17 @@ public interface RemoteSpecs {
     }
 
     @Test
+    default void useCaseCanBeHandled(final TestEnvironment testEnvironment) {
+        testEnvironment.givenTheStaticallyDeployedTestInstance()
+                .when().aRequestToThePath("/usecase").viaThePostMethod()
+                .withTheBody("{ \"id\": \"abc\", \"dto\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" } }")
+                .withTheOptionalHeader(authorizationHeader())
+                .withContentType("application/json").isIssued()
+                .theStatusCodeWas(200)
+                .theJsonResponseEquals("{\"value\":{\"fieldB\":\"bar\",\"fieldA\":\"foo\"},\"id\":\"abc\"}");
+    }
+
+    @Test
     default void handlerCanReceiveBodyOfPostRequest(final TestEnvironment testEnvironment) {
         testEnvironment.givenTheStaticallyDeployedTestInstance()
                 .when().aRequestToThePath("/echo").viaThePostMethod().withTheBody("This is a post request.")

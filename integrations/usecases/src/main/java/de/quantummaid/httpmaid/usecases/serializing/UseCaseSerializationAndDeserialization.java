@@ -23,7 +23,7 @@ package de.quantummaid.httpmaid.usecases.serializing;
 
 import de.quantummaid.httpmaid.events.Event;
 import de.quantummaid.httpmaid.serialization.Serializer;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

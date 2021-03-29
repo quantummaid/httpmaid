@@ -54,6 +54,8 @@ public final class HttpMaidFactory {
                 })
                 .get("/statusCode/201", (request, response) -> response.setStatus(201))
 
+                .post("/usecase", UseCaseWithSameDtoInRequestAndResponse.class)
+
                 .post("/echo", (request, response) -> response.setBody(request.bodyString()))
                 .put("/echo", (request, response) -> response.setBody(request.bodyString()))
                 .delete("/echo", (request, response) -> response.setBody(request.bodyString()))

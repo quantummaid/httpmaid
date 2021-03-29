@@ -24,7 +24,7 @@ package de.quantummaid.httpmaid.mapmaid.advancedscanner;
 import de.quantummaid.mapmaid.mapper.deserialization.DeserializationFields;
 import de.quantummaid.mapmaid.mapper.deserialization.deserializers.serializedobjects.SerializedObjectDeserializer;
 import de.quantummaid.mapmaid.shared.identifier.TypeIdentifier;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,6 @@ import java.util.Map;
 
 import static de.quantummaid.mapmaid.mapper.deserialization.DeserializationFields.deserializationFields;
 import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdentifierFor;
-import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static java.lang.String.format;
 
 @ToString
@@ -48,7 +47,7 @@ public final class VirtualDeserializer implements SerializedObjectDeserializer {
     public static SerializedObjectDeserializer virtualDeserializerFor(final String method,
                                                                       final Map<String, ResolvedType> parameters) {
         final Map<String, TypeIdentifier> fieldMap = new HashMap<>();
-        parameters.forEach((name, type) -> fieldMap.put(name, typeIdentifierFor(fromResolvedType(type))));
+        parameters.forEach((name, type) -> fieldMap.put(name, typeIdentifierFor(type)));
         final DeserializationFields deserializationFields = deserializationFields(fieldMap);
         return new VirtualDeserializer(method, deserializationFields);
     }

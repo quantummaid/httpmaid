@@ -21,16 +21,21 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules;
 
-import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.*;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifact;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationTemplateBuilder;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Lambda;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
-import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.JarCoordinates.jarCoordinates;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Iam.apiGatewayPermission;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Iam.iamRole;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Lambda.LambdaPayload.java11Payload;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Lambda.LambdaPayload.providedPayload;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FunctionModule implements CloudformationModule {
@@ -39,66 +44,86 @@ public final class FunctionModule implements CloudformationModule {
     private final CloudformationResource functionResourcePermission;
 
     public static FunctionModule unauthorizedFunctionModule(final Namespace namespace,
-                                                            final String bucketName,
-                                                            final String artifactKey,
+                                                            final Artifact artifact,
                                                             final Map<String, Object> environment) {
         return functionModule(
                 namespace,
-                bucketName,
-                artifactKey,
-                "de.quantummaid.httpmaid.testlambda.UnauthorizedLambda",
-                "handleRequest",
+                artifact,
+                forClass("de.quantummaid.httpmaid.testlambda.UnauthorizedLambda"),
+                environment
+        );
+    }
+
+    public static FunctionModule graalVmUnauthorizedFunctionModule(final Namespace namespace,
+                                                                   final Artifact artifact,
+                                                                   final Map<String, Object> environment) {
+        return functionModule(
+                namespace,
+                artifact,
+                providedPayload("Unauthorized"),
                 environment
         );
     }
 
     public static FunctionModule dummyAuthorizedFunctionModule(final Namespace namespace,
-                                                               final String bucketName,
-                                                               final String artifactKey,
+                                                               final Artifact artifact,
                                                                final Map<String, Object> environment) {
         return functionModule(
                 namespace,
-                bucketName,
-                artifactKey,
-                "de.quantummaid.httpmaid.testlambda.DummyAuthorizerLambda",
-                "handleRequest",
+                artifact,
+                forClass("de.quantummaid.httpmaid.testlambda.DummyAuthorizerLambda"),
+                environment
+        );
+    }
+
+    public static FunctionModule graalVmDummyAuthorizedFunctionModule(final Namespace namespace,
+                                                                      final Artifact artifact,
+                                                                      final Map<String, Object> environment) {
+        return functionModule(
+                namespace,
+                artifact,
+                providedPayload("DummyAuthorizer"),
                 environment
         );
     }
 
     public static FunctionModule cognitoAuthorizedFunctionModule(final Namespace namespace,
-                                                                 final String bucketName,
-                                                                 final String artifactKey,
+                                                                 final Artifact artifact,
                                                                  final Map<String, Object> environment) {
         return functionModule(
                 namespace,
-                bucketName,
-                artifactKey,
-                "de.quantummaid.httpmaid.testlambda.CognitoAuthorizerLambda",
-                "handleRequest",
+                artifact,
+                forClass("de.quantummaid.httpmaid.testlambda.CognitoAuthorizerLambda"),
+                environment
+        );
+    }
+
+    public static FunctionModule graalVmCognitoAuthorizedFunctionModule(final Namespace namespace,
+                                                                        final Artifact artifact,
+                                                                        final Map<String, Object> environment) {
+        return functionModule(
+                namespace,
+                artifact,
+                providedPayload("CognitoAuthorizer"),
                 environment
         );
     }
 
     public static FunctionModule functionModule(final Namespace namespace,
-                                                final String bucketName,
-                                                final String artifactKey,
-                                                final String handlerClass,
-                                                final String handlerMethod,
+                                                final Artifact artifact,
+                                                final Lambda.LambdaPayload payload,
                                                 final Map<String, Object> environment) {
         final CloudformationResource functionRole = iamRole(
                 namespace.id("FunctionRole"),
                 namespace.id("FunctionRole"),
                 namespace.sub("FunctionRole")
         );
-        final JarCoordinates jarCoordinates = jarCoordinates(bucketName, artifactKey);
         final CloudformationResource function = Lambda.function(
                 namespace.id("Function"),
                 namespace.id("Function"),
-                jarCoordinates,
+                artifact,
                 functionRole,
-                handlerClass,
-                handlerMethod,
+                payload,
                 environment
         );
         final CloudformationResource functionResourcePermission = apiGatewayPermission(
@@ -119,5 +144,12 @@ public final class FunctionModule implements CloudformationModule {
     @Override
     public void apply(final CloudformationTemplateBuilder builder) {
         builder.withResources(functionRole, function, functionResourcePermission);
+    }
+
+    private static Lambda.LambdaPayload forClass(final String className) {
+        return java11Payload(
+                className,
+                "handleRequest"
+        );
     }
 }

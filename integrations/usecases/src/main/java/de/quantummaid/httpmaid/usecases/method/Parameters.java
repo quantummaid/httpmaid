@@ -21,9 +21,9 @@
 
 package de.quantummaid.httpmaid.usecases.method;
 
-import de.quantummaid.reflectmaid.ResolvedType;
-import de.quantummaid.reflectmaid.resolver.ResolvedMethod;
-import de.quantummaid.reflectmaid.resolver.ResolvedParameter;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.resolver.ResolvedMethod;
+import de.quantummaid.reflectmaid.resolvedtype.resolver.ResolvedParameter;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public final class Parameters {
     private final List<ResolvedParameter> parameters;
 
     public static Parameters parametersOf(final ResolvedMethod method) {
-        final List<ResolvedParameter> parameters = method.parameters();
+        final List<ResolvedParameter> parameters = method.getParameters();
         return new Parameters(parameters);
     }
 
@@ -56,7 +56,7 @@ public final class Parameters {
         return this.parameters.stream()
                 .collect(toMap(
                         ResolvedParameter::name,
-                        ResolvedParameter::type
+                        ResolvedParameter::getType
                 ));
     }
 

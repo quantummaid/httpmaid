@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.132</version>
+        <version>0.9.133</version>
     </parent>
 
     <artifactId>testjar</artifactId>
@@ -34,11 +34,12 @@
     <name>HttpMaid - Tests - Test JAR</name>
 
     <properties>
+        <skipgraal>false</skipgraal>
         <checkstyle.suppressions.location>
             ${project.basedir}/src/test/checkstyle/checkstyle-suppressions.xml
         </checkstyle.suppressions.location>
         <dependency-update-file-checksum>42f33b16b7099885cd5becc23c104f35</dependency-update-file-checksum>
-        <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
+        <plugin-update-file-checksum>915baffd77985e9da0d3cfee67e149eb</plugin-update-file-checksum>
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
@@ -61,6 +62,12 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty-websockets</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.nativeimage</groupId>
+            <artifactId>svm</artifactId>
+            <version>21.0.0.2</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -92,6 +99,34 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>21.0.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${skipgraal}</skip>
+                    <imageName>remotespecs</imageName>
+                    <mainClass>de.quantummaid.httpmaid.testjar.TestMain</mainClass>
+                    <buildArgs>
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                        <buildArg>-H:EnableURLProtocols=http</buildArg>
+                        <buildArg>--enable-https</buildArg>
+                        <buildArg>--no-fallback</buildArg>
+                        <buildArg>-H:+ReportUnsupportedElementsAtRuntime</buildArg>
+                        <buildArg>-H:+PrintClassInitialization</buildArg>
+                        <buildArg>--initialize-at-build-time</buildArg>
+                        <buildArg>--allow-incomplete-classpath</buildArg>
+                    </buildArgs>
+                </configuration>
             </plugin>
         </plugins>
     </build>
