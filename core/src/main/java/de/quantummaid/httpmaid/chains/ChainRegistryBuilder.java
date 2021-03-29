@@ -21,7 +21,7 @@
 
 package de.quantummaid.httpmaid.chains;
 
-import de.quantummaid.httpmaid.chains.autoloading.Autoloader;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,7 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.chains.DependencyRegistry.load;
 import static de.quantummaid.httpmaid.chains.MetaData.emptyMetaData;
+import static de.quantummaid.httpmaid.chains.autoloading.Autoloader.loadModule;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNullNorEmpty;
 
@@ -57,9 +58,10 @@ public final class ChainRegistryBuilder {
         modules.add(module);
     }
 
-    public void addModuleIfPresent(final String fullyQualifiedClassName) {
+    public void addModuleIfPresent(final ReflectMaid reflectMaid, final String fullyQualifiedClassName) {
         validateNotNullNorEmpty(fullyQualifiedClassName, "fullyQualifiedClassName");
-        Autoloader.loadModule(fullyQualifiedClassName).ifPresent(this::addModule);
+        loadModule(reflectMaid, fullyQualifiedClassName)
+                .ifPresent(this::addModule);
     }
 
     public void addConfigurator(final Configurator configurator) {

@@ -1,7 +1,11 @@
 <ruleset comparisonMethod="maven"
          xmlns="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0 http://mojo.codehaus.org/versions-maven-plugin/xsd/rule-2.0.0.xsd">
-
+    <ignoreVersions>
+        <ignoreVersion type="regex">
+            .*[-_\.](alpha|Alpha|ALPHA|beta|Beta|BETA|rc|RC|M|EA)[-_\.]?[0-9]?.*
+        </ignoreVersion>
+    </ignoreVersions>
     <rules>
         <rule groupId="org.apache.maven.plugins" comparisonMethod="maven-surefire-plugin">
             <ignoreVersions>
@@ -13,6 +17,8 @@
                 <ignoreVersion>10.0.0</ignoreVersion>
                 <ignoreVersion>10.0.1</ignoreVersion>
                 <ignoreVersion>10.0.2</ignoreVersion>
+                <ignoreVersion>10.0.3</ignoreVersion>
+                <ignoreVersion>10.0.4</ignoreVersion>
                 <ignoreVersion>10.0.0-M10</ignoreVersion>
                 <ignoreVersion>10.0.0-M9</ignoreVersion>
                 <ignoreVersion>10.0.0-M8</ignoreVersion>
@@ -23,6 +29,7 @@
                 <ignoreVersion>10.0.0-M3</ignoreVersion>
                 <ignoreVersion>10.0.0-M2</ignoreVersion>
                 <ignoreVersion>10.0.0-M1</ignoreVersion>
+                <ignoreVersion>9.0.44</ignoreVersion>
                 <ignoreVersion>9.0.43</ignoreVersion>
                 <ignoreVersion>9.0.42</ignoreVersion>
                 <ignoreVersion>9.0.41</ignoreVersion>

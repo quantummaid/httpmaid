@@ -215,6 +215,7 @@ public final class AuthenticationSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().withTheHeader("user", "foo").isIssued()
-                .theResponseBodyWas("Type variables of 'de.quantummaid.httpmaid.tests.specs.aaa.domain.GenericUser' cannot be resolved");
+                .theResponseBodyWas("type 'de.quantummaid.httpmaid.tests.specs.aaa.domain.GenericUser' contains the following type variables " +
+                        "that need to be filled in in order to create a GenericType object: [T]");
     }
 }

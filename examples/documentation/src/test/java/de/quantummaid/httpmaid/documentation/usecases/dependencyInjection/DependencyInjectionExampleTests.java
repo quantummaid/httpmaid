@@ -21,20 +21,22 @@
 
 package de.quantummaid.httpmaid.documentation.usecases.dependencyInjection;
 
-import de.quantummaid.eventmaid.usecases.usecaseadapter.usecaseinstantiating.UseCaseInstantiator;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.documentation.support.Deployer;
+import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import org.junit.jupiter.api.Test;
 
-import static de.quantummaid.eventmaid.usecases.usecaseadapter.usecaseinstantiating.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
+import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
 
 public final class DependencyInjectionExampleTests {
 
     @Test
     public void dependencyInjectionExample() {
-        final UseCaseInstantiator injector = zeroArgumentsConstructorUseCaseInstantiator();
+        final ReflectMaid reflectMaid = ReflectMaid.aReflectMaid();
+        final UseCaseInstantiator injector = zeroArgumentsConstructorUseCaseInstantiator(reflectMaid);
 
         //Showcase start dependencyInjectionSample
         final HttpMaid httpMaid = anHttpMaid()

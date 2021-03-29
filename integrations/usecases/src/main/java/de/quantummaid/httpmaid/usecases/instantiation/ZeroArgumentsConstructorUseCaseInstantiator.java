@@ -21,6 +21,9 @@
 
 package de.quantummaid.httpmaid.usecases.instantiation;
 
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -37,16 +40,18 @@ import static lombok.AccessLevel.PRIVATE;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = PRIVATE)
 public final class ZeroArgumentsConstructorUseCaseInstantiator implements UseCaseInstantiator {
-    private final Map<Class<?>, InstantiationInformation> instantiationInformations = new HashMap<>();
+    private final ReflectMaid reflectMaid;
+    private final Map<ResolvedType, InstantiationInformation> instantiationInformations = new HashMap<>();
 
-    public static ZeroArgumentsConstructorUseCaseInstantiator zeroArgumentsConstructorUseCaseInstantiator() {
-        return new ZeroArgumentsConstructorUseCaseInstantiator();
+    public static ZeroArgumentsConstructorUseCaseInstantiator zeroArgumentsConstructorUseCaseInstantiator(final ReflectMaid reflectMaid) {
+        return new ZeroArgumentsConstructorUseCaseInstantiator(reflectMaid);
     }
 
     @Override
-    public <T> T instantiate(final Class<T> type) {
-        instantiationInformations.computeIfAbsent(type, InstantiationInformation::instantiationInformationFor);
-        final InstantiationInformation instantiationInformation = instantiationInformations.get(type);
+    public <T> T instantiate(final GenericType<T> type) {
+        final ResolvedType resolvedType = reflectMaid.resolve(type);
+        instantiationInformations.computeIfAbsent(resolvedType, InstantiationInformation::instantiationInformationFor);
+        final InstantiationInformation instantiationInformation = instantiationInformations.get(resolvedType);
         final Constructor<?> constructor = instantiationInformation.constructor();
         try {
             @SuppressWarnings("unchecked") final T newInstance = (T) constructor.newInstance();
@@ -56,11 +61,10 @@ public final class ZeroArgumentsConstructorUseCaseInstantiator implements UseCas
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException) cause;
             } else {
-                throw zeroArgumentsConstructorUseCaseInstantiatorException(type, e);
+                throw zeroArgumentsConstructorUseCaseInstantiatorException(resolvedType, e);
             }
         } catch (final InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw zeroArgumentsConstructorUseCaseInstantiatorException(type, e);
+            throw zeroArgumentsConstructorUseCaseInstantiatorException(resolvedType, e);
         }
     }
-
 }

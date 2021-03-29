@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.websockets.disconnect.Disconnector;
 import de.quantummaid.httpmaid.websockets.disconnect.DisconnectorFactory;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -68,7 +69,7 @@ public final class Broadcasters {
     }
 
     public <T, U> void addBroadcaster(final GenericType<T> type,
-                                      final GenericType<U> messageType,
+                                      final ResolvedType messageType,
                                       final BroadcasterFactory<T, U> factory) {
         final RegisteredBroadcasterFactory registeredFactory = registeredBroadcasterFactory(factory, type, messageType);
         broadcasterFactories.put(type, registeredFactory);
@@ -86,7 +87,7 @@ public final class Broadcasters {
         return injectionTypes;
     }
 
-    public List<GenericType<?>> messageTypes() {
+    public List<ResolvedType> messageTypes() {
         return broadcasterFactories.values().stream()
                 .map(RegisteredBroadcasterFactory::messageType)
                 .collect(toList());
@@ -101,11 +102,11 @@ public final class Broadcasters {
                                         final MetaData metaData) {
         final RegisteredBroadcasterFactory broadcasterFactory = broadcasterFactories.get(type);
         validateNotNull(broadcasterFactory, "broadcasterFactory");
-        final GenericType<?> messageType = broadcasterFactory.messageType();
+        final ResolvedType messageType = broadcasterFactory.messageType();
         final SerializingSender<Object> serializingSender = serializingSender(
                 websocketRegistry,
                 websocketSenders,
-                messageType.toResolvedType(),
+                messageType,
                 marshaller,
                 serializer,
                 metaData

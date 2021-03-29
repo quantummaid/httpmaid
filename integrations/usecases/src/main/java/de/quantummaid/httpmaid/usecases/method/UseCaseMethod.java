@@ -21,9 +21,9 @@
 
 package de.quantummaid.httpmaid.usecases.method;
 
-import de.quantummaid.reflectmaid.ClassType;
-import de.quantummaid.reflectmaid.ResolvedType;
-import de.quantummaid.reflectmaid.resolver.ResolvedMethod;
+import de.quantummaid.reflectmaid.resolvedtype.ClassType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.resolver.ResolvedMethod;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +89,7 @@ public final class UseCaseMethod {
                                    final Map<String, Object> parameters,
                                    final Object event) throws Exception { // NOSONAR
         final Object[] parameterInstances = this.parameters.toArray(parameters);
-        final Method lowLevelMethod = this.method.method();
+        final Method lowLevelMethod = this.method.getMethod();
         try {
             final Object returnValue = lowLevelMethod.invoke(useCase, parameterInstances);
             return ofNullable(returnValue);
@@ -131,9 +131,9 @@ public final class UseCaseMethod {
     private static List<ResolvedMethod> getAllPublicMethods(final ClassType useCaseClass, final Collection<String> excludedMethods) {
         return useCaseClass.methods().stream()
                 .filter(ResolvedMethod::isPublic)
-                .filter(method -> !Modifier.isStatic(method.method().getModifiers()))
-                .filter(method -> !isAbstract(method.method().getModifiers()))
-                .filter(method -> method.method().getDeclaringClass().equals(useCaseClass.assignableType()))
+                .filter(method -> !Modifier.isStatic(method.getMethod().getModifiers()))
+                .filter(method -> !isAbstract(method.getMethod().getModifiers()))
+                .filter(method -> method.getMethod().getDeclaringClass().equals(useCaseClass.assignableType()))
                 .filter(method -> !excludedMethods.contains(method.name()))
                 .collect(toList());
     }

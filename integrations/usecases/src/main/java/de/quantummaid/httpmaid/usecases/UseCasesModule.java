@@ -47,8 +47,9 @@ import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
 import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
 import de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,7 @@ import static de.quantummaid.eventmaid.internal.collections.predicatemap.Predica
 import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
 import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
 import static de.quantummaid.eventmaid.usecases.usecaseadapter.LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder;
+import static de.quantummaid.httpmaid.CoreModule.REFLECT_MAID;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
 import static de.quantummaid.httpmaid.events.EventModule.eventModule;
@@ -88,7 +90,7 @@ public final class UseCasesModule implements ChainModule {
     public static final MetaDataKey<SerializedMessageBus> SERIALIZED_MESSAGE_BUS = metaDataKey("SERIALIZED_MESSAGE_BUS");
 
     private SerializationAndDeserializationProvider serializationAndDeserializationProvider;
-    private UseCaseInstantiatorFactory useCaseInstantiatorFactory = types -> zeroArgumentsConstructorUseCaseInstantiator();
+    private UseCaseInstantiatorFactory useCaseInstantiatorFactory;
     private final Map<ResolvedType, EventType> useCaseToEventMappings = new HashMap<>();
     private final List<UseCaseMethod> useCaseMethods = new ArrayList<>();
 
@@ -118,25 +120,27 @@ public final class UseCasesModule implements ChainModule {
 
     @Override
     public void init(final MetaData configurationMetaData) {
+        final ReflectMaid reflectMaid = configurationMetaData.get(REFLECT_MAID);
         final HandlerDistributors handlerDistributors = configurationMetaData.get(HANDLER_DISTRIBUTORS);
         handlerDistributors.register(handler -> handler.handler() instanceof GenericType, handler -> {
             final GenericType<?> useCaseClass = (GenericType<?>) handler.handler();
-            return registerUseCase(useCaseClass, handler.condition(), handler.perRouteConfigurators());
+            final ResolvedType resolvedUseCaseClass = reflectMaid.resolve(useCaseClass);
+            return registerUseCase(resolvedUseCaseClass, handler.condition(), handler.perRouteConfigurators());
         });
         handlerDistributors.register(handler -> handler.handler() instanceof Class, handler -> {
             final Class<?> clazz = (Class<?>) handler.handler();
             final GenericType<?> useCaseClass = genericType(clazz);
-            return registerUseCase(useCaseClass, handler.condition(), handler.perRouteConfigurators());
+            final ResolvedType resolvedUseCaseClass = reflectMaid.resolve(useCaseClass);
+            return registerUseCase(resolvedUseCaseClass, handler.condition(), handler.perRouteConfigurators());
         });
     }
 
-    private List<DistributableHandler> registerUseCase(final GenericType<?> genericType,
+    private List<DistributableHandler> registerUseCase(final ResolvedType useCaseType,
                                                        final GenerationCondition condition,
                                                        final List<PerRouteConfigurator> perRouteConfigurators) {
-        final ResolvedType resolvedType = genericType.toResolvedType();
-        final EventType eventType = eventTypeFromString(resolvedType.description());
-        useCaseToEventMappings.put(resolvedType, eventType);
-        useCaseMethods.add(useCaseMethodOf(resolvedType));
+        final EventType eventType = eventTypeFromString(useCaseType.description());
+        useCaseToEventMappings.put(useCaseType, eventType);
+        useCaseMethods.add(useCaseMethodOf(useCaseType));
         final DistributableHandler eventHandler = distributableHandler(condition, eventType, perRouteConfigurators);
         return singletonList(eventHandler);
     }
@@ -156,7 +160,7 @@ public final class UseCasesModule implements ChainModule {
     public void register(final ChainExtender extender) {
         final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
         final List<GenericType<?>> injectionTypes = broadcasters.injectionTypes();
-        final List<GenericType<?>> messageTypes = broadcasters.messageTypes();
+        final List<ResolvedType> messageTypes = broadcasters.messageTypes();
         final UseCaseSerializationAndDeserialization serializationAndDeserialization =
                 serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes, messageTypes);
         final Serializer returnValueSerializer = serializationAndDeserialization.returnValueSerializer();
@@ -167,23 +171,23 @@ public final class UseCasesModule implements ChainModule {
                 .map(UseCaseMethod::useCaseClass)
                 .map(ResolvedType::assignableType)
                 .collect(toList());
+        if (useCaseInstantiatorFactory == null) {
+            final ReflectMaid reflectMaid = extender.getMetaDatum(REFLECT_MAID);
+            useCaseInstantiatorFactory = types -> zeroArgumentsConstructorUseCaseInstantiator(reflectMaid);
+        }
         final UseCaseInstantiator useCaseInstantiator = useCaseInstantiatorFactory.createInstantiator(useCaseClasses);
         final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
         final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
-        useCaseMethods.forEach(useCaseMethod -> {
-            final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
-            final EventType eventType = useCaseToEventMappings.get(useCaseClass);
-            adapterBuilder.addUseCase(useCaseClass.assignableType(), eventType, (useCase, untypedEvent, callingContext) -> {
-                final Event event = (Event) untypedEvent;
-                final Map<String, Object> parameters = serializationAndDeserialization.deserializeParameters(event, useCaseClass);
-                final Optional<Object> returnValue = useCaseMethod.invoke(useCase, parameters, event);
-                return returnValue
-                        .map(object -> serializationAndDeserialization.serializeReturnValue(object, useCaseMethod.returnType().orElseThrow()))
-                        .orElse(null);
-            });
-            startupChecks.addStartupCheck(() -> useCaseInstantiator.check(fromResolvedType(useCaseClass)));
+        useCaseMethods.forEach(useCaseMethod -> registerUseCaseMethod(
+                useCaseMethod, adapterBuilder, serializationAndDeserialization, startupChecks, useCaseInstantiator
+        ));
+        adapterBuilder.setUseCaseInstantiator(new de.quantummaid.eventmaid.usecases.usecaseadapter.usecaseinstantiating.UseCaseInstantiator() {
+            @Override
+            public <T> T instantiate(final Class<T> type) {
+                final GenericType<T> genericType = genericType(type);
+                return useCaseInstantiator.instantiate(genericType);
+            }
         });
-        adapterBuilder.setUseCaseInstantiator(useCaseInstantiator::instantiate);
         final PredicateMapBuilder<Exception, Mapifier<Exception>> exceptionSerializers = predicateMapBuilder();
         exceptionSerializers.setDefaultValue(defaultExceptionMapifier());
         adapterBuilder.setExceptionSerializers(exceptionSerializers);
@@ -191,6 +195,24 @@ public final class UseCasesModule implements ChainModule {
         final MessageBus messageBus = extender.getMetaDatum(MESSAGE_BUS);
         final SerializedMessageBus serializedMessageBus = useCaseAdapter.attachAndEnhance(messageBus);
         extender.addMetaDatum(SERIALIZED_MESSAGE_BUS, serializedMessageBus);
+    }
+
+    private void registerUseCaseMethod(final UseCaseMethod useCaseMethod,
+                                       final LowLevelUseCaseAdapterBuilder adapterBuilder,
+                                       final UseCaseSerializationAndDeserialization serializationAndDeserialization,
+                                       final StartupChecks startupChecks,
+                                       final UseCaseInstantiator useCaseInstantiator) {
+        final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
+        final EventType eventType = useCaseToEventMappings.get(useCaseClass);
+        adapterBuilder.addUseCase(useCaseClass.assignableType(), eventType, (useCase, untypedEvent, callingContext) -> {
+            final Event event = (Event) untypedEvent;
+            final Map<String, Object> parameters = serializationAndDeserialization.deserializeParameters(event, useCaseClass);
+            final Optional<Object> returnValue = useCaseMethod.invoke(useCase, parameters, event);
+            return returnValue
+                    .map(object -> serializationAndDeserialization.serializeReturnValue(object, useCaseMethod.returnType().orElseThrow()))
+                    .orElse(null);
+        });
+        startupChecks.addStartupCheck(() -> useCaseInstantiator.check(fromResolvedType(useCaseClass)));
     }
 
     private static LowLevelUseCaseAdapterBuilder createAdapterBuilder() {

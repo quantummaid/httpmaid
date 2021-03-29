@@ -21,15 +21,20 @@
 
 package de.quantummaid.httpmaid.usecases.instantiation;
 
+import de.quantummaid.reflectmaid.resolvedtype.ClassType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.resolver.ResolvedConstructor;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiatorException.zeroArgumentsConstructorUseCaseInstantiatorException;
-import static java.lang.reflect.Modifier.isAbstract;
+import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 
 @ToString
 @EqualsAndHashCode
@@ -38,10 +43,12 @@ import static java.lang.reflect.Modifier.isAbstract;
 public final class InstantiationInformation {
     private final Constructor<?> constructor;
 
-    public static InstantiationInformation instantiationInformationFor(final Class<?> type) {
+    public static InstantiationInformation instantiationInformationFor(final ResolvedType type) {
         validateNotInterface(type);
         validateNotAbstractClass(type);
-        final Constructor<?> constructor = extractZeroArgumentsConstructor(type);
+        final ClassType classType = (ClassType) type;
+        final Constructor<?> constructor = extractZeroArgumentsConstructor(classType);
+        validateNotNull(constructor, "constructor");
         return new InstantiationInformation(constructor);
     }
 
@@ -49,22 +56,25 @@ public final class InstantiationInformation {
         return constructor;
     }
 
-    private static Constructor<?> extractZeroArgumentsConstructor(final Class<?> type) {
-        try {
-            return type.getDeclaredConstructor();
-        } catch (final NoSuchMethodException e) {
-            throw zeroArgumentsConstructorUseCaseInstantiatorException(type, e);
+    private static Constructor<?> extractZeroArgumentsConstructor(final ClassType type) {
+        final List<ResolvedConstructor> relevantConstructors = type.constructors().stream()
+                .filter(ResolvedConstructor::isPublic)
+                .filter(resolvedConstructor -> resolvedConstructor.getParameters().isEmpty())
+                .collect(Collectors.toList());
+        if (relevantConstructors.isEmpty()) {
+            throw zeroArgumentsConstructorUseCaseInstantiatorException(type, "no zero-argument constructors found");
         }
+        return relevantConstructors.get(0).getConstructor();
     }
 
-    private static void validateNotInterface(final Class<?> type) {
+    private static void validateNotInterface(final ResolvedType type) {
         if (type.isInterface()) {
             throw zeroArgumentsConstructorUseCaseInstantiatorException(type, "must not be an interface");
         }
     }
 
-    private static void validateNotAbstractClass(final Class<?> type) {
-        if (isAbstract(type.getModifiers())) {
+    private static void validateNotAbstractClass(final ResolvedType type) {
+        if (type.isAbstract()) {
             throw zeroArgumentsConstructorUseCaseInstantiatorException(type, "must not be an abstract class");
         }
     }

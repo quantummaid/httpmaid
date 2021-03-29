@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.remotespecs.lambda;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecs;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsDeployer;
 import de.quantummaid.httpmaid.remotespecs.RemoteSpecsExtension;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifact;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifacts;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
@@ -67,12 +69,12 @@ public final class DummyAuthRestApiRemoteSpecs implements RemoteSpecs {
     }
 
     public static CloudformationModule infrastructureRequirements(final Namespace namespace,
-                                                                  final String bucketName,
-                                                                  final String artifactKey) {
+                                                                  final Artifacts artifacts) {
         return builder -> {
             final WebsocketRegistryModule websocketRegistryModule = websocketRegistryModule(namespace);
 
-            final FunctionModule functionModule = dummyAuthorizedFunctionModule(namespace, bucketName, artifactKey, Map.of(
+            final Artifact artifact = artifacts.jarImage();
+            final FunctionModule functionModule = dummyAuthorizedFunctionModule(namespace, artifact, Map.of(
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
                     "REGION", sub(REGION)
             ));

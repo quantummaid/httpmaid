@@ -31,7 +31,7 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
-import de.quantummaid.reflectmaid.ResolvedType;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.websockets.broadcast;
 
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -34,13 +35,13 @@ import lombok.ToString;
 public final class RegisteredBroadcasterFactory {
     private final BroadcasterFactory<?, Object> factory;
     private final GenericType<?> senderType;
-    private final GenericType<?> messageType;
+    private final ResolvedType messageType;
 
     @SuppressWarnings("unchecked")
     public static <T, U> RegisteredBroadcasterFactory registeredBroadcasterFactory(
             final BroadcasterFactory<T, U> factory,
             final GenericType<T> senderType,
-            final GenericType<U> messageType) {
+            final ResolvedType messageType) {
         return new RegisteredBroadcasterFactory((BroadcasterFactory<?, Object>) factory, senderType, messageType);
     }
 
@@ -48,7 +49,7 @@ public final class RegisteredBroadcasterFactory {
         return factory;
     }
 
-    public GenericType<?> messageType() {
+    public ResolvedType messageType() {
         return messageType;
     }
 

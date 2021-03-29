@@ -31,7 +31,9 @@ import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.httpmaid.websockets.broadcast.BroadcasterFactory;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
 import de.quantummaid.httpmaid.websockets.disconnect.DisconnectorFactory;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -60,14 +62,18 @@ import static java.util.Arrays.asList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder> {
+    private final ReflectMaid reflectMaid;
     private boolean autodetectionOfModules = true;
     private boolean performStartupChecks = true;
     private final CoreModule coreModule;
     private final List<Configurator> configurators;
     private final Broadcasters broadcasters = broadcasters();
 
-    static HttpMaidBuilder httpMaidBuilder() {
-        return new HttpMaidBuilder(CoreModule.coreModule(), new ArrayList<>());
+    static HttpMaidBuilder httpMaidBuilder(final ReflectMaid reflectMaid) {
+        return new HttpMaidBuilder(reflectMaid,
+                CoreModule.coreModule(reflectMaid),
+                new ArrayList<>()
+        );
     }
 
     public HttpMaidBuilder disableAutodectectionOfModules() {
@@ -117,7 +123,8 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
     public <T, U> HttpMaidBuilder broadcastToWebsocketsUsing(final GenericType<T> broadcaster,
                                                              final GenericType<U> messageType,
                                                              final BroadcasterFactory<T, U> factory) {
-        this.broadcasters.addBroadcaster(broadcaster, messageType, factory);
+        final ResolvedType resolvedMessageType = reflectMaid.resolve(messageType);
+        this.broadcasters.addBroadcaster(broadcaster, resolvedMessageType, factory);
         return this;
     }
 
@@ -147,9 +154,9 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
         chainRegistryBuilder.addModule(coreModule);
         chainRegistryBuilder.addModule(websocketsModule());
         if (autodetectionOfModules) {
-            chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.events.EventModule");
-            chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.usecases.UseCasesModule");
-            chainRegistryBuilder.addModuleIfPresent("de.quantummaid.httpmaid.mapmaid.MapMaidModule");
+            chainRegistryBuilder.addModuleIfPresent(reflectMaid, "de.quantummaid.httpmaid.events.EventModule");
+            chainRegistryBuilder.addModuleIfPresent(reflectMaid, "de.quantummaid.httpmaid.usecases.UseCasesModule");
+            chainRegistryBuilder.addModuleIfPresent(reflectMaid, "de.quantummaid.httpmaid.mapmaid.MapMaidModule");
         }
         configurators.forEach(chainRegistryBuilder::addConfigurator);
         final ChainRegistry chainRegistry = chainRegistryBuilder.build();

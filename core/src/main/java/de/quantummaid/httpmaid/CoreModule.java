@@ -21,10 +21,7 @@
 
 package de.quantummaid.httpmaid;
 
-import de.quantummaid.httpmaid.chains.ChainExtender;
-import de.quantummaid.httpmaid.chains.ChainModule;
-import de.quantummaid.httpmaid.chains.DependencyRegistry;
-import de.quantummaid.httpmaid.chains.MetaData;
+import de.quantummaid.httpmaid.chains.*;
 import de.quantummaid.httpmaid.chains.builder.ChainBuilder;
 import de.quantummaid.httpmaid.chains.rules.Consume;
 import de.quantummaid.httpmaid.chains.rules.Jump;
@@ -47,6 +44,7 @@ import de.quantummaid.httpmaid.responsetemplate.ApplyResponseTemplateProcessor;
 import de.quantummaid.httpmaid.responsetemplate.InitResponseProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ResponseTemplate;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
+import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +56,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
+import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
 import static de.quantummaid.httpmaid.exceptions.DefaultExceptionMapper.theDefaultExceptionMapper;
 import static de.quantummaid.httpmaid.exceptions.HandlerExceptionMapper.handlerExceptionMapper;
 import static de.quantummaid.httpmaid.handler.DefaultPageNotFoundHandler.defaultPageNotFoundHandler;
@@ -77,6 +76,9 @@ import static java.util.Collections.emptyList;
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CoreModule implements ChainModule {
+    public static final MetaDataKey<ReflectMaid> REFLECT_MAID = metaDataKey("REFLECT_MAID");
+
+    private final ReflectMaid reflectMaid;
     private final List<DistributableHandler> handlers = new ArrayList<>();
     private final List<Generator<Handler>> lowLevelHandlers = new LinkedList<>();
     private ResponseTemplate responseTemplate = emptyResponseTemplate();
@@ -84,8 +86,8 @@ public final class CoreModule implements ChainModule {
     private ExceptionMapper<?> pageNotFoundExceptionMapper = handlerExceptionMapper(defaultPageNotFoundHandler());
     private final ClosingActions closingActions = ClosingActions.closingActions();
 
-    public static CoreModule coreModule() {
-        final CoreModule coreModule = new CoreModule();
+    public static CoreModule coreModule(final ReflectMaid reflectMaid) {
+        final CoreModule coreModule = new CoreModule(reflectMaid);
         coreModule.setDefaultExceptionMapper(theDefaultExceptionMapper());
         return coreModule;
     }
@@ -123,6 +125,7 @@ public final class CoreModule implements ChainModule {
 
     @Override
     public void init(final MetaData configurationMetaData) {
+        configurationMetaData.set(REFLECT_MAID, reflectMaid);
         final StartupChecks startupChecks = startupChecks();
         configurationMetaData.set(STARTUP_CHECKS, startupChecks);
         final HandlerDistributors handlerDistributers = handlerDistributors();

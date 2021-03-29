@@ -43,6 +43,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifacts.artifacts;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.StackIdentifier.sharedStackIdentifier;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.StackIdentifier.userProvidedStackIdentifier;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.connectToCloudFormation;
@@ -83,6 +84,7 @@ import static java.util.Optional.empty;
 @Slf4j
 public final class LambdaDeployer implements RemoteSpecsDeployer {
     private static final String RELATIVE_PATH_TO_LAMBDA_JAR = "/tests/lambda/target/remotespecs.jar";
+    private static final String RELATIVE_PATH_TO_LAMBDA_ZIP = "/tests/lambda/target/remotespecs.zip";
 
     private final StackIdentifier stackIdentifier;
     private final Boolean developerMode;
@@ -107,17 +109,16 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
 
         final CloudformationTemplate bucketTemplate = Templates.bucketTemplate(artifactBucketName);
         create(artifactBucketName, StringTemplate.stringTemplate(bucketTemplate));
-        final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
-        final String lambdaPath = basePath + RELATIVE_PATH_TO_LAMBDA_JAR;
-        final File file = new File(lambdaPath);
-        final String s3Key = uploadToS3Bucket(artifactBucketName, file);
+        final Artifact jarArtifact = upload(RELATIVE_PATH_TO_LAMBDA_JAR, artifactBucketName);
+        final Artifact zipArtifact = upload(RELATIVE_PATH_TO_LAMBDA_ZIP, artifactBucketName);
+        final Artifacts artifacts = artifacts(jarArtifact, zipArtifact);
 
         final List<Class<?>> relevantClassSources = Listener.getClassSources().stream()
                 .filter(this::hasCloudformationRequirements)
                 .collect(Collectors.toList());
 
         final Namespace namespace = Namespace.namespace(stackIdentifier.value());
-        final CloudformationTemplate lambdaTemplate = buildTemplate(relevantClassSources, namespace, artifactBucketName, s3Key);
+        final CloudformationTemplate lambdaTemplate = buildTemplate(relevantClassSources, namespace, artifacts);
         final String renderedTemplate = lambdaTemplate.render();
         log.debug(renderedTemplate);
         final String templateArtifactName = uploadToS3Bucket(artifactBucketName, renderedTemplate);
@@ -128,13 +129,20 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         return RemoteSpecsDeployment.remoteSpecsDeployment(this::cleanUp, deploymentMap);
     }
 
+    private Artifact upload(final String relativePath, final String artifactBucketName) {
+        final String basePath = BaseDirectoryFinder.findProjectBaseDirectory();
+        final String lambdaPath = basePath + relativePath;
+        final File file = new File(lambdaPath);
+        final String s3Key = uploadToS3Bucket(artifactBucketName, file);
+        return Artifact.artifact(artifactBucketName, s3Key);
+    }
+
     private CloudformationTemplate buildTemplate(final List<Class<?>> relevantTestClasses,
                                                  final Namespace namespace,
-                                                 final String artifactBucketName,
-                                                 final String s3Key) {
+                                                 final Artifacts artifacts) {
         final CloudformationTemplateBuilder builder = cloudformationTemplateBuilder();
         relevantTestClasses.stream()
-                .map(aClass -> extractModuleFromTestClass(aClass, namespace, artifactBucketName, s3Key))
+                .map(aClass -> extractModuleFromTestClass(aClass, namespace, artifacts))
                 .flatMap(Optional::stream)
                 .forEach(builder::withModule);
         return builder
@@ -148,12 +156,11 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
 
     private Optional<CloudformationModule> extractModuleFromTestClass(final Class<?> testClass,
                                                                       final Namespace parentNamespace,
-                                                                      final String bucketName,
-                                                                      final String artifactKey) {
+                                                                      final Artifacts artifacts) {
         return infrastructureRequirementsMethod(testClass)
                 .map(method -> {
                     final Namespace namespace = parentNamespace.sub(testClass.getSimpleName());
-                    return invokeInfrastructureRequirementsMethod(method, namespace, bucketName, artifactKey);
+                    return invokeInfrastructureRequirementsMethod(method, namespace, artifacts);
                 });
     }
 
@@ -162,8 +169,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
             final Method method = testClass.getMethod(
                     "infrastructureRequirements",
                     Namespace.class,
-                    String.class,
-                    String.class
+                    Artifacts.class
             );
             return Optional.of(method);
         } catch (final NoSuchMethodException e) {
@@ -193,9 +199,8 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
 
     private CloudformationModule invokeInfrastructureRequirementsMethod(final Method method,
                                                                         final Namespace namespace,
-                                                                        final String bucketName,
-                                                                        final String artifactKey) {
-        return invokeStaticMethod(method, namespace, bucketName, artifactKey);
+                                                                        final Artifacts artifacts) {
+        return invokeStaticMethod(method, namespace, artifacts);
     }
 
     @SuppressWarnings("unchecked")

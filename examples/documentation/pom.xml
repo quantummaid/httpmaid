@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.examples</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.132</version>
+        <version>0.9.133</version>
     </parent>
 
     <artifactId>documentation</artifactId>
@@ -47,6 +47,21 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>1.4.32</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib-jdk7</artifactId>
+                <version>1.4.32</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib-jdk8</artifactId>
+                <version>1.4.32</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>4.0.1</version>
@@ -54,7 +69,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.12.1</version>
+                <version>2.12.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -63,7 +78,7 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid</groupId>
             <artifactId>core</artifactId>
-            <version>0.9.132</version>
+            <version>0.9.133</version>
         </dependency>
         <!-- Showcase end httpmaiddependency -->
         <dependency>
@@ -90,28 +105,28 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty</artifactId>
-            <version>0.9.132</version>
+            <version>0.9.133</version>
         </dependency>
         <!-- Showcase end jettydependency -->
         <!-- Showcase start servletdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-servlet</artifactId>
-            <version>0.9.132</version>
+            <version>0.9.133</version>
         </dependency>
         <!-- Showcase end servletdependency -->
         <!-- Showcase start jettywebsocketsdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty-websockets</artifactId>
-            <version>0.9.132</version>
+            <version>0.9.133</version>
         </dependency>
         <!-- Showcase end jettywebsocketsdependency -->
         <!-- Showcase start awsdependency -->
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-awslambda</artifactId>
-            <version>0.9.132</version>
+            <version>0.9.133</version>
         </dependency>
         <!-- Showcase end awsdependency -->
         <dependency>
@@ -140,7 +155,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.12.1</version>
+            <version>2.12.2</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -170,7 +185,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.36.v20210114</version>
+            <version>9.4.39.v20210325</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

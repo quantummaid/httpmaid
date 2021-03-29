@@ -123,7 +123,7 @@ to (de-)serialize our domain objects (`MultiplicationRequest`, `CalculationRespo
 <dependency>
     <groupId>de.quantummaid.httpmaid.integrations</groupId>
     <artifactId>httpmaid-mapmaid</artifactId>
-    <version>0.9.132</version>
+    <version>0.9.133</version>
 </dependency>
 ```
 Please refer to MapMaid's documentation if you want to learn more about this feature.
