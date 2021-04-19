@@ -278,19 +278,8 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("" +
-                        "The following classes could not be detected properly:\n" +
-                        "\n" +
-                        "?: unable to detect serialization-only:\n" +
-                        "no serialization detected:\n" +
-                        "[type '?' is not supported because it contains wildcard generics (\"?\")]\n" +
-                        "\n" +
-                        "?:\n" +
-                        "Mode: serialization-only\n" +
-                        "How it is serialized:\n" +
-                        "\tNo serializer available\n" +
-                        "Why it needs to be serializable:\n" +
-                        "\t- java.util.List<?> -> because return type of method 'List method()' [public java.util.List<? super java.lang.String> " +
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("[type '?' is not supported because it contains wildcard generics (\"?\")]")
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("java.util.List<?> -> because return type of method 'List<?> method()' [public java.util.List<? super java.lang.String> " +
                         "de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithWildcardInReturnType.method()]");
     }
 
