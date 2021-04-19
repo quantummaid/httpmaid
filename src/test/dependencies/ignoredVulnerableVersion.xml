@@ -2,6 +2,13 @@
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
         <notes><![CDATA[
+   file name: commons-io-2.2.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-io/commons\-io@.*$</packageUrl>
+        <cve>CVE-2021-29425</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
    file name: android-json-0.0.20131108.vaadin1.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.vaadin\.external\.google/android\-json@.*$</packageUrl>

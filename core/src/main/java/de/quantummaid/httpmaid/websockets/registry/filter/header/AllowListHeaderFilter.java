@@ -32,7 +32,7 @@ import java.util.List;
 
 import static de.quantummaid.httpmaid.http.Http.Headers.ACCEPT;
 import static de.quantummaid.httpmaid.http.Http.Headers.CONTENT_TYPE;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

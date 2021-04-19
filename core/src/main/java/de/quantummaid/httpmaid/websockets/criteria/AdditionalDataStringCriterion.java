@@ -31,7 +31,7 @@ import lombok.ToString;
 
 import java.util.Map;
 
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode

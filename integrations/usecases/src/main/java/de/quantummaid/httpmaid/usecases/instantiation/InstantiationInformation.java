@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiatorException.zeroArgumentsConstructorUseCaseInstantiatorException;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode

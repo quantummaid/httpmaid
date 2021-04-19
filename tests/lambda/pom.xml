@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.133</version>
+        <version>0.9.134</version>
     </parent>
 
     <artifactId>testlambda</artifactId>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
-                <version>4.1.60.Final</version>
+                <version>4.1.63.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>de.quantummaid.graalvmlambdaruntime</groupId>
             <artifactId>core</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

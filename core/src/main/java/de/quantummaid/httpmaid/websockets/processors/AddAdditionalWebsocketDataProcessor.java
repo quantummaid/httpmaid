@@ -31,9 +31,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AddAdditionalWebsocketDataProcessor implements Processor {

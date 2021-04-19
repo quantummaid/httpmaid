@@ -42,12 +42,12 @@ import static de.quantummaid.httpmaid.HttpMaidChainKeys.QUERY_PARAMETERS;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.REQUEST_HEADERS;
 import static de.quantummaid.httpmaid.http.Headers.headers;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.ADDITIONAL_WEBSOCKET_DATA;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.registry.ConnectionInformation.dummyConnectionInformation;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.websocketRegistryEntry;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId.WEBSOCKET_SENDER_ID;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CreateWebsocketRegistryEntryProcessor implements Processor {

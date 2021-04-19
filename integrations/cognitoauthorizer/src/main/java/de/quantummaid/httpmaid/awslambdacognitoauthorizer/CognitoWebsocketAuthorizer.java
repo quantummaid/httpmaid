@@ -37,9 +37,9 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.jwt.JwtParser.extractJwtPayload;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.fail;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.success;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
