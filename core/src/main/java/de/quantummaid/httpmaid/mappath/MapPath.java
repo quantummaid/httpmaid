@@ -34,7 +34,7 @@ import java.util.Map;
 import static de.quantummaid.httpmaid.mappath.IndexMapPathElement.indexMapPathElement;
 import static de.quantummaid.httpmaid.mappath.KeyMapPathElement.keyMapPathElement;
 import static de.quantummaid.httpmaid.mappath.statemachine.StateMachine.runStateMachineOn;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @ToString
 @EqualsAndHashCode

@@ -25,7 +25,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import static de.quantummaid.httpmaid.mappath.MapPathException.retrievalException;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Retrieval {

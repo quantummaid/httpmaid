@@ -39,15 +39,15 @@ import java.util.UUID;
 
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.AWS_LAMBDA_EVENT;
 import static de.quantummaid.httpmaid.awslambda.AwsLambdaEvent.awsLambdaEvent;
-import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.awslambda.EventUtils.extractMethodArn;
 import static de.quantummaid.httpmaid.awslambda.WebsocketEventUtils.extractHeaders;
 import static de.quantummaid.httpmaid.awslambda.WebsocketEventUtils.extractQueryParameters;
 import static de.quantummaid.httpmaid.awslambda.authorizer.AuthorizationDecisionMapper.mapAuthorizationDecision;
+import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
 import static de.quantummaid.httpmaid.websockets.endpoint.RawWebsocketAuthorizationBuilder.rawWebsocketAuthorizationBuilder;
-import static de.quantummaid.reflectmaid.validators.NotNullValidator.validateNotNull;
 import static java.util.Collections.emptyMap;
 
 @Slf4j
