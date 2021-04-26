@@ -196,7 +196,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-dynamodb</artifactId>
-            <version>0.10.3</version>
+            <version>0.10.4</version>
             <scope>test</scope>
         </dependency>
 
