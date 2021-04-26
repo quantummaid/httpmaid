@@ -91,7 +91,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.10.3</version>
+            <version>0.10.4</version>
         </dependency>
     </dependencies>
 </project>

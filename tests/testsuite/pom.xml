@@ -186,7 +186,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.10.3</version>
+            <version>0.10.4</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
