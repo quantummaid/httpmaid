@@ -395,7 +395,7 @@ public final class Structures {
                             .optionalKey("caller", nullValue())
                             .key("sourceIp", string())
                             .optionalKey("accessKey", nullValue())
-                            .key("cognitoAuthenticationProvider", nullValue())
+                            .optionalKey("cognitoAuthenticationProvider", nullValue())
                             .optionalKey("user", nullValue())
                     )
                     .key("requestId", string())
