@@ -28,7 +28,6 @@ import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.authorizer.LambdaWebsocketAuthorizer;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
 import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
-import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,17 +52,26 @@ public final class Router {
     private final AwsWebsocketLambdaEndpoint websocketEndpoint;
     private final LambdaWebsocketAuthorizer authorizer;
 
-    public static Router router(final Consumer<HttpMaidBuilder> additionalConfig) {
-        final String region = System.getenv("REGION");
-        final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
-        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 2.0);
-        final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
-        final HttpMaid httpMaid = HttpMaidFactory.httpMaid(httpMaidBuilder -> {
+    public static HttpMaid httpMaidForRouter(final Consumer<HttpMaidBuilder> additionalConfig) {
+        return HttpMaidFactory.httpMaid(httpMaidBuilder -> {
             additionalConfig.accept(httpMaidBuilder);
-            httpMaidBuilder.configured(toUseWebsocketRegistry(websocketRegistry));
+            httpMaidBuilder.configured(toUseWebsocketRegistry(() -> {
+                final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
+                final DynamoDbClient dynamoDbClient = DynamoDbClient.builder().build();
+                final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 2.0);
+                return dynamoDbWebsocketRegistry(dynamoDbRepository);
+            }));
         });
+    }
+
+    public static Router router(final Consumer<HttpMaidBuilder> additionalConfig) {
+        final HttpMaid httpMaid = httpMaidForRouter(additionalConfig);
+        return router(httpMaid);
+    }
+
+    public static Router router(final HttpMaid httpMaid) {
         final AwsLambdaEndpoint httpEndpoint = awsLambdaEndpointFor(httpMaid);
+        final String region = System.getenv("REGION");
         final AwsWebsocketLambdaEndpoint websocketEndpoint = awsWebsocketLambdaEndpointFor(httpMaid, region);
         final LambdaWebsocketAuthorizer authorizer = lambdaWebsocketAuthorizer(httpMaid);
         return new Router(httpEndpoint, websocketEndpoint, authorizer);

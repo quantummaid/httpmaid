@@ -24,8 +24,12 @@ package de.quantummaid.httpmaid.websockets;
 import de.quantummaid.httpmaid.chains.ChainExtender;
 import de.quantummaid.httpmaid.chains.ChainModule;
 import de.quantummaid.httpmaid.chains.ChainName;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfiguration;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValue;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValueProvider;
 import de.quantummaid.httpmaid.websockets.additionaldata.AdditionalWebsocketDataProvider;
 import de.quantummaid.httpmaid.websockets.authorization.WebsocketAuthorizer;
+import de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.filter.header.HeaderFilter;
 import de.quantummaid.httpmaid.websockets.registry.filter.queryparameter.QueryParameterFilter;
@@ -37,6 +41,7 @@ import lombok.ToString;
 
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.CoreModule.RUNTIME_CONFIGURATION;
 import static de.quantummaid.httpmaid.HttpMaidChains.*;
 import static de.quantummaid.httpmaid.chains.ChainName.chainName;
 import static de.quantummaid.httpmaid.chains.rules.Consume.consume;
@@ -52,7 +57,6 @@ import static de.quantummaid.httpmaid.websockets.processors.DetermineWebsocketRo
 import static de.quantummaid.httpmaid.websockets.processors.PutWebsocketInRegistryProcessor.putWebsocketInRegistryProcessor;
 import static de.quantummaid.httpmaid.websockets.processors.RemoveWebsocketFromRegistryProcessor.removeWebsocketFromRegistryProcessor;
 import static de.quantummaid.httpmaid.websockets.processors.RestoreWebsocketContextInformationProcessor.restoreWebsocketContextInformationProcessor;
-import static de.quantummaid.httpmaid.websockets.registry.InMemoryRegistry.inMemoryRegistry;
 import static de.quantummaid.httpmaid.websockets.registry.filter.header.AllowListHeaderFilter.onlyAllowingDefaultHeaders;
 import static de.quantummaid.httpmaid.websockets.registry.filter.queryparameter.AllowAllQueryParameterFilter.allowAllQueryParameterFilter;
 import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCKET_SENDERS;
@@ -66,9 +70,9 @@ public final class WebsocketsModule implements ChainModule {
     private static final ChainName DISCONNECT_WEBSOCKET = chainName("DISCONNECT_WEBSOCKET");
 
     private String routeSelectionExpression = "message";
-    private WebsocketRegistry websocketRegistry = inMemoryRegistry();
+    private RuntimeConfigurationValueProvider<WebsocketRegistry> websocketRegistryProvider = InMemoryRegistry::inMemoryRegistry;
     private AdditionalWebsocketDataProvider additionalWebsocketDataProvider = request -> Map.of();
-    private WebsocketAuthorizer websocketAuthorizer = request -> success();
+    private RuntimeConfigurationValueProvider<WebsocketAuthorizer> websocketAuthorizerProvider = () -> request -> success();
     private HeaderFilter headerFilter = onlyAllowingDefaultHeaders();
     private QueryParameterFilter queryParameterFilter = allowAllQueryParameterFilter();
 
@@ -80,16 +84,16 @@ public final class WebsocketsModule implements ChainModule {
         this.routeSelectionExpression = routeSelectionExpression;
     }
 
-    public void setWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
-        this.websocketRegistry = websocketRegistry;
+    public void setWebsocketRegistryProvider(final RuntimeConfigurationValueProvider<WebsocketRegistry> websocketRegistryProvider) {
+        this.websocketRegistryProvider = websocketRegistryProvider;
     }
 
     public void setAdditionalWebsocketDataProvider(final AdditionalWebsocketDataProvider additionalWebsocketDataProvider) {
         this.additionalWebsocketDataProvider = additionalWebsocketDataProvider;
     }
 
-    public void setWebsocketAuthorizer(final WebsocketAuthorizer websocketAuthorizer) {
-        this.websocketAuthorizer = websocketAuthorizer;
+    public void setWebsocketAuthorizerProvider(final RuntimeConfigurationValueProvider<WebsocketAuthorizer> websocketAuthorizerProvider) {
+        this.websocketAuthorizerProvider = websocketAuthorizerProvider;
     }
 
     public void setHeaderFilter(final HeaderFilter headerFilter) {
@@ -102,6 +106,9 @@ public final class WebsocketsModule implements ChainModule {
 
     @Override
     public void register(final ChainExtender extender) {
+        final RuntimeConfiguration runtimeConfiguration = extender.getMetaDatum(RUNTIME_CONFIGURATION);
+        final RuntimeConfigurationValue<WebsocketRegistry> websocketRegistry = runtimeConfiguration.create(websocketRegistryProvider);
+
         extender.addMetaDatum(WEBSOCKET_REGISTRY, websocketRegistry);
 
         final WebsocketSenders websocketSenders = extender.getMetaDatum(WEBSOCKET_SENDERS);
@@ -110,6 +117,7 @@ public final class WebsocketsModule implements ChainModule {
 
         extender.routeIfEquals(PRE_PROCESS, jumpTo(AUTHORIZE_WEBSOCKET), REQUEST_TYPE, WEBSOCKET_AUTHORIZATION);
         extender.createChain(AUTHORIZE_WEBSOCKET, consume(), jumpTo(EXCEPTION_OCCURRED));
+        final RuntimeConfigurationValue<WebsocketAuthorizer> websocketAuthorizer = runtimeConfiguration.create(websocketAuthorizerProvider);
         extender.appendProcessor(AUTHORIZE_WEBSOCKET, authorizeWebsocketProcessor(websocketAuthorizer));
         extender.appendProcessor(AUTHORIZE_WEBSOCKET, addAdditionalWebsocketDataProcessor(additionalWebsocketDataProvider));
         extender.appendProcessor(AUTHORIZE_WEBSOCKET, createWebsocketRegistryEntryProcessor(headerFilter, queryParameterFilter));

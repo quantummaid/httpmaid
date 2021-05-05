@@ -19,26 +19,27 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.testjar;
+package de.quantummaid.httpmaid.runtimeconfiguration;
 
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-import static de.quantummaid.httpmaid.jetty.JettyWebsocketEndpoint.jettyWebsocketEndpoint;
+import java.util.ArrayList;
+import java.util.List;
 
-@SuppressWarnings("java:S106")
-public final class TestMain {
-    private static final HttpMaid HTTP_MAID = HttpMaidFactory.httpMaid();
+import static de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValue.runtimeConfigurationValue;
 
-    private TestMain() {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RuntimeConfiguration {
+    private final List<RuntimeConfigurationValue<?>> values;
+
+    public static RuntimeConfiguration runtimeConfiguration() {
+        return new RuntimeConfiguration(new ArrayList<>());
     }
 
-    public static void main(final String[] args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("Usage: java -jar <jar> <port>");
-        }
-        final int port = Integer.parseInt(args[0]);
-        jettyWebsocketEndpoint(HTTP_MAID, port);
-        System.out.println("\nTestJar ready to be tested.");
+    public <T> RuntimeConfigurationValue<T> create(final RuntimeConfigurationValueProvider<T> provider) {
+        final RuntimeConfigurationValue<T> runtimeConfigurationValue = runtimeConfigurationValue(provider);
+        values.add(runtimeConfigurationValue);
+        return runtimeConfigurationValue;
     }
 }

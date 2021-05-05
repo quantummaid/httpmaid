@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.websockets.processors;
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
 import de.quantummaid.httpmaid.handler.http.HttpRequest;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValue;
 import de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision;
 import de.quantummaid.httpmaid.websockets.authorization.WebsocketAuthorizer;
 import lombok.AccessLevel;
@@ -35,16 +36,16 @@ import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDeci
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorizeWebsocketProcessor implements Processor {
-    private final WebsocketAuthorizer authorizer;
+    private final RuntimeConfigurationValue<WebsocketAuthorizer> authorizer;
 
-    public static Processor authorizeWebsocketProcessor(final WebsocketAuthorizer authorizer) {
+    public static Processor authorizeWebsocketProcessor(final RuntimeConfigurationValue<WebsocketAuthorizer> authorizer) {
         return new AuthorizeWebsocketProcessor(authorizer);
     }
 
     @Override
     public void apply(final MetaData metaData) {
         final HttpRequest httpRequest = httpRequest(metaData);
-        final AuthorizationDecision authorizationDecision = authorizer.isAuthorized(httpRequest);
+        final AuthorizationDecision authorizationDecision = authorizer.get().isAuthorized(httpRequest);
         metaData.set(AUTHORIZATION_DECISION, authorizationDecision);
         metaData.set(ADDITIONAL_WEBSOCKET_DATA, authorizationDecision.additionalData());
     }

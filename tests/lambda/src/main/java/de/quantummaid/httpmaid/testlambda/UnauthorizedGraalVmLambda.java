@@ -27,7 +27,6 @@ import de.quantummaid.httpmaid.awslambda.AwsWebsocketLambdaEndpoint;
 import de.quantummaid.httpmaid.awslambda.repository.dynamodb.DynamoDbRepository;
 import de.quantummaid.httpmaid.awslambda.sender.apigateway.ApiGatewayClientFactory;
 import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
-import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -46,25 +45,26 @@ import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toUseWeb
 
 @Slf4j
 public final class UnauthorizedGraalVmLambda {
-    private final HttpMaid httpMaid = httpMaid();
-    private final AwsLambdaEndpoint plainEndpoint = awsLambdaEndpointFor(httpMaid);
-    private final AwsWebsocketLambdaEndpoint websocketLambdaEndpoint = websocketLambdaEndpoint(httpMaid);
+    private static final HttpMaid HTTP_MAID = httpMaid();
+    private final AwsLambdaEndpoint plainEndpoint = awsLambdaEndpointFor(HTTP_MAID);
+    private final AwsWebsocketLambdaEndpoint websocketLambdaEndpoint = websocketLambdaEndpoint();
 
     private static HttpMaid httpMaid() {
-        final DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
-                .httpClient(ApacheHttpClient.create())
-                .build();
-        final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
-        final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 2.0);
-        final WebsocketRegistry websocketRegistry = dynamoDbWebsocketRegistry(dynamoDbRepository);
         return HttpMaidFactory.httpMaid(httpMaidBuilder -> httpMaidBuilder
-                .configured(toUseWebsocketRegistry(websocketRegistry)));
+                .configured(toUseWebsocketRegistry(() -> {
+                    final DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
+                            .httpClient(ApacheHttpClient.create())
+                            .build();
+                    final String websocketRegistryTable = System.getenv("WEBSOCKET_REGISTRY_TABLE");
+                    final DynamoDbRepository dynamoDbRepository = dynamoDbRepository(dynamoDbClient, websocketRegistryTable, "id", 2.0);
+                    return dynamoDbWebsocketRegistry(dynamoDbRepository);
+                })));
     }
 
-    private static AwsWebsocketLambdaEndpoint websocketLambdaEndpoint(final HttpMaid httpMaid) {
+    private static AwsWebsocketLambdaEndpoint websocketLambdaEndpoint() {
         final ApiGatewayClientFactory clientFactory = defaultSyncApiGatewayClientFactory();
         final String region = System.getenv("REGION");
-        return awsWebsocketLambdaEndpointFor(httpMaid, region, clientFactory);
+        return awsWebsocketLambdaEndpointFor(HTTP_MAID, region, clientFactory);
     }
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {

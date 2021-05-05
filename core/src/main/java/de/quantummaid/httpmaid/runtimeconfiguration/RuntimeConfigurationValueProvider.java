@@ -19,26 +19,8 @@
  * under the License.
  */
 
-package de.quantummaid.httpmaid.testjar;
+package de.quantummaid.httpmaid.runtimeconfiguration;
 
-import de.quantummaid.httpmaid.HttpMaid;
-import de.quantummaid.httpmaid.remotespecsinstance.HttpMaidFactory;
-
-import static de.quantummaid.httpmaid.jetty.JettyWebsocketEndpoint.jettyWebsocketEndpoint;
-
-@SuppressWarnings("java:S106")
-public final class TestMain {
-    private static final HttpMaid HTTP_MAID = HttpMaidFactory.httpMaid();
-
-    private TestMain() {
-    }
-
-    public static void main(final String[] args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException("Usage: java -jar <jar> <port>");
-        }
-        final int port = Integer.parseInt(args[0]);
-        jettyWebsocketEndpoint(HTTP_MAID, port);
-        System.out.println("\nTestJar ready to be tested.");
-    }
+public interface RuntimeConfigurationValueProvider<T> {
+    T provide();
 }

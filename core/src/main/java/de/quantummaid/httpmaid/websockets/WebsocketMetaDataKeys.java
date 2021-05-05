@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.websockets;
 
 import de.quantummaid.httpmaid.chains.MetaDataKey;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValue;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
@@ -36,7 +37,7 @@ public final class WebsocketMetaDataKeys {
     public static final String WEBSOCKET_MESSAGE = "WEBSOCKET_MESSAGE";
     public static final String WEBSOCKET_DISCONNECT = "WEBSOCKET_DISCONNECT";
 
-    public static final MetaDataKey<WebsocketRegistry> WEBSOCKET_REGISTRY = metaDataKey("WEBSOCKET_REGISTRY");
+    public static final MetaDataKey<RuntimeConfigurationValue<WebsocketRegistry>> WEBSOCKET_REGISTRY = metaDataKey("WEBSOCKET_REGISTRY");
 
     public static final MetaDataKey<Map<String, Object>> ADDITIONAL_WEBSOCKET_DATA = metaDataKey("ADDITIONAL_WEBSOCKET_DATA");
 

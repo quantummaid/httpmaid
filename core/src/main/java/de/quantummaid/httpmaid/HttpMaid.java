@@ -38,9 +38,9 @@ import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSender;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenderId;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
-import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
 import de.quantummaid.reflectmaid.ReflectMaid;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -120,11 +120,6 @@ public final class HttpMaid implements AutoCloseable {
         websocketSenders.addWebsocketSender(websocketSenderId, websocketSender);
     }
 
-    public void setWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
-        validateNotNull(websocketRegistry, "websocketRegistry");
-        chainRegistry.addMetaDatum(WEBSOCKET_REGISTRY, websocketRegistry);
-    }
-
     public <T> Optional<T> getOptionalMetaDatum(final MetaDataKey<T> key) {
         validateNotNull(key, "key");
         return chainRegistry.getOptionalMetaDatum(key);
@@ -144,13 +139,13 @@ public final class HttpMaid implements AutoCloseable {
     }
 
     public RuntimeInformation queryRuntimeInformation() {
-        final WebsocketRegistry websocketRegistry = chainRegistry.getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = chainRegistry.getMetaDatum(WEBSOCKET_REGISTRY).get();
         final long numberOfConnectedWebsockets = websocketRegistry.countConnections();
         return runtimeInformation(numberOfConnectedWebsockets);
     }
 
     public NonSerializingSender websocketSender() {
-        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY).get();
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         return nonSerializingSender(websocketRegistry, websocketSenders, emptyMetaData());
     }
@@ -169,7 +164,7 @@ public final class HttpMaid implements AutoCloseable {
                                                     final ContentType contentType) {
         final Marshallers marshallers = getMetaDatum(MARSHALLERS);
         final Marshaller marshaller = marshallers.marshallerFor(contentType);
-        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY).get();
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         final Serializer serializer = getMetaDatum(SERIALIZER);
         final ReflectMaid reflectMaid = getMetaDatum(REFLECT_MAID);
@@ -198,7 +193,7 @@ public final class HttpMaid implements AutoCloseable {
                                       final ContentType contentType) {
         final Marshallers marshallers = getMetaDatum(MARSHALLERS);
         final Marshaller marshaller = marshallers.marshallerFor(contentType);
-        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY).get();
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         final Serializer serializer = getMetaDatum(SERIALIZER);
         final Broadcasters broadcasters = getMetaDatum(BROADCASTERS);
@@ -213,7 +208,7 @@ public final class HttpMaid implements AutoCloseable {
     }
 
     public Disconnector websocketDisconnector() {
-        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY).get();
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         return disconnector(websocketRegistry, websocketSenders, emptyMetaData());
     }
@@ -224,7 +219,7 @@ public final class HttpMaid implements AutoCloseable {
     }
 
     public <T> T websocketDisconnector(final GenericType<T> disconnectorType) {
-        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = getMetaDatum(WEBSOCKET_REGISTRY).get();
         final WebsocketSenders websocketSenders = getMetaDatum(WEBSOCKET_SENDERS);
         final Broadcasters broadcasters = getMetaDatum(BROADCASTERS);
         return broadcasters.instantiateDisconnector(

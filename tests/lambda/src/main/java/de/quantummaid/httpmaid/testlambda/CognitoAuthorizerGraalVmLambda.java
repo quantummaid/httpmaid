@@ -21,39 +21,45 @@
 
 package de.quantummaid.httpmaid.testlambda;
 
+import de.quantummaid.httpmaid.HttpMaid;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
 import java.util.Map;
 
 import static de.quantummaid.graalvmlambdaruntime.GraalVmLambdaRuntime.startGraalVmLambdaRuntime;
-import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoConfigurators.toAuthorizeWebsocketsWithCognito;
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoConfigurators.toStoreCognitoDataInWebsocketContext;
+import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoWebsocketAuthorizer.cognitoWebsocketAuthorizer;
 import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
+import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toAuthorizeWebsocketsUsing;
 
 @ToString
 @EqualsAndHashCode
 @Slf4j
 public final class CognitoAuthorizerGraalVmLambda {
-    private final Router router = Router.router(builder -> {
-        final String region = System.getenv("REGION");
-        final String poolId = System.getenv("POOL_ID");
-        final String issuerUrl = String.format("https://cognito-idp.%s.amazonaws.com/%s", region, poolId);
-        final String poolClientId = System.getenv("POOL_CLIENT_ID");
-        builder
-                .websocket("returnLambdaContext", (request, response) -> {
-                    final String foo = (String) request.additionalData().get("foo");
-                    response.setBody(foo);
-                })
-                .configured(toAuthorizeWebsocketsWithCognito(
+    private static final HttpMaid HTTP_MAID = Router.httpMaidForRouter(builder -> builder
+            .websocket("returnLambdaContext", (request, response) -> {
+                final String foo = (String) request.additionalData().get("foo");
+                response.setBody(foo);
+            })
+            .configured(toAuthorizeWebsocketsUsing(() -> {
+                final String region = System.getenv("REGION");
+                final String poolId = System.getenv("POOL_ID");
+                final String issuerUrl = String.format("https://cognito-idp.%s.amazonaws.com/%s", region, poolId);
+                final String poolClientId = System.getenv("POOL_CLIENT_ID");
+                final CognitoIdentityProviderClient client = CognitoIdentityProviderClient.create();
+                return cognitoWebsocketAuthorizer(
+                        client,
+                        request -> request.queryParameters().parameter("access_token"),
                         issuerUrl,
-                        poolClientId,
-                        request -> request.queryParameters().parameter("access_token"))
-                )
-                .configured(toStoreCognitoDataInWebsocketContext(
-                        (request, getUserResponse, authorizationToken) -> Map.of("foo", "bar")));
-    });
+                        poolClientId
+                );
+            }))
+            .configured(toStoreCognitoDataInWebsocketContext(
+                    (request, getUserResponse, authorizationToken) -> Map.of("foo", "bar"))));
+    private final Router router = Router.router(HTTP_MAID);
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         log.debug("new lambda event: {}", event);

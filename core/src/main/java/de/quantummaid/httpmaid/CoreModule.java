@@ -43,6 +43,7 @@ import de.quantummaid.httpmaid.processors.MapExceptionProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ApplyResponseTemplateProcessor;
 import de.quantummaid.httpmaid.responsetemplate.InitResponseProcessor;
 import de.quantummaid.httpmaid.responsetemplate.ResponseTemplate;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfiguration;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
 import de.quantummaid.reflectmaid.ReflectMaid;
 import lombok.AccessLevel;
@@ -67,6 +68,7 @@ import static de.quantummaid.httpmaid.processors.StreamToStringProcessor.streamT
 import static de.quantummaid.httpmaid.processors.StringBodyToStreamProcessor.stringBodyToStreamProcessor;
 import static de.quantummaid.httpmaid.processors.TranslateToValueObjectsProcessor.translateToValueObjectsProcessor;
 import static de.quantummaid.httpmaid.responsetemplate.ResponseTemplate.emptyResponseTemplate;
+import static de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfiguration.runtimeConfiguration;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.startupChecks;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
@@ -77,6 +79,7 @@ import static java.util.Collections.emptyList;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CoreModule implements ChainModule {
     public static final MetaDataKey<ReflectMaid> REFLECT_MAID = metaDataKey("REFLECT_MAID");
+    public static final MetaDataKey<RuntimeConfiguration> RUNTIME_CONFIGURATION = metaDataKey("RUNTIME_CONFIGURATION");
 
     private final ReflectMaid reflectMaid;
     private final List<DistributableHandler> handlers = new ArrayList<>();
@@ -125,6 +128,7 @@ public final class CoreModule implements ChainModule {
 
     @Override
     public void init(final MetaData configurationMetaData) {
+        configurationMetaData.set(RUNTIME_CONFIGURATION, runtimeConfiguration());
         configurationMetaData.set(REFLECT_MAID, reflectMaid);
         final StartupChecks startupChecks = startupChecks();
         configurationMetaData.set(STARTUP_CHECKS, startupChecks);
