@@ -131,7 +131,7 @@ public final class Broadcasters {
             return emptyList();
         }
         final WebsocketSenders websocketSenders = metaData.get(WEBSOCKET_SENDERS);
-        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY).get();
         final Serializer serializer = metaData.get(SERIALIZER);
         final List<Object> instances = new ArrayList<>();
         final Marshallers marshallers = metaData.get(MARSHALLERS);

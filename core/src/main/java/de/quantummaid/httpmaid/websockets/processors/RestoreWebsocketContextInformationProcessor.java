@@ -48,7 +48,7 @@ public final class RestoreWebsocketContextInformationProcessor implements Proces
                 .map(WEBSOCKET_MESSAGE::equals)
                 .orElse(false);
         if (isWebsocketMessage) {
-            final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+            final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY).get();
             final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
             final WebsocketRegistryEntry entry = metaData.getOptional(WEBSOCKET_REGISTRY_ENTRY)
                     .orElseGet(() -> websocketRegistry.byConnectionInformation(connectionInformation));

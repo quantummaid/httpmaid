@@ -23,6 +23,7 @@ package de.quantummaid.httpmaid.websockets.processors;
 
 import de.quantummaid.httpmaid.chains.MetaData;
 import de.quantummaid.httpmaid.chains.Processor;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValue;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
 import de.quantummaid.httpmaid.websockets.sender.WebsocketSenders;
 import lombok.AccessLevel;
@@ -39,10 +40,10 @@ import static de.quantummaid.httpmaid.websockets.sender.WebsocketSenders.WEBSOCK
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AddWebsocketsMetaDataProcessor implements Processor {
     private final WebsocketSenders websocketSenders;
-    private final WebsocketRegistry registry;
+    private final RuntimeConfigurationValue<WebsocketRegistry> registry;
 
     public static Processor addWebsocketRegistryProcessor(final WebsocketSenders websocketSenders,
-                                                          final WebsocketRegistry registry) {
+                                                          final RuntimeConfigurationValue<WebsocketRegistry> registry) {
         validateNotNull(websocketSenders, "websocketSenders");
         validateNotNull(registry, "registry");
         return new AddWebsocketsMetaDataProcessor(websocketSenders, registry);

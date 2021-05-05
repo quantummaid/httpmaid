@@ -58,7 +58,7 @@ public final class DynamoDbRepository implements Repository {
     public static DynamoDbRepository dynamoDbRepository(final DynamoDbClient dynamoDbClient,
                                                         final String tableName,
                                                         final String primaryKey) {
-        return new DynamoDbRepository(dynamoDbClient, tableName, primaryKey, null);
+        return dynamoDbRepository(dynamoDbClient, tableName, primaryKey, null);
     }
 
     public static DynamoDbRepository dynamoDbRepository(final DynamoDbClient dynamoDbClient,

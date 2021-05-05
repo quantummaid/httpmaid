@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.testlambda;
 
+import de.quantummaid.httpmaid.HttpMaid;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +35,9 @@ import static de.quantummaid.httpmaid.lambdastructure.Structures.LAMBDA_EVENT;
 @EqualsAndHashCode
 @Slf4j
 public final class DummyAuthorizerGraalVmLambda {
-    private final Router router = Router.router(builder -> {
+    private static final HttpMaid HTTP_MAID = Router.httpMaidForRouter(httpMaidBuilder -> {
     });
+    private final Router router = Router.router(HTTP_MAID);
 
     public Map<String, Object> handleRequest(final Map<String, Object> event) {
         log.debug("new lambda event: {}", event);

@@ -45,7 +45,7 @@ public final class RemoveWebsocketFromRegistryProcessor implements Processor {
     @Override
     public void apply(final MetaData metaData) {
         final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
-        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY).get();
         websocketRegistry.removeConnection(connectionInformation);
     }
 }

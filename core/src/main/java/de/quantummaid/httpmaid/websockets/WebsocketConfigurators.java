@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.websockets;
 import de.quantummaid.httpmaid.chains.Configurator;
 import de.quantummaid.httpmaid.http.HeaderName;
 import de.quantummaid.httpmaid.http.QueryParameterName;
+import de.quantummaid.httpmaid.runtimeconfiguration.RuntimeConfigurationValueProvider;
 import de.quantummaid.httpmaid.websockets.additionaldata.AdditionalWebsocketDataProvider;
 import de.quantummaid.httpmaid.websockets.authorization.WebsocketAuthorizer;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistry;
@@ -58,14 +59,22 @@ public final class WebsocketConfigurators {
     }
 
     public static Configurator toUseWebsocketRegistry(final WebsocketRegistry websocketRegistry) {
+        return toUseWebsocketRegistry(() -> websocketRegistry);
+    }
+
+    public static Configurator toUseWebsocketRegistry(final RuntimeConfigurationValueProvider<WebsocketRegistry> websocketRegistry) {
         return configuratorForType(WebsocketsModule.class,
-                websocketsModule -> websocketsModule.setWebsocketRegistry(websocketRegistry));
+                websocketsModule -> websocketsModule.setWebsocketRegistryProvider(websocketRegistry));
     }
 
     public static Configurator toAuthorizeWebsocketsUsing(final WebsocketAuthorizer authorizer) {
+        return toAuthorizeWebsocketsUsing(() -> authorizer);
+    }
+
+    public static Configurator toAuthorizeWebsocketsUsing(final RuntimeConfigurationValueProvider<WebsocketAuthorizer> authorizer) {
         validateNotNull(authorizer, "authorizer");
         return configuratorForType(WebsocketsModule.class,
-                websocketsModule -> websocketsModule.setWebsocketAuthorizer(authorizer));
+                websocketsModule -> websocketsModule.setWebsocketAuthorizerProvider(authorizer));
     }
 
     public static Configurator toRememberAdditionalHeadersInWebsocketMessages(final String... headerNames) {

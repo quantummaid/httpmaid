@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.awslambdacognitoauthorizer;
 import de.quantummaid.httpmaid.chains.Configurator;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
+import java.util.function.Supplier;
+
 import static de.quantummaid.httpmaid.awslambdacognitoauthorizer.CognitoWebsocketAuthorizer.cognitoWebsocketAuthorizer;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toAuthorizeWebsocketsUsing;
@@ -39,23 +41,29 @@ public final class CognitoConfigurators {
         return toStoreAdditionalDataInWebsocketContext(enricher);
     }
 
-    public static Configurator toAuthorizeWebsocketsWithCognito(final String poolId,
+    public static Configurator toAuthorizeWebsocketsWithCognito(final String issuerUrl,
                                                                 final String poolClientId,
                                                                 final TokenExtractor tokenExtractor) {
-        final CognitoIdentityProviderClient client = CognitoIdentityProviderClient.create();
-        return toAuthorizeWebsocketsWithCognito(client, poolId, poolClientId, tokenExtractor);
+        final Supplier<CognitoIdentityProviderClient> client = CognitoIdentityProviderClient::create;
+        return toAuthorizeWebsocketsWithCognito(client, issuerUrl, poolClientId, tokenExtractor);
     }
 
     public static Configurator toAuthorizeWebsocketsWithCognito(final CognitoIdentityProviderClient client,
-                                                                final String poolId,
+                                                                final String issuerUrl,
                                                                 final String poolClientId,
                                                                 final TokenExtractor tokenExtractor) {
-        final CognitoWebsocketAuthorizer authorizer = cognitoWebsocketAuthorizer(
-                client,
+        return toAuthorizeWebsocketsWithCognito(() -> client, issuerUrl, poolClientId, tokenExtractor);
+    }
+
+    public static Configurator toAuthorizeWebsocketsWithCognito(final Supplier<CognitoIdentityProviderClient> client,
+                                                                final String issuerUrl,
+                                                                final String poolClientId,
+                                                                final TokenExtractor tokenExtractor) {
+        return toAuthorizeWebsocketsUsing(() -> cognitoWebsocketAuthorizer(
+                client.get(),
                 tokenExtractor,
-                poolId,
+                issuerUrl,
                 poolClientId
-        );
-        return toAuthorizeWebsocketsUsing(authorizer);
+        ));
     }
 }

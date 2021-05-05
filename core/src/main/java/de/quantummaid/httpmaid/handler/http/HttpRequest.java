@@ -148,7 +148,7 @@ public final class HttpRequest {
 
     public Websockets websockets() {
         final WebsocketSenders websocketSenders = metaData.get(WEBSOCKET_SENDERS);
-        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY).get();
         final NonSerializingSender sender = nonSerializingSender(websocketRegistry, websocketSenders, metaData);
         final Disconnector disconnector = disconnector(websocketRegistry, websocketSenders, metaData);
         return Websockets.websockets(sender, disconnector);

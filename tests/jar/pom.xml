@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.135</version>
+        <version>0.9.136</version>
     </parent>
 
     <artifactId>testjar</artifactId>
@@ -62,12 +62,6 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.integrations</groupId>
             <artifactId>httpmaid-jetty-websockets</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.nativeimage</groupId>
-            <artifactId>svm</artifactId>
-            <version>21.1.0</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

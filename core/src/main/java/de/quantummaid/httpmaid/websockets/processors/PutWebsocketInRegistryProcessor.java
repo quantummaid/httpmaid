@@ -49,7 +49,7 @@ public final class PutWebsocketInRegistryProcessor implements Processor {
         final ConnectionInformation connectionInformation = metaData.get(WEBSOCKET_CONNECTION_INFORMATION);
         final WebsocketRegistryEntry dummyEntry = metaData.get(WEBSOCKET_REGISTRY_ENTRY);
         final WebsocketRegistryEntry entry = dummyEntry.fixConnectionInformation(connectionInformation);
-        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY);
+        final WebsocketRegistry websocketRegistry = metaData.get(WEBSOCKET_REGISTRY).get();
         log.debug("adding websocket to registry");
         websocketRegistry.addConnection(entry);
     }
