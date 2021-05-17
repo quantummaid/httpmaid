@@ -104,6 +104,7 @@
                 <ignoreVersion>9.0.0.M3</ignoreVersion>
                 <ignoreVersion>9.0.0.M2</ignoreVersion>
                 <ignoreVersion>9.0.0.M1</ignoreVersion>
+                <ignoreVersion>8.5.66</ignoreVersion>
             </ignoreVersions>
         </rule>
     </rules>
