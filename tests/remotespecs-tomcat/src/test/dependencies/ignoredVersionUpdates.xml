@@ -20,6 +20,7 @@
                 <ignoreVersion>10.0.3</ignoreVersion>
                 <ignoreVersion>10.0.4</ignoreVersion>
                 <ignoreVersion>10.0.5</ignoreVersion>
+                <ignoreVersion>10.0.6</ignoreVersion>
                 <ignoreVersion>10.0.0-M10</ignoreVersion>
                 <ignoreVersion>10.0.0-M9</ignoreVersion>
                 <ignoreVersion>10.0.0-M8</ignoreVersion>
@@ -30,6 +31,7 @@
                 <ignoreVersion>10.0.0-M3</ignoreVersion>
                 <ignoreVersion>10.0.0-M2</ignoreVersion>
                 <ignoreVersion>10.0.0-M1</ignoreVersion>
+                <ignoreVersion>9.0.46</ignoreVersion>
                 <ignoreVersion>9.0.45</ignoreVersion>
                 <ignoreVersion>9.0.44</ignoreVersion>
                 <ignoreVersion>9.0.43</ignoreVersion>
