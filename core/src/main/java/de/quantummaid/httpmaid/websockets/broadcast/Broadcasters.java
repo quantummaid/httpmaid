@@ -57,7 +57,7 @@ import static java.util.stream.Collectors.toList;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings("java:S1845")
+@SuppressWarnings({"java:S1845", "java:S1452"})
 public final class Broadcasters {
     public static final MetaDataKey<Broadcasters> BROADCASTERS = metaDataKey("BROADCASTERS");
 

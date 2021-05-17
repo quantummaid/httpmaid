@@ -68,6 +68,7 @@ public final class MapPath {
 
     public Object retrieve(final Map<String, Object> map) {
         final Retrieval retrieval = retrieveOptionally(map);
+        validateNotNull(retrieval, "retrieval");
         return retrieval.value();
     }
 

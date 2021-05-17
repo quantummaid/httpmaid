@@ -34,6 +34,7 @@ import java.net.URI;
 import static software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S2095")
 public final class DefaultApiGatewayAsyncClientFactory
         implements LowLevelFactory<ApiGatewayManagementApiAsyncClient> {
     private final AwsCredentialsProvider credentialsProvider;

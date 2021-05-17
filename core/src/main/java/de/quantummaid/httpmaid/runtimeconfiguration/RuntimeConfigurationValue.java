@@ -25,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S3077")
 public final class RuntimeConfigurationValue<T> {
     private final RuntimeConfigurationValueProvider<T> provider;
     private volatile T value;

@@ -137,7 +137,7 @@ public final class MapMaidModule implements ChainModule {
 
     private void addExceptionHandler(final DependencyRegistry dependencyRegistry) {
         final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
-        coreModule.addExceptionMapper(throwable -> throwable instanceof AggregatedValidationException,
+        coreModule.addExceptionMapper(AggregatedValidationException.class::isInstance,
                 mapMaidValidationExceptionMapper(validationErrorStatusCode));
     }
 
