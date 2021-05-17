@@ -32,6 +32,7 @@ import static de.quantummaid.httpmaid.awslambda.sender.apigateway.sync.DefaultAp
 import static de.quantummaid.httpmaid.awslambda.sender.apigateway.sync.SyncApiGatewayClient.syncApiGatewayClient;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S2095")
 public final class ApiGatewaySyncClientFactory implements ApiGatewayClientFactory {
     private final LowLevelFactory<ApiGatewayManagementApiClient> lowLevelFactory;
 

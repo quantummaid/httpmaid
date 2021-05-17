@@ -35,18 +35,21 @@ import static de.quantummaid.httpmaid.lambdastructure.validators.OneOfValidator.
 import static de.quantummaid.httpmaid.lambdastructure.validators.StringMapValidator.mapOf;
 import static de.quantummaid.httpmaid.lambdastructure.validators.StringValidator.string;
 
+@SuppressWarnings("java:S1192")
 public final class Structures {
+
+    public static final StructureValidator HTTP_METHOD = oneOf(
+            fixed("GET"),
+            fixed("POST"),
+            fixed("PUT"),
+            fixed("DELETE"),
+            fixed("OPTIONS")
+    );
 
     public static final StructureValidator REST_REQUEST = map()
             .key("resource", string())
             .key("path", string())
-            .key("httpMethod", oneOf(
-                    fixed("GET"),
-                    fixed("POST"),
-                    fixed("PUT"),
-                    fixed("DELETE"),
-                    fixed("OPTIONS")
-            ))
+            .key("httpMethod", HTTP_METHOD)
             .key("headers", mapOf(string()))
             .key("multiValueHeaders", mapOf(listOf(string())))
             .key("queryStringParameters", oneOf(
@@ -65,13 +68,7 @@ public final class Structures {
             .key("requestContext", map()
                     .key("resourceId", string())
                     .key("resourcePath", string())
-                    .key("httpMethod", oneOf(
-                            fixed("GET"),
-                            fixed("POST"),
-                            fixed("PUT"),
-                            fixed("DELETE"),
-                            fixed("OPTIONS")
-                    ))
+                    .key("httpMethod", HTTP_METHOD)
                     .key("extendedRequestId", string())
                     .key("requestTime", string())
                     .key("path", string())
@@ -108,13 +105,7 @@ public final class Structures {
             .key("version", fixed("1.0"))
             .key("resource", string())
             .key("path", string())
-            .key("httpMethod", oneOf(
-                    fixed("GET"),
-                    fixed("POST"),
-                    fixed("PUT"),
-                    fixed("DELETE"),
-                    fixed("OPTIONS")
-            ))
+            .key("httpMethod", HTTP_METHOD)
             .key("headers", mapOf(string()))
             .key("multiValueHeaders", mapOf(listOf(string())))
             .key("queryStringParameters", oneOf(
@@ -147,13 +138,7 @@ public final class Structures {
                     .key("domainName", string())
                     .key("domainPrefix", string())
                     .key("extendedRequestId", string())
-                    .key("httpMethod", oneOf(
-                            fixed("GET"),
-                            fixed("POST"),
-                            fixed("PUT"),
-                            fixed("DELETE"),
-                            fixed("OPTIONS")
-                    ))
+                    .key("httpMethod", HTTP_METHOD)
                     .key("identity", map()
                             .optionalKey("accessKey", nullValue())
                             .optionalKey("accountId", nullValue())

@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.awslambda.authorizer;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.awslambda.AwsLambdaEvent;
 import de.quantummaid.httpmaid.awslambda.registry.EntryDeserializer;
+import de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender;
 import de.quantummaid.httpmaid.endpoint.RawResponse;
 import de.quantummaid.httpmaid.http.Headers;
 import de.quantummaid.httpmaid.http.QueryParameters;
@@ -43,7 +44,6 @@ import static de.quantummaid.httpmaid.awslambda.EventUtils.extractMethodArn;
 import static de.quantummaid.httpmaid.awslambda.WebsocketEventUtils.extractHeaders;
 import static de.quantummaid.httpmaid.awslambda.WebsocketEventUtils.extractQueryParameters;
 import static de.quantummaid.httpmaid.awslambda.authorizer.AuthorizationDecisionMapper.mapAuthorizationDecision;
-import static de.quantummaid.httpmaid.awslambda.sender.AwsWebsocketSender.AWS_WEBSOCKET_SENDER;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.WebsocketMetaDataKeys.WEBSOCKET_REGISTRY_ENTRY;
 import static de.quantummaid.httpmaid.websockets.authorization.AuthorizationDecision.AUTHORIZATION_DECISION;
@@ -88,7 +88,8 @@ public final class LambdaWebsocketAuthorizer implements LambdaAuthorizer {
     public static RawResponse authorize(final AwsLambdaEvent event,
                                         final HttpMaid httpMaid) {
         return httpMaid.handleRequestSynchronously(() -> {
-            final RawWebsocketAuthorizationBuilder builder = rawWebsocketAuthorizationBuilder(AWS_WEBSOCKET_SENDER);
+            final RawWebsocketAuthorizationBuilder builder =
+                    rawWebsocketAuthorizationBuilder(AwsWebsocketSender.AWS_WEBSOCKET_SENDER);
             builder.withAdditionalMetaData(AWS_LAMBDA_EVENT, event);
             final QueryParameters queryParameters = extractQueryParameters(event);
             builder.withQueryParameters(queryParameters);

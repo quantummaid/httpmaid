@@ -150,7 +150,7 @@ public final class CoreModule implements ChainModule {
     @SuppressWarnings("unchecked")
     @Override
     public void register(final ChainExtender extender) {
-        addExceptionMapper(throwable -> throwable instanceof PageNotFoundException, (ExceptionMapper<Throwable>) pageNotFoundExceptionMapper);
+        addExceptionMapper(PageNotFoundException.class::isInstance, (ExceptionMapper<Throwable>) pageNotFoundExceptionMapper);
         final ExceptionSerializer exceptionSerializer = ExceptionSerializer.exceptionSerializer(exceptionMappers.build());
         ChainBuilder.extendAChainWith(extender)
                 .append(INIT)
