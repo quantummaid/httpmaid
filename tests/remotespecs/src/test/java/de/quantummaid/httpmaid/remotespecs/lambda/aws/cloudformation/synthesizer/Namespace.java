@@ -24,6 +24,8 @@ package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesize
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName.cloudformationName;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Namespace {
     private final String prefix;
@@ -36,7 +38,7 @@ public final class Namespace {
         return new Namespace(prefix + id);
     }
 
-    public String id(final String id) {
-        return prefix + id;
+    public CloudformationName id(final String id) {
+        return cloudformationName(prefix + id);
     }
 }

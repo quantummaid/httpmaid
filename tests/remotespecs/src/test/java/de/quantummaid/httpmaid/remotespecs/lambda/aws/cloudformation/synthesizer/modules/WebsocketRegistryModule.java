@@ -37,7 +37,7 @@ public final class WebsocketRegistryModule implements CloudformationModule {
     private final CloudformationResource dynamoDb;
 
     public static WebsocketRegistryModule websocketRegistryModule(final Namespace namespace) {
-        final CloudformationResource dynamoDb = dynamoDbTable(namespace.id("WebsocketRegistryTable"), namespace.id("WebsocketRegistryTable"));
+        final CloudformationResource dynamoDb = dynamoDbTable(namespace.id("WebsocketRegistryTable"));
         return new WebsocketRegistryModule(namespace, dynamoDb);
     }
 

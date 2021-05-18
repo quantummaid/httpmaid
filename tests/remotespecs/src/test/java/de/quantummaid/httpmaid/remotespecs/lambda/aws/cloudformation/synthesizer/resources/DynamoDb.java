@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 
 import java.util.List;
@@ -31,12 +32,12 @@ public final class DynamoDb {
     private DynamoDb() {
     }
 
-    public static CloudformationResource dynamoDbTable(final String resourceId, final String tableName) {
+    public static CloudformationResource dynamoDbTable(final CloudformationName resourceId) {
         return CloudformationResource.cloudformationResource(
                 resourceId,
                 "AWS::DynamoDB::Table",
                 Map.of(
-                        "TableName", tableName,
+                        "TableName", resourceId.asId(),
                         "BillingMode", "PAY_PER_REQUEST",
                         "AttributeDefinitions", List.of(
                                 Map.of(

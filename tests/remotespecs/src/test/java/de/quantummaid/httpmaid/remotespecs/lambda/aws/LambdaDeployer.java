@@ -47,10 +47,12 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifacts.artifacts
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.StackIdentifier.sharedStackIdentifier;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.StackIdentifier.userProvidedStackIdentifier;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.CloudFormationHandler.connectToCloudFormation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName.cloudformationName;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationOutput.cloudformationOutput;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationTemplateBuilder.cloudformationTemplateBuilder;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.sub;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.PseudoParameters.REGION;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.StackOutputs.stackOutputs;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.template.S3Template.s3Template;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cognito.Cognito.generateValidAccessToken;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.S3Handler.deleteAllObjectsInBucket;
@@ -146,7 +148,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
                 .flatMap(Optional::stream)
                 .forEach(builder::withModule);
         return builder
-                .withOutputs(cloudformationOutput("Region", sub(REGION)))
+                .withOutputs(cloudformationOutput(cloudformationName("Region"), sub(REGION)))
                 .build();
     }
 
@@ -178,7 +180,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     }
 
     private Method deploymentMethod(final Class<?> testClass) {
-        return method(testClass, "loadDeployment", Map.class, Namespace.class);
+        return method(testClass, "loadDeployment", StackOutputs.class, Namespace.class);
     }
 
     private Method method(final Class<?> testClass,
@@ -194,7 +196,8 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
     private Deployment invokeDeploymentMethod(final Method method,
                                               final Map<String, String> stackOutputs,
                                               final Namespace namespace) {
-        return invokeStaticMethod(method, stackOutputs, namespace);
+        final StackOutputs stackOutputsObject = stackOutputs(stackOutputs);
+        return invokeStaticMethod(method, stackOutputsObject, namespace);
     }
 
     private CloudformationModule invokeInfrastructureRequirementsMethod(final Method method,
@@ -227,7 +230,7 @@ public final class LambdaDeployer implements RemoteSpecsDeployer {
         return deploymentMap;
     }
 
-    public static String loadToken(final Map<String, String> stackOutputs,
+    public static String loadToken(final StackOutputs stackOutputs,
                                    final Namespace namespace) {
         final String poolId = stackOutputs.get(namespace.id("PoolId"));
         final String poolClientId = stackOutputs.get(namespace.id("PoolClientId"));

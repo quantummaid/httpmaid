@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource.cloudformationResource;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.join;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.sub;
 import static java.lang.String.format;
@@ -37,20 +39,19 @@ public final class ApiGatewayV2 {
     private ApiGatewayV2() {
     }
 
-    public static CloudformationResource httpApi(final String resourceId,
-                                                 final String apiName) {
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Api", Map.of(
-                "Name", apiName,
+    public static CloudformationResource httpApi(final CloudformationName resourceId) {
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Api", Map.of(
+                "Name", resourceId.asId(),
                 "ProtocolType", "HTTP"
         ));
     }
 
-    public static CloudformationResource httpApiIntegration(final String resourceId,
+    public static CloudformationResource httpApiIntegration(final CloudformationName resourceId,
                                                             final String payloadVersion,
                                                             final CloudformationResource api,
                                                             final CloudformationResource function) {
         final Object integrationUri = buildInvocationUri(function);
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Integration", List.of(api), Map.of(
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Integration", List.of(api), Map.of(
                 "ApiId", api.reference(),
                 "IntegrationType", "AWS_PROXY",
                 "PayloadFormatVersion", payloadVersion,
@@ -58,7 +59,7 @@ public final class ApiGatewayV2 {
         ));
     }
 
-    public static CloudformationResource defaultRoute(final String resourceId,
+    public static CloudformationResource defaultRoute(final CloudformationName resourceId,
                                                       final CloudformationResource api,
                                                       final CloudformationResource apiIntegration,
                                                       final CloudformationResource authorizer) {
@@ -75,23 +76,23 @@ public final class ApiGatewayV2 {
         } else {
             map.put("AuthorizationType", "NONE");
         }
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", List.of(api, apiIntegration), map);
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", List.of(api, apiIntegration), map);
     }
 
-    public static CloudformationResource websocketsApiConnectRoute(final String resourceId,
+    public static CloudformationResource websocketsApiConnectRoute(final CloudformationName resourceId,
                                                                    final CloudformationResource api,
                                                                    final CloudformationResource integration,
                                                                    final CloudformationResource authorizer) {
         return websocketsApiRoute(resourceId, api, "$connect", integration, authorizer);
     }
 
-    public static CloudformationResource websocketsApiDisconnectRoute(final String resourceId,
+    public static CloudformationResource websocketsApiDisconnectRoute(final CloudformationName resourceId,
                                                                       final CloudformationResource api,
                                                                       final CloudformationResource integration) {
         return websocketsApiRoute(resourceId, api, "$disconnect", integration, null);
     }
 
-    private static CloudformationResource websocketsApiRoute(final String resourceId,
+    private static CloudformationResource websocketsApiRoute(final CloudformationName resourceId,
                                                              final CloudformationResource api,
                                                              final String routeKey,
                                                              final CloudformationResource integration,
@@ -109,14 +110,14 @@ public final class ApiGatewayV2 {
         } else {
             map.put("AuthorizationType", "NONE");
         }
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", map);
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", map);
     }
 
-    public static CloudformationResource deployment(final String resourceId,
+    public static CloudformationResource deployment(final CloudformationName resourceId,
                                                     final CloudformationResource api,
                                                     final CloudformationResource apiIntegration,
                                                     final CloudformationResource apiDefaultRoute) {
-        return CloudformationResource.cloudformationResource(resourceId,
+        return cloudformationResource(resourceId,
                 "AWS::ApiGatewayV2::Deployment",
                 List.of(api, apiIntegration, apiDefaultRoute),
                 Map.of(
@@ -124,21 +125,22 @@ public final class ApiGatewayV2 {
                 ));
     }
 
-    public static CloudformationResource stage(final String resourceId, final CloudformationResource api, final CloudformationResource deployment) {
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Stage", List.of(api, deployment), Map.of(
+    public static CloudformationResource stage(final CloudformationName resourceId,
+                                               final CloudformationResource api,
+                                               final CloudformationResource deployment) {
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Stage", List.of(api, deployment), Map.of(
                 "StageName", "$default",
                 "ApiId", api.reference(),
                 "DeploymentId", deployment.reference()
         ));
     }
 
-    public static CloudformationResource jwtAuthorizer(final String resourceId,
-                                                       final String name,
+    public static CloudformationResource jwtAuthorizer(final CloudformationName resourceId,
                                                        final CloudformationResource api,
                                                        final CloudformationResource pool,
                                                        final CloudformationResource poolClient) {
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Authorizer", Map.of(
-                "Name", name,
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Authorizer", Map.of(
+                "Name", resourceId.asId(),
                 "ApiId", api.reference(),
                 "AuthorizerType", "JWT",
                 "IdentitySource", List.of("$request.header.Authorization"),
@@ -149,15 +151,14 @@ public final class ApiGatewayV2 {
         ));
     }
 
-    public static CloudformationResource authorizer(final String resourceId,
-                                                    final String name,
+    public static CloudformationResource authorizer(final CloudformationName resourceId,
                                                     final CloudformationResource api,
                                                     final CloudformationResource functionRole,
                                                     final CloudformationResource function) {
         final Object authorizerUri = sub(String.format("arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${%s.Arn}/invocations",
-                function.name()));
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Authorizer", Map.of(
-                "Name", name,
+                function.name().asId()));
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Authorizer", Map.of(
+                "Name", resourceId.asId(),
                 "ApiId", api.reference(),
                 "AuthorizerCredentialsArn", functionRole.attribute("Arn"),
                 "AuthorizerType", "REQUEST",
@@ -166,32 +167,33 @@ public final class ApiGatewayV2 {
         ));
     }
 
-    public static CloudformationResource websocketsApi(final String resourceId, final String apiName, final CloudformationResource function) {
+    public static CloudformationResource websocketsApi(final CloudformationName resourceId,
+                                                       final CloudformationResource function) {
         final Object target = buildInvocationUri(function);
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Api", Map.of(
-                "Name", apiName,
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Api", Map.of(
+                "Name", resourceId.asId(),
                 "ProtocolType", "WEBSOCKET",
                 "RouteSelectionExpression", "$request.body.action",
                 "Target", target
         ));
     }
 
-    public static CloudformationResource websocketsApiIntegration(final String resourceId,
+    public static CloudformationResource websocketsApiIntegration(final CloudformationName resourceId,
                                                                   final CloudformationResource api,
                                                                   final CloudformationResource function) {
         final Object integrationUri = buildInvocationUri(function);
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Integration", Map.of(
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Integration", Map.of(
                 "ApiId", api.reference(),
                 "IntegrationType", "AWS_PROXY",
                 "IntegrationUri", integrationUri
         ));
     }
 
-    public static CloudformationResource websocketsApiDefaultRoute(final String resourceId,
+    public static CloudformationResource websocketsApiDefaultRoute(final CloudformationName resourceId,
                                                                    final CloudformationResource api,
                                                                    final CloudformationResource integration) {
         final Object target = join("/", "integrations", integration.reference());
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", Map.of(
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Route", Map.of(
                 "ApiId", api.reference(),
                 "RouteKey", "$default",
                 "AuthorizationType", "NONE",
@@ -200,22 +202,22 @@ public final class ApiGatewayV2 {
         ));
     }
 
-    public static CloudformationResource websocketsApiRouteResponse(final String resourceId,
+    public static CloudformationResource websocketsApiRouteResponse(final CloudformationName resourceId,
                                                                     final CloudformationResource api,
                                                                     final CloudformationResource route) {
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::RouteResponse", Map.of(
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::RouteResponse", Map.of(
                 "ApiId", api.reference(),
                 "RouteId", route.reference(),
                 "RouteResponseKey", "$default"
         ));
     }
 
-    public static CloudformationResource websocketsApiDeployment(final String resourceId,
+    public static CloudformationResource websocketsApiDeployment(final CloudformationName resourceId,
                                                                  final CloudformationResource api,
                                                                  final CloudformationResource connectRoute,
                                                                  final CloudformationResource defaultRoute,
                                                                  final CloudformationResource defaultResponse) {
-        return CloudformationResource.cloudformationResource(resourceId,
+        return cloudformationResource(resourceId,
                 "AWS::ApiGatewayV2::Deployment",
                 List.of(connectRoute, defaultRoute, defaultResponse),
                 Map.of(
@@ -223,10 +225,10 @@ public final class ApiGatewayV2 {
                 ));
     }
 
-    public static CloudformationResource websocketsApiStage(final String resourceId,
+    public static CloudformationResource websocketsApiStage(final CloudformationName resourceId,
                                                             final CloudformationResource api,
                                                             final CloudformationResource deployment) {
-        return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGatewayV2::Stage", Map.of(
+        return cloudformationResource(resourceId, "AWS::ApiGatewayV2::Stage", Map.of(
                 "StageName", "stage",
                 "ApiId", api.reference(),
                 "DeploymentId", deployment.reference()
@@ -236,7 +238,7 @@ public final class ApiGatewayV2 {
     public static Object buildInvocationUri(final CloudformationResource function) {
         return sub(format(
                 "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${%s.Arn}/invocations",
-                function.name()
+                function.name().asId()
                 )
         );
     }

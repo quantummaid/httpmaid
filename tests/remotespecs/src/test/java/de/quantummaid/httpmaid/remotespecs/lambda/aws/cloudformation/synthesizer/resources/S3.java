@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public final class S3 {
     private S3() {
     }
 
-    public static CloudformationResource bucket(final String resourceId,
+    public static CloudformationResource bucket(final CloudformationName resourceId,
                                                 final String bucketName) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::S3::Bucket", Map.of(
            "BucketName", bucketName,

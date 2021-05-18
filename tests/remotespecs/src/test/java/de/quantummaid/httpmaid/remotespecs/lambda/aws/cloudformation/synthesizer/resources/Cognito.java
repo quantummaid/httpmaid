@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 
 import java.util.List;
@@ -31,10 +32,9 @@ public final class Cognito {
     private Cognito() {
     }
 
-    public static CloudformationResource pool(final String resourceId,
-                                              final String userPoolName) {
+    public static CloudformationResource pool(final CloudformationName resourceId) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::Cognito::UserPool", Map.of(
-                "UserPoolName", userPoolName,
+                "UserPoolName", resourceId.asId(),
                 "Policies", Map.of(
                         "PasswordPolicy", Map.of(
                                 "MinimumLength", 6,
@@ -47,12 +47,11 @@ public final class Cognito {
         ));
     }
 
-    public static CloudformationResource poolClient(final String resourceId,
-                                                    final String clientName,
+    public static CloudformationResource poolClient(final CloudformationName resourceId,
                                                     final CloudformationResource pool) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::Cognito::UserPoolClient", Map.of(
             "UserPoolId", pool.reference(),
-                "ClientName", clientName,
+                "ClientName", resourceId.asId(),
                 "ExplicitAuthFlows", List.of("ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"),
                 "ReadAttributes", List.of("email"),
                 "CallbackURLs", List.of("https://example.org/"),

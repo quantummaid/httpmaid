@@ -32,28 +32,21 @@ import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CloudformationResource {
-    private static final int MAX_NAME_LENGTH = 64;
-    private final String name;
+    private final CloudformationName name;
     private final String type;
     private final List<CloudformationResource> dependencies;
     private final Map<String, Object> properties;
 
-    public static CloudformationResource cloudformationResource(final String name,
+    public static CloudformationResource cloudformationResource(final CloudformationName name,
                                                                 final String type,
                                                                 final Map<String, Object> properties) {
-        return new CloudformationResource(name, type, List.of(), properties);
+        return cloudformationResource(name, type, List.of(), properties);
     }
 
-    public static CloudformationResource cloudformationResource(final String name,
+    public static CloudformationResource cloudformationResource(final CloudformationName name,
                                                                 final String type,
                                                                 final List<CloudformationResource> dependencies,
                                                                 final Map<String, Object> properties) {
-        if (name.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException(String.format(
-                    "name %s for cloudformation resource of type %s must not be longer than %d characters",
-                    name, type, MAX_NAME_LENGTH));
-
-        }
         return new CloudformationResource(name, type, dependencies, properties);
     }
 
@@ -65,7 +58,7 @@ public final class CloudformationResource {
         return IntrinsicFunctions.reference(name);
     }
 
-    public String name() {
+    public CloudformationName name() {
         return name;
     }
 
@@ -75,6 +68,7 @@ public final class CloudformationResource {
         if (!dependencies.isEmpty()) {
             final List<String> dependencyNames = dependencies.stream()
                     .map(CloudformationResource::name)
+                    .map(CloudformationName::asId)
                     .collect(toList());
             map.put("DependsOn", dependencyNames);
         }

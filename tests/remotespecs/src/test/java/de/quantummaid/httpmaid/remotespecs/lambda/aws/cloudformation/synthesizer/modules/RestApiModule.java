@@ -42,7 +42,7 @@ public final class RestApiModule implements CloudformationModule {
 
     @Override
     public void apply(final CloudformationTemplateBuilder builder) {
-        final CloudformationResource api = restApi(namespace.id("RestApi"), namespace.id("RestApi"));
+        final CloudformationResource api = restApi(namespace.id("RestApi"));
         final CloudformationResource resource = resource(namespace.id("ApiResource"), api);
         final CloudformationResource anyMethod = anyMethod(namespace.id("AnyMethod"), api, resource, function);
         final CloudformationResource secondAnyMethod = secondAnyMethod(namespace.id("SecondAnyMethod"), api, function);

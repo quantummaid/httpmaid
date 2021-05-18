@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 
 import java.util.List;
@@ -31,14 +32,14 @@ public final class ApiGatewayV1 {
     private ApiGatewayV1() {
     }
 
-    public static CloudformationResource restApi(final String resourceId, final String apiName) {
+    public static CloudformationResource restApi(final CloudformationName resourceId) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGateway::RestApi", Map.of(
-                "Name", apiName,
+                "Name", resourceId.asId(),
                 "FailOnWarnings", true
         ));
     }
 
-    public static CloudformationResource resource(final String resourceId, final CloudformationResource api) {
+    public static CloudformationResource resource(final CloudformationName resourceId, final CloudformationResource api) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGateway::Resource", Map.of(
                 "RestApiId", api.reference(),
                 "ParentId", api.attribute("RootResourceId"),
@@ -46,7 +47,7 @@ public final class ApiGatewayV1 {
         ));
     }
 
-    public static CloudformationResource anyMethod(final String resourceId,
+    public static CloudformationResource anyMethod(final CloudformationName resourceId,
                                                    final CloudformationResource restApi,
                                                    final CloudformationResource resource,
                                                    final CloudformationResource function) {
@@ -66,7 +67,7 @@ public final class ApiGatewayV1 {
         ));
     }
 
-    public static CloudformationResource secondAnyMethod(final String resourceId,
+    public static CloudformationResource secondAnyMethod(final CloudformationName resourceId,
                                                          final CloudformationResource restApi,
                                                          final CloudformationResource function) {
         final Object invocationUri = ApiGatewayV2.buildInvocationUri(function);
@@ -85,7 +86,7 @@ public final class ApiGatewayV1 {
         ));
     }
 
-    public static CloudformationResource restApiDeployment(final String resourceId,
+    public static CloudformationResource restApiDeployment(final CloudformationName resourceId,
                                                            final CloudformationResource api,
                                                            final CloudformationResource method) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGateway::Deployment", List.of(method), Map.of(
@@ -93,7 +94,7 @@ public final class ApiGatewayV1 {
         ));
     }
 
-    public static CloudformationResource restApiStage(final String resourceId,
+    public static CloudformationResource restApiStage(final CloudformationName resourceId,
                                                       final CloudformationResource api,
                                                       final CloudformationResource deployment) {
         return CloudformationResource.cloudformationResource(resourceId, "AWS::ApiGateway::Stage", Map.of(

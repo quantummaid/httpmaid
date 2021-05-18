@@ -38,8 +38,8 @@ public final class CognitoModule implements CloudformationModule {
     private final CloudformationResource poolClient;
 
     public static CognitoModule cognitoModule(final Namespace namespace) {
-        final CloudformationResource pool = Cognito.pool(namespace.id("Pool"), namespace.id("Pool"));
-        final CloudformationResource poolClient = Cognito.poolClient(namespace.id("PoolClient"), namespace.id("PoolClient"), pool);
+        final CloudformationResource pool = Cognito.pool(namespace.id("Pool"));
+        final CloudformationResource poolClient = Cognito.poolClient(namespace.id("PoolClient"), pool);
         return new CognitoModule(namespace, pool, poolClient);
     }
 

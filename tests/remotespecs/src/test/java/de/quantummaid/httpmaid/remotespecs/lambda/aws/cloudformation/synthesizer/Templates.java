@@ -25,12 +25,16 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer
 
 import java.util.List;
 
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName.cloudformationName;
+
 public final class Templates {
 
     private Templates() {
     }
 
     public static CloudformationTemplate bucketTemplate(final String bucketName) {
-        return CloudformationTemplate.cloudformationTemplate(List.of(S3.bucket("RemoteSpecsArtifactBucket", bucketName)));
+        return CloudformationTemplate.cloudformationTemplate(List.of(
+                S3.bucket(cloudformationName("RemoteSpecsArtifactBucket"), bucketName))
+        );
     }
 }

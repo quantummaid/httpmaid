@@ -48,12 +48,10 @@ public final class WebsocketApiModule implements CloudformationModule {
 
     @Override
     public void apply(final CloudformationTemplateBuilder builder) {
-        final CloudformationResource websocketsApi = websocketsApi(
-                namespace.id("WebsocketsApi"), namespace.id("WebsocketsApi"), function);
+        final CloudformationResource websocketsApi = websocketsApi(namespace.id("WebsocketsApi"), function);
         final CloudformationResource websocketAuthorizer;
         if (authorized) {
-            websocketAuthorizer = authorizer(
-                    namespace.id("WsAuth"), namespace.id("WsAuth"), websocketsApi, functionRole, function);
+            websocketAuthorizer = authorizer(namespace.id("WsAuth"), websocketsApi, functionRole, function);
             builder.withResources(websocketAuthorizer);
         } else {
             websocketAuthorizer = null;

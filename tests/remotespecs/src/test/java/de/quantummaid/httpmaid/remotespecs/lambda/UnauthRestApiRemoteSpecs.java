@@ -30,6 +30,7 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.RestApiInformat
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.StackOutputs;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.FunctionModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.RestApiModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketApiModule;
@@ -46,6 +47,7 @@ import java.util.Optional;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.LambdaDeployer.lambdaDeployer;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.RestApiInformation.restApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation.websocketApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName.cloudformationName;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.sub;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.PseudoParameters.REGION;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.FunctionModule.unauthorizedFunctionModule;
@@ -77,7 +79,7 @@ public final class UnauthRestApiRemoteSpecs implements RemoteSpecs {
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
                     "REGION", sub(REGION)
             ));
-            final String functionName = functionModule.function().name();
+            final String functionName = functionModule.function().name().asId();
             logGroupReference = builder()
                     .withConventionalLogGroupNameForLambda(functionName)
                     .withRegionFromEnvironment()
@@ -98,12 +100,12 @@ public final class UnauthRestApiRemoteSpecs implements RemoteSpecs {
         };
     }
 
-    public static Deployment loadDeployment(final Map<String, String> stackOutputs,
+    public static Deployment loadDeployment(final StackOutputs stackOutputs,
                                             final Namespace namespace) {
         websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
 
-        final String region = stackOutputs.get("Region");
+        final String region = stackOutputs.get(cloudformationName("Region"));
         final String restWebsocketApiId = stackOutputs.get(namespace.id("WebsocketApiId"));
         final WebsocketApiInformation websocketApiInformation = websocketApiInformation(restWebsocketApiId, region);
 
