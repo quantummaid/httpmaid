@@ -32,6 +32,7 @@ import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CloudformationResource {
+    private static final int MAX_NAME_LENGTH = 64;
     private final String name;
     private final String type;
     private final List<CloudformationResource> dependencies;
@@ -47,6 +48,12 @@ public final class CloudformationResource {
                                                                 final String type,
                                                                 final List<CloudformationResource> dependencies,
                                                                 final Map<String, Object> properties) {
+        if (name.length() > MAX_NAME_LENGTH) {
+            throw new IllegalArgumentException(String.format(
+                    "name %s for cloudformation resource of type %s must not be longer than %d characters",
+                    name, type, MAX_NAME_LENGTH));
+
+        }
         return new CloudformationResource(name, type, dependencies, properties);
     }
 

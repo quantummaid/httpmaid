@@ -54,6 +54,8 @@ public final class Listener implements TestExecutionListener {
     public void executionFinished(final TestIdentifier testIdentifier, final TestExecutionResult testExecutionResult) {
         final TestExecutionResult.Status status = testExecutionResult.getStatus();
         if (status != TestExecutionResult.Status.SUCCESSFUL) {
+            testExecutionResult.getThrowable()
+                    .ifPresent(throwable -> log.warn("thrown exception", throwable));
             log.warn("test {} failed - stopping all test executions to enable better debugging", testIdentifier.getDisplayName());
             System.exit(1);
         }
