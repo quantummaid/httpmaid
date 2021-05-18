@@ -25,6 +25,7 @@ import de.quantummaid.httpmaid.http.Header;
 import de.quantummaid.httpmaid.http.QueryParameter;
 import de.quantummaid.httpmaid.websockets.registry.ConnectionInformation;
 import de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,10 +40,12 @@ import static de.quantummaid.httpmaid.http.QueryParameter.queryParameter;
 import static de.quantummaid.httpmaid.http.QueryParameterName.queryParameterName;
 import static de.quantummaid.httpmaid.http.QueryParameterValue.queryParameterValue;
 import static de.quantummaid.httpmaid.http.QueryParameters.queryParameters;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.registry.WebsocketRegistryEntry.restoreFromStrings;
 import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("java:S1192")
+@Slf4j
 public final class EntryDeserializer {
     private static final String HEADERS = "h";
     private static final String NAME = "n";
@@ -56,6 +59,9 @@ public final class EntryDeserializer {
     @SuppressWarnings("unchecked")
     public static WebsocketRegistryEntry deserializeEntry(final ConnectionInformation connectionInformation,
                                                           final Map<String, Object> map) {
+        validateNotNull(connectionInformation, "connectionInformation");
+        validateNotNull(map, "map");
+        log.trace("deserializing entry {}", map);
         final List<Map<String, String>> serializedHeaders = (List<Map<String, String>>) map.get(HEADERS);
         final List<Header> headers = serializedHeaders.stream()
                 .map(headerMap -> {
