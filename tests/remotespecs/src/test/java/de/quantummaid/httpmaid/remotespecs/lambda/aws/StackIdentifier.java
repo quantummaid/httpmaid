@@ -47,7 +47,7 @@ public final class StackIdentifier {
     }
 
     public static StackIdentifier sharedStackIdentifier() {
-        final String uuid = UUID.randomUUID().toString().substring(0, 7);
+        final String uuid = UUID.randomUUID().toString().substring(0, 5);
         final String value = String.format("%s%s", SHARED_STACK_PREFIX, uuid);
         return stackIdentifier(value);
     }

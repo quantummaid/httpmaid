@@ -24,21 +24,18 @@ package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesize
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CloudformationOutput {
-    private final CloudformationName name;
-    private final Object value;
+public final class StackOutputs {
+    private final Map<String, String> outputs;
 
-    public static CloudformationOutput cloudformationOutput(final CloudformationName name,
-                                                            final Object value) {
-        return new CloudformationOutput(name, value);
+    public static StackOutputs stackOutputs(final Map<String, String> outputs) {
+        return new StackOutputs(outputs);
     }
 
-    public CloudformationName name() {
-        return name;
-    }
-
-    public Object value() {
-        return value;
+    public String get(final CloudformationName cloudformationName) {
+        final String key = cloudformationName.asId();
+        return outputs.get(key);
     }
 }

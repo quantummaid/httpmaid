@@ -22,6 +22,7 @@
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifact;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,7 @@ public final class Lambda {
     private Lambda() {
     }
 
-    public static CloudformationResource function(final String resourceId,
-                                                  final String functionName,
+    public static CloudformationResource function(final CloudformationName resourceId,
                                                   final Artifact artifact,
                                                   final CloudformationResource functionRole,
                                                   final LambdaPayload payload,
@@ -50,7 +50,7 @@ public final class Lambda {
         final Map<String, Object> fullEnvironment = new LinkedHashMap<>(payload.additionalEnvironmentVariables);
         fullEnvironment.putAll(environment);
         return cloudformationResource(resourceId, "AWS::Lambda::Function", Map.of(
-                "FunctionName", functionName,
+                "FunctionName", resourceId.asId(),
                 "Code", Map.of(
                         "S3Bucket", artifact.bucket(),
                         "S3Key", artifact.object()

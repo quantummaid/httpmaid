@@ -69,10 +69,7 @@ public final class HttpApiModule implements CloudformationModule {
 
     @Override
     public void apply(final CloudformationTemplateBuilder builder) {
-        final CloudformationResource api = httpApi(
-                namespace.id("HttpApi"),
-                namespace.id("HttpApi")
-        );
+        final CloudformationResource api = httpApi(namespace.id("HttpApi"));
 
         final CloudformationResource integration = httpApiIntegration(
                 namespace.id("HttpApiDefaultIntegration"),
@@ -84,7 +81,6 @@ public final class HttpApiModule implements CloudformationModule {
         final CloudformationResource jwtAuthorizer;
         if (authorized) {
             jwtAuthorizer = jwtAuthorizer(
-                    namespace.id("HttpApiJwtAuthorizer"),
                     namespace.id("HttpApiJwtAuthorizer"),
                     api,
                     pool,

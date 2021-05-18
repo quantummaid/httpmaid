@@ -29,7 +29,9 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.Artifacts;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.RestApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.StackOutputs;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.FunctionModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.RestApiModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.WebsocketApiModule;
@@ -78,7 +80,7 @@ public final class DummyAuthRestApiRemoteSpecs implements RemoteSpecs {
                     "WEBSOCKET_REGISTRY_TABLE", websocketRegistryModule.dynamoDb().reference(),
                     "REGION", sub(REGION)
             ));
-            final String functionName = functionModule.function().name();
+            final String functionName = functionModule.function().name().asId();
             logGroupReference = builder()
                     .withConventionalLogGroupNameForLambda(functionName)
                     .withRegionFromEnvironment()
@@ -99,12 +101,12 @@ public final class DummyAuthRestApiRemoteSpecs implements RemoteSpecs {
         };
     }
 
-    public static Deployment loadDeployment(final Map<String, String> stackOutputs,
+    public static Deployment loadDeployment(final StackOutputs stackOutputs,
                                             final Namespace namespace) {
         websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
 
-        final String region = stackOutputs.get("Region");
+        final String region = stackOutputs.get(CloudformationName.cloudformationName("Region"));
         final String restWebsocketApiId = stackOutputs.get(namespace.id("WebsocketApiId"));
         final WebsocketApiInformation websocketApiInformation = websocketApiInformation(restWebsocketApiId, region);
 

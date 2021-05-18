@@ -21,6 +21,7 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
 
@@ -36,7 +37,8 @@ public final class Iam {
     private Iam() {
     }
 
-    public static CloudformationResource apiGatewayPermission(final String resourceId, final CloudformationResource function) {
+    public static CloudformationResource apiGatewayPermission(final CloudformationName resourceId,
+                                                              final CloudformationResource function) {
         return CloudformationResource.cloudformationResource(
                 resourceId, "AWS::Lambda::Permission", Map.of(
                         "Action", "lambda:invokeFunction",
@@ -46,13 +48,13 @@ public final class Iam {
         );
     }
 
-    public static CloudformationResource functionPermission(final String resourceId,
+    public static CloudformationResource functionPermission(final CloudformationName resourceId,
                                                             final CloudformationResource function,
                                                             final CloudformationResource websocketsApi,
                                                             final CloudformationResource websocketsApiStage) {
         final Object sourceArn = sub(format("arn:aws:apigateway:${AWS::Region}::/restapis/${%s}/stages/${%s}",
-                websocketsApi.name(),
-                websocketsApiStage.name()));
+                websocketsApi.name().asId(),
+                websocketsApiStage.name().asId()));
         return CloudformationResource.cloudformationResource(
                 resourceId, "AWS::Lambda::Permission", Map.of(
                         "Action", "lambda:invokeFunction",
@@ -63,14 +65,13 @@ public final class Iam {
         );
     }
 
-    public static CloudformationResource iamRole(final String resourceId,
-                                                 final String roleName,
+    public static CloudformationResource iamRole(final CloudformationName resourceId,
                                                  final Namespace namespace) {
         return CloudformationResource.cloudformationResource(
                 resourceId,
                 "AWS::IAM::Role",
                 Map.of(
-                        "RoleName", roleName,
+                        "RoleName", resourceId.asId(),
                         "ManagedPolicyArns", List.of("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"),
                         "Policies", List.of(
                                 allowPolicy(namespace.id("FunctionRolePolicy"), List.of("sts:AssumeRole")),
@@ -102,10 +103,10 @@ public final class Iam {
         );
     }
 
-    private static Map<String, Object> allowPolicy(final String policyName,
+    private static Map<String, Object> allowPolicy(final CloudformationName policyName,
                                                    final List<String> actions) {
         return Map.of(
-                "PolicyName", policyName,
+                "PolicyName", policyName.asId(),
                 "PolicyDocument", Map.of(
                         "Version", VERSION,
                         "Statement", List.of(

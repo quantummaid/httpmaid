@@ -31,6 +31,7 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInf
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationModule;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationResource;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.Namespace;
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.StackOutputs;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.modules.*;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Cognito;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference;
@@ -46,6 +47,7 @@ import static de.quantummaid.httpmaid.remotespecs.lambda.aws.LambdaDeployer.lamb
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.LambdaDeployer.loadToken;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.HttpApiInformation.httpApiInformation;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.apigateway.WebsocketApiInformation.websocketApiInformation;
+import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationName.cloudformationName;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.CloudformationOutput.cloudformationOutput;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.IntrinsicFunctions.sub;
 import static de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.PseudoParameters.REGION;
@@ -80,7 +82,6 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
             final Namespace malicious2 = namespace.sub("malicious2");
             final CloudformationResource otherClient = Cognito.poolClient(
                     malicious2.id("OtherClient"),
-                    malicious2.id("OtherClient"),
                     cognitoModule.pool()
             );
             builder
@@ -95,7 +96,7 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
                     "POOL_CLIENT_ID", cognitoModule.poolClient().reference(),
                     "REGION", sub(REGION)
             ));
-            final String functionName = functionModule.function().name();
+            final String functionName = functionModule.function().name().asId();
             logGroupReference = builder()
                     .withConventionalLogGroupNameForLambda(functionName)
                     .withRegionFromEnvironment()
@@ -115,7 +116,7 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
         };
     }
 
-    public static Deployment loadDeployment(final Map<String, String> stackOutputs,
+    public static Deployment loadDeployment(final StackOutputs stackOutputs,
                                             final Namespace namespace) {
         accessToken = loadToken(stackOutputs, namespace);
         maliciousAccessToken = loadToken(stackOutputs, namespace.sub("malicious"));
@@ -124,7 +125,7 @@ public final class CognitoHttpApiV1PayloadRemoteSpecs implements RemoteSpecs {
         websocketRegistryDynamoDb = stackOutputs.get(namespace.id("WebsocketRegistryDynamoDb"));
         resetTable(websocketRegistryDynamoDb);
 
-        final String region = stackOutputs.get("Region");
+        final String region = stackOutputs.get(cloudformationName("Region"));
         final String websocketApiId = stackOutputs.get(namespace.id("WebsocketApiId"));
         final WebsocketApiInformation websocketApiInformation = websocketApiInformation(websocketApiId, region);
 

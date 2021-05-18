@@ -21,24 +21,23 @@
 
 package de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer;
 
+import de.quantummaid.httpmaid.remotespecs.lambda.aws.s3.Md5Checksum;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
+@ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CloudformationOutput {
-    private final CloudformationName name;
-    private final Object value;
+public final class CloudformationName {
+    private final String name;
 
-    public static CloudformationOutput cloudformationOutput(final CloudformationName name,
-                                                            final Object value) {
-        return new CloudformationOutput(name, value);
+    public static CloudformationName cloudformationName(final String name) {
+        return new CloudformationName(name);
     }
 
-    public CloudformationName name() {
-        return name;
-    }
-
-    public Object value() {
-        return value;
+    public String asId() {
+        return Md5Checksum.ofString(name).getValue();
     }
 }

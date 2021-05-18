@@ -30,16 +30,16 @@ public final class IntrinsicFunctions {
     private IntrinsicFunctions() {
     }
 
-    public static Object reference(final String resource) {
-        return Map.of("Ref", resource);
+    public static Object reference(final CloudformationName resource) {
+        return Map.of("Ref", resource.asId());
     }
 
     public static Object sub(final String string) {
         return Map.of("Fn::Sub", string);
     }
 
-    public static Object getAttribute(final String name, final String attribute) {
-        return Map.of("Fn::GetAtt", List.of(name, attribute));
+    public static Object getAttribute(final CloudformationName name, final String attribute) {
+        return Map.of("Fn::GetAtt", List.of(name.asId(), attribute));
     }
 
     public static Object join(final String delimiter, final Object... values) {

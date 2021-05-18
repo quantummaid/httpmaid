@@ -115,11 +115,9 @@ public final class FunctionModule implements CloudformationModule {
                                                 final Map<String, Object> environment) {
         final CloudformationResource functionRole = iamRole(
                 namespace.id("FunctionRole"),
-                namespace.id("FunctionRole"),
                 namespace.sub("FunctionRole")
         );
         final CloudformationResource function = Lambda.function(
-                namespace.id("Function"),
                 namespace.id("Function"),
                 artifact,
                 functionRole,
