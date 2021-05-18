@@ -39,6 +39,7 @@ import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S2259")
 public final class MapPath {
     private final List<MapPathElement> elements;
 
