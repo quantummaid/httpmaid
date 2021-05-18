@@ -34,6 +34,7 @@ import java.net.URI;
 import static software.amazon.awssdk.http.apache.ApacheHttpClient.create;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S2095")
 public final class DefaultApiGatewaySyncClientFactory implements LowLevelFactory<ApiGatewayManagementApiClient> {
     private final AwsCredentialsProvider credentialsProvider;
     private final SdkHttpClient httpClient;

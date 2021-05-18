@@ -40,7 +40,7 @@ public final class AutoCloseableResolvedParametersSupportExtension implements In
             invocation.proceed();
         } finally {
             invocationContext.getArguments().stream()
-                    .filter(it -> it instanceof AutoCloseable)
+                    .filter(AutoCloseable.class::isInstance)
                     .forEach(it -> safelyClose((AutoCloseable) it));
         }
     }
