@@ -36,8 +36,8 @@ import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public final class CloudFormationWaiter {
-    private static final int MAX_NUMBER_OF_TRIES = 50;
-    private static final int SLEEP_TIME_IN_MILLISECONDS = 5000;
+    private static final int MAX_NUMBER_OF_TRIES = 5;
+    private static final int SLEEP_TIME_IN_MILLISECONDS = 50000;
 
     private CloudFormationWaiter() {
     }
