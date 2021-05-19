@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.pollWithTimeout;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.mapmaid.dynamodb.attributevalue.AttributeValueUnmarshaller.attributeValueUnmarshaller;
 
 @Slf4j
@@ -67,6 +68,7 @@ public final class DynamoDbHandler {
 
     public static void resetTable(final String tableName) {
         log.info("Resetting table {}...", tableName);
+        validateNotNull(tableName, "tableName");
         try (DynamoDbClient dynamoDbClient = DynamoDbClient.create()) {
             final ScanRequest scanRequest = ScanRequest.builder()
                     .tableName(tableName)

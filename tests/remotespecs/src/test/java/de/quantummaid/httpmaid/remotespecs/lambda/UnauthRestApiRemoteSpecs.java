@@ -125,8 +125,8 @@ public final class UnauthRestApiRemoteSpecs implements RemoteSpecs {
 
     @Test
     public void noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(final TestEnvironment testEnvironment) {
-        Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(
-                testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
+            Shared.noLeakedConnectionsInWebsocketRegistryAfterDisconnectByClient(
+                    testEnvironment, websocketRegistryDynamoDb, mapWithAccessToken());
     }
 
     @Test

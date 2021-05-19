@@ -42,6 +42,7 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Headers.emptyHeaders;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.Poller.sleep;
+import static de.quantummaid.httpmaid.tests.givenwhenthen.WebsocketTestClientConnectException.websocketTestClientConnectException;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.client.HttpClientRequest.httpClientRequest;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.websockets.WebsocketStatus.CLOSED;
 import static java.lang.String.format;
@@ -71,8 +72,8 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
 
     @Override
     public Then aWebsocketIsConnected(final Map<String, List<String>> queryParameters,
-                                      final Map<String, List<String>> headers) {
-        final int maxConnectionAttempts = 3;
+                                      final Map<String, List<String>> headers,
+                                      final int maxConnectionAttempts) {
         int tryNumber = 0;
         int waitTime = WAIT_TIME_BASE;
         while (true) {
@@ -81,7 +82,7 @@ public final class When implements FirstWhenStage, MethodBuilder, BodyBuilder, H
             } catch (final HttpMaidClientException e) {
                 log.warn("connect attempt {} failed", tryNumber, e);
                 if (tryNumber + 1 == maxConnectionAttempts) {
-                    throw new IllegalStateException(format("failed %d times to connect, giving up connecting", maxConnectionAttempts), e);
+                    throw websocketTestClientConnectException(maxConnectionAttempts, e);
                 } else {
                     log.warn("retrying in {} ms", waitTime);
                     sleep(waitTime);

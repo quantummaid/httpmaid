@@ -24,6 +24,7 @@ package de.quantummaid.httpmaid.remotespecsinstance;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.HttpMaidBuilder;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -112,11 +113,18 @@ public final class HttpMaidFactory {
                         .withAdvancedSettings(advancedBuilder -> advancedBuilder
                                 .usingMarshaller(minimalJsonMarshallerAndUnmarshaller()))))
 
-                .configured(toStoreAdditionalDataInWebsocketContext(request -> request
-                        .queryParameters()
-                        .optionalParameter("toBeStoredInContext")
-                        .map(value -> Map.of("key", (Object) value))
-                        .orElseGet(Map::of)));
+                .configured(toStoreAdditionalDataInWebsocketContext(request -> {
+                    final Map<String, Object> additionalData = new LinkedHashMap<>();
+                    request
+                            .queryParameters()
+                            .optionalParameter("toBeStoredInContext")
+                            .ifPresent(value -> additionalData.put("key", value));
+                    request
+                            .headers()
+                            .optionalHeader("X-Trace-Id")
+                            .ifPresent(value -> additionalData.put("traceId", value));
+                    return additionalData;
+                }));
         configurator.accept(builder);
         return builder.build();
     }
