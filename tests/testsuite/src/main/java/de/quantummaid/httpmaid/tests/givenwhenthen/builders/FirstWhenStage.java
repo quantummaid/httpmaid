@@ -46,7 +46,14 @@ public interface FirstWhenStage {
         return aWebsocketIsConnected(Map.of(), Map.of());
     }
 
-    Then aWebsocketIsConnected(Map<String, List<String>> queryParameters, Map<String, List<String>> headers);
+    default Then aWebsocketIsConnected(Map<String, List<String>> queryParameters, Map<String, List<String>> headers) {
+        final int maxConnectionAttempts = 3;
+        return aWebsocketIsConnected(queryParameters, headers, maxConnectionAttempts);
+    }
+
+    Then aWebsocketIsConnected(Map<String, List<String>> queryParameters,
+                               Map<String, List<String>> headers,
+                               int maxConnectionAttempts);
 
     Then running(Runnable runnable);
 

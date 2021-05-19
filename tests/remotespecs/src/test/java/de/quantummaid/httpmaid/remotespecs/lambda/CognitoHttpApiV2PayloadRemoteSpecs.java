@@ -37,6 +37,7 @@ import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudformation.synthesizer.resources.Cognito;
 import de.quantummaid.httpmaid.remotespecs.lambda.aws.cloudwatch.CloudwatchLogGroupReference;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.tests.givenwhenthen.WebsocketTestClientConnectException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.deploy.Deployment;
 import org.eclipse.jetty.websocket.api.UpgradeException;
 import org.junit.jupiter.api.Test;
@@ -202,7 +203,7 @@ public final class CognitoHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
         try {
             testEnvironment.givenTheStaticallyDeployedTestInstance()
                     .when().aWebsocketIsConnected(Map.of(), Map.of());
-        } catch (final IllegalStateException e) {
+        } catch (final WebsocketTestClientConnectException e) {
             exception = e;
         }
         assertThat(exception, is(notNullValue()));
@@ -222,7 +223,7 @@ public final class CognitoHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
         try {
             testEnvironment.givenTheStaticallyDeployedTestInstance()
                     .when().aWebsocketIsConnected(Map.of("access_token", List.of("abcdef")), Map.of());
-        } catch (final IllegalStateException e) {
+        } catch (final WebsocketTestClientConnectException e) {
             exception = e;
         }
         assertThat(exception, is(notNullValue()));
@@ -242,7 +243,7 @@ public final class CognitoHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
         try {
             testEnvironment.givenTheStaticallyDeployedTestInstance()
                     .when().aWebsocketIsConnected(Map.of("access_token", List.of(maliciousAccessToken)), Map.of());
-        } catch (final IllegalStateException e) {
+        } catch (final WebsocketTestClientConnectException e) {
             exception = e;
         }
         assertThat(exception, is(notNullValue()));
@@ -262,7 +263,7 @@ public final class CognitoHttpApiV2PayloadRemoteSpecs implements RemoteSpecs {
         try {
             testEnvironment.givenTheStaticallyDeployedTestInstance()
                     .when().aWebsocketIsConnected(Map.of("access_token", List.of(tokenFromDifferentCognitoClient)), Map.of());
-        } catch (final IllegalStateException e) {
+        } catch (final WebsocketTestClientConnectException e) {
             exception = e;
         }
         assertThat(exception, is(notNullValue()));

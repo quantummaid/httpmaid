@@ -5,7 +5,7 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{48} - %msg%n</pattern>
         </encoder>
     </appender>
-    <!-- <logger name="de.quantummaid.httpmaid" level="debug"/> one logger to another level -->
+    <logger name="de.quantummaid.httpmaid" level="debug"/>
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
