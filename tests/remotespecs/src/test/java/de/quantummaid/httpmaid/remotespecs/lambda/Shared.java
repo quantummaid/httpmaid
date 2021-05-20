@@ -57,8 +57,8 @@ public final class Shared {
                                                                                       final String websocketRegistryDynamoDb,
                                                                                       final Map<String, List<String>> mapWithAccessToken,
                                                                                       final String traceId) {
-        final Then connectedStage = cleanUpAndConnectWebsockets(websocketRegistryDynamoDb, testEnvironment, mapWithAccessToken, traceId);
-        assertTableHasNumberOfEntries(20, websocketRegistryDynamoDb);
+        final Then connectedStage = cleanUpAndConnectWebsockets(websocketRegistryDynamoDb, testEnvironment, mapWithAccessToken, traceId, 5);
+        assertTableHasNumberOfEntries(5, websocketRegistryDynamoDb);
 
         connectedStage
                 .andWhen().allWebsocketsAreDisconnected()
@@ -82,9 +82,9 @@ public final class Shared {
                                                                                       final String websocketRegistryDynamoDb,
                                                                                       final Map<String, List<String>> mapWithAccessToken,
                                                                                       final String traceId) {
-        final Then connectedStage = cleanUpAndConnectWebsockets(websocketRegistryDynamoDb, testEnvironment, mapWithAccessToken, traceId);
+        final Then connectedStage = cleanUpAndConnectWebsockets(websocketRegistryDynamoDb, testEnvironment, mapWithAccessToken, traceId, 5);
 
-        assertTableHasNumberOfEntries(20, websocketRegistryDynamoDb);
+        assertTableHasNumberOfEntries(5, websocketRegistryDynamoDb);
 
         connectedStage
                 .andWhen().aWebsocketMessageIsSent("{ \"message\": \"disconnect\" }")
@@ -96,7 +96,8 @@ public final class Shared {
     private static Then cleanUpAndConnectWebsockets(final String websocketRegistryDynamoDb,
                                                     final TestEnvironment testEnvironment,
                                                     final Map<String, List<String>> mapWithAccessToken,
-                                                    final String traceId) {
+                                                    final String traceId,
+                                                    final int number) {
         int count = 0;
         Then connectedStage;
         while (true) {
@@ -108,7 +109,7 @@ public final class Shared {
             assertTableEmpty(websocketRegistryDynamoDb);
 
             try {
-                connectedStage = connectWebsockets(20, testEnvironment, mapWithAccessToken, traceId);
+                connectedStage = connectWebsockets(number, testEnvironment, mapWithAccessToken, traceId);
                 break;
             } catch (final WebsocketTestClientConnectException e) {
                 log.warn("could not connect all websockets", e);
