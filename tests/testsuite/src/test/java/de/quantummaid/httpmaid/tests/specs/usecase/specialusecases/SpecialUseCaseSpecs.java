@@ -321,7 +321,7 @@ public final class SpecialUseCaseSpecs {
                         "The following classes could not be detected properly:\n" +
                         "\n" +
                         "?: unable to detect deserialization-only:\n" +
-                        "no deserialization detected:\n" +
+                        "no deserialization-only detected:\n" +
                         "[type '?' is not supported because it contains wildcard generics (\"?\")]\n" +
                         "\n" +
                         "?:\n" +
