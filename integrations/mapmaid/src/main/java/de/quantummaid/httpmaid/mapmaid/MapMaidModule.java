@@ -37,9 +37,9 @@ import de.quantummaid.mapmaid.MapMaid;
 import de.quantummaid.mapmaid.builder.MapMaidBuilder;
 import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
 import de.quantummaid.mapmaid.mapper.marshalling.MarshallingType;
-import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import de.quantummaid.reflectmaid.GenericType;
 import de.quantummaid.reflectmaid.ReflectMaid;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ import static de.quantummaid.httpmaid.mapmaid.advancedscanner.UseCaseClassScanne
 import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
 import static de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization.useCaseSerializationAndDeserialization;
 import static de.quantummaid.mapmaid.MapMaid.aMapMaid;
-import static de.quantummaid.mapmaid.shared.identifier.TypeIdentifier.typeIdentifierFor;
+import static de.quantummaid.reflectmaid.typescanner.TypeIdentifier.typeIdentifierFor;
 import static java.util.Collections.singletonList;
 
 @Slf4j
@@ -126,7 +126,7 @@ public final class MapMaidModule implements ChainModule {
                     final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
                     mapMaidMarshallingMapper.mapMarshalling(mapMaid, marshallingModule);
                     final Serializer serializer = (returnValue, type) ->
-                            mapMaid.serializer().serializeToUniversalObject(returnValue, typeIdentifierFor(type));
+                            mapMaid.serializeToUniversalObject(returnValue, typeIdentifierFor(type));
                     return useCaseSerializationAndDeserialization(parameterProviders, serializer);
                 };
         useCasesModule.setSerializationAndDeserializationProvider(serializationAndDeserializationProvider);

@@ -16,6 +16,8 @@
                 <ignoreVersion>10.0.0</ignoreVersion>
                 <ignoreVersion>10.0.1</ignoreVersion>
                 <ignoreVersion>10.0.2</ignoreVersion>
+                <ignoreVersion>10.0.3</ignoreVersion>
+                <ignoreVersion>10.0.4</ignoreVersion>
                 <ignoreVersion>11.0.0-alpha0</ignoreVersion>
                 <ignoreVersion>11.0.0.beta1</ignoreVersion>
                 <ignoreVersion>11.0.0.beta2</ignoreVersion>
@@ -23,6 +25,8 @@
                 <ignoreVersion>11.0.0</ignoreVersion>
                 <ignoreVersion>11.0.1</ignoreVersion>
                 <ignoreVersion>11.0.2</ignoreVersion>
+                <ignoreVersion>11.0.3</ignoreVersion>
+                <ignoreVersion>11.0.4</ignoreVersion>
             </ignoreVersions>
         </rule>
     </rules>
