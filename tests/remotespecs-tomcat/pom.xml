@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.138</version>
+        <version>0.9.139</version>
     </parent>
 
     <artifactId>remotespecs-tomcat</artifactId>
@@ -37,7 +37,7 @@
         <plugin-update-file-checksum>35fe547b725ca8e71b0d13c8c21894df</plugin-update-file-checksum>
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
-
+        <kotlin.version>1.4.32</kotlin.version>
     </properties>
 
     <dependencyManagement>
@@ -45,17 +45,17 @@
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
-                <version>1.5.0</version>
+                <version>${kotlin.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib-jdk7</artifactId>
-                <version>1.5.0</version>
+                <version>${kotlin.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib-jdk8</artifactId>
-                <version>1.5.0</version>
+                <version>${kotlin.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
             <artifactId>remotespecs</artifactId>
-            <version>0.9.138</version>
+            <version>0.9.139</version>
             <scope>test</scope>
         </dependency>
         <dependency>
