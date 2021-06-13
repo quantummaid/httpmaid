@@ -24,28 +24,8 @@
         </rule>
         <rule groupId="org.eclipse.jetty" comparisonMethod="maven">
             <ignoreVersions>
-                <ignoreVersion>10.0.0-alpha0</ignoreVersion>
-                <ignoreVersion>10.0.0.alpha1</ignoreVersion>
-                <ignoreVersion>10.0.0.alpha2</ignoreVersion>
-                <ignoreVersion>10.0.0.alpha3</ignoreVersion>
-                <ignoreVersion>10.0.0.beta0</ignoreVersion>
-                <ignoreVersion>10.0.0.beta1</ignoreVersion>
-                <ignoreVersion>10.0.0.beta2</ignoreVersion>
-                <ignoreVersion>10.0.0.beta3</ignoreVersion>
-                <ignoreVersion>10.0.0</ignoreVersion>
-                <ignoreVersion>10.0.1</ignoreVersion>
-                <ignoreVersion>10.0.2</ignoreVersion>
-                <ignoreVersion>10.0.3</ignoreVersion>
-                <ignoreVersion>10.0.4</ignoreVersion>
-                <ignoreVersion>11.0.0-alpha0</ignoreVersion>
-                <ignoreVersion>11.0.0.beta1</ignoreVersion>
-                <ignoreVersion>11.0.0.beta2</ignoreVersion>
-                <ignoreVersion>11.0.0.beta3</ignoreVersion>
-                <ignoreVersion>11.0.0</ignoreVersion>
-                <ignoreVersion>11.0.1</ignoreVersion>
-                <ignoreVersion>11.0.2</ignoreVersion>
-                <ignoreVersion>11.0.3</ignoreVersion>
-                <ignoreVersion>11.0.4</ignoreVersion>
+                <ignoreVersion type="regex">11\..*\..*</ignoreVersion>
+                <ignoreVersion type="regex">10\..*\..*</ignoreVersion>
             </ignoreVersions>
         </rule>
         <rule groupId="software.amazon.awssdk">
