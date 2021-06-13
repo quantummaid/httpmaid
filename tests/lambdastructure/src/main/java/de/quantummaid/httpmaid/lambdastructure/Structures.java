@@ -193,6 +193,7 @@ public final class Structures {
                                             .key("iat", numeric())
                                             .key("iss", string())
                                             .key("jti", string())
+                                            .optionalKey("origin_jti", string())
                                             .key("scope", string())
                                             .key("sub", string())
                                             .key("token_use", string())
