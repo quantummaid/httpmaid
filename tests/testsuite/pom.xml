@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.141</version>
+        <version>0.9.142</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -43,7 +43,7 @@
         <plugin-update-file-checksum>a9c106f16f2d959e2db68534062e7623</plugin-update-file-checksum>
         <sonar.coverage.jacoco.xmlReportPaths>../../coverage/target/site/jacoco-aggregate/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        <kotlin.version>1.4.32</kotlin.version>
+        <kotlin.version>1.5.20</kotlin.version>
     </properties>
 
     <dependencyManagement>
@@ -131,14 +131,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.12.3</version>
+                <version>2.12.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.16.88</version>
+                <version>2.16.98</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -187,7 +187,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.10.15</version>
+            <version>0.10.17</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
@@ -258,18 +258,18 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.42.v20210604</version>
+            <version>9.4.43.v20210629</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-cbor</artifactId>
-            <version>2.12.3</version>
+            <version>2.12.4</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.42.v20210604</version>
+            <version>9.4.43.v20210629</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -299,7 +299,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>9.4.42.v20210604</version>
+            <version>9.4.43.v20210629</version>
             <scope>test</scope>
         </dependency>
 
