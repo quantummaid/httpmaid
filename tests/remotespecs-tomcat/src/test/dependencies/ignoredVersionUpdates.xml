@@ -19,11 +19,7 @@
                 <ignoreVersion>8.5.66</ignoreVersion>
                 <ignoreVersion>8.5.67</ignoreVersion>
                 <ignoreVersion>8.5.68</ignoreVersion>
-            </ignoreVersions>
-        </rule>
-        <rule groupId="org.jetbrains.kotlin" comparisonMethod="maven">
-            <ignoreVersions>
-                <ignoreVersion type="regex">1\.5\..*</ignoreVersion>
+                <ignoreVersion>8.5.69</ignoreVersion>
             </ignoreVersions>
         </rule>
     </rules>
