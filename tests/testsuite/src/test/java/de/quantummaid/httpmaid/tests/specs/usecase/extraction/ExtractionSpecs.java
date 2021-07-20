@@ -27,9 +27,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.statusCode;
-import static de.quantummaid.httpmaid.events.EventConfigurators.toExtractFromTheResponseMapTheHeader;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.statusCode;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.toExtractFromTheResponseMapTheHeader;
 
 public final class ExtractionSpecs {
 

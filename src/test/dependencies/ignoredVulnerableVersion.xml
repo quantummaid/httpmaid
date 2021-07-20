@@ -200,4 +200,11 @@
         <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
         <vulnerabilityName>CVE-2020-25649</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: httpmaid-awslambda-websocket-0.9.143.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/de\.quantummaid\.httpmaid\.integrations/httpmaid\-awslambda\-websocket@.*$</packageUrl>
+        <cve>CVE-2021-33880</cve>
+    </suppress>
 </suppressions>

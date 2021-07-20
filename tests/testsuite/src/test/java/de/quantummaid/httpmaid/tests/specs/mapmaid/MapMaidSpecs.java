@@ -32,13 +32,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.http.headers.ContentType.fromString;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.*;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentTypeInResponses;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toUnmarshallContentTypeInRequests;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.*;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingHeader;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingPathParameter;
 
 public final class MapMaidSpecs {
 
@@ -96,11 +96,11 @@ public final class MapMaidSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", MyUseCase.class)
-                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                        .configured(withMapperConfiguration(mapMaidBuilder -> mapMaidBuilder
                                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"wrong\", \"field2\": \"wrong\"}").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"myRequest\": {\"field1\": \"wrong\", \"field2\": \"wrong\"} }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(400)
                 .theJsonResponseEquals("" +
                         "{" +
@@ -121,11 +121,11 @@ public final class MapMaidSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", MyFailingWithEmptyMessageUseCase.class)
-                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                        .configured(withMapperConfiguration(mapMaidBuilder -> mapMaidBuilder
                                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": \"foo\" }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(400)
                 .theJsonResponseEquals("" +
                         "{" +
@@ -141,12 +141,12 @@ public final class MapMaidSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", MyUseCase.class)
-                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                        .configured(withMapperConfiguration(mapMaidBuilder -> mapMaidBuilder
                                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
                         .configured(toSetStatusCodeOnMapMaidValidationErrorsTo(401))
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"wrong\", \"field2\": \"wrong\"}").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"myRequest\": {\"field1\": \"wrong\", \"field2\": \"wrong\"} }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(401)
                 .theJsonResponseEquals("" +
                         "{" +
@@ -167,12 +167,12 @@ public final class MapMaidSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .post("/", MyUseCase.class)
-                        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                        .configured(withMapperConfiguration(mapMaidBuilder -> mapMaidBuilder
                                 .withExceptionIndicatingValidationError(IllegalArgumentException.class)))
                         .configured(toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{\"field1\": \"wrong\", \"field2\": \"wrong\"}").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"myRequest\": {\"field1\": \"wrong\", \"field2\": \"wrong\"} }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(500)
                 .theResponseBodyWas("");
     }

@@ -154,9 +154,7 @@ public final class HttpMaidBuilder implements HttpConfiguration<HttpMaidBuilder>
         chainRegistryBuilder.addModule(coreModule);
         chainRegistryBuilder.addModule(websocketsModule());
         if (autodetectionOfModules) {
-            chainRegistryBuilder.addModuleIfPresent(reflectMaid, "de.quantummaid.httpmaid.events.EventModule");
             chainRegistryBuilder.addModuleIfPresent(reflectMaid, "de.quantummaid.httpmaid.usecases.UseCasesModule");
-            chainRegistryBuilder.addModuleIfPresent(reflectMaid, "de.quantummaid.httpmaid.mapmaid.MapMaidModule");
         }
         configurators.forEach(chainRegistryBuilder::addConfigurator);
         final ChainRegistry chainRegistry = chainRegistryBuilder.build();

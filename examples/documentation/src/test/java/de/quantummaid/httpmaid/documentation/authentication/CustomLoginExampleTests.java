@@ -36,9 +36,9 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aGetRequestToThePath;
 import static de.quantummaid.httpmaid.client.HttpClientRequest.aPostRequestToThePath;
 import static de.quantummaid.httpmaid.documentation.support.Deployer.test;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingCookie;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthorizeRequestsUsing;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.withMapperConfiguration;
 import static de.quantummaid.mapmaid.builder.recipes.urlencoded.UrlEncodedMarshallerRecipe.urlEncodedMarshaller;
 import static io.jsonwebtoken.Jwts.builder;
 import static io.jsonwebtoken.Jwts.parserBuilder;
@@ -122,7 +122,7 @@ public final class CustomLoginExampleTests {
                         .orElse(false))
                         .onlyRequestsTo("/admin")
                         .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-                .configured(toConfigureMapMaidUsingRecipe(urlEncodedMarshaller()))
+                .configured(withMapperConfiguration(urlEncodedMarshaller()))
                 .build();
         //Showcase end customLoginFull
 

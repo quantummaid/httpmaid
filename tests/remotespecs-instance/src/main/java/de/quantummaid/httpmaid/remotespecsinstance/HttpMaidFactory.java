@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.withMapperConfiguration;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toStoreAdditionalDataInWebsocketContext;
 import static de.quantummaid.mapmaid.minimaljson.MinimalJsonMarshallerAndUnmarshaller.minimalJsonMarshallerAndUnmarshaller;
 
@@ -109,7 +109,7 @@ public final class HttpMaidFactory {
                     final String value = (String) request.additionalData().get("key");
                     response.setBody(value);
                 })
-                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                .configured(withMapperConfiguration(mapMaidBuilder -> mapMaidBuilder
                         .withAdvancedSettings(advancedBuilder -> advancedBuilder
                                 .usingMarshaller(minimalJsonMarshallerAndUnmarshaller()))))
 

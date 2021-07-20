@@ -21,22 +21,22 @@
 
 package de.quantummaid.httpmaid.tests.specs.usecase.enriching;
 
-import de.quantummaid.httpmaid.exceptions.ExceptionConfigurators;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.SingleStringParameterUseCase;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.TwoStringsParameterUseCase;
-import de.quantummaid.mapmaid.debug.MapMaidException;
+import de.quantummaid.mapmaid.mapper.deserialization.WrongInputStructureException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.*;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
+import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingPathParameter;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.toAuthenticateUsingQueryParameter;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.*;
 
 public class EnrichingSpecs {
 
@@ -70,7 +70,7 @@ public class EnrichingSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/<parameter>", SingleStringParameterUseCase.class, ignorePathParameter("parameter"))
-                        .configured(ExceptionConfigurators.toMapExceptionsOfType(MapMaidException.class,
+                        .configured(toMapExceptionsOfType(WrongInputStructureException.class,
                                 (exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )

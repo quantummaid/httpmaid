@@ -23,26 +23,18 @@ package de.quantummaid.httpmaid.tests.specs.usecase.specialusecases;
 
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.*;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
-import de.quantummaid.reflectmaid.GenericType;
+import de.quantummaid.httpmaid.usecases.UseCaseConfigurators;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
-import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
-import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.toCreateUseCaseInstancesUsing;
 import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
 import static de.quantummaid.reflectmaid.GenericType.genericType;
 
 public final class SpecialUseCaseSpecs {
-
-    /*
-    final data class UseCaseResponse<T>(val type: String, val payload: T, val mapMaidFix: String = "");
-     */
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
@@ -127,8 +119,8 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(500)
-                .theResponseBodyWas("");
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("\"foo\"");
     }
 
     @ParameterizedTest
@@ -154,8 +146,8 @@ public final class SpecialUseCaseSpecs {
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theStatusCodeWas(500)
-                .theResponseBodyWas("");
+                .theStatusCodeWas(200)
+                .theResponseBodyWas("[\"a\",\"b\",\"c\"]");
     }
 
     @ParameterizedTest
@@ -180,8 +172,8 @@ public final class SpecialUseCaseSpecs {
                         .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
-                .theResponseBodyWas("type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsDirectParameter' contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"t\": \"foo\" }").withContentType("application/json").isIssued()
+                .theResponseBodyWas("foo");
     }
 
     @ParameterizedTest
@@ -207,8 +199,8 @@ public final class SpecialUseCaseSpecs {
                         .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\", \"b\", \"c\"]").withContentType("application/json").isIssued()
-                .theResponseBodyWas("type 'de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseWithClassScopeTypeVariableAsIndirectParameter' contains the following type variables that need to be filled in in order to create a GenericType object: [T]");
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"list\": [\"a\", \"b\", \"c\"] }").withContentType("application/json").isIssued()
+                .theResponseBodyWas("{a, b, c}");
     }
 
     @ParameterizedTest
@@ -304,7 +296,7 @@ public final class SpecialUseCaseSpecs {
                         .configured(toMapExceptionsByDefaultUsing((exception, request, response) -> response.setBody(exception.getMessage())))
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("[\"a\",\"b\",\"c\"]").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": [\"a\",\"b\",\"c\"] }").withContentType("application/json").isIssued()
                 .theResponseBodyWas("{a, b, c}");
     }
 
@@ -340,15 +332,10 @@ public final class SpecialUseCaseSpecs {
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
-                        .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
-
-                            @SuppressWarnings("unchecked")
-                            @Override
-                            public <T> T instantiate(final GenericType<T> type) {
-                                return (T) new UseCaseThatIsAnInterface() {};
-                            }
-                        }))
+                        .configured(toUseModules(useCasesModule()))
+                        .configured(UseCaseConfigurators.withRequestScopedDependencies(builder -> builder
+                                .withCustomType(UseCaseThatIsAnInterface.class, () -> new UseCaseThatIsAnInterface() {
+                                })))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -362,15 +349,10 @@ public final class SpecialUseCaseSpecs {
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
-                        .configured(toCreateUseCaseInstancesUsing(new UseCaseInstantiator() {
-
-                            @SuppressWarnings("unchecked")
-                            @Override
-                            public <T> T instantiate(final GenericType<T> type) {
-                                return (T) new UseCaseThatIsAnAbstractClass() {};
-                            }
-                        }))
+                        .configured(toUseModules(useCasesModule()))
+                        .configured(UseCaseConfigurators.withRequestScopedDependencies(builder -> builder
+                                .withCustomType(UseCaseThatIsAnAbstractClass.class, () -> new UseCaseThatIsAnAbstractClass() {
+                                })))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()

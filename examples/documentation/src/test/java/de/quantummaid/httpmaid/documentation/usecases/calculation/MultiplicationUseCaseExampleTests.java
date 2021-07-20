@@ -35,11 +35,11 @@ import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.documentation.support.curl.Curl.parseFromCurlFile;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingQueryParameter;
-import static de.quantummaid.httpmaid.events.EventConfigurators.statusCode;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.withMapperConfiguration;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingQueryParameter;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.statusCode;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -82,9 +82,9 @@ public final class MultiplicationUseCaseExampleTests {
             final String body = response.getBody();
             assertThat(body, is("{\"result\":12}"));
 
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"4\"}", "{\"result\":12}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"5\"}", "{\"result\":15}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"20\", \"factor2\": \"7\"}", "{\"result\":140}", client);
+            Deployer.assertPost("/multiply", "{\"multiplicationRequest\": {\"factor1\": \"3\", \"factor2\": \"4\"}}", "{\"result\":12}", client);
+            Deployer.assertPost("/multiply", "{\"multiplicationRequest\": {\"factor1\": \"3\", \"factor2\": \"5\"}}", "{\"result\":15}", client);
+            Deployer.assertPost("/multiply", "{\"multiplicationRequest\": {\"factor1\": \"20\", \"factor2\": \"7\"}}", "{\"result\":140}", client);
         });
     }
 
@@ -100,13 +100,13 @@ public final class MultiplicationUseCaseExampleTests {
         //Showcase end multAndDivUseCaseExample
 
         Deployer.test(httpMaid, client -> {
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"4\"}", "{\"result\":12}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"3\", \"factor2\": \"5\"}", "{\"result\":15}", client);
-            Deployer.assertPost("/multiply", "{\"factor1\": \"20\", \"factor2\": \"7\"}", "{\"result\":140}", client);
+            Deployer.assertPost("/multiply", "{\"multiplicationRequest\": {\"factor1\": \"3\", \"factor2\": \"4\"}}", "{\"result\":12}", client);
+            Deployer.assertPost("/multiply", "{\"multiplicationRequest\": {\"factor1\": \"3\", \"factor2\": \"5\"}}", "{\"result\":15}", client);
+            Deployer.assertPost("/multiply", "{\"multiplicationRequest\": {\"factor1\": \"20\", \"factor2\": \"7\"}}", "{\"result\":140}", client);
 
-            Deployer.assertPost("/divide", "{\"dividend\": \"12\", \"divisor\": \"4\"}", "{\"result\":3}", client);
-            Deployer.assertPost("/divide", "{\"dividend\": \"15\", \"divisor\": \"5\"}", "{\"result\":3}", client);
-            Deployer.assertPost("/divide", "{\"dividend\": \"140\", \"divisor\": \"7\"}", "{\"result\":20}", client);
+            Deployer.assertPost("/divide", "{\"divisionRequest\": {\"dividend\": \"12\", \"divisor\": \"4\"}}", "{\"result\":3}", client);
+            Deployer.assertPost("/divide", "{\"divisionRequest\": {\"dividend\": \"15\", \"divisor\": \"5\"}}", "{\"result\":3}", client);
+            Deployer.assertPost("/divide", "{\"divisionRequest\": {\"dividend\": \"140\", \"divisor\": \"7\"}}", "{\"result\":20}", client);
         });
     }
 
@@ -125,7 +125,7 @@ public final class MultiplicationUseCaseExampleTests {
                         mappingQueryParameter("divisor", "divisionRequest.divisor")
                 )
                 .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+                .configured(withMapperConfiguration(mapMaidBuilder -> {
                     mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
                 }))
                 .build();

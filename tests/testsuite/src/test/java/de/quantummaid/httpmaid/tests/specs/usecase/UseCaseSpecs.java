@@ -27,11 +27,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingHeader;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingPathParameter;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingHeader;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingPathParameter;
 
 public final class UseCaseSpecs {
 
@@ -95,7 +95,7 @@ public final class UseCaseSpecs {
     @MethodSource(ALL_ENVIRONMENTS)
     public void testTwoUseCaseParameters(final TestEnvironment testEnvironment) {
         testEnvironment.given(
-                () -> anHttpMaid()
+                anHttpMaid()
                         .get("/twoparameters", TwoStringsParameterUseCase.class, mappingHeader("parameter1"), mappingHeader("parameter2"))
                         .build()
         )
@@ -182,7 +182,7 @@ public final class UseCaseSpecs {
                         .post("/", SingleStringParameterUseCase.class)
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("\"foo\"").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": \"foo\" }").withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("\"foo\"");
     }
@@ -208,7 +208,7 @@ public final class UseCaseSpecs {
                         .post("/", SingleDtoParameterUseCase.class)
                         .build()
         )
-                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"fieldA\": \"foo\", \"fieldB\": \"bar\" }").withContentType("application/json").isIssued()
+                .when().aRequestToThePath("/").viaThePostMethod().withTheBody("{ \"parameter\": { \"fieldA\": \"foo\", \"fieldB\": \"bar\" }}").withContentType("application/json").isIssued()
                 .theStatusCodeWas(200)
                 .theResponseBodyWas("\"MyDto(fieldA=foo, fieldB=bar)\"");
     }

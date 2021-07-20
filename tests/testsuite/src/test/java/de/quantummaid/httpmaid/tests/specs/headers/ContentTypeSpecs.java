@@ -24,13 +24,13 @@ package de.quantummaid.httpmaid.tests.specs.headers;
 import com.google.gson.Gson;
 import de.quantummaid.httpmaid.HttpMaid;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.usecases.UseCaseConfigurators;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 
 public final class ContentTypeSpecs {
@@ -45,7 +45,7 @@ public final class ContentTypeSpecs {
                     response.setBody(map);
                     response.setContentType("application/yaml");
                 })
-                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> mapMaidBuilder
+                .configured(UseCaseConfigurators.withMapperConfiguration(mapMaidBuilder -> mapMaidBuilder
                         .withAdvancedSettings(advancedBuilder -> {
                             advancedBuilder.usingJsonMarshaller(gson::toJson, input -> gson.fromJson(input, Object.class));
                             advancedBuilder.usingYamlMarshaller(object -> "asdf", input -> {

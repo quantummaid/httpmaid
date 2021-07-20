@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingAdditionalWebsocketData;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ENVIRONMENTS_WITH_ALL_CAPABILITIES_WITHOUT_SHITTY_CLIENT;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.WEBSOCKET_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingAdditionalWebsocketData;
 import static de.quantummaid.httpmaid.websockets.WebsocketConfigurators.toStoreAdditionalDataInWebsocketContext;
 import static de.quantummaid.httpmaid.websockets.criteria.WebsocketCriteria.websocketCriteria;
 

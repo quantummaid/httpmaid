@@ -21,232 +21,257 @@
 
 package de.quantummaid.httpmaid.usecases;
 
-import de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder;
-import de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder;
-import de.quantummaid.eventmaid.mapping.Demapifier;
-import de.quantummaid.eventmaid.mapping.Mapifier;
-import de.quantummaid.eventmaid.messagebus.MessageBus;
-import de.quantummaid.eventmaid.processingcontext.EventType;
-import de.quantummaid.eventmaid.serializedmessagebus.SerializedMessageBus;
-import de.quantummaid.eventmaid.usecases.usecaseadapter.LowLevelUseCaseAdapterBuilder;
-import de.quantummaid.eventmaid.usecases.usecaseadapter.UseCaseAdapter;
-import de.quantummaid.httpmaid.HttpMaidChains;
-import de.quantummaid.httpmaid.PerRouteConfigurator;
+import de.quantummaid.httpmaid.CoreModule;
 import de.quantummaid.httpmaid.chains.*;
-import de.quantummaid.httpmaid.events.Event;
-import de.quantummaid.httpmaid.events.EventFactory;
-import de.quantummaid.httpmaid.events.EventModule;
+import de.quantummaid.httpmaid.closing.ClosingActions;
 import de.quantummaid.httpmaid.generator.GenerationCondition;
+import de.quantummaid.httpmaid.generator.Generator;
 import de.quantummaid.httpmaid.handler.distribution.DistributableHandler;
 import de.quantummaid.httpmaid.handler.distribution.HandlerDistributors;
-import de.quantummaid.httpmaid.serialization.Serializer;
+import de.quantummaid.httpmaid.marshalling.MarshallingModule;
 import de.quantummaid.httpmaid.startupchecks.StartupChecks;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiatorFactory;
-import de.quantummaid.httpmaid.usecases.method.UseCaseMethod;
-import de.quantummaid.httpmaid.usecases.serializing.SerializationAndDeserializationProvider;
-import de.quantummaid.httpmaid.usecases.serializing.UseCaseSerializationAndDeserialization;
+import de.quantummaid.httpmaid.usecases.eventfactories.EventFactory;
+import de.quantummaid.httpmaid.usecases.eventfactories.enriching.Event;
+import de.quantummaid.httpmaid.usecases.eventfactories.enriching.PerEventEnrichers;
+import de.quantummaid.httpmaid.usecases.eventfactories.enriching.enrichers.PathParameterEnricher;
+import de.quantummaid.httpmaid.usecases.eventfactories.extraction.PerEventExtractors;
+import de.quantummaid.httpmaid.usecases.eventfactories.extraction.ResponseMapExtractor;
+import de.quantummaid.httpmaid.usecases.mapmaid.ReturnValueSerializer;
 import de.quantummaid.httpmaid.websockets.broadcast.Broadcasters;
-import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.injectmaid.api.InjectorConfiguration;
+import de.quantummaid.mapmaid.MapMaid;
+import de.quantummaid.mapmaid.builder.recipes.Recipe;
+import de.quantummaid.mapmaid.mapper.deserialization.validation.AggregatedValidationException;
 import de.quantummaid.reflectmaid.GenericType;
 import de.quantummaid.reflectmaid.ReflectMaid;
+import de.quantummaid.reflectmaid.resolvedtype.ResolvedType;
+import de.quantummaid.usecasemaid.RoutingTarget;
+import de.quantummaid.usecasemaid.UseCaseMaid;
+import de.quantummaid.usecasemaid.UseCaseMaidBuilder;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.*;
+import java.util.function.Consumer;
 
-import static de.quantummaid.eventmaid.internal.collections.filtermap.FilterMapBuilder.filterMapBuilder;
-import static de.quantummaid.eventmaid.internal.collections.predicatemap.PredicateMapBuilder.predicateMapBuilder;
-import static de.quantummaid.eventmaid.mapping.ExceptionMapifier.defaultExceptionMapifier;
-import static de.quantummaid.eventmaid.processingcontext.EventType.eventTypeFromString;
-import static de.quantummaid.eventmaid.usecases.usecaseadapter.LowLevelUseCaseAdapterBuilder.aLowLevelUseCaseInvocationBuilder;
 import static de.quantummaid.httpmaid.CoreModule.REFLECT_MAID;
+import static de.quantummaid.httpmaid.HttpMaidChainKeys.RESPONSE_BODY_OBJECT;
+import static de.quantummaid.httpmaid.HttpMaidChains.*;
+import static de.quantummaid.httpmaid.chains.ChainName.chainName;
 import static de.quantummaid.httpmaid.chains.MetaDataKey.metaDataKey;
-import static de.quantummaid.httpmaid.events.EventModule.MESSAGE_BUS;
-import static de.quantummaid.httpmaid.events.EventModule.eventModule;
+import static de.quantummaid.httpmaid.chains.rules.Drop.drop;
+import static de.quantummaid.httpmaid.chains.rules.Jump.jumpTo;
+import static de.quantummaid.httpmaid.closing.ClosingActions.CLOSING_ACTIONS;
+import static de.quantummaid.httpmaid.generator.Generator.generator;
+import static de.quantummaid.httpmaid.generator.Generators.generators;
 import static de.quantummaid.httpmaid.handler.distribution.DistributableHandler.distributableHandler;
 import static de.quantummaid.httpmaid.handler.distribution.HandlerDistributors.HANDLER_DISTRIBUTORS;
+import static de.quantummaid.httpmaid.marshalling.MarshallingModule.emptyMarshallingModule;
 import static de.quantummaid.httpmaid.serialization.Serializer.SERIALIZER;
 import static de.quantummaid.httpmaid.startupchecks.StartupChecks.STARTUP_CHECKS;
+import static de.quantummaid.httpmaid.usecases.DetermineRoutingTargetProcessor.determineRoutingTargetProcessor;
 import static de.quantummaid.httpmaid.usecases.RegisterSerializerProcessor.registerSerializerProcessor;
-import static de.quantummaid.httpmaid.usecases.eventfactories.MultipleParametersEventFactory.multipleParametersEventFactory;
-import static de.quantummaid.httpmaid.usecases.eventfactories.SingleParameterEventFactory.singleParameterEventFactory;
-import static de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiator.zeroArgumentsConstructorUseCaseInstantiator;
-import static de.quantummaid.httpmaid.usecases.method.UseCaseMethod.useCaseMethodOf;
+import static de.quantummaid.httpmaid.usecases.eventfactories.GenericEventFactory.genericEventFactory;
+import static de.quantummaid.httpmaid.usecases.eventfactories.enriching.PerEventEnrichers.perEventEnrichers;
+import static de.quantummaid.httpmaid.usecases.eventfactories.enriching.enrichers.PathParameterEnricher.pathParameterEnricher;
+import static de.quantummaid.httpmaid.usecases.eventfactories.extraction.PerEventExtractors.perEventExtractors;
+import static de.quantummaid.httpmaid.usecases.mapmaid.MapMaidMarshallingMapper.mapMaidMarshallingMapper;
+import static de.quantummaid.httpmaid.usecases.mapmaid.MapMaidValidationExceptionMapper.mapMaidValidationExceptionMapper;
+import static de.quantummaid.httpmaid.usecases.mapmaid.ReturnValueSerializer.returnValueSerializer;
+import static de.quantummaid.httpmaid.usecases.processors.BroadcastingProcessor.broadcastingProcessor;
+import static de.quantummaid.httpmaid.usecases.processors.ConstructEventMapProcessor.constructEventMapProcessor;
+import static de.quantummaid.httpmaid.usecases.processors.DispatchEventProcessor.dispatchEventProcessor;
+import static de.quantummaid.httpmaid.usecases.processors.PerRequestEnrichersProcessor.enrichersProcessor;
+import static de.quantummaid.httpmaid.usecases.processors.PerRequestExtractorsProcessor.extractorsProcessor;
+import static de.quantummaid.httpmaid.usecases.processors.UnwrapDispatchingExceptionProcessor.unwrapDispatchingExceptionProcessor;
 import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static de.quantummaid.httpmaid.websockets.broadcast.Broadcasters.BROADCASTERS;
 import static de.quantummaid.reflectmaid.GenericType.fromResolvedType;
 import static de.quantummaid.reflectmaid.GenericType.genericType;
+import static de.quantummaid.usecasemaid.RoutingTarget.routingTarget;
+import static de.quantummaid.usecasemaid.UseCaseMaid.aUseCaseMaid;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("java:S1905")
 public final class UseCasesModule implements ChainModule {
-    public static final MetaDataKey<SerializedMessageBus> SERIALIZED_MESSAGE_BUS = metaDataKey("SERIALIZED_MESSAGE_BUS");
+    public static final MetaDataKey<RoutingTarget> ROUTING_TARGET = metaDataKey("ROUTING_TARGET");
+    public static final MetaDataKey<Event> EVENT = metaDataKey("EVENT");
+    public static final MetaDataKey<Optional<Object>> RECEIVED_EVENT = metaDataKey("RECEIVED_EVENT");
 
-    private SerializationAndDeserializationProvider serializationAndDeserializationProvider;
-    private UseCaseInstantiatorFactory useCaseInstantiatorFactory;
-    private final Map<ResolvedType, EventType> useCaseToEventMappings = new HashMap<>();
-    private final List<UseCaseMethod> useCaseMethods = new ArrayList<>();
+    public static final ChainName MAP_REQUEST_TO_EVENT = chainName("MAP_REQUEST_TO_EVENT");
+    public static final ChainName SUBMIT_EVENT = chainName("SUBMIT_EVENT");
+    public static final ChainName MAP_EVENT_TO_RESPONSE = chainName("MAP_EVENT_TO_RESPONSE");
+    public static final ChainName EXTERNAL_EVENT = chainName("EXTERNAL_EVENT");
+
+    private static final int DEFAULT_VALIDATION_ERROR_STATUS_CODE = 400;
+
+    private final Map<GenerationCondition, RoutingTarget> useCaseClasses = new LinkedHashMap<>();
+    private final List<Generator<RoutingTarget>> routingTargetGenerators = new LinkedList<>();
+    private final List<Recipe> mapperConfigurations = new LinkedList<>();
+    private final List<InjectorConfiguration> globalScopedInjectorConfigurations = new LinkedList<>();
+    private final List<InjectorConfiguration> requestScopedInjectorConfigurations = new LinkedList<>();
+
+    private final List<Generator<RoutingTarget>> eventTypeGenerators = new LinkedList<>();
+    private final Map<RoutingTarget, EventFactory> eventFactories = new HashMap<>();
+    private final Map<RoutingTarget, PerEventEnrichers> enrichers = new HashMap<>();
+    private final Map<RoutingTarget, PerEventExtractors> extractors = new HashMap<>();
+    private final List<ResponseMapExtractor> responseMapExtractors = new LinkedList<>();
+    private UseCaseMaid useCaseMaid;
+
+    private boolean addAggregatedExceptionHandler = true;
+    private int validationErrorStatusCode = DEFAULT_VALIDATION_ERROR_STATUS_CODE;
 
     public static UseCasesModule useCasesModule() {
         return new UseCasesModule();
     }
 
-    public void setUseCaseInstantiatorFactory(final UseCaseInstantiatorFactory useCaseInstantiatorFactory) {
-        this.useCaseInstantiatorFactory = useCaseInstantiatorFactory;
+    public void addMapperConfiguration(final Recipe recipe) {
+        this.mapperConfigurations.add(recipe);
     }
 
-    public void addUseCaseToEventMapping(final ResolvedType useCaseClass,
-                                         final EventType eventType) {
-        validateNotNull(useCaseClass, "useCaseClass");
-        validateNotNull(eventType, "eventType");
-        useCaseToEventMappings.put(useCaseClass, eventType);
+    public void addGlobalScopedInjectorConfiguration(final InjectorConfiguration injectorConfiguration) {
+        this.globalScopedInjectorConfigurations.add(injectorConfiguration);
     }
 
-    public void setSerializationAndDeserializationProvider(final SerializationAndDeserializationProvider serializationAndDeserializationProvider) {
-        this.serializationAndDeserializationProvider = serializationAndDeserializationProvider;
+    public void addRequestScopedInjectorConfiguration(final InjectorConfiguration injectorConfiguration) {
+        this.requestScopedInjectorConfigurations.add(injectorConfiguration);
     }
 
-    @Override
-    public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
-        return singletonList(eventModule());
+    public void addResponseMapExtractor(final ResponseMapExtractor extractor) {
+        validateNotNull(extractor, "extractor");
+        responseMapExtractors.add(extractor);
+    }
+
+    public void addEnricher(final RoutingTarget eventType, final Consumer<PerEventEnrichers> enricher) {
+        enrichers.computeIfAbsent(eventType, x -> perEventEnrichers());
+        final PerEventEnrichers perEventEnrichers = enrichers.get(eventType);
+        enricher.accept(perEventEnrichers);
+    }
+
+    public void addExtractor(final RoutingTarget routingTarget, final Consumer<PerEventExtractors> extractor) {
+        extractors.computeIfAbsent(routingTarget, x -> perEventExtractors());
+        final PerEventExtractors perEventExtractors = extractors.get(routingTarget);
+        extractor.accept(perEventExtractors);
+    }
+
+    public void doNotAddAggregatedExceptionHandler() {
+        this.addAggregatedExceptionHandler = false;
+    }
+
+    public void setValidationErrorStatusCode(final int validationErrorStatusCode) {
+        this.validationErrorStatusCode = validationErrorStatusCode;
     }
 
     @Override
     public void init(final MetaData configurationMetaData) {
         final ReflectMaid reflectMaid = configurationMetaData.get(REFLECT_MAID);
+
         final HandlerDistributors handlerDistributors = configurationMetaData.get(HANDLER_DISTRIBUTORS);
         handlerDistributors.register(handler -> handler.handler() instanceof GenericType, handler -> {
             final GenericType<?> useCaseClass = (GenericType<?>) handler.handler();
             final ResolvedType resolvedUseCaseClass = reflectMaid.resolve(useCaseClass);
-            return registerUseCase(resolvedUseCaseClass, handler.condition(), handler.perRouteConfigurators());
+            final DistributableHandler followUpHandler = distributableHandler(handler.condition(), routingTarget(resolvedUseCaseClass), handler.perRouteConfigurators());
+            return singletonList(followUpHandler);
         });
         handlerDistributors.register(handler -> handler.handler() instanceof Class, handler -> {
             final Class<?> clazz = (Class<?>) handler.handler();
             final GenericType<?> useCaseClass = genericType(clazz);
             final ResolvedType resolvedUseCaseClass = reflectMaid.resolve(useCaseClass);
-            return registerUseCase(resolvedUseCaseClass, handler.condition(), handler.perRouteConfigurators());
+            final DistributableHandler followUpHandler = distributableHandler(handler.condition(), routingTarget(resolvedUseCaseClass), handler.perRouteConfigurators());
+            return singletonList(followUpHandler);
+        });
+        handlerDistributors.register(handler -> handler.handler() instanceof RoutingTarget, handler -> {
+            final RoutingTarget routingTarget = (RoutingTarget) handler.handler();
+            useCaseClasses.put(handler.condition(), routingTarget);
+            return emptyList();
         });
     }
 
-    private List<DistributableHandler> registerUseCase(final ResolvedType useCaseType,
-                                                       final GenerationCondition condition,
-                                                       final List<PerRouteConfigurator> perRouteConfigurators) {
-        final EventType eventType = eventTypeFromString(useCaseType.description());
-        useCaseToEventMappings.put(useCaseType, eventType);
-        useCaseMethods.add(useCaseMethodOf(useCaseType));
-        final DistributableHandler eventHandler = distributableHandler(condition, eventType, perRouteConfigurators);
-        return singletonList(eventHandler);
+    @Override
+    public List<ChainModule> supplyModulesIfNotAlreadyPresent() {
+        return List.of(emptyMarshallingModule());
     }
 
     @Override
     public void configure(final DependencyRegistry dependencyRegistry) {
-        final EventModule eventModule = dependencyRegistry.getDependency(EventModule.class);
-        useCaseMethods.forEach(useCaseMethod -> {
-            final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
-            final EventType eventType = useCaseToEventMappings.get(useCaseClass);
-            final EventFactory eventFactory = buildEventFactory(useCaseMethod);
-            eventModule.setEventFactoryFor(eventType, eventFactory);
+        final ReflectMaid reflectMaid = dependencyRegistry.getMetaDatum(REFLECT_MAID);
+        final UseCaseMaidBuilder useCaseMaidBuilder = aUseCaseMaid(reflectMaid);
+        useCaseClasses.forEach((condition, routingTarget) -> {
+            useCaseMaidBuilder.invoking(routingTarget);
+            final Generator<RoutingTarget> eventTypeGenerator = generator(routingTarget, condition);
+            routingTargetGenerators.add(eventTypeGenerator);
+            final List<String> pathParameters = condition.pathParameters();
+            pathParameters.forEach(name -> {
+                final PathParameterEnricher enricher = pathParameterEnricher(name, name);
+                addEnricher(routingTarget, perEventEnrichers -> perEventEnrichers.addPathParameterEnricher(enricher));
+            });
         });
+        mapperConfigurations.forEach(useCaseMaidBuilder::withMapperConfiguration);
+        requestScopedInjectorConfigurations.forEach(useCaseMaidBuilder::withInvocationScopedDependencies);
+        globalScopedInjectorConfigurations.forEach(useCaseMaidBuilder::withDependencies);
+        final Broadcasters broadcasters = dependencyRegistry.getMetaDatum(BROADCASTERS);
+        broadcasters.injectionTypes().forEach(injectionType -> useCaseMaidBuilder
+                .withMapperConfiguration(builder -> builder.injecting(injectionType)));
+        final List<ResolvedType> messageTypes = broadcasters.messageTypes();
+        messageTypes.forEach(resolvedType -> useCaseMaidBuilder
+                .withMapperConfiguration(builder -> builder.serializing(fromResolvedType(resolvedType))));
+        useCaseMaid = useCaseMaidBuilder.build();
+        useCaseClasses.values().forEach(routingTarget -> {
+            final Collection<String> parameterNames = useCaseMaid.topLevelParameterNamesFor(routingTarget);
+            final EventFactory eventFactory = genericEventFactory(parameterNames);
+            eventFactories.put(routingTarget, eventFactory);
+        });
+        final MapMaid mapMaid = useCaseMaid.mapper();
+        final MarshallingModule marshallingModule = dependencyRegistry.getDependency(MarshallingModule.class);
+        mapMaidMarshallingMapper().mapMarshalling(mapMaid, marshallingModule);
+        final StartupChecks startupChecks = dependencyRegistry.getMetaDatum(STARTUP_CHECKS);
+        startupChecks.addStartupCheck(useCaseMaid::runStartupChecks);
+        if (addAggregatedExceptionHandler) {
+            final CoreModule coreModule = dependencyRegistry.getDependency(CoreModule.class);
+            coreModule.addExceptionMapper(AggregatedValidationException.class::isInstance,
+                    mapMaidValidationExceptionMapper(validationErrorStatusCode));
+        }
     }
 
     @Override
     public void register(final ChainExtender extender) {
-        final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
-        final List<GenericType<?>> injectionTypes = broadcasters.injectionTypes();
-        final List<ResolvedType> messageTypes = broadcasters.messageTypes();
-        final UseCaseSerializationAndDeserialization serializationAndDeserialization =
-                serializationAndDeserializationProvider.provide(useCaseMethods, injectionTypes, messageTypes);
-        final Serializer returnValueSerializer = serializationAndDeserialization.returnValueSerializer();
-        extender.appendProcessor(HttpMaidChains.INIT,
-                registerSerializerProcessor(returnValueSerializer));
+        final ClosingActions closingActions = extender.getMetaDatum(CLOSING_ACTIONS);
+        closingActions.addClosingAction(() -> useCaseMaid.instantiator().close());
+
+        final MapMaid mapMaid = useCaseMaid.mapper();
+        final ReturnValueSerializer returnValueSerializer = returnValueSerializer(mapMaid);
+        extender.appendProcessor(INIT, registerSerializerProcessor(returnValueSerializer));
         extender.addMetaDatum(SERIALIZER, returnValueSerializer);
-        final List<Class<?>> useCaseClasses = useCaseMethods.stream()
-                .map(UseCaseMethod::useCaseClass)
-                .map(ResolvedType::assignableType)
-                .collect(toList());
-        if (useCaseInstantiatorFactory == null) {
-            final ReflectMaid reflectMaid = extender.getMetaDatum(REFLECT_MAID);
-            useCaseInstantiatorFactory = types -> zeroArgumentsConstructorUseCaseInstantiator(reflectMaid);
-        }
-        final UseCaseInstantiator useCaseInstantiator = useCaseInstantiatorFactory.createInstantiator(useCaseClasses);
-        final StartupChecks startupChecks = extender.getMetaDatum(STARTUP_CHECKS);
-        final LowLevelUseCaseAdapterBuilder adapterBuilder = createAdapterBuilder();
-        useCaseMethods.forEach(useCaseMethod -> registerUseCaseMethod(
-                useCaseMethod, adapterBuilder, serializationAndDeserialization, startupChecks, useCaseInstantiator
-        ));
-        adapterBuilder.setUseCaseInstantiator(new de.quantummaid.eventmaid.usecases.usecaseadapter.usecaseinstantiating.UseCaseInstantiator() {
-            @Override
-            public <T> T instantiate(final Class<T> type) {
-                final GenericType<T> genericType = genericType(type);
-                return useCaseInstantiator.instantiate(genericType);
-            }
+
+        extender.appendProcessor(DETERMINE_HANDLER, determineRoutingTargetProcessor(generators(routingTargetGenerators)));
+        extender.routeIfSet(PREPARE_RESPONSE, jumpTo(MAP_REQUEST_TO_EVENT), ROUTING_TARGET);
+
+        extender.createChain(MAP_REQUEST_TO_EVENT, jumpTo(SUBMIT_EVENT), jumpTo(EXCEPTION_OCCURRED));
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, constructEventMapProcessor(eventFactories));
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, enrichersProcessor(enrichers));
+
+        final Broadcasters broadcasters = extender.getMetaDatum(BROADCASTERS);
+        extender.appendProcessor(MAP_REQUEST_TO_EVENT, broadcastingProcessor(broadcasters));
+
+        extender.createChain(SUBMIT_EVENT, jumpTo(MAP_EVENT_TO_RESPONSE), jumpTo(EXCEPTION_OCCURRED));
+        extender.appendProcessor(SUBMIT_EVENT, dispatchEventProcessor(useCaseMaid));
+
+        extender.createChain(MAP_EVENT_TO_RESPONSE, jumpTo(POST_INVOKE), jumpTo(EXCEPTION_OCCURRED));
+        responseMapExtractors.forEach(extractor -> extender.appendProcessor(MAP_EVENT_TO_RESPONSE, extractor));
+        extender.appendProcessor(MAP_EVENT_TO_RESPONSE, extractorsProcessor(extractors));
+
+        extender.appendProcessor(MAP_EVENT_TO_RESPONSE, metaData -> {
+            final Object map = metaData.get(RECEIVED_EVENT).orElseGet(HashMap::new);
+            metaData.set(RESPONSE_BODY_OBJECT, map);
         });
-        final PredicateMapBuilder<Exception, Mapifier<Exception>> exceptionSerializers = predicateMapBuilder();
-        exceptionSerializers.setDefaultValue(defaultExceptionMapifier());
-        adapterBuilder.setExceptionSerializers(exceptionSerializers);
-        final UseCaseAdapter useCaseAdapter = adapterBuilder.build();
-        final MessageBus messageBus = extender.getMetaDatum(MESSAGE_BUS);
-        final SerializedMessageBus serializedMessageBus = useCaseAdapter.attachAndEnhance(messageBus);
-        extender.addMetaDatum(SERIALIZED_MESSAGE_BUS, serializedMessageBus);
-    }
 
-    private void registerUseCaseMethod(final UseCaseMethod useCaseMethod,
-                                       final LowLevelUseCaseAdapterBuilder adapterBuilder,
-                                       final UseCaseSerializationAndDeserialization serializationAndDeserialization,
-                                       final StartupChecks startupChecks,
-                                       final UseCaseInstantiator useCaseInstantiator) {
-        final ResolvedType useCaseClass = useCaseMethod.useCaseClass();
-        final EventType eventType = useCaseToEventMappings.get(useCaseClass);
-        adapterBuilder.addUseCase(useCaseClass.assignableType(), eventType, (useCase, untypedEvent, callingContext) -> {
-            final Event event = (Event) untypedEvent;
-            final Map<String, Object> parameters = serializationAndDeserialization.deserializeParameters(event, useCaseClass);
-            final Optional<Object> returnValue = useCaseMethod.invoke(useCase, parameters, event);
-            return returnValue
-                    .map(object -> serializationAndDeserialization.serializeReturnValue(object, useCaseMethod.returnType().orElseThrow()))
-                    .orElse(null);
-        });
-        startupChecks.addStartupCheck(() -> useCaseInstantiator.check(fromResolvedType(useCaseClass)));
-    }
-
-    private static LowLevelUseCaseAdapterBuilder createAdapterBuilder() {
-        final LowLevelUseCaseAdapterBuilder adapterBuilder = aLowLevelUseCaseInvocationBuilder();
-        adapterBuilder.setRequestSerializers(failingPredicateMap());
-        adapterBuilder.setRequestDeserializers(failingFilterMap());
-        adapterBuilder.setReseponseSerializers(failingPredicateMap());
-        adapterBuilder.setResponseDeserializers(failingFilterMap());
-        return adapterBuilder;
-    }
-
-    private static FilterMapBuilder<Class<?>, Object, Demapifier<?>> failingFilterMap() {
-        final FilterMapBuilder<Class<?>, Object, Demapifier<?>> filterMap = filterMapBuilder();
-        filterMap.setDefaultValue((targetType, map) -> {
-            throw new UnsupportedOperationException();
-        });
-        return filterMap;
-    }
-
-    private static PredicateMapBuilder<Object, Mapifier<Object>> failingPredicateMap() {
-        final PredicateMapBuilder<Object, Mapifier<Object>> predicateMap = predicateMapBuilder();
-        predicateMap.setDefaultValue(object -> {
-            throw new UnsupportedOperationException();
-        });
-        return predicateMap;
-    }
-
-    private static EventFactory buildEventFactory(final UseCaseMethod useCaseMethod) {
-        if (useCaseMethod.isSingleParameterUseCase()) {
-            final String name = useCaseMethod.singleParameterName();
-            return singleParameterEventFactory(name);
-        } else {
-            final List<String> parameterNames = useCaseMethod.parameterNames();
-            return multipleParametersEventFactory(parameterNames);
-        }
+        extender.appendProcessor(PREPARE_EXCEPTION_RESPONSE, unwrapDispatchingExceptionProcessor());
+        extender.createChain(EXTERNAL_EVENT, drop(), jumpTo(EXCEPTION_OCCURRED));
     }
 }

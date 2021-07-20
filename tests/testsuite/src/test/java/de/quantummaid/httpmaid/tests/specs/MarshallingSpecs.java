@@ -21,10 +21,10 @@
 
 package de.quantummaid.httpmaid.tests.specs;
 
-import de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators;
 import de.quantummaid.httpmaid.marshalling.MarshallingException;
 import de.quantummaid.httpmaid.marshalling.UnsupportedContentTypeException;
 import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
+import de.quantummaid.httpmaid.usecases.UseCaseConfigurators;
 import de.quantummaid.mapmaid.builder.AdvancedBuilder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -104,7 +104,7 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("wrong"), body -> Map.of("a", "wrong")))
                         .configured(toUnmarshallContentTypeInRequests(fromString("right"), body -> Map.of("a", "right")))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("right")))
-                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                        .configured(UseCaseConfigurators.withMapperConfiguration(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
@@ -161,7 +161,7 @@ public final class MarshallingSpecs {
                         .configured(toMarshallContentTypeInResponses(fromString("wrong/x"), map -> "the wrong marshaller"))
                         .configured(toMarshallContentTypeInResponses(fromString("right/x"), map -> "the right marshaller"))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("wrong/x")))
-                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                        .configured(UseCaseConfigurators.withMapperConfiguration(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
@@ -202,7 +202,7 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("asdf"), body -> Map.of("a", "c")))
                         .configured(toMarshallContentTypeInResponses(fromString("qwer"), map -> "right"))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
-                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                        .configured(UseCaseConfigurators.withMapperConfiguration(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
@@ -220,7 +220,7 @@ public final class MarshallingSpecs {
                         .configured(toUnmarshallContentTypeInRequests(fromString("qwer"), body -> Map.of("a", "b")))
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .configured(toThrowAnExceptionIfNoMarshallerWasFound())
-                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                        .configured(UseCaseConfigurators.withMapperConfiguration(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .configured(toMapExceptionsOfType(UnsupportedContentTypeException.class, (exception, request, response) -> {
                             response.setStatus(501);
@@ -230,7 +230,9 @@ public final class MarshallingSpecs {
         )
                 .when().aRequestToThePath("/").viaThePostMethod().withAnEmptyBody().withContentType("asdf").isIssued()
                 .theStatusCodeWas(501)
-                .theResponseBodyWas("Content type 'asdf' is not supported; supported content types are: 'application/x-www-form-urlencoded, qwer'");
+                .theResponseBodyContains("Content type 'asdf' is not supported; supported content types are:")
+                .theResponseBodyContains("application/x-www-form-urlencoded")
+                .theResponseBodyContains("qwer");
     }
 
     @ParameterizedTest
@@ -243,7 +245,7 @@ public final class MarshallingSpecs {
                         .configured(toMarshallByDefaultUsingTheContentType(fromString("qwer")))
                         .configured(toThrowAnExceptionIfNoMarshallerWasFound())
                         .configured(toMapExceptionsOfType(MarshallingException.class, (exception, request, response) -> response.setStatus(501)))
-                        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+                        .configured(UseCaseConfigurators.withMapperConfiguration(mapMaidBuilder ->
                                 mapMaidBuilder.withAdvancedSettings(AdvancedBuilder::doNotAutoloadMarshallers)))
                         .build()
         )
