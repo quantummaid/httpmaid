@@ -32,10 +32,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Optional;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
-import static de.quantummaid.httpmaid.events.EventConfigurators.mappingAuthenticationInformation;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.security.SecurityConfigurators.*;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
+import static de.quantummaid.httpmaid.usecases.eventfactories.EventConfigurators.mappingAuthenticationInformation;
 import static java.util.Optional.of;
 
 public final class AuthenticationSpecs {

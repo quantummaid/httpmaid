@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.142</version>
+        <version>0.9.143</version>
     </parent>
 
     <artifactId>testlambda</artifactId>
@@ -41,7 +41,7 @@
         <sonar.coverage.exclusions>
             **/testlambda/**/*,
         </sonar.coverage.exclusions>
-        <kotlin.version>1.5.20</kotlin.version>
+        <kotlin.version>1.5.21</kotlin.version>
     </properties>
 
     <dependencyManagement>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
-                <version>4.1.65.Final</version>
+                <version>4.1.66.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

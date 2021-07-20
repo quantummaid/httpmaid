@@ -37,8 +37,8 @@ import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.documentation.support.curl.Curl.parseFromCurlFile;
 import static de.quantummaid.httpmaid.documentation.usecases.calculation.JsonMatcher.isJson;
 import static de.quantummaid.httpmaid.http.headers.ContentType.json;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidConfigurators.toConfigureMapMaidUsingRecipe;
 import static de.quantummaid.httpmaid.marshalling.MarshallingConfigurators.toMarshallContentType;
+import static de.quantummaid.httpmaid.usecases.UseCaseConfigurators.withMapperConfiguration;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -52,7 +52,7 @@ public final class DivisionUseCaseExampleStep2Tests {
                 .post("/multiply", MultiplicationUseCase.class)
                 .post("/divide", DivisionUseCase.class)
                 .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-                .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+                .configured(withMapperConfiguration(mapMaidBuilder -> {
                     mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
                 }))
                 .build();

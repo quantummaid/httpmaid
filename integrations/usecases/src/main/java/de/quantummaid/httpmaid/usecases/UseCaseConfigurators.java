@@ -22,20 +22,42 @@
 package de.quantummaid.httpmaid.usecases;
 
 import de.quantummaid.httpmaid.chains.Configurator;
-import de.quantummaid.httpmaid.usecases.instantiation.UseCaseInstantiator;
+import de.quantummaid.injectmaid.api.InjectorConfiguration;
+import de.quantummaid.mapmaid.builder.recipes.Recipe;
 
-import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
+import static de.quantummaid.httpmaid.chains.Configurator.configuratorForType;
 
 public final class UseCaseConfigurators {
 
     private UseCaseConfigurators() {
     }
 
-    public static Configurator toCreateUseCaseInstancesUsing(final UseCaseInstantiator useCaseInstantiator) {
-        validateNotNull(useCaseInstantiator, "useCaseInstantiator");
+    public static Configurator withMapperConfiguration(final Recipe recipe) {
         return dependencyRegistry -> {
             final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
-            useCasesModule.setUseCaseInstantiatorFactory(requiredTypes -> useCaseInstantiator);
+            useCasesModule.addMapperConfiguration(recipe);
+        };
+    }
+
+    public static Configurator toSetStatusCodeOnMapMaidValidationErrorsTo(final int statusCode) {
+        return configuratorForType(UseCasesModule.class, module -> module.setValidationErrorStatusCode(statusCode));
+    }
+
+    public static Configurator toNotCreateAnAutomaticResponseForMapMaidValidationErrors() {
+        return configuratorForType(UseCasesModule.class, UseCasesModule::doNotAddAggregatedExceptionHandler);
+    }
+
+    public static Configurator withGlobalScopedDependencies(final InjectorConfiguration configuration) {
+        return dependencyRegistry -> {
+            final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
+            useCasesModule.addGlobalScopedInjectorConfiguration(configuration);
+        };
+    }
+
+    public static Configurator withRequestScopedDependencies(final InjectorConfiguration configuration) {
+        return dependencyRegistry -> {
+            final UseCasesModule useCasesModule = dependencyRegistry.getDependency(UseCasesModule.class);
+            useCasesModule.addRequestScopedInjectorConfiguration(configuration);
         };
     }
 }

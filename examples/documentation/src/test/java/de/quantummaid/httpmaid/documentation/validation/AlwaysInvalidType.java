@@ -39,6 +39,7 @@ public final class AlwaysInvalidType {
     public static AlwaysInvalidType alwaysInvalidType(final String field1,
                                                       final String field2,
                                                       final String field3) {
+        System.out.println("abcdefg");
         throw someValidationException();
     }
 }

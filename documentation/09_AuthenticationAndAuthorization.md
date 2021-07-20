@@ -253,7 +253,7 @@ final HttpMaid httpMaid = anHttpMaid()
                 .orElse(false))
                 .onlyRequestsTo("/admin")
                 .rejectingUnauthorizedRequestsUsing((request, response) -> response.setBody("Please login as an administrator.")))
-        .configured(toConfigureMapMaidUsingRecipe(urlEncodedMarshaller()))
+        .configured(withMapperConfiguration(urlEncodedMarshaller()))
         .build();
 ```
 

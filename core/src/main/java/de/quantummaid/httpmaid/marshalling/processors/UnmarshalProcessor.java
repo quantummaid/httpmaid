@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import static de.quantummaid.httpmaid.HttpMaidChainKeys.*;
 import static de.quantummaid.httpmaid.handler.http.HttpRequest.httpRequest;
 import static de.quantummaid.httpmaid.marshalling.UnsupportedContentTypeException.unsupportedContentTypeException;
+import static de.quantummaid.httpmaid.util.Validators.validateNotNull;
 import static java.util.Objects.nonNull;
 
 @ToString
@@ -54,6 +55,8 @@ public final class UnmarshalProcessor implements Processor {
             final Unmarshallers unmarshallers,
             final boolean throwExceptionIfNoMarshallerFound,
             final DefaultContentTypeProvider defaultContentTypeProvider) {
+        validateNotNull(unmarshallers, "unmarshallers");
+        validateNotNull(defaultContentTypeProvider, "defaultContentTypeProvider");
         return new UnmarshalProcessor(
                 unmarshallers,
                 throwExceptionIfNoMarshallerFound,
@@ -88,7 +91,7 @@ public final class UnmarshalProcessor implements Processor {
 
     private Unmarshaller defaultUnmarshaller(final MetaData metaData) {
         final HttpRequest request = httpRequest(metaData);
-        final ContentType defaultContentType = this.defaultContentTypeProvider.provideDefaultContentType(request);
+        final ContentType defaultContentType = defaultContentTypeProvider.provideDefaultContentType(request);
         return unmarshallersMap.byContentType(defaultContentType);
     }
 }

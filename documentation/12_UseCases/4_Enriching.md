@@ -117,7 +117,7 @@ final HttpMaid httpMaid = anHttpMaid()
                 mappingQueryParameter("divisor", "divisionRequest.divisor")
         )
         .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+        .configured(withMapperConfiguration(mapMaidBuilder -> {
             mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
         }))
         .build();

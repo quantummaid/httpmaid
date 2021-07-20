@@ -52,7 +52,7 @@ You can try it out with the following curl command:
 
 <!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division1.curl)-->
 ```
-$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "3"}' http://localhost:1337/divide
+$ curl --request POST --header 'Content-Type: application/json' --data '{"divisionRequest": {"dividend": "12", "divisor": "3"}}' http://localhost:1337/divide
 ```
 
 The output will be the correct result to the division of 12 by 3:
@@ -65,7 +65,7 @@ Now, school taught every single one of us that there is one highly illegal thing
 Let's go:
 <!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
-$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+$ curl --request POST --header 'Content-Type: application/json' --data '{"divisionRequest": {"dividend": "12", "divisor": "0"}}' http://localhost:1337/divide
 ```
 
 Unlike us, Java actually respects the laws of math and we should see the following exception on the console:
@@ -116,7 +116,7 @@ Let's devide through zero again:
 
 <!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
-$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+$ curl --request POST --header 'Content-Type: application/json' --data '{"divisionRequest": {"dividend": "12", "divisor": "0"}}' http://localhost:1337/divide
 ```
 
 Now, we see an `UnrecognizedExceptionOccurredException` on the console. This is actually an exception of the MapMaid project,
@@ -135,7 +135,7 @@ final HttpMaid httpMaid = anHttpMaid()
         .post("/multiply", MultiplicationUseCase.class)
         .post("/divide", DivisionUseCase.class)
         .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
-        .configured(toConfigureMapMaidUsingRecipe(mapMaidBuilder -> {
+        .configured(withMapperConfiguration(mapMaidBuilder -> {
             mapMaidBuilder.withExceptionIndicatingValidationError(IllegalArgumentException.class);
         }))
         .build();
@@ -145,7 +145,7 @@ Now, when we devide by zero (again):
 
 <!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
-$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+$ curl --request POST --header 'Content-Type: application/json' --data '{"divisionRequest": {"dividend": "12", "divisor": "0"}}' http://localhost:1337/divide
 ```
 
 we actually get something meaningful out of it:
@@ -255,7 +255,7 @@ When you once again request the division by zero like this:
 
 <!---[CodeSnippet] (file=../../examples/documentation/src/test/resources/division2.curl)-->
 ```
-$ curl --request POST --header 'Content-Type: application/json' --data '{"dividend": "12", "divisor": "0"}' http://localhost:1337/divide
+$ curl --request POST --header 'Content-Type: application/json' --data '{"divisionRequest": {"dividend": "12", "divisor": "0"}}' http://localhost:1337/divide
 ```
 
 you will receive the following validation output:
@@ -273,10 +273,11 @@ HttpMaid to use another status code like this:
 <!---[CodeSnippet] (setValidationErrorStatusCode)-->
 ```java
 final HttpMaid httpMaid = anHttpMaid()
+        .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
         .post("/", SomeUseCase.class)
-        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+        .configured(withMapperConfiguration(mapMaidBuilder ->
                 mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
-        .configured(MapMaidConfigurators.toSetStatusCodeOnMapMaidValidationErrorsTo(401))
+        .configured(toSetStatusCodeOnMapMaidValidationErrorsTo(401))
         .build();
 ```
 
@@ -288,9 +289,10 @@ Example:
 ```java
 final HttpMaid httpMaid = anHttpMaid()
         .post("/", SomeUseCase.class)
-        .configured(MapMaidConfigurators.toConfigureMapMaidUsingRecipe(mapMaidBuilder ->
+        .configured(toMarshallContentType(json(), string -> GSON.fromJson(string, Map.class), GSON::toJson))
+        .configured(withMapperConfiguration(mapMaidBuilder ->
                 mapMaidBuilder.withExceptionIndicatingValidationError(SomeValidationException.class)))
-        .configured(MapMaidConfigurators.toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
+        .configured(toNotCreateAnAutomaticResponseForMapMaidValidationErrors())
         .configured(ExceptionConfigurators.toMapExceptionsOfType(AggregatedValidationException.class, (exception, request, response) -> {
             // handle validation errors here
         }))

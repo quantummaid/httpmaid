@@ -25,16 +25,14 @@ import de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironment;
 import de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass;
 import de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface;
 import de.quantummaid.httpmaid.tests.specs.usecase.usecases.FailInInitializerUseCase;
-import de.quantummaid.httpmaid.usecases.instantiation.ZeroArgumentsConstructorUseCaseInstantiatorException;
+import de.quantummaid.injectmaid.InjectMaidException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static de.quantummaid.httpmaid.HttpMaid.anHttpMaid;
 import static de.quantummaid.httpmaid.chains.Configurator.toUseModules;
-import static de.quantummaid.httpmaid.events.EventModule.eventModule;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsByDefaultUsing;
 import static de.quantummaid.httpmaid.exceptions.ExceptionConfigurators.toMapExceptionsOfType;
-import static de.quantummaid.httpmaid.mapmaid.MapMaidModule.mapMaidModule;
 import static de.quantummaid.httpmaid.tests.givenwhenthen.TestEnvironments.ALL_ENVIRONMENTS;
 import static de.quantummaid.httpmaid.usecases.UseCasesModule.useCasesModule;
 
@@ -47,11 +45,12 @@ public final class InstantiationSpecs {
                 () -> anHttpMaid()
                         .get("/", FailInInitializerUseCase.class)
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
+                        .configured(toUseModules(useCasesModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.usecases.FailInInitializerUseCase using zero argument constructor");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of 'FailInInitializerUseCase' " +
+                        "using constructor 'public de.quantummaid.httpmaid.tests.specs.usecase.usecases.FailInInitializerUseCase()'");
     }
 
     @ParameterizedTest
@@ -60,7 +59,7 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", FailInInitializerUseCase.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
+                        .configured(toMapExceptionsOfType(InjectMaidException.class,
                                 (exception, request, response) -> {
                                     response.setBody("The correct exception has been thrown");
                                     response.setStatus(505);
@@ -71,7 +70,7 @@ public final class InstantiationSpecs {
                         }))
                         .disableStartupChecks()
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
+                        .configured(toUseModules(useCasesModule()))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
@@ -97,18 +96,15 @@ public final class InstantiationSpecs {
     @MethodSource(ALL_ENVIRONMENTS)
     public void defaultInstantiatorFailsForInterfacesOnRuntime(final TestEnvironment testEnvironment) {
         testEnvironment.given(
-                anHttpMaid()
+                () -> anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, request, response) -> response.setBody(exception.getMessage())))
-                        .disableStartupChecks()
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
+                        .configured(toUseModules(useCasesModule()))
                         .build()
         )
-                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface using zero argument constructor: " +
-                        "must not be an interface");
+                .when().httpMaidIsInitialized()
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface:\n" +
+                        "unable to detect registered:");
     }
 
     @ParameterizedTest
@@ -117,15 +113,13 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .get("/", UseCaseThatIsAnInterface.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
+                        .configured(toUseModules(useCasesModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface using zero argument constructor: " +
-                        "must not be an interface");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnInterface:\n" +
+                        "unable to detect registered:");
     }
 
     @ParameterizedTest
@@ -134,16 +128,16 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
+                        .configured(toMapExceptionsOfType(InjectMaidException.class,
                                 (exception, request, response) -> response.setBody(exception.getMessage())))
-                        .disableStartupChecks()
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
+                        .disableStartupChecks()
+                        .configured(toUseModules(useCasesModule()))
                         .build()
         )
                 .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass using zero argument constructor: " +
-                        "must not be an abstract class");
+                .theResponseBodyWas("Exception during instantiation of 'UseCaseThatIsAnAbstractClass' using constructor " +
+                        "'public de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass()'");
     }
 
     @ParameterizedTest
@@ -152,14 +146,12 @@ public final class InstantiationSpecs {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
-                        .configured(toMapExceptionsOfType(ZeroArgumentsConstructorUseCaseInstantiatorException.class,
-                                (exception, request, response) -> response.setBody(exception.getMessage())))
                         .disableAutodectectionOfModules()
-                        .configured(toUseModules(eventModule(), useCasesModule(), mapMaidModule()))
+                        .configured(toUseModules(useCasesModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass using zero argument constructor: " +
-                        "must not be an abstract class");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of " +
+                        "'UseCaseThatIsAnAbstractClass' using constructor 'public de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass()'");
     }
 }
