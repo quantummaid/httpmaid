@@ -124,34 +124,16 @@ public final class InstantiationSpecs {
 
     @ParameterizedTest
     @MethodSource(ALL_ENVIRONMENTS)
-    public void defaultInstantiatorFailsForAbstractClassOnRuntime(final TestEnvironment testEnvironment) {
-        testEnvironment.given(
-                anHttpMaid()
-                        .get("/", UseCaseThatIsAnAbstractClass.class)
-                        .configured(toMapExceptionsOfType(InjectMaidException.class,
-                                (exception, request, response) -> response.setBody(exception.getMessage())))
-                        .disableAutodectectionOfModules()
-                        .disableStartupChecks()
-                        .configured(toUseModules(useCasesModule()))
-                        .build()
-        )
-                .when().aRequestToThePath("/").viaTheGetMethod().withAnEmptyBody().isIssued()
-                .theResponseBodyWas("Exception during instantiation of 'UseCaseThatIsAnAbstractClass' using constructor " +
-                        "'public de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass()'");
-    }
-
-    @ParameterizedTest
-    @MethodSource(ALL_ENVIRONMENTS)
     public void defaultInstantiatorFailsForAbstractClassOnStartup(final TestEnvironment testEnvironment) {
         testEnvironment.given(
                 () -> anHttpMaid()
                         .get("/", UseCaseThatIsAnAbstractClass.class)
                         .disableAutodectectionOfModules()
+                        .disableStartupChecks()
                         .configured(toUseModules(useCasesModule()))
                         .build()
         )
                 .when().httpMaidIsInitialized()
-                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("Exception during instantiation of " +
-                        "'UseCaseThatIsAnAbstractClass' using constructor 'public de.quantummaid.httpmaid.tests.specs.usecase.specialusecases.usecases.UseCaseThatIsAnAbstractClass()'");
+                .anExceptionHasBeenThrownDuringInitializationWithAMessageContaining("unable to detect");
     }
 }
