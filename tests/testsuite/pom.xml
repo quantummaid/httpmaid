@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.143</version>
+        <version>0.9.144</version>
     </parent>
 
     <artifactId>testsuite</artifactId>
@@ -121,7 +121,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.31</version>
+                <version>1.7.32</version>
             </dependency>
             <dependency>
                 <groupId>org.reactivestreams</groupId>
@@ -138,7 +138,7 @@
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.16.104</version>
+                <version>2.17.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -187,7 +187,7 @@
         <dependency>
             <groupId>de.quantummaid.mapmaid.integrations</groupId>
             <artifactId>mapmaid-minimal-json</artifactId>
-            <version>0.10.17</version>
+            <version>0.10.19</version>
         </dependency>
         <dependency>
             <groupId>de.quantummaid.httpmaid.tests</groupId>
@@ -238,7 +238,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.31</version>
+            <version>1.7.32</version>
             <scope>test</scope>
         </dependency>
 

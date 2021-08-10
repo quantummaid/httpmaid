@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.144](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.144/jar) - 2021-08-10
+### Changed
+- Update dependencies.
+
 ## [0.9.143](https://search.maven.org/artifact/de.quantummaid.httpmaid/core/0.9.143/jar) - 2021-07-20
 ### Changed
 - Update dependencies.
