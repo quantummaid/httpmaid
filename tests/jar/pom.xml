@@ -26,7 +26,7 @@
     <parent>
         <groupId>de.quantummaid.httpmaid.tests</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.143</version>
+        <version>0.9.144</version>
     </parent>
 
     <artifactId>testjar</artifactId>
@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.31</version>
+                <version>1.7.32</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -97,7 +97,7 @@
             <plugin>
                 <groupId>org.graalvm.nativeimage</groupId>
                 <artifactId>native-image-maven-plugin</artifactId>
-                <version>21.1.0</version>
+                <version>21.2.0</version>
                 <executions>
                     <execution>
                         <goals>
